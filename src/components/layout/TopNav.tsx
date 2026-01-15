@@ -19,7 +19,7 @@ export function TopNav() {
       <div className="flex h-full items-center justify-between px-6">
         {/* Left: Logo */}
         <div className="flex items-center gap-8">
-          <a href="/dashboard" className="flex items-center gap-2">
+          <a href="/jewett-junction/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded bg-[--brand-secondary] text-white font-bold text-sm">
               JJ
             </div>
@@ -30,33 +30,33 @@ export function TopNav() {
 
           {/* Main Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink href="/dashboard" active>Dashboard</NavLink>
+            <NavLink href="/jewett-junction/dashboard" active>Dashboard</NavLink>
             <NavDropdown label="Resources">
               <DropdownMenuItem asChild>
-                <a href="/safety">Safety</a>
+                <a href="/jewett-junction/safety">Safety</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/hr">HR</a>
+                <a href="/jewett-junction/hr">HR</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/it-helpdesk">IT Helpdesk</a>
+                <a href="/jewett-junction/it-helpdesk">IT Helpdesk</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/marketing">Marketing</a>
+                <a href="/jewett-junction/marketing">Marketing</a>
               </DropdownMenuItem>
             </NavDropdown>
             <NavDropdown label="Community">
               <DropdownMenuItem asChild>
-                <a href="/culture">Culture</a>
+                <a href="/jewett-junction/culture">Culture</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/events">Events</a>
+                <a href="/jewett-junction/events">Events</a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/directory">Directory</a>
+                <a href="/jewett-junction/directory">Directory</a>
               </DropdownMenuItem>
             </NavDropdown>
-            <NavLink href="/careers">
+            <NavLink href="/jewett-junction/careers">
               Careers
               <Badge className="ml-1.5 bg-[--brand-primary] text-gray-900 text-[10px] px-1.5 py-0">
                 3
