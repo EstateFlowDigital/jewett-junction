@@ -1,0 +1,72 @@
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.u-gap-large {
+  grid-column-gap: var(--space--large);
+  grid-row-gap: var(--space--large);
+}
+
+.awards_visuals_wrap {
+  position: relative;
+
+  display: flex;
+  overflow: visible;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: 5rem;
+  grid-row-gap: 5rem;
+}
+
+.awards_visuals_layout {
+  display: flex;
+}
+
+.awards_visuals_track {
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+
+  animation-name: awards_visuals_timeline;
+  animation-duration: 40s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+  animation-direction: normal;
+  will-change: transform;
+}
+
+.awards_visuals_track.is-reversed {
+  animation-direction: reverse;
+}
+
+.awards_visuals_cms_wrap {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.awards_visuals_cms_list {
+  display: flex;
+  min-width: 100vw;
+  justify-content: space-around;
+  flex: 0 0 auto;
+}
+
+.awards_visuals_embed {
+  display: none;
+}

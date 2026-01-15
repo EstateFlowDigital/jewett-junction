@@ -1,0 +1,10 @@
+.u-text-large {
+  font-family: var(--text-large--font-family);
+  font-size: var(--text-large--font-size);
+  line-height: var(--text-large--line-height);
+  letter-spacing: var(--text-large--letter-spacing);
+  font-weight: var(--text-large--font-weight);
+  text-transform: var(--text-large--text-transform);
+
+  text-wrap: pretty;
+}

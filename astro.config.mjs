@@ -7,7 +7,7 @@ export default defineConfig({
   // Update this to your Webflow Cloud URL when deployed
   site: process.env.SITE_URL || 'http://localhost:4321',
   // Note: base is NOT set because Webflow Cloud handles the mount path
-  // All links in pages are hardcoded with /jewett-junction/ prefix
+  // Links should NOT include /jewett-junction/ prefix - Webflow Cloud adds it automatically
   output: 'server',
   adapter: cloudflare({
     platformProxy: {

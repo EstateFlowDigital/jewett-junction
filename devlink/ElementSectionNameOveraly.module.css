@@ -1,0 +1,28 @@
+.wireframe_heading {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: auto;
+  z-index: 50;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.wireframe_heading.u-text-display {
+  opacity: 0.5;
+  font-size: 7rem;
+}
+
+.u-text-display {
+  font-family: var(--display--font-family);
+  font-size: var(--display--font-size);
+  line-height: var(--display--line-height);
+  letter-spacing: var(--display--letter-spacing);
+  font-weight: var(--display--font-weight);
+  text-transform: var(--display--text-transform);
+
+  text-wrap: balance;
+}

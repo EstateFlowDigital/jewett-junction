@@ -1,0 +1,32 @@
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.our_work_gallery_list {
+  column-width: 24rem;
+}
+
+@media screen and (max-width: 991px) {
+  .our_work_gallery_list {
+    column-width: 20rem;
+  }
+}
+
+.our_work_gallery_list.u-grid-autofit {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}

@@ -1,0 +1,164 @@
+.g_eyebrow_wrap {
+  padding-top: var(--size--0-25rem);
+  padding-right: var(--size--0-75rem);
+  padding-bottom: var(--size--0-25rem);
+  padding-left: var(--size--0-25rem);
+
+  border-top-style: solid;
+  border-top-width: var(--border-width--main);
+  border-top-color: var(--swatch--brand);
+  border-right-style: solid;
+  border-right-width: var(--border-width--main);
+  border-right-color: var(--swatch--brand);
+  border-bottom-style: solid;
+  border-bottom-width: var(--border-width--main);
+  border-bottom-color: var(--swatch--brand);
+  border-left-style: solid;
+  border-left-width: var(--border-width--main);
+  border-left-color: var(--swatch--brand);
+  border-top-left-radius: var(--radius--outer-radius);
+  border-top-right-radius: var(--radius--outer-radius);
+  border-bottom-left-radius: var(--radius--outer-radius);
+  border-bottom-right-radius: var(--radius--outer-radius);
+
+  font-size: var(--text-small--font-size);
+
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.u-gap-xsmall {
+  grid-column-gap: var(--space--extra-small);
+  grid-row-gap: var(--space--extra-small);
+}
+
+.u-hflex-left-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.g_eyebrow_wrap.u-hflex-left-center {
+  line-height: var(--line-height--1-3em);
+}
+
+@media screen and (max-width: 479px) {
+  .g_eyebrow_wrap.u-hflex-left-center {
+    font-size: var(--size--0-75rem);
+    line-height: var(--line-height--1-3em);
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .g_eyebrow_wrap.u-hflex-left-center.u-gap-small {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.eyebrow_featured_text {
+  padding: var(--size--0-25rem) var(--size--0-5rem);
+  align-self: stretch;
+  flex: 0 0 auto;
+  background-color: var(--swatch--brand);
+  line-height: var(--line-height--1-3em);
+}
+
+.eyebrow_featured_text.u-button-style {
+  border-radius: var(--radius--main);
+}
+
+.u-button-style {
+  position: relative;
+  border: var(--border-width--main) solid var(--button--border);
+  background-color: var(--button--background);
+  transition: border-radius 400ms ease-in-out,border-color 400ms ease-in-out,color 400ms ease-in-out,background-color 400ms ease-in-out;
+  color: var(--button--text);
+}
+
+.u-button-style:hover {
+  border-color: var(--button--border-hover);
+  background-color: var(--button--background-hover);
+  color: var(--button--text-hover);
+}
+
+.u-button-style:active {
+  transform: scale(0.99);
+}
+
+.u-text-small {
+  font-family: var(--text-small--font-family);
+  font-size: var(--text-small--font-size);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
+  font-weight: var(--text-small--font-weight);
+  text-transform: var(--text-small--text-transform);
+
+  text-wrap: pretty;
+}
+
+.u-hflex-center-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.eyebrow_featured_text.u-button-style.u-text-small.u-hflex-center-center.u-gap-xsmall.u-weight-bold:hover {
+  border-color: var(--swatch--brand);
+  background-color: var(--button--background);
+}
+
+@media screen and (max-width: 479px) {
+  .eyebrow_featured_text.u-button-style.u-text-small.u-hflex-center-center.u-gap-xsmall.u-weight-bold {
+    font-size: var(--size--0-75rem);
+  }
+}
+
+.u-weight-bold {
+  font-weight: var(--font--primary-bold);
+}
+
+.eyebrow_icon_wrap {
+  position: relative;
+  width: var(--size--1-25rem);
+  height: var(--size--1-25rem);
+  flex: 0 0 auto;
+}
+
+.g_eyebrow_text {
+  margin-left: var(--space--small);
+}
+
+.u-text-main {
+  font-family: var(--text-main--font-family);
+  font-size: var(--text-main--font-size);
+  line-height: var(--text-main--line-height);
+  letter-spacing: var(--text-main--letter-spacing);
+  font-weight: var(--text-main--font-weight);
+  text-transform: var(--text-main--text-transform);
+
+  text-wrap: pretty;
+}
+
+.u-text-h6 {
+  font-family: var(--h6--font-family);
+  font-size: var(--h6--font-size);
+  line-height: var(--h6--line-height);
+  letter-spacing: var(--h6--letter-spacing);
+  font-weight: var(--h6--font-weight);
+  text-transform: var(--h6--text-transform);
+
+  text-wrap: balance;
+}

@@ -1,0 +1,5 @@
+.horizontal_line_divider {
+  width: 100%;
+  height: var(--border-width--main);
+  background-color: var(--theme--border);
+}

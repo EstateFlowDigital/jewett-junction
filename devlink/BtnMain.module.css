@@ -1,0 +1,200 @@
+.btn_main_wrap {
+  display: flex;
+  overflow: hidden;
+  min-height: var(--size--3-5rem);
+  padding: var(--size--0-75rem) var(--size--1-5rem);
+  justify-content: center;
+  align-items: center;
+
+  line-height: 1;
+
+  cursor: crosshair;
+}
+
+.u-radius-round {
+  border-radius: var(--radius--round);
+}
+
+.u-button-style {
+  position: relative;
+  border: var(--border-width--main) solid var(--button--border);
+  background-color: var(--button--background);
+  transition: border-radius 400ms ease-in-out,border-color 400ms ease-in-out,color 400ms ease-in-out,background-color 400ms ease-in-out;
+  color: var(--button--text);
+}
+
+.u-button-style:hover {
+  border-color: var(--button--border-hover);
+  background-color: var(--button--background-hover);
+  color: var(--button--text-hover);
+}
+
+.u-button-style:active {
+  transform: scale(0.99);
+}
+
+.u-position-relative {
+  position: relative;
+}
+
+.u-display-inline-block {
+  display: inline-block;
+}
+
+.u-radius-main {
+  border-radius: var(--radius--main);
+}
+
+.btn_main_wrap.u-button-style.u-radius-main.u-position-relative.u-display-inline-block {
+  text-align: center;
+}
+
+.btn_main_wrap.u-button-style.u-position-relative.u-display-inline-block {
+  text-align: center;
+}
+
+.u-text-transform-uppercase {
+  text-transform: uppercase;
+}
+
+.btn_main_wrap.u-button-style.u-position-relative.u-display-inline-block.u-text-transform-uppercase.u-weight-bold:hover {
+  border-color: var(--swatch--brand);
+  background-color: var(--button--background);
+}
+
+.u-weight-bold {
+  font-weight: var(--font--primary-bold);
+}
+
+.u-text-small {
+  font-family: var(--text-small--font-family);
+  font-size: var(--text-small--font-size);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
+  font-weight: var(--text-small--font-weight);
+  text-transform: var(--text-small--text-transform);
+
+  text-wrap: pretty;
+}
+
+.btn_main_wrap.u-button-style.u-position-relative.u-display-inline-block.is-small {
+  padding: var(--size--0-5rem) var(--size--1rem);
+}
+
+.button-block-25 {
+  position: relative;
+
+  display: flex;
+  overflow: hidden;
+  min-height: 3rem;
+  padding: 0.5rem 1.5rem;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  grid-column-gap: 0.5rem;
+  grid-row-gap: 0.5rem;
+
+  border-style: solid;
+  border-width: 1px;
+  border-color: hsla(0, 0.00%, 94.00%, 0.20);
+  border-radius: 100vw;
+
+  color: hsla(0, 0.00%, 94.00%, 1.00);
+  text-decoration: none;
+}
+
+.btn_scale {
+  transition: all 300ms ease-in-out;
+}
+
+.btn_scale:hover {
+  transform: scale(1.05);
+}
+
+.btn_scale:active {
+  transform: scale(0.95);
+}
+
+.btn_main_wrap.btn_scale.is-submit {
+  position: relative;
+
+  padding-right: 3.5rem;
+
+  background-image: url("https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/67a464bc7184fcb8aacb0f25_svgviewer-output%20(22).svg");
+  background-position: 92% 50%;
+  background-size: 2rem 2rem;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+.btn_main_wrap.btn_scale.is-submit:hover {
+  background-color: hsla(0, 0.00%, 100.00%, 0.00);
+  color: white;
+}
+
+.btn_main_layout {
+  min-height: var(--size--2rem);
+  margin-right: auto;
+  margin-left: auto;
+  flex: 1;
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.u-hflex-between-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.btn_text_wrap {
+  text-align: left;
+}
+
+.u-vflex-left-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.btn_text_wrap.u-vflex-left-center.u-gap-xsmall {
+  grid-column-gap: var(--size--0-125rem);
+  grid-row-gap: var(--size--0-125rem);
+}
+
+.u-gap-xsmall {
+  grid-column-gap: var(--space--extra-small);
+  grid-row-gap: var(--space--extra-small);
+}
+
+.btn_main_text {
+  position: relative;
+  z-index: 2;
+}
+
+.btn_main_text.u-weight-bold {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 479px) {
+  .btn_main_text.u-weight-bold {
+    white-space: normal;
+  }
+}
+
+.btn_icon_wrap {
+  position: relative;
+  width: var(--size--2rem);
+  height: var(--size--2rem);
+  margin-right: -0.5rem;
+  flex: 0 0 auto;
+}

@@ -1,0 +1,88 @@
+.nav_dropdown_link_heading {
+  width: 100%;
+  margin-bottom: var(--size--0-5rem);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: var(--border-width--main) solid var(--theme--border);
+}
+
+.nav_dropdown_link_heading:hover {
+  color: var(--swatch--brand);
+}
+
+.u-text-large {
+  font-family: var(--text-large--font-family);
+  font-size: var(--text-large--font-size);
+  line-height: var(--text-large--line-height);
+  letter-spacing: var(--text-large--letter-spacing);
+  font-weight: var(--text-large--font-weight);
+  text-transform: var(--text-large--text-transform);
+
+  text-wrap: pretty;
+}
+
+.u-hflex-between-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.u-gap-xsmall {
+  grid-column-gap: var(--space--extra-small);
+  grid-row-gap: var(--space--extra-small);
+}
+
+.u-weight-bold {
+  font-weight: var(--font--primary-bold);
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.u-hflex-right-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.u-text-small {
+  font-family: var(--text-small--font-family);
+  font-size: var(--text-small--font-size);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
+  font-weight: var(--text-small--font-weight);
+  text-transform: var(--text-small--text-transform);
+
+  text-wrap: pretty;
+}
+
+.u-text-main {
+  font-family: var(--text-main--font-family);
+  font-size: var(--text-main--font-size);
+  line-height: var(--text-main--line-height);
+  letter-spacing: var(--text-main--letter-spacing);
+  font-weight: var(--text-main--font-weight);
+  text-transform: var(--text-main--text-transform);
+
+  text-wrap: pretty;
+}
+
+.tab_icon_wrap {
+  position: relative;
+  width: var(--size--1-5rem);
+  height: var(--size--1-5rem);
+  flex: 0 0 auto;
+}
+
+.tab_icon_wrap.is-smaller {
+  width: var(--size--1rem);
+  height: var(--size--1rem);
+}

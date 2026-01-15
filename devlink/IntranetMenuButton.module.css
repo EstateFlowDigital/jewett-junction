@@ -1,0 +1,35 @@
+.menu_open_button {
+  position: fixed;
+  left: var(--size--0-5rem);
+  top: var(--size--1-5rem);
+  z-index: 1;
+
+  width: var(--size--4rem);
+
+  border-radius: var(--radius--small);
+
+  background-color: var(--theme--text);
+
+  color: var(--theme--border);
+  text-align: center;
+
+  cursor: pointer;
+}
+
+.menu_open_icon_wrap {
+  position: relative;
+  height: var(--size--2rem);
+  transform: rotateX(0deg) rotateY(180deg) rotateZ(0deg);
+  transform-style: preserve-3d;
+}
+
+.u-text-small {
+  font-family: var(--text-small--font-family);
+  font-size: var(--text-small--font-size);
+  line-height: var(--text-small--line-height);
+  letter-spacing: var(--text-small--letter-spacing);
+  font-weight: var(--text-small--font-weight);
+  text-transform: var(--text-small--text-transform);
+
+  text-wrap: pretty;
+}

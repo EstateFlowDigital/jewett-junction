@@ -1,0 +1,29 @@
+.our_work_gallery_item {
+  margin-bottom: var(--size--1-5rem);
+  break-inside: avoid;
+}
+
+.our_work_gallery_item.u-visual-wrap {
+  min-height: 15rem;
+  aspect-ratio: auto;
+}
+
+.u-visual-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius--main);
+}
+
+.our_work_gallery_item.u-visual-wrap.is-1 {
+  padding-top: 40rem;
+}
+
+.our_work_gallery_item.u-visual-wrap.is-2 {
+  padding-top: 17rem;
+}
+
+.our_work_gallery_item.u-visual-wrap.is-3 {
+  padding-top: 8.83rem;
+}

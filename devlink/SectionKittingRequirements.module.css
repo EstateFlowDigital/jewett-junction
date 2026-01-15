@@ -1,0 +1,115 @@
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-left-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.u-gap-medium {
+  grid-column-gap: var(--space--medium);
+  grid-row-gap: var(--space--medium);
+}
+
+.u-grid-column-2 {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: var(--grid-2);
+}
+
+@media screen and (max-width: 767px) {
+  .u-grid-column-2 {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+.kitting_contain.u-container.u-grid-column-2.u-gap-large {
+  align-items: start;
+}
+
+@media screen and (max-width: 991px) {
+  .kitting_contain.u-container.u-grid-column-2.u-gap-large {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+.u-gap-large {
+  grid-column-gap: var(--space--large);
+  grid-row-gap: var(--space--large);
+}
+
+@media screen and (max-width: 991px) {
+  .kitting_contain.u-container.u-grid-column-2.u-gap-large.is-revered {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.kitting_details_wrap {
+  background-color: var(--swatch--transparent);
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.kitting_details_wrap.u-grid-autofit {
+  background-color: var(--swatch--transparent);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+@media screen and (max-width: 991px) {
+  .kitting_details_wrap.u-grid-autofit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  }
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.kitting_content.u-position-sticky {
+  top: 7rem;
+}
+
+@media screen and (max-width: 991px) {
+  .kitting_content.u-position-sticky {
+    position: static;
+  }
+}
+
+.u-position-sticky {
+  position: sticky;
+  top: 0px;
+}

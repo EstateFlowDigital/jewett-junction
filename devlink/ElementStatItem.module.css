@@ -1,0 +1,18 @@
+.u-text-display {
+  font-family: var(--display--font-family);
+  font-size: var(--display--font-size);
+  line-height: var(--display--line-height);
+  letter-spacing: var(--display--letter-spacing);
+  font-weight: var(--display--font-weight);
+  text-transform: var(--display--text-transform);
+
+  text-wrap: balance;
+}
+
+.u-weight-bold {
+  font-weight: var(--font--primary-bold);
+}
+
+.u-text-transform-uppercase {
+  text-transform: uppercase;
+}

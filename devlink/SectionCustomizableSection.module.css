@@ -1,0 +1,80 @@
+.g_visual_wrap {
+  object-position: inherit;
+}
+
+.g_visual_wrap.u-cover-absolute {
+  object-fit: cover;
+}
+
+.u-cover-absolute {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+
+  width: 100%;
+  height: 100%;
+}
+
+.g_visual_wrap.u-visual-wrap {
+  min-height: 20rem;
+  aspect-ratio: auto;
+}
+
+.g_visual_wrap.u-visual-wrap:where(.w-variant-8ae56eea-3a0b-6562-4559-93679cd03722) {
+  aspect-ratio: 3/2;
+}
+
+.g_visual_wrap.u-visual-wrap:where(.w-variant-23b4ddba-80e6-7927-a5d7-8566d9f517c5) {
+  aspect-ratio: 16/9;
+}
+
+.g_visual_wrap.u-visual-wrap:where(.w-variant-12e825c2-2861-8231-73a4-9141f85d6ade) {
+  aspect-ratio: 2/3;
+}
+
+.g_visual_wrap.u-visual-wrap:where(.w-variant-aa560c33-2d9e-2205-5a0b-28f79fbe16dd) {
+  aspect-ratio: 1/1;
+}
+
+.u-visual-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius--main);
+}
+
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.customizable_section_layout {
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}

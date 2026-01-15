@@ -1,0 +1,83 @@
+.circuit_connection_wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-items: center;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+}
+
+.circuit_connection_circle {
+  width: var(--size--4rem);
+  height: var(--size--4rem);
+  flex: 0 0 auto;
+  color: var(--swatch--brand);
+}
+
+.circuit_connection_circle.top {
+  position: sticky;
+  top: 7rem;
+  z-index: 2;
+
+  margin-top: var(--size--1rem);
+  padding-top: var(--space--medium);
+  padding-bottom: var(--space--medium);
+
+  background-color: var(--theme--background);
+}
+
+.circuit_connection_circle.bottom {
+  position: relative;
+  z-index: 3;
+
+  width: var(--size--3-5rem);
+  height: var(--size--3-5rem);
+
+  border-style: none solid solid;
+  border-width: 6px;
+  border-color: var(--button--background);
+}
+
+.circuit_connection_circle.bottom.white {
+  background-color: var(--theme--background);
+}
+
+.circuit_connection_line {
+  position: absolute;
+  left: auto;
+  top: 0%;
+  right: auto;
+  bottom: 0%;
+  z-index: 0;
+
+  width: 5px;
+  height: 98.5%;
+
+  background-color: var(--button--background);
+}
+
+@media screen and (max-width: 767px) {
+  .circuit_connection_line {
+    height: 99%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .circuit_connection_line {
+    height: 99.25%;
+  }
+}
+
+.circuit_connection_line.is-top {
+  position: absolute;
+  width: 75vw;
+  height: 10px;
+}
+
+@media screen and (max-width: 991px) {
+  .circuit_connection_line.is-top {
+    width: 115vw;
+  }
+}

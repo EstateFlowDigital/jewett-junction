@@ -1,0 +1,83 @@
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.logos_wrap {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: 5rem;
+  grid-row-gap: 5rem;
+}
+
+.logos_layout {
+  display: flex;
+}
+
+.logos_track {
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+
+  color: var(--theme--text);
+
+  animation-name: logos_timeline;
+  animation-duration: 40s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+  animation-direction: normal;
+  will-change: transform;
+}
+
+.logos_track._2 {
+  animation-direction: reverse;
+}
+
+.logos_cms_wrap {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.u-text-h4 {
+  font-family: var(--h4--font-family);
+  font-size: var(--h4--font-size);
+  line-height: var(--h4--line-height);
+  letter-spacing: var(--h4--letter-spacing);
+  font-weight: var(--h4--font-weight);
+  text-transform: var(--h4--text-transform);
+
+  text-wrap: balance;
+}
+
+.logos_cms_list {
+  display: flex;
+  min-width: 100vw;
+  justify-content: space-around;
+}
+
+.logos_embed {
+  display: none;
+}

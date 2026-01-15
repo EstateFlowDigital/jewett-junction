@@ -1,0 +1,22 @@
+.intranet_content_full_wrap {
+  overflow: auto;
+  max-height: 100vh;
+  flex: 1;
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.intranet_content_full_wrap.u-vflex-stretch-top.u-gap-medium {
+  flex: 1;
+}
+
+.u-gap-medium {
+  grid-column-gap: var(--space--medium);
+  grid-row-gap: var(--space--medium);
+}

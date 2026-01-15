@@ -56,7 +56,7 @@ export function UpcomingEvents() {
           <Calendar className="h-5 w-5 text-primary" />
           Upcoming Events
         </CardTitle>
-        <a href="/jewett-junction/events">
+        <a href="/events">
           <Button variant="ghost" size="sm" className="text-primary">
             View All
             <ChevronRight className="h-4 w-4 ml-1" />

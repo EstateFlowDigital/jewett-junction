@@ -1,0 +1,7 @@
+.g_heading_rich {
+  line-height: var(--line-height--1-3em);
+}
+
+.g_heading_rich p {
+  position: relative;
+}

@@ -1,0 +1,5 @@
+.why_us_subitem_bg {
+  padding: var(--size--0-5rem);
+  border-radius: var(--size--0-5rem);
+  background-color: var(--swatch--light);
+}

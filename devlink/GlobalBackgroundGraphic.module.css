@@ -1,0 +1,67 @@
+.background_graphic_wrap {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+  z-index: -1;
+}
+
+.right_background_graphic {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+  z-index: -1;
+
+  width: 100%;
+  height: 100%;
+
+  background-image: url("https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/67a464bc7184fcb8aacb0f24_Right.svg");
+  background-position: 100% 0%;
+  background-size: contain;
+  background-repeat: repeat-y;
+  background-attachment: fixed;
+
+  opacity: 0.06;
+}
+
+.left_background_graphic {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+  z-index: -1;
+
+  width: 100%;
+  height: 100%;
+
+  background-image: url("https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/67a464bc7184fcb8aacb0f23_Left.svg");
+  background-size: contain;
+  background-repeat: repeat-y;
+  background-attachment: fixed;
+
+  opacity: 0.06;
+}
+
+.top_background_graphic {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+  z-index: -1;
+
+  width: 100%;
+  height: 100%;
+
+  background-image: url("https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/67a464bc7184fcb8aacb0f26_Top.svg");
+  background-position: 50% 0%;
+  background-size: contain;
+  background-repeat: repeat-x;
+  background-attachment: scroll;
+
+  opacity: 0.05;
+}

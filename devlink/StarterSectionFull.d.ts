@@ -1,0 +1,31 @@
+import * as React from "react";
+import * as Types from "./types";
+
+declare function StarterSectionFull(props: {
+  as?: React.ElementType;
+  stylesTheme?: Types.Builtin.Text;
+  stylesPaddingTop?: Types.Builtin.Text;
+  stylesPaddingBottom?: Types.Builtin.Text;
+  eyebrowEyebrowVisibility?: Types.Visibility.VisibilityConditions;
+  eyebrowEyebrowText?: Types.Basic.RichTextChildren;
+  eyebrowEyebrowMaxWidth?: Types.Builtin.Text;
+  headingHeadingVisibility?: Types.Visibility.VisibilityConditions;
+  headingHeadingText?: Types.Basic.RichTextChildren;
+  headingHeadingMaxWidth?: Types.Builtin.Text;
+  paragraphParagraphVisibility?: Types.Visibility.VisibilityConditions;
+  paragraphParagraphText?: Types.Basic.RichTextChildren;
+  paragraphParagraphMaxWidth?: Types.Builtin.Text;
+  buttonGroupButtonGroupVisibility?: Types.Visibility.VisibilityConditions;
+  button1Button1Visibility?: Types.Visibility.VisibilityConditions;
+  button1Button1Text?: React.ReactNode;
+  button1Button1Link?: Types.Basic.Link;
+  button2Button2Visibility?: Types.Visibility.VisibilityConditions;
+  button2Button2Text?: React.ReactNode;
+  button2Button2Link?: Types.Basic.Link;
+  mainVisualMainImageVisibility?: Types.Visibility.VisibilityConditions;
+  mainVisualMainImageFile?: Types.Asset.Image;
+  mainVisualMainImageAltText?: Types.Basic.AltText;
+  mainVisualMainImageLoading?: Types.Builtin.Text;
+  mainVisualMainVideoVisibility?: Types.Visibility.VisibilityConditions;
+  mainVisualMainVideoUrl?: Types.Builtin.Text;
+}): React.JSX.Element;

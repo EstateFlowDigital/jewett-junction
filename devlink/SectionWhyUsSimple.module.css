@@ -1,0 +1,120 @@
+.why_us_contain {
+  position: static;
+}
+
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-center-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.u-gap-medium {
+  grid-column-gap: var(--space--medium);
+  grid-row-gap: var(--space--medium);
+}
+
+.why_us_item_layout {
+  width: 100%;
+  border-radius: var(--size--2rem);
+}
+
+.why_us_item_layout.u-radius-main {
+  background-color: var(--swatch--brand-secondary);
+}
+
+@media screen and (min-width: 1440px) {
+  .why_us_item_layout.u-radius-main {
+    background-color: var(--swatch--brand-secondary);
+  }
+}
+
+.u-radius-main {
+  border-radius: var(--radius--main);
+}
+
+.u-hflex-center-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.why_us_item_layout.u-hflex-center-center.u-gap-xsmall {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.u-gap-xsmall {
+  grid-column-gap: var(--space--extra-small);
+  grid-row-gap: var(--space--extra-small);
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.u-grid-column-2 {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: var(--grid-2);
+}
+
+@media screen and (max-width: 767px) {
+  .u-grid-column-2 {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .why_us_item_layout.u-grid-column-2.u-width-full {
+    grid-template-columns: var(--grid-2);
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .why_us_item_layout.u-grid-column-2.u-width-full {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+.u-width-full {
+  width: 100%;
+}
+
+.u-height-full {
+  height: 100%;
+}
+
+.why_us_item_layout.u-grid-autofit {
+  margin-right: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  max-width: calc(4 * 11rem);
+}
+
+#w-node-ce5db733-2572-74ee-c9e2-37b8d65fcb19-d65fcb17 {
+  align-self: center;
+  justify-self: center;
+}

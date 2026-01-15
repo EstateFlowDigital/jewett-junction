@@ -4,6 +4,7 @@ import '../../../../generated/webflow.css';
 import '../../../site-components/global.css';
 import '../../../styles/global.css';
 import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
+import { MobileNav } from '../../../components/layout/MobileNav';
 ---
 
 <html lang="en">
@@ -14,9 +15,11 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
     <title>Patriotic Dashboard | Jewett Junction</title>
     <style>
       .card-hover:hover { transform: translateY(-2px); }
+      @media (max-width: 767px) { .mobile-safe-area { padding-top: 4.5rem; } }
     </style>
   </head>
   <body class="bg-slate-50 min-h-screen">
+    <MobileNav client:load currentTheme="patriotic" currentPath="/jewett-junction/dashboard" />
     <!-- Top Header -->
     <header class="bg-blue-950 h-16 fixed top-0 left-0 right-0 z-50">
       <div class="h-full flex items-center justify-between px-6">
@@ -54,9 +57,9 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
 
     <!-- Main -->
     <main class="pt-20 min-h-screen">
-      <div class="p-6 md:p-8 lg:p-10">
+      <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
         <!-- Back Link -->
-        <a href="/jewett-junction/preview" class="inline-flex items-center gap-2 text-sm text-blue-800 hover:text-blue-900 mb-6 group">
+        <a href="/jewett-junction" class="inline-flex items-center gap-2 text-sm text-blue-800 hover:text-blue-900 mb-6 group">
           <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -68,13 +71,13 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
           <div class="absolute right-0 top-0 bottom-0 w-40 bg-red-600"></div>
           <div class="absolute right-36 top-0 bottom-0 w-4 bg-white"></div>
           <div class="relative z-10">
-            <h1 class="text-3xl font-bold mb-2">Welcome to Jewett Junction</h1>
-            <p class="text-blue-200 text-lg">Your central hub for company news, resources, and team updates.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2">Welcome to Jewett Junction</h1>
+            <p class="text-blue-200 text-sm sm:text-base">Your central hub for company news, resources, and team updates.</p>
           </div>
         </div>
 
         <!-- Bento Stats Grid -->
-        <div class="grid grid-cols-12 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
           <!-- Safety - Large Card -->
           <div class="col-span-12 md:col-span-5 bg-white rounded-2xl p-6 border-l-4 border-blue-950 shadow-sm card-hover transition-transform">
             <div class="flex items-start justify-between mb-4">
@@ -152,8 +155,8 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
                 <span class="px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded-full">Featured</span>
                 <span class="text-blue-300 text-sm">January 14, 2026</span>
               </div>
-              <h3 class="text-xl font-bold text-white mb-2">Q4 2025 Results: Record-Breaking Year!</h3>
-              <p class="text-blue-200 text-sm">We're proud to announce that Jewett Construction achieved record revenue in 2025, completing 48 major projects across all divisions. Thank you to every team member for your dedication!</p>
+              <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Q4 2025 Results: Record-Breaking Year!</h3>
+              <p class="text-blue-200 text-xs sm:text-sm">We're proud to announce that Jewett Construction achieved record revenue in 2025, completing 48 major projects across all divisions. Thank you to every team member for your dedication!</p>
             </div>
             <button class="px-5 py-2.5 bg-white text-blue-950 rounded-xl text-sm font-semibold hover:bg-blue-50 transition-colors shadow-md flex-shrink-0">
               Read More

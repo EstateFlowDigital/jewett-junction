@@ -1,0 +1,229 @@
+.u-width-full {
+  width: 100%;
+}
+
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-center-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+.u-gap-medium {
+  grid-column-gap: var(--space--medium);
+  grid-row-gap: var(--space--medium);
+}
+
+.u-vflex-center-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}
+
+@media screen and (max-width: 767px) {
+  .portfolio_layout.u-vflex-center-top.u-gap-large {
+    padding-right: var(--size--2-5rem);
+    padding-left: var(--size--5rem);
+  }
+}
+
+.u-gap-large {
+  grid-column-gap: var(--space--large);
+  grid-row-gap: var(--space--large);
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.u-position-relative {
+  position: relative;
+}
+
+.portfolio_layout.swiper-container.u-position-relative.u-width-full {
+  height: 50rem;
+}
+
+.u-vflex-stretch-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.u-hflex-left-stretch {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: stretch;
+}
+
+.u-gap-main {
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+}
+
+.portfolio-slider_wrap {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  grid-column-gap: 3rem;
+  grid-row-gap: 3rem;
+}
+
+.portfolio-slider_trim {
+  margin-right: -0.6rem;
+  margin-left: -0.6rem;
+}
+
+.portfolio-slider_cms_wrap.swiper {
+  position: relative;
+  overflow: visible;
+}
+
+.portfolio-slider_cms_list.swiper-wrapper {
+  display: flex;
+}
+
+.portfolio-slider_cms_item {
+  position: relative;
+}
+
+.portfolio-slider_cms_item.swiper-slide {
+  width: 35%;
+  padding-right: 0.6rem;
+  padding-left: 0.6rem;
+  flex: 0 0 auto;
+
+  background-color: var(--swatch--transparent);
+
+  opacity: 0.3;
+}
+
+@media screen and (max-width: 991px) {
+  .portfolio-slider_cms_item.swiper-slide {
+    width: 33.33%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .portfolio-slider_cms_item.swiper-slide {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .portfolio-slider_cms_item.swiper-slide {
+    width: 90%;
+  }
+}
+
+.swiper-slide {
+  width: 100%;
+}
+
+.portfolio-slider_cms_item.swiper-slide.is-active {
+  width: 50%;
+  opacity: 100;
+  cursor: auto;
+}
+
+.u-vflex-stretch-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.portfolio-slider_layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  grid-column-gap: 2rem;
+  grid-row-gap: 2rem;
+}
+
+.portfolio-slider_draggable_wrap {
+  overflow: hidden;
+  width: 12rem;
+  height: 1rem;
+  max-width: 100%;
+  min-width: 0px;
+
+  border: var(--border-width--main) solid var(--theme--text);
+  border-radius: var(--radius--round);
+}
+
+.portfolio-slider_draggable_handle {
+  width: 30%;
+  height: 100%;
+  border-radius: 100vw;
+  background-color: var(--swatch--brand);
+  cursor: grab;
+}
+
+.portfolio-slider_btn_layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  grid-column-gap: 0.5rem;
+  grid-row-gap: 0.5rem;
+}
+
+.portfolio-slider_btn_element {
+  position: relative;
+
+  display: flex;
+  width: var(--size--4rem);
+  height: var(--size--4rem);
+  padding-right: var(--size--0-5rem);
+  padding-left: var(--size--0-5rem);
+  justify-content: center;
+  align-items: center;
+
+  border-radius: var(--radius--round);
+
+  background-color: var(--swatch--brand);
+
+  color: var(--swatch--light);
+
+  cursor: pointer;
+}
+
+.portfolio-slider_btn_element.swiper-button-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.portfolio-slider_btn_element.is-prev {
+  transform: rotate(-180deg);
+}

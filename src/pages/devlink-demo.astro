@@ -1,0 +1,59 @@
+---
+import DashboardLayout from '../layouts/dashboard.astro';
+import { DevLinkDemo } from '../components/DevLinkDemo';
+---
+
+<DashboardLayout title="DevLink Demo | Jewett Junction">
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">DevLink Components Demo</h1>
+    <p class="text-muted-foreground mb-8">
+      This page demonstrates how to use Webflow DevLink components in the app.
+      These components are synced from Webflow and can be customized with CMS data.
+    </p>
+
+    <DevLinkDemo client:load />
+
+    <div class="mt-12 p-6 bg-muted/50 rounded-lg">
+      <h2 class="text-xl font-semibold mb-4">How to Use DevLink Components</h2>
+
+      <div class="prose prose-sm max-w-none">
+        <h3 class="text-lg font-medium mt-4 mb-2">1. Import the Provider and Component</h3>
+        <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>{`import { DevLinkProvider } from '../../devlink/devlinkContext';
+import { IntranetCard } from '../../devlink/IntranetCard';`}</code></pre>
+
+        <h3 class="text-lg font-medium mt-4 mb-2">2. Wrap Components with DevLinkProvider</h3>
+        <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>{`<DevLinkProvider>
+  <IntranetCard
+    headingHeadingRichText="My Title"
+    paragraphParagraphRichText="Description text"
+    urlClickableLink={{ href: "/link" }}
+  />
+</DevLinkProvider>`}</code></pre>
+
+        <h3 class="text-lg font-medium mt-4 mb-2">3. Available Intranet Components</h3>
+        <ul class="list-disc pl-6 space-y-1">
+          <li><code>IntranetCard</code> - Card with image, heading, paragraph, and button</li>
+          <li><code>IntranetMenu</code> - Full navigation menu with dropdowns</li>
+          <li><code>IntranetTopHeading</code> - Page heading with scrolling text banner</li>
+          <li><code>IntranetMenuButton</code> - Menu toggle button</li>
+          <li><code>IntranetPageContentWrap</code> - Content wrapper</li>
+          <li><code>IntranetSectionWSlot</code> - Section with slot for custom content</li>
+        </ul>
+
+        <h3 class="text-lg font-medium mt-4 mb-2">4. Using with CMS Data</h3>
+        <pre class="bg-muted p-4 rounded text-sm overflow-x-auto"><code>{`// In your Astro page frontmatter:
+import { getAnnouncements } from '../lib/webflow-cms';
+const { items } = await getAnnouncements({ limit: 5 });
+
+// In your template:
+{items.map(item => (
+  <IntranetCard
+    headingHeadingRichText={item.name}
+    paragraphParagraphRichText={item.content}
+    urlClickableLink={{ href: \`/announcement/\${item.slug}\` }}
+  />
+))}`}</code></pre>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

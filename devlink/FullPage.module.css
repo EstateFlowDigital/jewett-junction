@@ -1,0 +1,17 @@
+.page_wrap {
+  overflow: clip;
+}
+
+.page_main {
+  color: inherit;
+  background-color: inherit;
+}
+
+.u-hflex-left-stretch {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: stretch;
+}

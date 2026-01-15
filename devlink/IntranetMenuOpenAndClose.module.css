@@ -1,0 +1,22 @@
+.button_code_wrap {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: 0%;
+
+  width: 100vw;
+  height: 100vh;
+
+  pointer-events: none;
+
+  cursor: none;
+}
+
+.close_open_menu_css {
+  display: none;
+}
+
+.close_open_menu_js {
+  display: none;
+}

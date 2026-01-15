@@ -1,0 +1,17 @@
+.awards_visuals_cms_item {
+  padding-right: 1rem;
+  padding-left: 1rem;
+  flex: 0 0 auto;
+}
+
+.awards_visuals_cms_img {
+  position: relative;
+  width: 25rem;
+  max-width: none;
+  aspect-ratio: 16/9;
+  opacity: 0.69;
+}
+
+.awards_visuals_cms_img.is-first {
+  opacity: 100;
+}

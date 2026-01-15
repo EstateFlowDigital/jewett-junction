@@ -1,0 +1,53 @@
+.styleguide_guide_wrap {
+  position: fixed;
+  left: 0%;
+  top: 0%;
+  right: 0%;
+  bottom: auto;
+  z-index: 2000;
+
+  display: block;
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.styleguide_guide_layout.u-grid-custom {
+  grid-template-columns: var(--grid-main);
+}
+
+.u-grid-custom {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: var(--grid-1);
+}
+
+.styleguide_guide_column {
+  height: 100vh;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  background-color: hsla(176, 0.00%, 57.33%, 0.06);
+  color: hsla(175.95238095238096, 0.00%, 54.00%, 0.50);
+}
+
+.u-vflex-center-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}

@@ -1,0 +1,110 @@
+.services_swiper_item {
+  height: 100%;
+}
+
+.u-hflex-between-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.u-gap-large {
+  grid-column-gap: var(--space--large);
+  grid-row-gap: var(--space--large);
+}
+
+.services_swiper_item.u-hflex-between-stretch {
+  grid-column-gap: var(--space--extra-small);
+  grid-row-gap: var(--space--extra-small);
+}
+
+.u-hflex-between-stretch {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  align-content: stretch;
+}
+
+.u-vflex-left-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.services_slider_thumb_visual_wrap {
+  position: relative;
+  width: var(--size--4rem);
+  height: var(--size--4rem);
+  border-radius: var(--radius--round);
+  background-color: var(--swatch--light);
+}
+
+.services_slider_thumb_visual {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.75rem;
+
+  flex: 0 0 auto;
+
+  border-radius: var(--radius--round);
+
+  background-color: var(--swatch--light);
+
+  color: var(--swatch--brand);
+}
+
+@media screen and (max-width: 767px) {
+  .services_slider_thumb_visual {
+    flex: 0 0 auto;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .services_slider_thumb_heading {
+    min-width: auto;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .services_slider_thumb_heading {
+    flex: 0 auto;
+  }
+}
+
+.vertical_divider {
+  position: relative;
+  z-index: 1;
+
+  width: var(--border-width--main);
+  padding-right: 1px;
+  padding-left: 1px;
+  align-self: stretch;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+
+  border-radius: var(--radius--round);
+
+  background-color: var(--swatch--light);
+
+  opacity: 0.23;
+}
+
+.u-branded-color {
+  color: var(--swatch--brand);
+}

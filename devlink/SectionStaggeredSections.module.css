@@ -1,0 +1,204 @@
+.u-container {
+  position: relative;
+
+  width: 100%;
+  max-width: var(--max-width--main);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--padding-vertical--main) var(--padding-horizontal--main);
+}
+
+.u-vflex-left-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.u-gap-medium {
+  grid-column-gap: var(--space--medium);
+  grid-row-gap: var(--space--medium);
+}
+
+.u-grid-column-3 {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: var(--grid-3);
+}
+
+@media screen and (max-width: 767px) {
+  .u-grid-column-3 {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .capabilities_contain.u-container.u-grid-column-3.u-gap-large {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+.u-gap-large {
+  grid-column-gap: var(--space--large);
+  grid-row-gap: var(--space--large);
+}
+
+@media screen and (max-width: 991px) {
+  .capabilities_contain.u-container.u-grid-column-3.u-gap-large.is-revered {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.u-vflex-left-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.capabilities_content_wrap.u-vflex-left-top.u-gap-medium {
+  position: sticky;
+  top: 7rem;
+}
+
+@media screen and (max-width: 991px) {
+  .capabilities_content_wrap.u-vflex-left-top.u-gap-medium {
+    position: static;
+  }
+}
+
+.capabilities_features_wrap {
+  position: relative;
+}
+
+.capabilities_features_wrap.u-grid-autofit {
+  align-self: stretch;
+}
+
+.u-grid-autofit {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.u-gap-small {
+  grid-column-gap: var(--space--small);
+  grid-row-gap: var(--space--small);
+}
+
+.capabilities_features_wrap.u-vflex-left-top.u-gap-small {
+  margin-top: -1rem;
+  padding-top: 1rem;
+}
+
+.capabilities_features_wrap.u-vflex-left-top.u-gap-small {
+  margin-top: -1rem;
+  padding-top: 1rem;
+}
+
+.capabilities_features {
+  margin-top: -1rem;
+}
+
+.capabilities_features.u-grid-autofit {
+  align-self: stretch;
+}
+
+.u-hflex-left-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.circuit_connection_line {
+  position: absolute;
+  left: auto;
+  top: 0%;
+  right: auto;
+  bottom: 0%;
+  z-index: 0;
+
+  width: 5px;
+  height: 98.5%;
+
+  background-color: var(--button--background);
+}
+
+@media screen and (max-width: 767px) {
+  .circuit_connection_line {
+    height: 99%;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .circuit_connection_line {
+    height: 99.25%;
+  }
+}
+
+.circuit_connection_line.is-top {
+  position: absolute;
+  width: 75vw;
+  height: 10px;
+}
+
+@media screen and (max-width: 991px) {
+  .circuit_connection_line.is-top {
+    width: 115vw;
+  }
+}
+
+.industries_cms_wrap {
+  margin-top: var(--size--3rem);
+}
+
+.capabilities_features_items.u-grid-column-2 {
+  margin-top: var(--size--2rem);
+}
+
+.u-grid-column-2 {
+  display: grid;
+  grid-auto-columns: minmax(0px, 1fr);
+  grid-column-gap: var(--grid-gap--main);
+  grid-row-gap: var(--grid-gap--main);
+  grid-template-rows: auto;
+  grid-template-columns: var(--grid-2);
+}
+
+@media screen and (max-width: 767px) {
+  .u-grid-column-2 {
+    grid-template-columns: var(--grid-1);
+  }
+}
+
+.capabilities_features_items.u-grid-autofit {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+
+#w-node-_68941f4d-bc41-3c81-4aac-d2ea9c6ffa28-9c6ffa24 {
+  align-self: start;
+}
+#w-node-_68941f4d-bc41-3c81-4aac-d2ea9c6ffa32-9c6ffa24 {
+  grid-column-start: span 2;
+  grid-column-end: span 2;
+}
+@media screen and (max-width: 991px) {
+  #w-node-_68941f4d-bc41-3c81-4aac-d2ea9c6ffa32-9c6ffa24 {
+    grid-column-start: span 1;
+    grid-column-end: span 1;
+  }
+}

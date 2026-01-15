@@ -1,0 +1,18 @@
+.vertical_divider_hide_mobile {
+  width: var(--border-width--main);
+  height: 80%;
+  flex: 0 0 auto;
+  background-color: var(--swatch--brand);
+}
+
+@media screen and (max-width: 991px) {
+  .vertical_divider_hide_mobile {
+    min-height: 5rem;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .vertical_divider_hide_mobile {
+    display: none;
+  }
+}

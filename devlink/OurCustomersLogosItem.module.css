@@ -1,0 +1,44 @@
+.logos_cms_item {
+  width: 15%;
+  max-width: var(--size--16rem);
+  padding-right: 2rem;
+  padding-left: 2rem;
+  align-self: center;
+}
+
+@media screen and (max-width: 991px) {
+  .logos_cms_item {
+    max-width: 22rem;
+  }
+}
+
+.logos_cms_item.is-dark-mode {
+  filter: invert(100%);
+}
+
+.logos_item {
+  position: relative;
+  min-height: var(--size--4-5rem);
+  min-width: var(--size--12rem);
+}
+
+.u-visual-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius--main);
+}
+
+.logos_item.u-visual-wrap.u-vflex-center-center {
+  border-radius: 0rem;
+}
+
+.u-vflex-center-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-content: center;
+}

@@ -4,6 +4,7 @@ import '../../../../generated/webflow.css';
 import '../../../site-components/global.css';
 import '../../../styles/global.css';
 import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
+import { MobileNav } from '../../../components/layout/MobileNav';
 ---
 
 <html lang="en">
@@ -15,9 +16,11 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
     <style>
       .glow-amber { box-shadow: 0 0 40px rgba(251, 191, 36, 0.15); }
       .card-hover:hover { transform: translateY(-2px); }
+      @media (max-width: 767px) { .mobile-safe-area { padding-top: 4.5rem; } }
     </style>
   </head>
   <body class="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 min-h-screen">
+    <MobileNav client:load currentTheme="warm" currentPath="/jewett-junction/dashboard" />
     <!-- Sidebar -->
     <aside class="fixed left-0 top-0 bottom-0 w-72 bg-white/80 backdrop-blur-xl border-r border-amber-100 z-40 hidden md:flex flex-col">
       <div class="p-6">
@@ -92,9 +95,9 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
 
     <!-- Main -->
     <main class="md:pl-72 min-h-screen">
-      <div class="p-6 md:p-8 lg:p-10">
+      <div class="mobile-safe-area md:pt-6 p-6 md:p-8 lg:p-10">
         <!-- Back Link -->
-        <a href="/jewett-junction/preview" class="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 mb-8 group">
+        <a href="/jewett-junction" class="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 mb-8 group">
           <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -103,8 +106,8 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
 
         <!-- Welcome -->
         <div class="mb-10">
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">Welcome to Jewett Junction</h1>
-          <p class="text-gray-600 text-lg">Your central hub for company news, resources, and updates. Tuesday, January 14th, 2025.</p>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Welcome to Jewett Junction</h1>
+          <p class="text-gray-600 text-sm sm:text-base md:text-lg">Your central hub for company news, resources, and updates. Tuesday, January 14th, 2025.</p>
         </div>
 
         <!-- Featured Announcement -->
@@ -112,26 +115,26 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div class="relative">
             <span class="text-xs text-amber-100 uppercase tracking-wider">Featured Announcement</span>
-            <h2 class="text-2xl font-bold mt-2 mb-3">Q4 2024 Results Are In!</h2>
-            <p class="text-amber-100 mb-4 max-w-2xl">We exceeded our safety and revenue targets this quarter. Join us for the all-hands meeting on Wednesday to celebrate our achievements and hear about plans for 2025.</p>
-            <div class="flex items-center gap-4">
-              <a href="/jewett-junction/resources/warm" class="px-5 py-2.5 bg-white text-orange-600 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-colors">Read Full Announcement</a>
+            <h2 class="text-xl sm:text-2xl font-bold mt-2 mb-3">Q4 2024 Results Are In!</h2>
+            <p class="text-amber-100 text-sm sm:text-base mb-4 max-w-2xl">We exceeded our safety and revenue targets this quarter. Join us for the all-hands meeting on Wednesday to celebrate our achievements and hear about plans for 2025.</p>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <a href="/jewett-junction/resources/warm" class="px-5 py-2.5 bg-white text-orange-600 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-colors text-center">Read Full Announcement</a>
               <span class="text-sm text-amber-100">CEO Office • 2 hours ago</span>
             </div>
           </div>
         </div>
 
         <!-- Bento Grid Stats -->
-        <div class="grid grid-cols-12 gap-4 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-10">
           <!-- Safety Card - Large -->
-          <div class="col-span-12 md:col-span-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white relative overflow-hidden card-hover transition-transform">
+          <div class="col-span-1 md:col-span-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white relative overflow-hidden card-hover transition-transform">
             <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div class="relative">
               <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               </div>
-              <div class="text-emerald-100 text-sm mb-1">Days Without Incident</div>
-              <div class="text-6xl font-bold mb-2">247</div>
+              <div class="text-emerald-100 text-sm">Days Without Incident</div>
+              <div class="text-4xl sm:text-5xl md:text-6xl font-bold mb-2">247</div>
               <div class="flex items-center gap-2 text-sm text-emerald-100">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 Company record: 312 days
@@ -140,44 +143,44 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
           </div>
 
           <!-- Right Column Stats -->
-          <div class="col-span-12 md:col-span-7 grid grid-cols-2 gap-4">
+          <div class="col-span-1 md:col-span-7 grid grid-cols-2 gap-4">
             <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
               <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-gray-500">Active Projects</span>
+                <span class="text-xs sm:text-sm text-gray-500">Active Projects</span>
                 <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 </div>
               </div>
-              <div class="text-4xl font-bold text-gray-900">42</div>
-              <div class="text-sm text-green-600 mt-1">+3 this month</div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">42</div>
+              <div class="text-xs sm:text-sm text-green-600 mt-1">+3 this month</div>
             </div>
             <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
               <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-gray-500">Total Employees</span>
+                <span class="text-xs sm:text-sm text-gray-500">Total Employees</span>
                 <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
               </div>
-              <div class="text-4xl font-bold text-gray-900">156</div>
-              <div class="text-sm text-gray-500 mt-1">Across 5 locations</div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">156</div>
+              <div class="text-xs sm:text-sm text-gray-500 mt-1">Across 5 locations</div>
             </div>
             <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
               <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-gray-500">Open Positions</span>
+                <span class="text-xs sm:text-sm text-gray-500">Open Positions</span>
                 <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </div>
               </div>
-              <div class="text-4xl font-bold text-gray-900">8</div>
-              <div class="text-sm text-amber-600 mt-1">View openings →</div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">8</div>
+              <div class="text-xs sm:text-sm text-amber-600 mt-1">View openings</div>
             </div>
             <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 text-white card-hover transition-transform shadow-lg shadow-orange-500/20">
               <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-amber-100">Referral Bonus</span>
+                <span class="text-xs sm:text-sm text-amber-100">Referral Bonus</span>
                 <svg class="w-6 h-6 text-amber-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
-              <div class="text-4xl font-bold">$500</div>
-              <div class="text-sm text-amber-100 mt-1">Per successful hire</div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold">$500</div>
+              <div class="text-xs sm:text-sm text-amber-100 mt-1">Per successful hire</div>
             </div>
           </div>
         </div>
@@ -333,22 +336,22 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
               <h2 class="font-bold text-gray-900">Employee Spotlight</h2>
             </div>
             <div class="p-6">
-              <div class="flex items-start gap-5">
+              <div class="flex flex-col sm:flex-row items-start gap-5">
                 <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0 shadow-lg shadow-orange-500/20">
                   RG
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900">Robert Garcia</h3>
+                  <h3 class="text-base sm:text-lg font-bold text-gray-900">Robert Garcia</h3>
                   <p class="text-gray-500 text-sm mb-3">Site Superintendent • 12 years</p>
                   <p class="text-gray-600 text-sm leading-relaxed">
                     "Robert's leadership on the Downtown Plaza project has been exceptional. His commitment to safety sets the standard for all of us."
                   </p>
-                  <p class="text-xs text-gray-400 mt-3 italic">— Nominated by Engineering Team</p>
+                  <p class="text-xs text-gray-400 mt-3 italic">-- Nominated by Engineering Team</p>
                 </div>
               </div>
-              <div class="mt-5 pt-4 border-t border-amber-50 flex items-center justify-between">
+              <div class="mt-5 pt-4 border-t border-amber-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <span class="text-sm text-gray-500">Know someone deserving recognition?</span>
-                <a href="/jewett-junction/culture/warm" class="text-sm text-amber-600 hover:text-amber-700 font-medium">Nominate →</a>
+                <a href="/jewett-junction/culture/warm" class="text-sm text-amber-600 hover:text-amber-700 font-medium">Nominate</a>
               </div>
             </div>
           </div>
@@ -383,7 +386,7 @@ import { ThemeSwitcher } from '../../../components/ThemeSwitcher';
               </a>
             </div>
             <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-amber-100">
-              <div class="flex items-center justify-between">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <div class="font-medium text-gray-900">Refer a Friend</div>
                   <div class="text-sm text-gray-500">Earn $500 for each successful hire</div>

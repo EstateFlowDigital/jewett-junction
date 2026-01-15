@@ -9,5 +9,12 @@
     "fileExtensions": {
       "js": "jsx"
     }
+  },
+  "telemetry": {
+    "global": {
+      "allowTelemetry": false,
+      "lastPrompted": 1768496150410,
+      "version": "1.10.0"
+    }
   }
 }
