@@ -10,5 +10,8 @@
   },
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "WEBFLOW_SITE_ID": "67a464bc7184fcb8aacb0e8d"
   }
 }

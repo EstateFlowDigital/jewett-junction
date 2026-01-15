@@ -8,3 +8,13 @@ declare namespace App {
     // Add custom locals here
   }
 }
+
+interface ImportMetaEnv {
+  readonly WEBFLOW_API_TOKEN: string;
+  readonly WEBFLOW_SITE_ID: string;
+  readonly SITE_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
