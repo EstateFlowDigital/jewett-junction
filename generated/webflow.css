@@ -1,0 +1,286 @@
+/**
+ * Jewett Junction Design System
+ *
+ * Google Gemini-inspired clean, warm design
+ * American flag color palette (Red, White, Blue)
+ */
+
+/* Import Google Sans-like font */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ========================================
+     AMERICAN FLAG COLOR PALETTE
+     ======================================== */
+
+  /* Primary Blue - Navy/Royal Blue */
+  --brand-primary: #1A56DB;
+  --brand-primary-hover: #1E40AF;
+  --brand-primary-light: #DBEAFE;
+  --brand-primary-dark: #1E3A5F;
+
+  /* Accent Red - American Red */
+  --brand-accent: #DC2626;
+  --brand-accent-hover: #B91C1C;
+  --brand-accent-light: #FEE2E2;
+
+  /* Neutral White/Off-white */
+  --brand-white: #FFFFFF;
+  --brand-off-white: #F8FAFC;
+  --brand-cream: #F1F5F9;
+
+  /* Dark gradients for feature cards */
+  --gradient-dark-start: #1F2937;
+  --gradient-dark-end: #111827;
+  --gradient-blue-start: #1E3A5F;
+  --gradient-blue-end: #0F172A;
+  --gradient-teal-start: #134E4A;
+  --gradient-teal-end: #042F2E;
+
+  /* Success/Safety Green */
+  --brand-success: #059669;
+  --brand-success-light: #D1FAE5;
+
+  /* Warning */
+  --brand-warning: #D97706;
+  --brand-warning-light: #FEF3C7;
+
+  /* Error */
+  --brand-error: #DC2626;
+  --brand-error-light: #FEE2E2;
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --_apps---typography--heading-font: var(--font-display);
+  --_apps---typography--body-font: var(--font-body);
+  --_apps---typography--button-font: var(--font-body);
+
+  /* ========================================
+     GEMINI-STYLE DESIGN TOKENS
+     ======================================== */
+
+  /* Rounded corners - more rounded for friendly feel */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --_apps---sizes--radius: 12px;
+
+  /* Shadows - soft and subtle */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ========================================
+     SEMANTIC COLORS - Light Mode
+     ======================================== */
+
+  /* Backgrounds */
+  --_apps---colors--background: var(--brand-off-white);
+  --_apps---colors--background-secondary: var(--brand-cream);
+
+  /* Text */
+  --_apps---colors--foreground: #111827;
+  --_apps---colors--foreground-muted: #6B7280;
+
+  /* Cards */
+  --_apps---colors--card: var(--brand-white);
+  --_apps---colors--card-foreground: #111827;
+
+  /* Popover/Dropdown */
+  --_apps---colors--popover: var(--brand-white);
+  --_apps---colors--popover-foreground: #111827;
+
+  /* Primary Action - Blue */
+  --_apps---colors--primary: var(--brand-primary);
+  --_apps---colors--primary-foreground: var(--brand-white);
+
+  /* Secondary/Muted */
+  --_apps---colors--secondary: var(--brand-cream);
+  --_apps---colors--secondary-foreground: #374151;
+
+  /* Muted elements */
+  --_apps---colors--muted: var(--brand-cream);
+  --_apps---colors--muted-foreground: #6B7280;
+
+  /* Accent - Red highlight */
+  --_apps---colors--accent: var(--brand-accent-light);
+  --_apps---colors--accent-foreground: var(--brand-accent);
+
+  /* Destructive */
+  --_apps---colors--destructive: var(--brand-error);
+
+  /* Borders & Inputs */
+  --_apps---colors--border: #E5E7EB;
+  --_apps---colors--border-light: #F3F4F6;
+  --_apps---colors--input: #E5E7EB;
+  --_apps---colors--ring: var(--brand-primary);
+
+  /* ========================================
+     COLORS - Dark Mode
+     ======================================== */
+  --_apps---colors--background-dark: #0F172A;
+  --_apps---colors--foreground-dark: #F8FAFC;
+  --_apps---colors--card-dark: #1E293B;
+  --_apps---colors--card-foreground-dark: #F8FAFC;
+  --_apps---colors--popover-dark: #1E293B;
+  --_apps---colors--popover-foreground-dark: #F8FAFC;
+  --_apps---colors--primary-dark: #3B82F6;
+  --_apps---colors--primary-foreground-dark: var(--brand-white);
+  --_apps---colors--secondary-dark: #334155;
+  --_apps---colors--secondary-foreground-dark: #F8FAFC;
+  --_apps---colors--muted-dark: #334155;
+  --_apps---colors--muted-foreground-dark: #94A3B8;
+  --_apps---colors--destructive-dark: #EF4444;
+  --_apps---colors--border-dark: #334155;
+  --_apps---colors--input-dark: #334155;
+  --_apps---colors--ring-dark: #3B82F6;
+
+  /* ========================================
+     CHART COLORS
+     ======================================== */
+  --_apps---charts--chart-1: var(--brand-primary);
+  --_apps---charts--chart-2: var(--brand-success);
+  --_apps---charts--chart-3: var(--brand-accent);
+  --_apps---charts--chart-4: #8B5CF6;
+  --_apps---charts--chart-5: #F59E0B;
+  --_apps---charts--chart-1-dark: #3B82F6;
+  --_apps---charts--chart-2-dark: #10B981;
+  --_apps---charts--chart-3-dark: #EF4444;
+  --_apps---charts--chart-4-dark: #A78BFA;
+  --_apps---charts--chart-5-dark: #FBBF24;
+
+  /* ========================================
+     SIDEBAR
+     ======================================== */
+  --_apps---sidebar--sidebar: var(--brand-white);
+  --_apps---sidebar--sidebar-foreground: #374151;
+  --_apps---sidebar--sidebar-primary: var(--brand-primary);
+  --_apps---sidebar--sidebar-primary-foreground: var(--brand-white);
+  --_apps---sidebar--sidebar-accent: var(--brand-primary-light);
+  --_apps---sidebar--sidebar-accent-foreground: var(--brand-primary);
+  --_apps---sidebar--sidebar-border: #E5E7EB;
+  --_apps---sidebar--sidebar-ring: var(--brand-primary);
+
+  /* Sidebar Dark */
+  --_apps---sidebar--sidebar-dark: #0F172A;
+  --_apps---sidebar--sidebar-foreground-dark: #CBD5E1;
+  --_apps---sidebar--sidebar-primary-dark: #3B82F6;
+  --_apps---sidebar--sidebar-primary-foreground-dark: var(--brand-white);
+  --_apps---sidebar--sidebar-accent-dark: #1E293B;
+  --_apps---sidebar--sidebar-accent-foreground-dark: #F8FAFC;
+  --_apps---sidebar--sidebar-border-dark: #334155;
+  --_apps---sidebar--sidebar-ring-dark: #3B82F6;
+
+  /* ========================================
+     COMPONENT-SPECIFIC TOKENS
+     ======================================== */
+
+  /* Navigation */
+  --nav-height: 64px;
+  --nav-bg: var(--brand-white);
+  --nav-border: #E5E7EB;
+
+  /* Sidebar */
+  --sidebar-width: 72px;
+  --sidebar-width-expanded: 260px;
+
+  /* Progress bars */
+  --progress-bg: #E5E7EB;
+  --progress-fill: var(--brand-primary);
+
+  /* Badges */
+  --badge-primary-bg: var(--brand-primary);
+  --badge-primary-text: var(--brand-white);
+  --badge-accent-bg: var(--brand-accent);
+  --badge-accent-text: var(--brand-white);
+  --badge-success-bg: var(--brand-success);
+  --badge-success-text: var(--brand-white);
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Gemini-style card */
+.card-gemini {
+  background: var(--brand-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--_apps---colors--border);
+}
+
+/* Dark gradient card */
+.card-dark-gradient {
+  background: linear-gradient(135deg, var(--gradient-dark-start) 0%, var(--gradient-dark-end) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.card-blue-gradient {
+  background: linear-gradient(135deg, var(--gradient-blue-start) 0%, var(--gradient-blue-end) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.card-teal-gradient {
+  background: linear-gradient(135deg, var(--gradient-teal-start) 0%, var(--gradient-teal-end) 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+/* Pill button */
+.btn-pill {
+  border-radius: var(--radius-full);
+  padding: 10px 24px;
+  font-weight: 500;
+}
+
+.btn-pill-primary {
+  background: var(--brand-primary);
+  color: white;
+}
+
+.btn-pill-primary:hover {
+  background: var(--brand-primary-hover);
+}
+
+.btn-pill-outline {
+  background: transparent;
+  border: 1px solid var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.btn-pill-outline:hover {
+  background: var(--brand-primary-light);
+}
+
+/* Large stat number */
+.stat-large {
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--_apps---colors--foreground);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--_apps---colors--foreground-muted);
+  margin-bottom: 4px;
+}

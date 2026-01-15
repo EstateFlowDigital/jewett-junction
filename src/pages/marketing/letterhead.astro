@@ -1,0 +1,204 @@
+---
+import DashboardLayout from '../../layouts/dashboard.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
+import { FileText, Download, ArrowLeft, File, FileSpreadsheet, Mail } from 'lucide-react';
+---
+
+<DashboardLayout title="Letterhead & Forms | Jewett Junction">
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a href="/marketing" class="text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-5 w-5" />
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3">
+          <FileText className="h-7 w-7 text-blue-500" />
+          Letterhead & Forms
+        </h1>
+        <p class="text-muted-foreground mt-1">
+          Official document templates and forms
+        </p>
+      </div>
+    </div>
+
+    <!-- Letterhead Templates -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Letterhead Templates</CardTitle>
+        <CardDescription>Official company letterhead for correspondence</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="border rounded-lg p-4">
+            <div class="h-32 bg-slate-50 rounded border mb-3 flex items-start justify-center pt-4">
+              <div class="text-center">
+                <div class="text-lg font-bold text-blue-600">JC</div>
+                <div class="text-[8px] text-slate-400 mt-1">JEWETT CONSTRUCTION</div>
+                <div class="w-16 h-px bg-slate-200 mx-auto mt-2"></div>
+              </div>
+            </div>
+            <p class="font-medium text-sm">Standard Letterhead</p>
+            <p class="text-xs text-muted-foreground mb-3">For general correspondence</p>
+            <div class="flex gap-2">
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Word
+              </Button>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> PDF
+              </Button>
+            </div>
+          </div>
+
+          <div class="border rounded-lg p-4">
+            <div class="h-32 bg-slate-50 rounded border mb-3 flex items-start justify-center pt-4">
+              <div class="text-center">
+                <div class="text-lg font-bold text-blue-600">JC</div>
+                <div class="text-[8px] text-slate-400 mt-1">EXECUTIVE OFFICE</div>
+                <div class="w-16 h-px bg-blue-200 mx-auto mt-2"></div>
+              </div>
+            </div>
+            <p class="font-medium text-sm">Executive Letterhead</p>
+            <p class="text-xs text-muted-foreground mb-3">For leadership communications</p>
+            <div class="flex gap-2">
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Word
+              </Button>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> PDF
+              </Button>
+            </div>
+          </div>
+
+          <div class="border rounded-lg p-4">
+            <div class="h-32 bg-slate-50 rounded border mb-3 flex items-start justify-center pt-4">
+              <div class="text-center">
+                <div class="text-lg font-bold text-blue-600">JC</div>
+                <div class="text-[8px] text-slate-400 mt-1">PROJECT CORRESPONDENCE</div>
+                <div class="w-16 h-px bg-orange-200 mx-auto mt-2"></div>
+              </div>
+            </div>
+            <p class="font-medium text-sm">Project Letterhead</p>
+            <p class="text-xs text-muted-foreground mb-3">For project communications</p>
+            <div class="flex gap-2">
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Word
+              </Button>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> PDF
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Business Forms -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Business Forms</CardTitle>
+        <CardDescription>Commonly used internal and external forms</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div class="flex items-center gap-3">
+              <File className="h-5 w-5 text-blue-500" />
+              <div>
+                <p class="font-medium text-sm">Expense Report Form</p>
+                <p class="text-xs text-muted-foreground">Submit expense reimbursements</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <Badge variant="secondary">Excel</Badge>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Download
+              </Button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div class="flex items-center gap-3">
+              <File className="h-5 w-5 text-green-500" />
+              <div>
+                <p class="font-medium text-sm">Time Off Request</p>
+                <p class="text-xs text-muted-foreground">PTO and leave requests</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <Badge variant="secondary">PDF</Badge>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Download
+              </Button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div class="flex items-center gap-3">
+              <FileSpreadsheet className="h-5 w-5 text-orange-500" />
+              <div>
+                <p class="font-medium text-sm">Purchase Order Form</p>
+                <p class="text-xs text-muted-foreground">Material and equipment orders</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <Badge variant="secondary">Excel</Badge>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Download
+              </Button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-muted rounded-lg">
+            <div class="flex items-center gap-3">
+              <File className="h-5 w-5 text-purple-500" />
+              <div>
+                <p class="font-medium text-sm">Mileage Log</p>
+                <p class="text-xs text-muted-foreground">Track business travel mileage</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <Badge variant="secondary">Excel</Badge>
+              <Button size="sm" variant="outline">
+                <Download className="h-3 w-3 mr-1" /> Download
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Email Signature -->
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="h-5 w-5" />
+          Email Signature
+        </CardTitle>
+        <CardDescription>Standard email signature template</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="border rounded-lg p-4 bg-white">
+          <div class="border-l-4 border-blue-600 pl-4">
+            <p class="font-semibold text-slate-800">John Smith</p>
+            <p class="text-sm text-slate-600">Project Manager</p>
+            <p class="text-sm text-slate-600">Jewett Construction</p>
+            <div class="mt-2 text-sm text-slate-500">
+              <p>P: (555) 123-4567</p>
+              <p>E: john.smith@jewett.com</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" /> Download HTML
+          </Button>
+          <Button variant="outline">
+            View Setup Guide
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+</DashboardLayout>

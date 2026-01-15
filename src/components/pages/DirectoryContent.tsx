@@ -1,0 +1,115 @@
+import * as React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Users, Search, Phone, Mail, Building, MapPin, Filter } from 'lucide-react';
+import { Button } from '../ui/button';
+
+interface DirectoryContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+}
+
+export function DirectoryContent({ theme = 'modern' }: DirectoryContentProps) {
+  const isDark = theme === 'dark';
+
+  const employees = [
+    { name: 'James Mitchell', role: 'Director of Safety', dept: 'Safety', location: 'Denver', initials: 'JM', color: 'green' },
+    { name: 'Jennifer Davis', role: 'HR Manager', dept: 'Human Resources', location: 'Denver', initials: 'JD', color: 'purple' },
+    { name: 'Mike Thompson', role: 'Project Manager', dept: 'Operations', location: 'Boulder', initials: 'MT', color: 'blue' },
+    { name: 'Sarah Chen', role: 'IT Manager', dept: 'Information Technology', location: 'Denver', initials: 'SC', color: 'indigo' },
+    { name: 'Robert Johnson', role: 'CFO', dept: 'Finance', location: 'Denver', initials: 'RJ', color: 'amber' },
+    { name: 'Lisa Wang', role: 'Marketing Director', dept: 'Marketing', location: 'Denver', initials: 'LW', color: 'pink' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
+          <Users className="h-7 w-7 text-cyan-600" />
+          Employee Directory
+        </h1>
+        <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+          Find and connect with your colleagues
+        </p>
+      </div>
+
+      {/* Search */}
+      <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+        <CardContent className="pt-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
+              <input
+                type="text"
+                placeholder="Search by name, role, or department..."
+                className={`w-full pl-10 pr-4 py-2 border rounded-md text-sm ${isDark ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' : ''}`}
+              />
+            </div>
+            <div className="flex gap-2">
+              <select className={`px-3 py-2 border rounded-md text-sm ${isDark ? 'bg-slate-700 border-slate-600 text-white' : ''}`}>
+                <option>All Departments</option>
+                <option>Operations</option>
+                <option>Safety</option>
+                <option>HR</option>
+                <option>IT</option>
+                <option>Marketing</option>
+              </select>
+              <select className={`px-3 py-2 border rounded-md text-sm ${isDark ? 'bg-slate-700 border-slate-600 text-white' : ''}`}>
+                <option>All Locations</option>
+                <option>Denver</option>
+                <option>Boulder</option>
+                <option>Fort Collins</option>
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Employee Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {employees.map((emp) => (
+          <Card key={emp.name} className={`transition-all hover:shadow-lg cursor-pointer ${isDark ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'hover:border-slate-300'}`}>
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className={`w-14 h-14 bg-${emp.color}-${isDark ? '900' : '100'} rounded-full flex items-center justify-center text-${emp.color}-${isDark ? '400' : '600'} font-bold text-lg shrink-0`}>
+                  {emp.initials}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-semibold truncate ${isDark ? 'text-white' : ''}`}>{emp.name}</h3>
+                  <p className={`text-sm truncate ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{emp.role}</p>
+                  <div className={`flex items-center gap-3 mt-2 text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
+                    <span className="flex items-center gap-1"><Building className="h-3 w-3" /> {emp.dept}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {emp.location}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button size="sm" variant="outline" className={`flex-1 ${isDark ? 'border-slate-600' : ''}`}>
+                  <Phone className="h-4 w-4 mr-1" /> Call
+                </Button>
+                <Button size="sm" variant="outline" className={`flex-1 ${isDark ? 'border-slate-600' : ''}`}>
+                  <Mail className="h-4 w-4 mr-1" /> Email
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Employees', value: '156' },
+          { label: 'Departments', value: '8' },
+          { label: 'Locations', value: '4' },
+          { label: 'Remote', value: '12' },
+        ].map((stat) => (
+          <Card key={stat.label} className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+            <CardContent className="pt-6 text-center">
+              <div className={`text-3xl font-bold ${isDark ? 'text-cyan-400' : 'text-cyan-600'}`}>{stat.value}</div>
+              <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stat.label}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

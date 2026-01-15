@@ -1,0 +1,13 @@
+{
+  "cloud": {
+    "framework": "astro",
+    "mount": "/jewett-junction/site"
+  },
+  "devlink": {
+    "rootDir": "./devlink",
+    "cssModules": true,
+    "fileExtensions": {
+      "js": "jsx"
+    }
+  }
+}
