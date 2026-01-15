@@ -64,7 +64,7 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
 
   // Compute href for a theme based on current path
   const getThemeHref = (themeId: string): string => {
-    if (!currentPath) return `/dashboard/${themeId}`
+    if (!currentPath) return `/jewett-junction/dashboard/${themeId}`
 
     const themeNames = ['modern', 'classic', 'minimal', 'warm', 'dark', 'patriotic']
     for (const themeName of themeNames) {
@@ -72,7 +72,7 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
         return currentPath.replace(`/${themeName}`, `/${themeId}`)
       }
     }
-    return `/dashboard/${themeId}`
+    return `/jewett-junction/dashboard/${themeId}`
   }
 
   return (
@@ -143,7 +143,7 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
 
             <div className="p-3 border-t border-gray-100 bg-gray-50">
               <a
-                href="/preview"
+                href="/jewett-junction/preview"
                 className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1"
               >
                 View full comparison page

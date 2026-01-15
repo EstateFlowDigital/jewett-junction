@@ -1,7 +1,7 @@
 {
   "cloud": {
     "framework": "astro",
-    "mount": "/jewett-junction/site"
+    "mount": "/jewett-junction"
   },
   "devlink": {
     "rootDir": "./devlink",

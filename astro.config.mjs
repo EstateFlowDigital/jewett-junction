@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   // Update this to your Webflow Cloud URL when deployed
   site: process.env.SITE_URL || 'http://localhost:4321',
-  base: '/jewett-junction/site',
+  base: '/jewett-junction',
   output: 'server',
   adapter: cloudflare({
     platformProxy: {
@@ -25,7 +25,7 @@ export default defineConfig({
     },
   },
   build: {
-    assetsPrefix: '/jewett-junction/site',
+    assetsPrefix: '/jewett-junction',
   },
   trailingSlash: 'never',
 });
