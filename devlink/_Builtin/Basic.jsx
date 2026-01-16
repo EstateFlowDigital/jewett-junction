@@ -2,20 +2,22 @@
 import * as React from "react";
 import { DevLinkContext } from "../devlinkContext";
 import * as utils from "../utils";
+import { parseStyleString } from "../utils";
 export const Block = React.forwardRef(function Block(
-  { tag = "div", ...props },
+  { tag = "div", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
-export const Span = React.forwardRef(function Span(props, ref) {
-  return React.createElement("span", { ...props, ref: ref });
+export const Span = React.forwardRef(function Span({ style, ...props }, ref) {
+  return React.createElement("span", { style: parseStyleString(style), ...props, ref: ref });
 });
-export const Blockquote = React.forwardRef(function Blockquote(props, ref) {
-  return React.createElement("blockquote", { ...props, ref: ref });
+export const Blockquote = React.forwardRef(function Blockquote({ style, ...props }, ref) {
+  return React.createElement("blockquote", { style: parseStyleString(style), ...props, ref: ref });
 });
 export const Link = React.forwardRef(function Link(
   {
@@ -54,134 +56,148 @@ export const Link = React.forwardRef(function Link(
   );
 });
 export const List = React.forwardRef(function List(
-  { tag = "ul", unstyled = true, className = "", ...props },
+  { tag = "ul", unstyled = true, className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     role: "list",
     className: className + (unstyled ? " w-list-unstyled" : ""),
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
-export const ListItem = React.forwardRef(function ListItem(props, ref) {
+export const ListItem = React.forwardRef(function ListItem({ style, ...props }, ref) {
   return React.createElement("li", {
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
-export const Image = React.forwardRef(function Image({ alt, ...props }, ref) {
+export const Image = React.forwardRef(function Image({ alt, style, ...props }, ref) {
   const { renderImage: UserImage } = React.useContext(DevLinkContext);
+  const parsedStyle = parseStyleString(style);
   return UserImage
-    ? React.createElement(UserImage, { alt: alt || "", ...props, ref: ref })
-    : React.createElement("img", { alt: alt || "", ...props, ref: ref });
+    ? React.createElement(UserImage, { alt: alt || "", style: parsedStyle, ...props, ref: ref })
+    : React.createElement("img", { alt: alt || "", style: parsedStyle, ...props, ref: ref });
 });
 export const Section = React.forwardRef(function Section(
-  { tag = "section", ...props },
+  { tag = "section", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Container = React.forwardRef(function Container(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-container",
+    style: parseStyleString(style),
     ref,
     ...props,
   });
 });
 export const BlockContainer = React.forwardRef(function BlockContainer(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-blockcontainer",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const HFlex = React.forwardRef(function HFlex(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-hflex",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const VFlex = React.forwardRef(function VFlex(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-vflex",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Layout = React.forwardRef(function Layout(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-layout wf-layout-layout",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Cell = React.forwardRef(function Cell(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-cell",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const HtmlEmbed = React.forwardRef(function HtmlEmbed(
-  { tag = "div", className = "", value = "", ...props },
+  { tag = "div", className = "", value = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-embed",
     dangerouslySetInnerHTML: { __html: utils.removeUnescaped(value) },
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Grid = React.forwardRef(function Grid(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-layout-grid",
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Icon = React.forwardRef(function Icon(
-  { widget, className = "", ...props },
+  { widget, className = "", style, ...props },
   ref
 ) {
   return React.createElement("div", {
     className: className + ` w-icon-${widget.icon}`,
+    style: parseStyleString(style),
     ...props,
     ref,
   });
 });
 export const Column = React.forwardRef(function Column(
-  { tag = "div", className = "", columnClasses = "", ...props },
+  { tag = "div", className = "", columnClasses = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className: className + " w-col " + columnClasses,
+    style: parseStyleString(style),
     ...props,
     ref,
   });
@@ -226,11 +242,12 @@ export const Row = React.forwardRef(function Row(
   );
 });
 export const DOM = React.forwardRef(function DOM(
-  { tag = "div", className = "", ...props },
+  { tag = "div", className = "", style, ...props },
   ref
 ) {
   return React.createElement(tag, {
     className,
+    style: parseStyleString(style),
     ...props,
     ref,
   });

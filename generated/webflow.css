@@ -5,8 +5,7 @@
  * American flag color palette (Red, White, Blue)
  */
 
-/* Import Google Sans-like font */
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+/* Google Fonts import moved to src/styles/global.css to avoid CSS bundling issues */
 
 :root {
   /* ========================================

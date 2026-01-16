@@ -64,7 +64,11 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
 
   // Compute href for a theme based on current path
   const getThemeHref = (themeId: string): string => {
-    if (!currentPath) return `/dashboard/${themeId}`
+    // Determine prefix based on current path or default based on environment
+    const hasJewettPrefix = currentPath?.startsWith('/jewett-junction')
+    const prefix = hasJewettPrefix ? '/jewett-junction' : ''
+
+    if (!currentPath) return `${prefix}/dashboard/${themeId}`
 
     const themeNames = ['modern', 'classic', 'minimal', 'warm', 'dark', 'patriotic']
     for (const themeName of themeNames) {
@@ -72,7 +76,7 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
         return currentPath.replace(`/${themeName}`, `/${themeId}`)
       }
     }
-    return `/dashboard/${themeId}`
+    return `${prefix}/dashboard/${themeId}`
   }
 
   return (

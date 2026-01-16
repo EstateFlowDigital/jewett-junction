@@ -27,9 +27,9 @@ export function IconSvgWrap({
         viewBox={viewbox}
         width="100%"
         height="100%"
-        vector-path="non-scaling-stroke"
+        vectorpath="non-scaling-stroke"
         aria-hidden="true"
-        fill-rule="evenodd"
+        fillRule="evenodd"
       >
         <_Builtin.DOM tag="path" slot="" d={path1} />
         {iconPath2Visibility ? (

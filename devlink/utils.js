@@ -187,6 +187,21 @@ export function dispatchCustomEvent(element, eventName) {
     })
   );
 }
+// Convert CSS string to React style object (e.g., "opacity: 40%;" -> { opacity: "40%" })
+export function parseStyleString(styleString) {
+  if (!styleString || typeof styleString !== "string") return styleString;
+  if (typeof styleString === "object") return styleString;
+  const styleObj = {};
+  styleString.split(";").forEach((rule) => {
+    const [property, value] = rule.split(":").map((s) => s?.trim());
+    if (property && value) {
+      // Convert kebab-case to camelCase
+      const camelProperty = property.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+      styleObj[camelProperty] = value;
+    }
+  });
+  return Object.keys(styleObj).length > 0 ? styleObj : undefined;
+}
 export function useClickOut(ref, action) {
   React.useEffect(() => {
     function handleClickOutside(event) {
