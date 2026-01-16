@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   // Update this to your Webflow Cloud URL when deployed
   site: process.env.SITE_URL || 'http://localhost:4321',
-  // Note: base is NOT set because Webflow Cloud handles the mount path
-  // Links should NOT include /jewett-junction/ prefix - Webflow Cloud adds it automatically
+  // Base path for subdirectory deployment - works for both local dev and production
+  base: '/jewett-junction',
   output: 'server',
   adapter: cloudflare({
     platformProxy: {
@@ -25,6 +25,5 @@ export default defineConfig({
       } : undefined,
     },
   },
-  // Note: assetsPrefix not needed - Webflow Cloud mount path handles this
   trailingSlash: 'never',
 });
