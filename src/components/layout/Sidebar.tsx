@@ -57,7 +57,7 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
     >
       {/* Logo */}
       <div className="flex h-14 items-center justify-center">
-        <a href="/" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <a href="/jewett-junction" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <HardHat className="h-5 w-5" aria-hidden="true" />
         </a>
       </div>
@@ -79,7 +79,7 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <a
-                href="/"
+                href="/jewett-junction"
                 className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors mx-auto"
                 aria-label="Theme Selector"
               >
@@ -93,7 +93,7 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <a
-                href="/settings/modern"
+                href="/jewett-junction/settings/modern"
                 className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors mx-auto"
                 aria-label="Settings"
               >
@@ -150,7 +150,7 @@ function MobileSidebarContent({ currentPath, currentTheme }: { currentPath: stri
     <div className="flex h-full flex-col bg-white" role="navigation" aria-label="Mobile navigation">
       {/* Header */}
       <div className="flex h-14 items-center gap-3 border-b border-gray-100 px-4">
-        <a href="/" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <a href="/jewett-junction" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <HardHat className="h-5 w-5" aria-hidden="true" />
         </a>
         <span className="font-semibold text-gray-900">Jewett Junction</span>
@@ -185,7 +185,7 @@ function MobileSidebarContent({ currentPath, currentTheme }: { currentPath: stri
       <div className="border-t border-gray-100 p-2 space-y-1" role="group" aria-label="Utility navigation">
         <ThemeSelector currentTheme={currentTheme} />
         <a
-          href={`/settings/${currentTheme}`}
+          href={`/jewett-junction/settings/${currentTheme}`}
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="h-5 w-5" aria-hidden="true" />

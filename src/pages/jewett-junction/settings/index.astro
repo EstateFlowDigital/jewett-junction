@@ -1,0 +1,250 @@
+---
+import DashboardLayout from '../../../layouts/dashboard.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { Settings, Bell, Lock, User, Palette, Globe, Monitor, Mail, Shield, Eye, ChevronRight, Check } from 'lucide-react';
+---
+
+<DashboardLayout title="Settings | Jewett Junction">
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3">
+        <Settings className="h-7 w-7 text-gray-600" />
+        Settings
+      </h1>
+      <p class="text-muted-foreground mt-1">
+        Manage your account preferences and portal settings
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Settings -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Profile Settings -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Profile Settings
+            </CardTitle>
+            <CardDescription>Manage your personal information</CardDescription>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span class="text-xl font-bold text-blue-600">JC</span>
+                </div>
+                <div>
+                  <div class="font-medium">Jewett Construction Admin</div>
+                  <div class="text-sm text-muted-foreground">admin@jewettconstruction.com</div>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-medium text-muted-foreground">Display Name</label>
+                <input type="text" value="Jewett Construction" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+              </div>
+              <div>
+                <label class="text-sm font-medium text-muted-foreground">Department</label>
+                <input type="text" value="Administration" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Notification Settings -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notification Preferences
+            </CardTitle>
+            <CardDescription>Choose what updates you want to receive</CardDescription>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            {[
+              { title: 'Company Announcements', desc: 'Important updates from leadership', enabled: true },
+              { title: 'Safety Alerts', desc: 'Critical safety notifications', enabled: true },
+              { title: 'HR Updates', desc: 'Benefits, policies, and HR news', enabled: true },
+              { title: 'Event Reminders', desc: 'Upcoming meetings and events', enabled: false },
+              { title: 'New Job Postings', desc: 'Open positions and referral opportunities', enabled: false },
+            ].map((item) => (
+              <div class="flex items-center justify-between p-3 rounded-lg border">
+                <div>
+                  <div class="font-medium text-sm">{item.title}</div>
+                  <div class="text-xs text-muted-foreground">{item.desc}</div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" checked={item.enabled} class="sr-only peer" />
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <!-- Appearance Settings -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Appearance
+            </CardTitle>
+            <CardDescription>Customize how the portal looks</CardDescription>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div>
+              <label class="text-sm font-medium">Dashboard Theme</label>
+              <p class="text-xs text-muted-foreground mb-3">Select your preferred dashboard style</p>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {[
+                  { id: 'modern', name: 'Modern', colors: ['#3b82f6', '#0ea5e9'] },
+                  { id: 'classic', name: 'Classic', colors: ['#1e40af', '#1d4ed8'] },
+                  { id: 'minimal', name: 'Minimal', colors: ['#374151', '#6b7280'] },
+                  { id: 'warm', name: 'Warm', colors: ['#d97706', '#ea580c'] },
+                  { id: 'dark', name: 'Dark', colors: ['#6366f1', '#8b5cf6'] },
+                  { id: 'patriotic', name: 'Patriotic', colors: ['#dc2626', '#1d4ed8'] },
+                ].map((theme) => (
+                  <a
+                    href={theme.id === 'modern' ? '/dashboard' : `/dashboard/${theme.id}`}
+                    class="p-3 rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors group"
+                  >
+                    <div class="flex items-center gap-2 mb-2">
+                      <div class="flex gap-1">
+                        <div class="w-4 h-4 rounded-full" style={`background-color: ${theme.colors[0]}`}></div>
+                        <div class="w-4 h-4 rounded-full" style={`background-color: ${theme.colors[1]}`}></div>
+                      </div>
+                    </div>
+                    <div class="text-sm font-medium group-hover:text-blue-600">{theme.name}</div>
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div class="pt-4 border-t">
+              <a href="/preview" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
+                <Eye className="h-4 w-4" />
+                Preview all themes in full screen
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Security Settings -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Security
+            </CardTitle>
+            <CardDescription>Manage your security preferences</CardDescription>
+          </CardHeader>
+          <CardContent class="space-y-4">
+            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <div class="font-medium">Two-Factor Authentication</div>
+                  <div class="text-sm text-muted-foreground">Add an extra layer of security</div>
+                </div>
+              </div>
+              <Badge className="bg-green-100 text-green-700">Enabled</Badge>
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Lock className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <div class="font-medium">Change Password</div>
+                  <div class="text-sm text-muted-foreground">Last changed 30 days ago</div>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Monitor className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <div class="font-medium">Active Sessions</div>
+                  <div class="text-sm text-muted-foreground">Manage devices where you're logged in</div>
+                </div>
+              </div>
+              <Badge variant="secondary">2 devices</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Quick Links -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Quick Links</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-2">
+            <a href="/it-helpdesk" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+              <Monitor className="h-5 w-5 text-blue-600" />
+              <span class="text-sm font-medium">IT Helpdesk</span>
+            </a>
+            <a href="/hr" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+              <User className="h-5 w-5 text-green-600" />
+              <span class="text-sm font-medium">HR Resources</span>
+            </a>
+            <a href="/directory" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+              <Globe className="h-5 w-5 text-purple-600" />
+              <span class="text-sm font-medium">Employee Directory</span>
+            </a>
+          </CardContent>
+        </Card>
+
+        <!-- Help Card -->
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-6">
+            <div class="text-center">
+              <div class="w-12 h-12 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                <Mail className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 class="font-semibold text-blue-900 mb-1">Need Help?</h3>
+              <p class="text-sm text-blue-700 mb-4">Contact IT for account or technical issues</p>
+              <a href="/it-helpdesk">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                  Contact IT Support
+                </Button>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Portal Info -->
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Portal Information</CardTitle>
+          </CardHeader>
+          <CardContent class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Version</span>
+              <span class="font-medium">2.1.0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Last Updated</span>
+              <span class="font-medium">Jan 14, 2026</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Environment</span>
+              <Badge variant="secondary">Production</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

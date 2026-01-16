@@ -29,16 +29,16 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Safety", href: "/safety", icon: Shield },
-  { title: "HR", href: "/hr", icon: Users },
-  { title: "IT Helpdesk", href: "/it-helpdesk", icon: Monitor },
-  { title: "Marketing", href: "/marketing", icon: Megaphone },
-  { title: "Events", href: "/events", icon: Calendar },
-  { title: "Culture", href: "/culture", icon: Heart },
-  { title: "Careers", href: "/careers", icon: Briefcase },
-  { title: "Directory", href: "/directory", icon: BookUser },
-  { title: "Resources", href: "/resources", icon: FolderOpen },
+  { title: "Dashboard", href: "/jewett-junction/dashboard", icon: LayoutDashboard },
+  { title: "Safety", href: "/jewett-junction/safety", icon: Shield },
+  { title: "HR", href: "/jewett-junction/hr", icon: Users },
+  { title: "IT Helpdesk", href: "/jewett-junction/it-helpdesk", icon: Monitor },
+  { title: "Marketing", href: "/jewett-junction/marketing", icon: Megaphone },
+  { title: "Events", href: "/jewett-junction/events", icon: Calendar },
+  { title: "Culture", href: "/jewett-junction/culture", icon: Heart },
+  { title: "Careers", href: "/jewett-junction/careers", icon: Briefcase },
+  { title: "Directory", href: "/jewett-junction/directory", icon: BookUser },
+  { title: "Resources", href: "/jewett-junction/resources", icon: FolderOpen },
 ];
 
 interface MobileNavProps {
@@ -80,7 +80,7 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
           {/* Header */}
           <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
             <a
-              href="/"
+              href="/jewett-junction"
               className="flex items-center gap-3"
               onClick={() => setIsOpen(false)}
             >
@@ -124,7 +124,7 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
           {/* Footer */}
           <div className="border-t border-gray-100 p-3 space-y-1">
             <a
-              href="/"
+              href="/jewett-junction"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             >
@@ -132,7 +132,7 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
               <span>Theme Selector</span>
             </a>
             <a
-              href={`/settings/${currentTheme}`}
+              href={`/jewett-junction/settings/${currentTheme}`}
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
             >
