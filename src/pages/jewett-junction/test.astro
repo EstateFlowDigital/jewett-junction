@@ -1,0 +1,16 @@
+---
+// Simple test page - no imports
+const url = Astro.url;
+const request = Astro.request;
+---
+<html>
+<head><title>Test Page</title></head>
+<body style="font-family: monospace; padding: 20px;">
+  <h1>Test Page Works!</h1>
+  <p><strong>URL pathname:</strong> {url.pathname}</p>
+  <p><strong>URL href:</strong> {url.href}</p>
+  <p><strong>Request URL:</strong> {request.url}</p>
+  <hr />
+  <p>If you see this, the route /jewett-junction/test is working.</p>
+</body>
+</html>

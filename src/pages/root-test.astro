@@ -1,0 +1,13 @@
+---
+// Root level test page
+const url = Astro.url;
+---
+<html>
+<head><title>Root Test</title></head>
+<body style="font-family: monospace; padding: 20px;">
+  <h1>Root Test Page</h1>
+  <p><strong>URL pathname:</strong> {url.pathname}</p>
+  <p>This page is at src/pages/root-test.astro</p>
+  <p>Route should be: /root-test</p>
+</body>
+</html>
