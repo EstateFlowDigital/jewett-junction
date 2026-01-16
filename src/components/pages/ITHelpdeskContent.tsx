@@ -10,7 +10,7 @@ interface ITHelpdeskContentProps {
 
 export function ITHelpdeskContent({ theme = 'modern' }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
-  const resourcesLink = `/resources/${theme}`;
+  const resourcesLink = `/jewett-junction/resources/${theme}`;
 
   return (
     <div className="space-y-6">

@@ -75,7 +75,7 @@ export function ThemeSelector({ currentTheme = "modern" }: ThemeSelectorProps) {
     if (themeId === "modern") {
       window.location.href = "/jewett-junction/dashboard"
     } else {
-      window.location.href = `/dashboard/${themeId}`
+      window.location.href = `/jewett-junction/dashboard/${themeId}`
     }
   }
 
