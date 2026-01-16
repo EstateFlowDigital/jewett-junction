@@ -1,0 +1,184 @@
+---
+import DashboardLayout from '../../layouts/dashboard.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
+import { Image, ArrowLeft, Download, Search, Filter, Building2, HardHat, Users, Calendar } from 'lucide-react';
+---
+
+<DashboardLayout title="Photo Library | Jewett Junction">
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a href="/jewett-junction/marketing" class="text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-5 w-5" />
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3">
+          <Image className="h-7 w-7 text-purple-500" />
+          Photo Library
+        </h1>
+        <p class="text-muted-foreground mt-1">
+          Browse and download project photos and company imagery
+        </p>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <Card>
+      <CardContent className="pt-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              class="w-full pl-10 pr-4 py-2 border rounded-md text-sm"
+              placeholder="Search photos by project, location, or tag..."
+            />
+          </div>
+          <div class="flex gap-2">
+            <Button variant="outline" size="default">
+              <Filter className="h-4 w-4 mr-2" /> Filters
+            </Button>
+            <select class="px-3 py-2 border rounded-md text-sm">
+              <option>All Categories</option>
+              <option>Projects</option>
+              <option>Team</option>
+              <option>Events</option>
+              <option>Office</option>
+            </select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Photo Categories -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <CardContent className="pt-6">
+          <div class="h-32 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg mb-3 flex items-center justify-center">
+            <Building2 className="h-12 w-12 text-white/80" />
+          </div>
+          <h3 class="font-semibold">Project Photos</h3>
+          <p class="text-sm text-muted-foreground">248 photos</p>
+        </CardContent>
+      </Card>
+
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <CardContent className="pt-6">
+          <div class="h-32 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg mb-3 flex items-center justify-center">
+            <HardHat className="h-12 w-12 text-white/80" />
+          </div>
+          <h3 class="font-semibold">Job Site</h3>
+          <p class="text-sm text-muted-foreground">156 photos</p>
+        </CardContent>
+      </Card>
+
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <CardContent className="pt-6">
+          <div class="h-32 bg-gradient-to-br from-green-400 to-green-600 rounded-lg mb-3 flex items-center justify-center">
+            <Users className="h-12 w-12 text-white/80" />
+          </div>
+          <h3 class="font-semibold">Team Photos</h3>
+          <p class="text-sm text-muted-foreground">89 photos</p>
+        </CardContent>
+      </Card>
+
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <CardContent className="pt-6">
+          <div class="h-32 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg mb-3 flex items-center justify-center">
+            <Calendar className="h-12 w-12 text-white/80" />
+          </div>
+          <h3 class="font-semibold">Events</h3>
+          <p class="text-sm text-muted-foreground">124 photos</p>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Recent Photos -->
+    <Card>
+      <CardHeader>
+        <div class="flex items-center justify-between">
+          <div>
+            <CardTitle>Recent Uploads</CardTitle>
+            <CardDescription>Latest photos added to the library</CardDescription>
+          </div>
+          <Button variant="outline" size="sm">View All</Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-slate-300 to-slate-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-300 to-blue-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-orange-300 to-orange-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-green-300 to-green-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-300 to-purple-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          <div class="aspect-square bg-slate-200 rounded-lg relative group cursor-pointer overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-red-300 to-red-400"></div>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Download className="h-6 w-6 text-white" />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Featured Project Gallery -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Featured: Downtown Office Complex</CardTitle>
+        <CardDescription>Completed December 2024 • 45 photos</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="col-span-2 row-span-2 aspect-video bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg"></div>
+          <div class="aspect-square bg-gradient-to-br from-slate-500 to-slate-700 rounded-lg"></div>
+          <div class="aspect-square bg-gradient-to-br from-slate-400 to-slate-600 rounded-lg"></div>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <Button>
+            <Download className="h-4 w-4 mr-2" /> Download All (ZIP)
+          </Button>
+          <Button variant="outline">View Full Gallery</Button>
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Usage Guidelines -->
+    <Card className="bg-amber-50 border-amber-200">
+      <CardContent className="pt-6">
+        <h3 class="font-semibold text-amber-900 mb-2">Photo Usage Guidelines</h3>
+        <ul class="text-sm text-amber-800 space-y-1">
+          <li>• All photos are for official Jewett Construction business use only</li>
+          <li>• Always credit the photographer when known</li>
+          <li>• Contact Marketing before using photos in external publications</li>
+          <li>• High-resolution versions available upon request</li>
+        </ul>
+      </CardContent>
+    </Card>
+  </div>
+</DashboardLayout>
