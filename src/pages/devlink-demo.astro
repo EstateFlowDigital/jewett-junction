@@ -1,0 +1,215 @@
+---
+// DevLink demo - using actual Webflow DevLink components (SSR only)
+import '../../generated/fonts.css';
+import '../../generated/webflow.css';
+import '../site-components/global.css';
+import '../styles/global.css';
+import '../../devlink/global.css';
+import { ThemeSwitcher } from '../components/ThemeSwitcher';
+import { MobileNav } from '../components/layout/MobileNav';
+import { CustomCode } from '../../devlink/CustomCode';
+import { IntranetCard } from '../../devlink/IntranetCard';
+import { BtnMain } from '../../devlink/BtnMain';
+---
+
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevLink Demo | Jewett Junction</title>
+    <style>
+      /* Safe area for mobile nav button */
+      @media (max-width: 767px) {
+        .mobile-safe-area { padding-top: 4.5rem; }
+      }
+      /* DevLink card fixes */
+      .devlink-card-wrapper {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        min-height: 350px;
+      }
+      /* Fix DevLink button overflow */
+      .devlink-button-wrapper [class*="btn_main_wrap"] {
+        min-width: 0;
+        max-width: 100%;
+      }
+      .devlink-button-wrapper [class*="btn_main_text"] {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 min-h-screen">
+    <!-- CustomCode injects DevLink theme/button CSS variables -->
+    <CustomCode />
+
+    <!-- Mobile Navigation -->
+    <MobileNav client:load currentTheme="modern" currentPath="/jewett-junction/devlink-demo" />
+
+    <!-- Desktop Sidebar -->
+    <aside class="fixed left-0 top-0 bottom-0 w-16 bg-white border-r border-slate-200 z-40 hidden md:flex flex-col items-center py-4">
+      <a href="/jewett-junction" class="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center text-white mb-6 hover:scale-105 transition-transform" title="Home">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </a>
+      <nav class="flex-1 flex flex-col items-center gap-2">
+        <a href="/jewett-junction/dashboard/modern" class="w-10 h-10 hover:bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center transition-colors" title="Dashboard">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        </a>
+        <a href="/jewett-junction/safety/modern" class="w-10 h-10 hover:bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center transition-colors" title="Safety">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </a>
+        <a href="/jewett-junction/hr/modern" class="w-10 h-10 hover:bg-slate-100 text-slate-400 rounded-xl flex items-center justify-center transition-colors" title="HR">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/devlink-demo" class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center" title="DevLink Demo">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="md:pl-16 min-h-screen">
+      <div class="p-4 sm:p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
+        <!-- Back Link -->
+        <a href="/jewett-junction" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-600 mb-6 md:mb-8 group">
+          <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Style Selector
+        </a>
+
+        <!-- Header -->
+        <div class="mb-6 md:mb-10">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full">DevLink</span>
+            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">SSR Only</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">DevLink Components Demo</h1>
+          <p class="text-sm sm:text-base text-slate-500">Using actual Webflow DevLink components rendered server-side in Astro.</p>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm mb-6 md:mb-8">
+          <div class="flex flex-col sm:flex-row items-start gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="flex-1">
+              <h2 class="text-base sm:text-lg font-semibold text-slate-900 mb-1">About This Demo</h2>
+              <p class="text-slate-600 text-sm">These components are imported directly from the DevLink folder (449 synced files from Webflow). They use CSS modules and are rendered server-side without client hydration.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- DevLink Intranet Cards Section -->
+        <div class="mb-6 md:mb-8">
+          <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Intranet Cards (DevLink)</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div class="devlink-card-wrapper">
+              <IntranetCard
+                headingHeadingRichText="Safety First"
+                paragraphParagraphRichText="Access safety newsletters, crisis management guides, and training resources."
+                urlClickableLink={{ href: "/jewett-junction/safety/modern" }}
+                urlDescriptiveText="View Safety Resources"
+                visualVisualImageFile="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=400&fit=crop"
+              />
+            </div>
+
+            <div class="devlink-card-wrapper">
+              <IntranetCard
+                headingHeadingRichText="HR Resources"
+                paragraphParagraphRichText="Employee handbook, benefits information, payroll, and timesheets."
+                urlClickableLink={{ href: "/jewett-junction/hr/modern" }}
+                urlDescriptiveText="View HR Resources"
+                visualVisualImageFile="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&h=400&fit=crop"
+              />
+            </div>
+
+            <div class="devlink-card-wrapper">
+              <IntranetCard
+                headingHeadingRichText="IT Helpdesk"
+                paragraphParagraphRichText="Submit tickets, access knowledge base, and get technical support."
+                urlClickableLink={{ href: "/jewett-junction/it-helpdesk/modern" }}
+                urlDescriptiveText="Get IT Help"
+                visualVisualImageFile="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- DevLink Buttons Section -->
+        <div class="mb-6 md:mb-8">
+          <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Buttons (DevLink)</h2>
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+              <div class="devlink-button-wrapper">
+                <BtnMain
+                  text="Share Good News"
+                  link={{ href: "mailto:marketing@jewettconstruction.com?subject=Good%20News" }}
+                  buttonStyle="primary"
+                  subtextVisibility={false}
+                  iconIconVisibility={true}
+                  buttonSizeIsSmall=""
+                />
+              </div>
+              <div class="devlink-button-wrapper">
+                <BtnMain
+                  text="Browse Resources"
+                  link={{ href: "/jewett-junction/resources/modern" }}
+                  buttonStyle="secondary"
+                  subtextVisibility={false}
+                  iconIconVisibility={false}
+                  buttonSizeIsSmall=""
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison with Tailwind -->
+        <div class="mb-6 md:mb-8">
+          <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 sm:mb-4">Comparison: Tailwind CSS Buttons</h2>
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+              <a href="mailto:marketing@jewettconstruction.com?subject=Good%20News" class="inline-flex items-center gap-2 px-5 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors">
+                <span>Share Good News</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              </a>
+              <a href="/jewett-junction/resources/modern" class="inline-flex items-center gap-2 px-5 py-3 bg-white text-slate-700 font-medium rounded-full border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors">
+                <span>Browse Resources</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Notes -->
+        <div class="bg-slate-100 rounded-2xl p-5 sm:p-6">
+          <h2 class="text-sm font-semibold text-slate-700 mb-3">Technical Notes</h2>
+          <ul class="text-sm text-slate-600 space-y-2">
+            <li class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>DevLink components render via SSR (no client hydration required)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>CSS modules are imported and applied automatically</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>CustomCode component injects theme CSS variables</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>Some styling adjustments needed for optimal display</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <ThemeSwitcher client:load currentTheme="modern" />
+  </body>
+</html>
