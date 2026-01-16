@@ -60,7 +60,7 @@ export function CultureCorner() {
         {mockStories.map((story) => (
           <a
             key={story.id}
-            href={`/culture/${story.id}`}
+            href={`/jewett-junction/culture/${story.id}`}
             className="flex gap-4 p-3 -mx-3 rounded-lg hover:bg-accent/50 transition-colors group"
           >
             {/* Placeholder image */}

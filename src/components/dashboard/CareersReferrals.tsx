@@ -69,7 +69,7 @@ export function CareersReferrals() {
           {mockJobs.slice(0, 3).map((job) => (
             <a
               key={job.id}
-              href={`/careers/${job.id}`}
+              href={`/jewett-junction/careers/${job.id}`}
               className="flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-accent/50 transition-colors group"
             >
               <div>

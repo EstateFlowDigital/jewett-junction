@@ -73,7 +73,7 @@ export function ThemeSelector({ currentTheme = "modern" }: ThemeSelectorProps) {
   const handleThemeChange = (themeId: string) => {
     // Navigate to the selected theme dashboard
     if (themeId === "modern") {
-      window.location.href = "/dashboard"
+      window.location.href = "/jewett-junction/dashboard"
     } else {
       window.location.href = `/dashboard/${themeId}`
     }

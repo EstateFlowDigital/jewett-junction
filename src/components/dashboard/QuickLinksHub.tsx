@@ -29,15 +29,15 @@ const quickLinkCategories: QuickLinkCategory[] = [
   {
     name: "Safety First",
     links: [
-      { title: "Safety Newsletter", href: "/safety/newsletter", icon: Shield },
-      { title: "Crisis Management", href: "/safety/crisis", icon: Shield },
-      { title: "Report Incident", href: "/safety/report", icon: FileText },
+      { title: "Safety Newsletter", href: "/jewett-junction/safety/newsletter", icon: Shield },
+      { title: "Crisis Management", href: "/jewett-junction/safety/crisis", icon: Shield },
+      { title: "Report Incident", href: "/jewett-junction/safety/report", icon: FileText },
     ],
   },
   {
     name: "HR Resources",
     links: [
-      { title: "Employee Handbook", href: "/hr/handbook", icon: FileText },
+      { title: "Employee Handbook", href: "/jewett-junction/hr/handbook", icon: FileText },
       { title: "Benefits Portal", href: "https://adp.com", icon: Heart, isExternal: true },
       { title: "Payroll / Timesheets", href: "https://adp.com", icon: Users, isExternal: true },
     ],
@@ -45,22 +45,22 @@ const quickLinkCategories: QuickLinkCategory[] = [
   {
     name: "IT & Support",
     links: [
-      { title: "IT Helpdesk", href: "/it-helpdesk", icon: Monitor },
-      { title: "Submit Ticket", href: "/it-helpdesk/tickets", icon: FileText },
+      { title: "IT Helpdesk", href: "/jewett-junction/it-helpdesk", icon: Monitor },
+      { title: "Submit Ticket", href: "/jewett-junction/it-helpdesk/tickets", icon: FileText },
     ],
   },
   {
     name: "Marketing",
     links: [
-      { title: "Brand Assets", href: "/marketing/brand-assets", icon: Megaphone },
-      { title: "Signage Request", href: "/marketing/signage", icon: FileText },
+      { title: "Brand Assets", href: "/jewett-junction/marketing/brand-assets", icon: Megaphone },
+      { title: "Signage Request", href: "/jewett-junction/marketing/signage", icon: FileText },
     ],
   },
   {
     name: "Organization",
     links: [
-      { title: "Org Chart", href: "/directory/org-chart", icon: Building2 },
-      { title: "Team Contacts", href: "/directory", icon: BookUser },
+      { title: "Org Chart", href: "/jewett-junction/directory/org-chart", icon: Building2 },
+      { title: "Team Contacts", href: "/jewett-junction/directory", icon: BookUser },
     ],
   },
 ]

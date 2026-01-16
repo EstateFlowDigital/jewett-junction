@@ -80,7 +80,7 @@ export function EventsCalendar() {
         {mockEvents.map((event) => (
           <a
             key={event.id}
-            href={`/events/${event.id}`}
+            href={`/jewett-junction/events/${event.id}`}
             className="flex items-start gap-3 p-3 -mx-3 rounded-lg hover:bg-accent/50 transition-colors group"
           >
             {/* Date box */}

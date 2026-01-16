@@ -74,7 +74,7 @@ export function Headlines() {
         {mockHeadlines.map((headline) => (
           <a
             key={headline.id}
-            href={`/headlines/${headline.id}`}
+            href={`/jewett-junction/headlines/${headline.id}`}
             className="block group"
           >
             <article className="flex gap-4 p-3 -mx-3 rounded-lg hover:bg-accent/50 transition-colors">

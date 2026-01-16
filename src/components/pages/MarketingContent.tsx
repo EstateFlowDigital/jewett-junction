@@ -11,11 +11,11 @@ export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
   const isDark = theme === 'dark';
 
   const resources = [
-    { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/marketing/brand-assets`, color: 'blue' },
-    { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/marketing/letterhead`, color: 'green' },
-    { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/marketing/presentations`, color: 'purple' },
-    { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/marketing/signage`, color: 'orange' },
-    { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/marketing/photos`, color: 'pink' },
+    { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/jewett-junction/marketing/brand-assets`, color: 'blue' },
+    { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/jewett-junction/marketing/letterhead`, color: 'green' },
+    { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/jewett-junction/marketing/presentations`, color: 'purple' },
+    { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange' },
+    { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink' },
   ];
 
   return (

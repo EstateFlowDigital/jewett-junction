@@ -9,12 +9,12 @@ import {
 } from "lucide-react"
 
 const actions = [
-  { label: "Submit Report", icon: FileText, href: "/safety/report" },
-  { label: "View Calendar", icon: Calendar, href: "/events" },
-  { label: "Directory", icon: Users, href: "/directory" },
-  { label: "IT Help", icon: HelpCircle, href: "/it-helpdesk" },
-  { label: "Training", icon: BookOpen, href: "/resources" },
-  { label: "Refer Friend", icon: Gift, href: "/careers" },
+  { label: "Submit Report", icon: FileText, href: "/jewett-junction/safety/report" },
+  { label: "View Calendar", icon: Calendar, href: "/jewett-junction/events" },
+  { label: "Directory", icon: Users, href: "/jewett-junction/directory" },
+  { label: "IT Help", icon: HelpCircle, href: "/jewett-junction/it-helpdesk" },
+  { label: "Training", icon: BookOpen, href: "/jewett-junction/resources" },
+  { label: "Refer Friend", icon: Gift, href: "/jewett-junction/careers" },
 ]
 
 export function QuickActions() {
