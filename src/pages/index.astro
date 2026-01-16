@@ -1,4 +1,6 @@
 ---
-// Root redirects to dashboard
-return Astro.redirect('/jewett-junction/dashboard/modern');
+// This file exists but the root path is handled by middleware
+// which rewrites /jewett-junction to /home
+// If somehow this gets hit, redirect to home
+return Astro.redirect('/jewett-junction/home');
 ---
