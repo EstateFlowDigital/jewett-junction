@@ -1,0 +1,404 @@
+---
+import '../../../../../generated/fonts.css';
+import '../../../../../generated/webflow.css';
+import '../../../../site-components/global.css';
+import '../../../../styles/global.css';
+import { ThemeSwitcher } from '../../../../components/ThemeSwitcher';
+import { MobileNav } from '../../../../components/layout/MobileNav';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Warm Dashboard | Jewett Junction</title>
+    <style>
+      .glow-amber { box-shadow: 0 0 40px rgba(251, 191, 36, 0.15); }
+      .card-hover:hover { transform: translateY(-2px); }
+      @media (max-width: 767px) { .mobile-safe-area { padding-top: 4.5rem; } }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 min-h-screen">
+    <MobileNav client:load currentTheme="warm" currentPath="/jewett-junction/dashboard" />
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 bottom-0 w-72 bg-white/80 backdrop-blur-xl border-r border-amber-100 z-40 hidden md:flex flex-col">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-10">
+          <div class="w-12 h-12 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900 text-lg">Jewett Junction</div>
+            <div class="text-xs text-amber-600 font-medium">Employee Portal</div>
+          </div>
+        </div>
+
+        <!-- Company Card -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 mb-8 text-white glow-amber">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <div>
+              <div class="font-semibold">Safety Record</div>
+              <div class="text-amber-100 text-sm">4EverSafe Commitment</div>
+            </div>
+          </div>
+          <div class="text-4xl font-bold mb-1">247</div>
+          <div class="text-sm text-amber-100">Days Without Incident</div>
+        </div>
+
+        <nav class="space-y-2">
+          <a href="/jewett-junction/dashboard/warm" class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl shadow-md shadow-orange-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Dashboard
+          </a>
+          <a href="/jewett-junction/safety/warm" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-amber-50 rounded-xl transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Safety Hub
+          </a>
+          <a href="/jewett-junction/hr/warm" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-amber-50 rounded-xl transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            HR & Benefits
+          </a>
+          <a href="/jewett-junction/events/warm" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-amber-50 rounded-xl transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Calendar
+          </a>
+          <a href="/jewett-junction/careers/warm" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-amber-50 rounded-xl transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Careers
+          </a>
+          <a href="/jewett-junction/directory/warm" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-amber-50 rounded-xl transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Directory
+          </a>
+        </nav>
+      </div>
+
+      <!-- Contact Info at Bottom -->
+      <div class="mt-auto p-6 border-t border-amber-100">
+        <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Need Help?</div>
+        <div class="space-y-2 text-sm">
+          <a href="mailto:hr@jewettconstruction.com" class="flex items-center gap-2 text-gray-600 hover:text-amber-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            HR@jewett.com
+          </a>
+          <a href="/jewett-junction/it-helpdesk/warm" class="flex items-center gap-2 text-gray-600 hover:text-amber-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            IT Helpdesk
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="md:pl-72 min-h-screen">
+      <div class="mobile-safe-area md:pt-6 p-6 md:p-8 lg:p-10">
+        <!-- Back Link -->
+        <a href="/jewett-junction" class="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 mb-8 group">
+          <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Style Selector
+        </a>
+
+        <!-- Welcome -->
+        <div class="mb-10">
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Welcome to Jewett Junction</h1>
+          <p class="text-gray-600 text-sm sm:text-base md:text-lg">Your central hub for company news, resources, and updates. Tuesday, January 14th, 2025.</p>
+        </div>
+
+        <!-- Featured Announcement -->
+        <div class="bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 rounded-3xl p-6 mb-10 text-white relative overflow-hidden shadow-lg shadow-orange-500/20">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div class="relative">
+            <span class="text-xs text-amber-100 uppercase tracking-wider">Featured Announcement</span>
+            <h2 class="text-xl sm:text-2xl font-bold mt-2 mb-3">Q4 2024 Results Are In!</h2>
+            <p class="text-amber-100 text-sm sm:text-base mb-4 max-w-2xl">We exceeded our safety and revenue targets this quarter. Join us for the all-hands meeting on Wednesday to celebrate our achievements and hear about plans for 2025.</p>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <a href="/jewett-junction/resources/warm" class="px-5 py-2.5 bg-white text-orange-600 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-colors text-center">Read Full Announcement</a>
+              <span class="text-sm text-amber-100">CEO Office • 2 hours ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Grid Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-10">
+          <!-- Safety Card - Large -->
+          <div class="col-span-1 md:col-span-5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white relative overflow-hidden card-hover transition-transform">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="relative">
+              <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <div class="text-emerald-100 text-sm">Days Without Incident</div>
+              <div class="text-4xl sm:text-5xl md:text-6xl font-bold mb-2">247</div>
+              <div class="flex items-center gap-2 text-sm text-emerald-100">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Company record: 312 days
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column Stats -->
+          <div class="col-span-1 md:col-span-7 grid grid-cols-2 gap-4">
+            <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs sm:text-sm text-gray-500">Active Projects</span>
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+              </div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">42</div>
+              <div class="text-xs sm:text-sm text-green-600 mt-1">+3 this month</div>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs sm:text-sm text-gray-500">Total Employees</span>
+                <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+              </div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">156</div>
+              <div class="text-xs sm:text-sm text-gray-500 mt-1">Across 5 locations</div>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm card-hover transition-transform">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs sm:text-sm text-gray-500">Open Positions</span>
+                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+              </div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">8</div>
+              <div class="text-xs sm:text-sm text-amber-600 mt-1">View openings</div>
+            </div>
+            <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 text-white card-hover transition-transform shadow-lg shadow-orange-500/20">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs sm:text-sm text-amber-100">Referral Bonus</span>
+                <svg class="w-6 h-6 text-amber-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div class="text-2xl sm:text-3xl md:text-4xl font-bold">$500</div>
+              <div class="text-xs sm:text-sm text-amber-100 mt-1">Per successful hire</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="mb-10">
+          <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Quick Links</h2>
+          <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <a href="/jewett-junction/safety/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">Safety</div>
+            </a>
+            <a href="/jewett-junction/hr/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">HR</div>
+            </a>
+            <a href="/jewett-junction/it-helpdesk/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">IT Help</div>
+            </a>
+            <a href="/jewett-junction/resources/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">Training</div>
+            </a>
+            <a href="/jewett-junction/events/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">Calendar</div>
+            </a>
+            <a href="/jewett-junction/careers/warm" class="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm card-hover transition-transform text-center">
+              <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="font-medium text-gray-900 text-sm">Careers</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- News & Events -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+          <!-- News Feed -->
+          <div class="lg:col-span-2 bg-white rounded-3xl border border-amber-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-amber-50 flex items-center justify-between">
+              <h2 class="font-bold text-gray-900">News & Updates</h2>
+              <a href="/jewett-junction/resources/warm" class="text-sm text-amber-600 hover:text-amber-700">View All</a>
+            </div>
+            <div class="divide-y divide-amber-50">
+              <div class="p-4 flex items-center gap-4 hover:bg-amber-50/30 transition-colors">
+                <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <span class="text-xs text-blue-600 font-medium">Company News</span>
+                  <div class="font-medium text-gray-900 text-sm">Q4 Results Exceed Expectations</div>
+                  <div class="text-xs text-gray-500">Strong performance across all divisions...</div>
+                </div>
+                <span class="text-xs text-gray-400">2h ago</span>
+              </div>
+              <div class="p-4 flex items-center gap-4 hover:bg-amber-50/30 transition-colors">
+                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <span class="text-xs text-green-600 font-medium">Safety</span>
+                  <div class="font-medium text-gray-900 text-sm">Winter Weather Safety Protocols</div>
+                  <div class="text-xs text-gray-500">Updated guidelines for cold weather operations...</div>
+                </div>
+                <span class="text-xs text-gray-400">Yesterday</span>
+              </div>
+              <div class="p-4 flex items-center gap-4 hover:bg-amber-50/30 transition-colors">
+                <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <span class="text-xs text-purple-600 font-medium">Team</span>
+                  <div class="font-medium text-gray-900 text-sm">Welcome Sarah Chen to Engineering</div>
+                  <div class="text-xs text-gray-500">New project coordinator joins us from Turner...</div>
+                </div>
+                <span class="text-xs text-gray-400">2 days ago</span>
+              </div>
+              <div class="p-4 flex items-center gap-4 hover:bg-amber-50/30 transition-colors">
+                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <span class="text-xs text-amber-600 font-medium">HR</span>
+                  <div class="font-medium text-gray-900 text-sm">Open Enrollment Deadline Approaching</div>
+                  <div class="text-xs text-gray-500">Review and update your benefits selections...</div>
+                </div>
+                <span class="text-xs text-gray-400">3 days ago</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Events -->
+          <div class="bg-white rounded-3xl border border-amber-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-amber-50 flex items-center justify-between">
+              <h2 class="font-bold text-gray-900">Upcoming Events</h2>
+              <a href="/jewett-junction/events/warm" class="text-sm text-amber-600 hover:text-amber-700">View All</a>
+            </div>
+            <div class="p-4 space-y-3">
+              <div class="flex gap-4 p-3 bg-amber-50 rounded-xl">
+                <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-xl flex flex-col items-center justify-center flex-shrink-0 shadow-md shadow-orange-500/20">
+                  <span class="text-xs font-medium">Wed</span>
+                  <span class="text-xl font-bold">15</span>
+                </div>
+                <div>
+                  <div class="font-semibold text-gray-900">All-Hands Meeting</div>
+                  <div class="text-sm text-gray-500">10:00 AM</div>
+                  <div class="text-xs text-gray-400">Main Conference Room</div>
+                </div>
+              </div>
+              <div class="flex gap-4 p-3 hover:bg-amber-50/50 rounded-xl transition-colors">
+                <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-xl flex flex-col items-center justify-center flex-shrink-0 shadow-md shadow-red-500/20">
+                  <span class="text-xs font-medium">Fri</span>
+                  <span class="text-xl font-bold">17</span>
+                </div>
+                <div>
+                  <div class="font-semibold text-gray-900">Safety Training</div>
+                  <div class="text-sm text-gray-500">2:00 PM</div>
+                  <div class="text-xs text-gray-400">Training Center</div>
+                </div>
+              </div>
+              <div class="flex gap-4 p-3 hover:bg-amber-50/50 rounded-xl transition-colors">
+                <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-emerald-500 text-white rounded-xl flex flex-col items-center justify-center flex-shrink-0 shadow-md shadow-emerald-500/20">
+                  <span class="text-xs font-medium">Sat</span>
+                  <span class="text-xl font-bold">18</span>
+                </div>
+                <div>
+                  <div class="font-semibold text-gray-900">Team Lunch</div>
+                  <div class="text-sm text-gray-500">12:30 PM</div>
+                  <div class="text-xs text-gray-400">Tony's Italian</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee Spotlight & Careers -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Employee Spotlight -->
+          <div class="bg-white rounded-3xl border border-amber-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-amber-50">
+              <h2 class="font-bold text-gray-900">Employee Spotlight</h2>
+            </div>
+            <div class="p-6">
+              <div class="flex flex-col sm:flex-row items-start gap-5">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0 shadow-lg shadow-orange-500/20">
+                  RG
+                </div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-gray-900">Robert Garcia</h3>
+                  <p class="text-gray-500 text-sm mb-3">Site Superintendent • 12 years</p>
+                  <p class="text-gray-600 text-sm leading-relaxed">
+                    "Robert's leadership on the Downtown Plaza project has been exceptional. His commitment to safety sets the standard for all of us."
+                  </p>
+                  <p class="text-xs text-gray-400 mt-3 italic">-- Nominated by Engineering Team</p>
+                </div>
+              </div>
+              <div class="mt-5 pt-4 border-t border-amber-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <span class="text-sm text-gray-500">Know someone deserving recognition?</span>
+                <a href="/jewett-junction/culture/warm" class="text-sm text-amber-600 hover:text-amber-700 font-medium">Nominate</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Positions -->
+          <div class="bg-white rounded-3xl border border-amber-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-amber-50 flex items-center justify-between">
+              <h2 class="font-bold text-gray-900">Open Positions</h2>
+              <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">8 openings</span>
+            </div>
+            <div class="divide-y divide-amber-50">
+              <a href="/jewett-junction/careers/warm" class="p-4 flex items-center justify-between hover:bg-amber-50/30 transition-colors group">
+                <div>
+                  <div class="font-medium text-gray-900 group-hover:text-amber-600">Project Manager</div>
+                  <div class="text-sm text-gray-500">Commercial Division • Columbus</div>
+                </div>
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+              <a href="/jewett-junction/careers/warm" class="p-4 flex items-center justify-between hover:bg-amber-50/30 transition-colors group">
+                <div>
+                  <div class="font-medium text-gray-900 group-hover:text-amber-600">Safety Coordinator</div>
+                  <div class="text-sm text-gray-500">Safety Team • Cleveland</div>
+                </div>
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+              <a href="/jewett-junction/careers/warm" class="p-4 flex items-center justify-between hover:bg-amber-50/30 transition-colors group">
+                <div>
+                  <div class="font-medium text-gray-900 group-hover:text-amber-600">Field Engineer</div>
+                  <div class="text-sm text-gray-500">Engineering • Cincinnati</div>
+                </div>
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-amber-100">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <div class="font-medium text-gray-900">Refer a Friend</div>
+                  <div class="text-sm text-gray-500">Earn $500 for each successful hire</div>
+                </div>
+                <a href="/jewett-junction/careers/warm" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity shadow-md shadow-orange-500/20">Submit Referral</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <ThemeSwitcher client:load currentTheme="warm" />
+  </body>
+</html>
