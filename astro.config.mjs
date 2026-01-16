@@ -26,5 +26,5 @@ export default defineConfig({
     },
   },
   // Note: assetsPrefix not needed - Webflow Cloud mount path handles this
-  trailingSlash: 'never',
+  trailingSlash: 'ignore',
 });
