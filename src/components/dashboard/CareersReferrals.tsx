@@ -57,7 +57,7 @@ export function CareersReferrals() {
             </div>
           </div>
           <Button variant="outline" size="sm" asChild>
-            <a href="/careers">
+            <a href="/jewett-junction/careers">
               View All
               <ArrowRight className="ml-1 h-4 w-4" />
             </a>

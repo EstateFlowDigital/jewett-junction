@@ -147,7 +147,7 @@ export function ThemeSwitcher({ currentTheme = "modern" }: ThemeSwitcherProps) {
 
             <div className="p-3 border-t border-gray-100 bg-gray-50">
               <a
-                href="/preview"
+                href="/jewett-junction/preview"
                 className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1"
               >
                 View full comparison page

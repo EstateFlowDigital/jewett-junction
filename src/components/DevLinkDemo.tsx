@@ -56,19 +56,19 @@ export function DevLinkDemo() {
         <div style={cardStyle}>
           <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>Safety First</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>Access safety newsletters, crisis management guides, and training resources.</p>
-          <a href="/safety/modern" style={primaryButtonStyle}>View Safety Resources →</a>
+          <a href="/jewett-junction/safety/modern" style={primaryButtonStyle}>View Safety Resources →</a>
         </div>
 
         <div style={cardStyle}>
           <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>HR Resources</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>Employee handbook, benefits information, payroll, and timesheets.</p>
-          <a href="/hr/modern" style={primaryButtonStyle}>View HR Resources →</a>
+          <a href="/jewett-junction/hr/modern" style={primaryButtonStyle}>View HR Resources →</a>
         </div>
 
         <div style={cardStyle}>
           <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 0.5rem 0' }}>IT Helpdesk</h3>
           <p style={{ margin: '0 0 1rem 0', opacity: 0.9 }}>Submit tickets, access knowledge base, and get technical support.</p>
-          <a href="/it-helpdesk/modern" style={primaryButtonStyle}>Get IT Help →</a>
+          <a href="/jewett-junction/it-helpdesk/modern" style={primaryButtonStyle}>Get IT Help →</a>
         </div>
       </div>
 
@@ -77,7 +77,7 @@ export function DevLinkDemo() {
         <a href="mailto:marketing@jewettconstruction.com?subject=Good%20News" style={primaryButtonStyle}>
           Share Good News
         </a>
-        <a href="/resources/modern" style={secondaryButtonStyle}>
+        <a href="/jewett-junction/resources/modern" style={secondaryButtonStyle}>
           Browse Resources
         </a>
       </div>

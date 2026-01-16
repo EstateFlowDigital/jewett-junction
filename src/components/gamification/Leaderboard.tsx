@@ -29,7 +29,7 @@ export function Leaderboard({ limit = 5, showFullList = false, className }: Lead
         ))}
         {!showFullList && (
           <a
-            href="/culture"
+            href="/jewett-junction/culture"
             className="block text-center text-sm text-[--brand-secondary] hover:underline pt-2"
           >
             View full leaderboard →
