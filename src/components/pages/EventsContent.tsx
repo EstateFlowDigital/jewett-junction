@@ -4,19 +4,61 @@ import { Calendar, Clock, MapPin, Users, ChevronRight, Plus, Filter } from 'luci
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-interface EventsContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+interface CMSEvent {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  'event-date': string;
+  'end-date'?: string;
+  location?: string;
+  category?: string;
+  'registration-link'?: string;
 }
 
-export function EventsContent({ theme = 'modern' }: EventsContentProps) {
+interface EventsContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  events?: CMSEvent[];
+}
+
+const categoryColors: Record<string, string> = {
+  company: 'blue',
+  training: 'green',
+  social: 'orange',
+  safety: 'red',
+};
+
+function formatEventDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return {
+    month: date.toLocaleDateString('en-US', { month: 'short' }),
+    day: date.getDate().toString(),
+    time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+  };
+}
+
+export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: EventsContentProps) {
   const isDark = theme === 'dark';
 
-  const events = [
-    { title: 'All-Hands Meeting', date: 'Jan 15', time: '10:00 AM', location: 'Main Conference', type: 'Company', color: 'blue' },
-    { title: 'Safety Training', date: 'Jan 17', time: '2:00 PM', location: 'Training Center', type: 'Training', color: 'green' },
-    { title: 'New Hire Orientation', date: 'Jan 20', time: '9:00 AM', location: 'HR Office', type: 'HR', color: 'purple' },
-    { title: 'Project Kickoff', date: 'Jan 22', time: '1:00 PM', location: 'Boardroom', type: 'Project', color: 'orange' },
-  ];
+  // Transform CMS events to display format, fallback to sample data if empty
+  const events = cmsEvents.length > 0
+    ? cmsEvents.map(e => {
+        const { month, day, time } = formatEventDate(e['event-date']);
+        return {
+          title: e.name,
+          date: `${month} ${day}`,
+          time,
+          location: e.location || 'TBD',
+          type: e.category || 'Company',
+          color: categoryColors[e.category || 'company'] || 'blue',
+        };
+      })
+    : [
+        { title: 'All-Hands Meeting', date: 'Jan 15', time: '10:00 AM', location: 'Main Conference', type: 'Company', color: 'blue' },
+        { title: 'Safety Training', date: 'Jan 17', time: '2:00 PM', location: 'Training Center', type: 'Training', color: 'green' },
+        { title: 'New Hire Orientation', date: 'Jan 20', time: '9:00 AM', location: 'HR Office', type: 'HR', color: 'purple' },
+        { title: 'Project Kickoff', date: 'Jan 22', time: '1:00 PM', location: 'Boardroom', type: 'Project', color: 'orange' },
+      ];
 
   return (
     <div className="space-y-6">

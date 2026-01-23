@@ -1,8 +1,18 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { EventsContent } from '../../components/pages/EventsContent';
+import { getEvents } from '../../lib/webflow-cms';
+
+// Fetch events from CMS
+let events: any[] = [];
+try {
+  const result = await getEvents({ upcoming: true });
+  events = result.items;
+} catch (error) {
+  console.error('Error fetching events:', error);
+}
 ---
 
 <ThemedPage title="Events | Jewett Junction" theme="dark" currentSection="events">
-  <EventsContent client:load theme="dark" />
+  <EventsContent client:load theme="dark" events={events} />
 </ThemedPage>

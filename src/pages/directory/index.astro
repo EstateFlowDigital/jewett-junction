@@ -1,8 +1,18 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { DirectoryContent } from '../../components/pages/DirectoryContent';
+import { getEmployees } from '../../lib/webflow-cms';
+
+// Fetch employees from CMS
+let employees: any[] = [];
+try {
+  const result = await getEmployees();
+  employees = result.items;
+} catch (error) {
+  console.error('Error fetching employees:', error);
+}
 ---
 
 <ThemedPage title="Directory | Jewett Junction" theme="dark" currentSection="directory">
-  <DirectoryContent client:load theme="dark" />
+  <DirectoryContent client:load theme="dark" employees={employees} />
 </ThemedPage>

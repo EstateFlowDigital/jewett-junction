@@ -1,8 +1,18 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { ResourcesContent } from '../../components/pages/ResourcesContent';
+import { getResources } from '../../lib/webflow-cms';
+
+// Fetch resources from CMS
+let resources: any[] = [];
+try {
+  const result = await getResources();
+  resources = result.items;
+} catch (error) {
+  console.error('Error fetching resources:', error);
+}
 ---
 
 <ThemedPage title="Resources | Jewett Junction" theme="dark" currentSection="resources">
-  <ResourcesContent client:load theme="dark" />
+  <ResourcesContent client:load theme="dark" resources={resources} />
 </ThemedPage>

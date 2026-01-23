@@ -3,21 +3,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Users, Search, Phone, Mail, Building, MapPin, Filter } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface DirectoryContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+interface CMSEmployee {
+  id: string;
+  name: string;
+  slug?: string;
+  role: string;
+  department: string;
+  email?: string;
+  phone?: string;
+  photo?: { url: string; alt?: string };
+  bio?: string;
+  'start-date'?: string;
+  'is-featured'?: boolean;
 }
 
-export function DirectoryContent({ theme = 'modern' }: DirectoryContentProps) {
+interface DirectoryContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  employees?: CMSEmployee[];
+}
+
+const deptColors: Record<string, string> = {
+  Safety: 'green',
+  'Human Resources': 'purple',
+  HR: 'purple',
+  Operations: 'blue',
+  'Information Technology': 'indigo',
+  IT: 'indigo',
+  Finance: 'amber',
+  Marketing: 'pink',
+  Engineering: 'cyan',
+  Commercial: 'orange',
+  Admin: 'slate',
+};
+
+function getInitials(name: string) {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+}
+
+export function DirectoryContent({ theme = 'modern', employees: cmsEmployees = [] }: DirectoryContentProps) {
   const isDark = theme === 'dark';
 
-  const employees = [
-    { name: 'James Mitchell', role: 'Director of Safety', dept: 'Safety', location: 'Denver', initials: 'JM', color: 'green' },
-    { name: 'Jennifer Davis', role: 'HR Manager', dept: 'Human Resources', location: 'Denver', initials: 'JD', color: 'purple' },
-    { name: 'Mike Thompson', role: 'Project Manager', dept: 'Operations', location: 'Boulder', initials: 'MT', color: 'blue' },
-    { name: 'Sarah Chen', role: 'IT Manager', dept: 'Information Technology', location: 'Denver', initials: 'SC', color: 'indigo' },
-    { name: 'Robert Johnson', role: 'CFO', dept: 'Finance', location: 'Denver', initials: 'RJ', color: 'amber' },
-    { name: 'Lisa Wang', role: 'Marketing Director', dept: 'Marketing', location: 'Denver', initials: 'LW', color: 'pink' },
-  ];
+  // Transform CMS employees to display format, fallback to sample data if empty
+  const employees = cmsEmployees.length > 0
+    ? cmsEmployees.map(e => ({
+        name: e.name,
+        role: e.role,
+        dept: e.department,
+        location: 'Columbus', // Default location
+        initials: getInitials(e.name),
+        color: deptColors[e.department] || 'blue',
+        email: e.email,
+        phone: e.phone,
+        photo: e.photo?.url,
+      }))
+    : [
+        { name: 'James Mitchell', role: 'Director of Safety', dept: 'Safety', location: 'Denver', initials: 'JM', color: 'green' },
+        { name: 'Jennifer Davis', role: 'HR Manager', dept: 'Human Resources', location: 'Denver', initials: 'JD', color: 'purple' },
+        { name: 'Mike Thompson', role: 'Project Manager', dept: 'Operations', location: 'Boulder', initials: 'MT', color: 'blue' },
+        { name: 'Sarah Chen', role: 'IT Manager', dept: 'Information Technology', location: 'Denver', initials: 'SC', color: 'indigo' },
+        { name: 'Robert Johnson', role: 'CFO', dept: 'Finance', location: 'Denver', initials: 'RJ', color: 'amber' },
+        { name: 'Lisa Wang', role: 'Marketing Director', dept: 'Marketing', location: 'Denver', initials: 'LW', color: 'pink' },
+      ];
 
   return (
     <div className="space-y-6">
@@ -97,9 +143,9 @@ export function DirectoryContent({ theme = 'modern' }: DirectoryContentProps) {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Employees', value: '156' },
-          { label: 'Departments', value: '8' },
-          { label: 'Locations', value: '4' },
+          { label: 'Total Employees', value: employees.length.toString() || '156' },
+          { label: 'Departments', value: [...new Set(employees.map(e => e.dept))].length.toString() || '8' },
+          { label: 'Locations', value: [...new Set(employees.map(e => e.location))].length.toString() || '4' },
           { label: 'Remote', value: '12' },
         ].map((stat) => (
           <Card key={stat.label} className={isDark ? 'bg-slate-800 border-slate-700' : ''}>

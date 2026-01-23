@@ -4,26 +4,83 @@ import { FolderOpen, FileText, Download, Search, Filter, Shield, Users, Building
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-interface ResourcesContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+interface CMSResource {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  category?: string;
+  file?: { url: string };
+  'external-link'?: string;
+  icon?: string;
 }
 
-export function ResourcesContent({ theme = 'modern' }: ResourcesContentProps) {
+interface ResourcesContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  resources?: CMSResource[];
+}
+
+const categoryIcons: Record<string, any> = {
+  'Safety': Shield,
+  'Safety Documents': Shield,
+  'HR': Users,
+  'HR Forms': Users,
+  'Project': Building,
+  'Project Templates': Building,
+  'IT': Wrench,
+  'IT Guides': Wrench,
+};
+
+const categoryColors: Record<string, string> = {
+  'Safety': 'green',
+  'Safety Documents': 'green',
+  'HR': 'purple',
+  'HR Forms': 'purple',
+  'Project': 'blue',
+  'Project Templates': 'blue',
+  'IT': 'orange',
+  'IT Guides': 'orange',
+};
+
+export function ResourcesContent({ theme = 'modern', resources: cmsResources = [] }: ResourcesContentProps) {
   const isDark = theme === 'dark';
 
-  const categories = [
-    { name: 'Safety Documents', icon: Shield, count: 24, color: 'green' },
-    { name: 'HR Forms', icon: Users, count: 18, color: 'purple' },
-    { name: 'Project Templates', icon: Building, count: 32, color: 'blue' },
-    { name: 'IT Guides', icon: Wrench, count: 15, color: 'orange' },
-  ];
+  // Group CMS resources by category
+  const resourcesByCategory = cmsResources.reduce((acc, r) => {
+    const cat = r.category || 'Other';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(r);
+    return acc;
+  }, {} as Record<string, CMSResource[]>);
 
-  const recentDocs = [
-    { name: 'Safety Manual 2026', type: 'PDF', size: '2.4 MB', date: 'Jan 10, 2026' },
-    { name: 'Employee Handbook', type: 'PDF', size: '1.8 MB', date: 'Jan 8, 2026' },
-    { name: 'Project Budget Template', type: 'Excel', size: '156 KB', date: 'Jan 5, 2026' },
-    { name: 'Brand Guidelines', type: 'PDF', size: '5.2 MB', date: 'Jan 3, 2026' },
-  ];
+  const categories = cmsResources.length > 0
+    ? Object.entries(resourcesByCategory).map(([name, items]) => ({
+        name,
+        icon: categoryIcons[name] || FolderOpen,
+        count: items.length,
+        color: categoryColors[name] || 'amber',
+      }))
+    : [
+        { name: 'Safety Documents', icon: Shield, count: 24, color: 'green' },
+        { name: 'HR Forms', icon: Users, count: 18, color: 'purple' },
+        { name: 'Project Templates', icon: Building, count: 32, color: 'blue' },
+        { name: 'IT Guides', icon: Wrench, count: 15, color: 'orange' },
+      ];
+
+  const recentDocs = cmsResources.length > 0
+    ? cmsResources.slice(0, 4).map(r => ({
+        name: r.name,
+        type: r.file?.url?.split('.').pop()?.toUpperCase() || 'Link',
+        size: '',
+        date: '',
+        url: r.file?.url || r['external-link'],
+      }))
+    : [
+        { name: 'Safety Manual 2026', type: 'PDF', size: '2.4 MB', date: 'Jan 10, 2026' },
+        { name: 'Employee Handbook', type: 'PDF', size: '1.8 MB', date: 'Jan 8, 2026' },
+        { name: 'Project Budget Template', type: 'Excel', size: '156 KB', date: 'Jan 5, 2026' },
+        { name: 'Brand Guidelines', type: 'PDF', size: '5.2 MB', date: 'Jan 3, 2026' },
+      ];
 
   return (
     <div className="space-y-6">
@@ -109,11 +166,11 @@ export function ResourcesContent({ theme = 'modern' }: ResourcesContentProps) {
             <CardContent className="space-y-4">
               <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
                 <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Total Documents</div>
-                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>89</div>
+                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{cmsResources.length || 89}</div>
               </div>
               <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
                 <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Categories</div>
-                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>12</div>
+                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{categories.length || 12}</div>
               </div>
               <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
                 <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Updated This Month</div>

@@ -1,8 +1,18 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CultureContent } from '../../components/pages/CultureContent';
+import { getCultureStories } from '../../lib/webflow-cms';
+
+// Fetch culture stories from CMS
+let stories: any[] = [];
+try {
+  const result = await getCultureStories();
+  stories = result.items;
+} catch (error) {
+  console.error('Error fetching culture stories:', error);
+}
 ---
 
 <ThemedPage title="Culture | Jewett Junction" theme="dark" currentSection="culture">
-  <CultureContent client:load theme="dark" />
+  <CultureContent client:load theme="dark" stories={stories} />
 </ThemedPage>

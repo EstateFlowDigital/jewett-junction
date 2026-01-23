@@ -4,12 +4,28 @@ import { Heart, Award, Users, Star, Trophy, Target, Sparkles, ChevronRight } fro
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-interface CultureContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+interface CMSCultureStory {
+  id: string;
+  name: string;
+  slug?: string;
+  excerpt?: string;
+  content?: string;
+  image?: { url: string; alt?: string };
+  author?: string;
+  'published-date'?: string;
+  category?: string;
 }
 
-export function CultureContent({ theme = 'modern' }: CultureContentProps) {
+interface CultureContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  stories?: CMSCultureStory[];
+}
+
+export function CultureContent({ theme = 'modern', stories: cmsStories = [] }: CultureContentProps) {
   const isDark = theme === 'dark';
+
+  // Get featured story from CMS or use default
+  const featuredStory = cmsStories.length > 0 ? cmsStories[0] : null;
 
   return (
     <div className="space-y-6">
