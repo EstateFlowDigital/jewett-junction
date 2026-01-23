@@ -59,9 +59,23 @@ function getDayInfo(dateStr: string) {
   };
 }
 
+// Strip HTML tags from content
+function stripHtml(html: string | undefined) {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
 // Get current date
 const today = new Date();
 const dateString = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+// Debug: Log CMS data counts
+console.log('CMS Data:', {
+  announcements: announcements.length,
+  events: events.length,
+  jobs: jobs.length,
+  cultureStories: cultureStories.length
+});
 
 // Get featured announcement (first pinned or first item)
 const featuredAnnouncement = announcements.find(a => a['is-pinned']) || announcements[0];
@@ -139,7 +153,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             <div class="relative">
               <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
               <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
-              <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{featuredAnnouncement.content?.substring(0, 200)}{featuredAnnouncement.content?.length > 200 ? '...' : ''}</p>
+              <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{stripHtml(featuredAnnouncement.content)?.substring(0, 200)}{stripHtml(featuredAnnouncement.content)?.length > 200 ? '...' : ''}</p>
               <div class="flex items-center gap-4">
                 <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
                 <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
@@ -298,7 +312,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                         {announcement.priority === 'high' ? 'Important' : 'Update'}
                       </span>
                       <div class="text-sm text-white">{announcement.name}</div>
-                      <div class="text-xs text-slate-500 truncate">{announcement.content?.substring(0, 60)}...</div>
+                      <div class="text-xs text-slate-500 truncate">{stripHtml(announcement.content)?.substring(0, 60)}...</div>
                     </div>
                     <span class="text-xs text-slate-500 flex-shrink-0">{getRelativeTime(announcement['published-date'])}</span>
                   </a>
@@ -369,7 +383,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                       <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-pink-400 transition-colors">{cultureStories[0].name}</h3>
                       <p class="text-slate-400 text-xs sm:text-sm mb-3">{cultureStories[0].category || 'Story'}</p>
                       <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                        {cultureStories[0].excerpt || cultureStories[0].content?.substring(0, 150)}...
+                        {cultureStories[0].excerpt || stripHtml(cultureStories[0].content)?.substring(0, 150)}...
                       </p>
                     </div>
                   </div>
