@@ -9,6 +9,7 @@ import {
   Briefcase,
   BookUser,
   FolderOpen,
+  Lightbulb,
   type LucideIcon,
 } from "lucide-react"
 
@@ -79,5 +80,11 @@ export const mainNavItems: NavItem[] = [
     href: "/jewett-junction/resources",
     icon: FolderOpen,
     description: "Documents & links",
+  },
+  {
+    title: "Submit Idea",
+    href: "/jewett-junction/submit-idea",
+    icon: Lightbulb,
+    description: "Share your ideas",
   },
 ]

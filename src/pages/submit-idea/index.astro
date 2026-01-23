@@ -1,0 +1,11 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { IdeaSubmissionContent } from '../../components/pages/IdeaSubmissionContent';
+
+// Configure the email address for notifications
+const notificationEmail = import.meta.env.IDEA_NOTIFICATION_EMAIL || 'ideas@jewett.com';
+---
+
+<ThemedPage title="Submit an Idea | Jewett Junction" theme="dark" currentSection="submit-idea">
+  <IdeaSubmissionContent client:load theme="dark" notificationEmail={notificationEmail} />
+</ThemedPage>

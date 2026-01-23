@@ -211,12 +211,12 @@ export interface Resource {
 // ============================================
 
 export const COLLECTIONS = {
-  employees: '', // Add collection ID after creating in Webflow
-  announcements: '',
-  events: '',
-  jobPostings: '',
-  cultureStories: '',
-  resources: '',
+  employees: '69738d872d19741af9e461a1',
+  announcements: '69738dd73f2d71626fcc6b0a',
+  events: '69738e25a192594f2ba185f3',
+  jobPostings: '69738e490bd2a14f9c7f1885',
+  cultureStories: '69738e5ef6e68b6b209e404c',
+  resources: '69738e7aaef2bb2746f8d943',
 } as const;
 
 // ============================================

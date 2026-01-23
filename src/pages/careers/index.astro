@@ -1,8 +1,18 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CareersContent } from '../../components/pages/CareersContent';
+import { getJobPostings } from '../../lib/webflow-cms';
+
+// Fetch job postings from CMS
+let jobs: any[] = [];
+try {
+  const result = await getJobPostings();
+  jobs = result.items;
+} catch (error) {
+  console.error('Error fetching job postings:', error);
+}
 ---
 
 <ThemedPage title="Careers | Jewett Junction" theme="dark" currentSection="careers">
-  <CareersContent client:load theme="dark" />
+  <CareersContent client:load theme="dark" jobs={jobs} />
 </ThemedPage>
