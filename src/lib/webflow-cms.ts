@@ -169,7 +169,7 @@ export interface Event {
   'event-date': string;
   'end-date'?: string;
   location?: string;
-  category: 'company' | 'training' | 'social' | 'safety';
+  category?: string; // Reference field returns ID, handle in component
   'registration-link'?: string;
 }
 
@@ -182,7 +182,7 @@ export interface JobPosting {
   requirements?: string;
   'referral-bonus'?: number;
   'apply-link'?: string;
-  'is-active'?: boolean;
+  'job-is-active'?: boolean;
 }
 
 export interface CultureStory {
@@ -193,7 +193,7 @@ export interface CultureStory {
   image?: { url: string; alt?: string };
   author?: string;
   'published-date': string;
-  category: 'wellness' | 'community' | 'recognition' | 'milestone';
+  category?: string; // Reference field returns ID, handle in component
 }
 
 export interface Resource {
@@ -266,7 +266,8 @@ export async function getJobPostings(options?: { limit?: number }) {
   const result = await getCollection<JobPosting>(COLLECTIONS.jobPostings, options);
   return {
     ...result,
-    items: result.items.filter(j => j['is-active'] !== false),
+    // Note: Webflow uses 'job-is-active' field name
+    items: result.items.filter(j => j['job-is-active'] !== false),
   };
 }
 
