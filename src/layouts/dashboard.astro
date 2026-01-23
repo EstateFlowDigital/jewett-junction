@@ -5,7 +5,6 @@ import '../styles/global.css';
 // DevLink global styles (Webflow components)
 import '../../devlink/global.css';
 import { AppShell } from '../components/layout/AppShell';
-import { ThemeSwitcher } from '../components/ThemeSwitcher';
 
 interface Props {
   title?: string;
@@ -29,6 +28,5 @@ const currentPath = Astro.url.pathname;
     <AppShell client:load currentPath={currentPath}>
       <slot />
     </AppShell>
-    <ThemeSwitcher client:load />
   </body>
 </html>

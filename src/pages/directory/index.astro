@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/directory/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { DirectoryContent } from '../../components/pages/DirectoryContent';
 ---
+
+<ThemedPage title="Directory | Jewett Junction" theme="dark" currentSection="directory">
+  <DirectoryContent client:load theme="dark" />
+</ThemedPage>

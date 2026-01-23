@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/careers/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { CareersContent } from '../../components/pages/CareersContent';
 ---
+
+<ThemedPage title="Careers | Jewett Junction" theme="dark" currentSection="careers">
+  <CareersContent client:load theme="dark" />
+</ThemedPage>

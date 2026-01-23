@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/marketing/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { MarketingContent } from '../../components/pages/MarketingContent';
 ---
+
+<ThemedPage title="Marketing | Jewett Junction" theme="dark" currentSection="marketing">
+  <MarketingContent client:load theme="dark" />
+</ThemedPage>

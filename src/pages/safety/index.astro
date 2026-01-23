@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/safety/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { SafetyContent } from '../../components/pages/SafetyContent';
 ---
+
+<ThemedPage title="Safety Hub | Jewett Junction" theme="dark" currentSection="safety">
+  <SafetyContent client:load theme="dark" />
+</ThemedPage>

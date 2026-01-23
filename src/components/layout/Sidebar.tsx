@@ -9,8 +9,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { mainNavItems, type NavItem } from "@/lib/constants/navigation"
-import { Menu, HardHat, Settings, Palette } from "lucide-react"
-import { ThemeSelector } from "./ThemeSelector"
+import { Menu, HardHat, Settings } from "lucide-react"
 
 interface SidebarProps {
   currentPath?: string
@@ -79,21 +78,7 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <a
-                href="/jewett-junction"
-                className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors mx-auto"
-                aria-label="Theme Selector"
-              >
-                <Palette className="h-5 w-5" aria-hidden="true" />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent side="right">Theme Preview</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <a
-                href="/jewett-junction/settings/modern"
+                href="/jewett-junction/settings"
                 className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors mx-auto"
                 aria-label="Settings"
               >
@@ -183,9 +168,8 @@ function MobileSidebarContent({ currentPath, currentTheme }: { currentPath: stri
 
       {/* Footer */}
       <div className="border-t border-gray-100 p-2 space-y-1" role="group" aria-label="Utility navigation">
-        <ThemeSelector currentTheme={currentTheme} />
         <a
-          href={`/jewett-junction/settings/${currentTheme}`}
+          href="/jewett-junction/settings"
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="h-5 w-5" aria-hidden="true" />

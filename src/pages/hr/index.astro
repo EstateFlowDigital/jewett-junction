@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/hr/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { HRContent } from '../../components/pages/HRContent';
 ---
+
+<ThemedPage title="HR Resources | Jewett Junction" theme="dark" currentSection="hr">
+  <HRContent client:load theme="dark" />
+</ThemedPage>

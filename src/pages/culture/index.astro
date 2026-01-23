@@ -1,4 +1,8 @@
 ---
-// Redirect to modern theme
-return Astro.redirect('/jewett-junction/culture/modern');
+import ThemedPage from '../../layouts/themed-page.astro';
+import { CultureContent } from '../../components/pages/CultureContent';
 ---
+
+<ThemedPage title="Culture | Jewett Junction" theme="dark" currentSection="culture">
+  <CultureContent client:load theme="dark" />
+</ThemedPage>
