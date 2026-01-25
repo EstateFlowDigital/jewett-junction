@@ -20,22 +20,45 @@ import {
   Loader2,
   Settings,
   Sparkles,
-  Shield
+  Shield,
+  Image,
+  Link,
+  Video,
+  DollarSign,
+  Clock,
+  MapPin,
+  Tag,
+  Star,
+  Bell,
+  FileText,
+  Globe,
+  Linkedin,
+  Phone,
+  Mail,
+  Building,
+  Award,
+  Zap
 } from 'lucide-react';
 
-// Collection configurations
+// Collection configurations with expanded fields
 const COLLECTIONS = {
   announcements: {
     name: 'Announcements',
     icon: Megaphone,
     color: 'blue',
     gradient: 'from-blue-500 to-cyan-500',
+    description: 'Company-wide announcements and news updates',
     fields: [
-      { key: 'name', label: 'Title', type: 'text', required: true },
-      { key: 'content', label: 'Content', type: 'richtext', required: true },
-      { key: 'author', label: 'Author', type: 'text' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['normal', 'high'] },
-      { key: 'is-pinned', label: 'Pinned', type: 'boolean' },
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter announcement title', icon: FileText },
+      { key: 'content', label: 'Content', type: 'richtext', required: true, placeholder: 'Write your announcement content...', helpText: 'Supports basic HTML formatting' },
+      { key: 'image', label: 'Featured Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Paste image URL (recommended: 1200x630px)', icon: Image },
+      { key: 'author', label: 'Author', type: 'text', placeholder: 'e.g., HR Team, CEO Office', icon: Users },
+      { key: 'category', label: 'Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: Tag },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: Bell },
+      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional: When should this announcement expire?', icon: Clock },
+      { key: 'cta-text', label: 'Button Text', type: 'text', placeholder: 'e.g., Learn More, Register Now', icon: Zap },
+      { key: 'cta-link', label: 'Button Link', type: 'url', placeholder: 'https://...', icon: Link },
+      { key: 'is-pinned', label: 'Pin to Top', type: 'boolean', helpText: 'Pinned announcements appear first' },
     ]
   },
   events: {
@@ -43,13 +66,20 @@ const COLLECTIONS = {
     icon: Calendar,
     color: 'indigo',
     gradient: 'from-indigo-500 to-purple-500',
+    description: 'Company events, meetings, and training sessions',
     fields: [
-      { key: 'name', label: 'Event Title', type: 'text', required: true },
-      { key: 'event-date', label: 'Date', type: 'datetime', required: true },
-      { key: 'location', label: 'Location', type: 'text' },
-      { key: 'category', label: 'Category', type: 'select', options: ['Company', 'Training', 'HR', 'Safety', 'Social'] },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'registration-link', label: 'Registration Link', type: 'url' },
+      { key: 'name', label: 'Event Title', type: 'text', required: true, placeholder: 'Enter event name', icon: Calendar },
+      { key: 'event-date', label: 'Start Date & Time', type: 'datetime', required: true, icon: Clock },
+      { key: 'end-date', label: 'End Date & Time', type: 'datetime', helpText: 'Optional for multi-day events', icon: Clock },
+      { key: 'banner-image', label: 'Event Banner', type: 'image', placeholder: 'https://example.com/banner.jpg', helpText: 'Recommended: 1920x600px', icon: Image },
+      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Main Conference Room, Building A', icon: MapPin },
+      { key: 'virtual-link', label: 'Virtual Meeting Link', type: 'url', placeholder: 'Teams/Zoom link', helpText: 'For virtual or hybrid events', icon: Video },
+      { key: 'category', label: 'Event Type', type: 'select', options: ['All-Hands Meeting', 'Training', 'HR Session', 'Safety Meeting', 'Social Event', 'Workshop', 'Webinar', 'Holiday'], icon: Tag },
+      { key: 'description', label: 'Description', type: 'richtext', placeholder: 'Describe the event...', helpText: 'Include agenda, what to bring, etc.' },
+      { key: 'capacity', label: 'Max Capacity', type: 'number', placeholder: 'Leave empty for unlimited', icon: Users },
+      { key: 'registration-link', label: 'Registration Link', type: 'url', placeholder: 'https://...', icon: Link },
+      { key: 'is-mandatory', label: 'Mandatory Attendance', type: 'boolean', helpText: 'Mark if attendance is required' },
+      { key: 'is-virtual', label: 'Virtual Event', type: 'boolean', helpText: 'Is this a virtual/online event?' },
     ]
   },
   jobPostings: {
@@ -57,16 +87,24 @@ const COLLECTIONS = {
     icon: Briefcase,
     color: 'emerald',
     gradient: 'from-emerald-500 to-teal-500',
+    description: 'Open positions and career opportunities',
     fields: [
-      { key: 'name', label: 'Job Title', type: 'text', required: true },
-      { key: 'department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT'] },
-      { key: 'location', label: 'Location', type: 'text' },
-      { key: 'employment-type', label: 'Employment Type', type: 'select', options: ['Full-time', 'Part-time', 'Contract'] },
-      { key: 'description', label: 'Description', type: 'richtext' },
-      { key: 'requirements', label: 'Requirements', type: 'richtext' },
-      { key: 'referral-bonus', label: 'Referral Bonus ($)', type: 'number' },
-      { key: 'apply-link', label: 'Apply Link', type: 'url' },
-      { key: 'job-is-active', label: 'Active', type: 'boolean' },
+      { key: 'name', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Project Manager', icon: Briefcase },
+      { key: 'department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: Building },
+      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Columbus, OH', icon: MapPin },
+      { key: 'employment-type', label: 'Employment Type', type: 'select', options: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'], icon: Clock },
+      { key: 'experience-level', label: 'Experience Level', type: 'select', options: ['Entry Level', 'Mid Level', 'Senior', 'Lead', 'Manager', 'Director', 'Executive'], icon: Award },
+      { key: 'salary-min', label: 'Salary Range Min ($)', type: 'number', placeholder: '50000', icon: DollarSign },
+      { key: 'salary-max', label: 'Salary Range Max ($)', type: 'number', placeholder: '75000', icon: DollarSign },
+      { key: 'description', label: 'Job Description', type: 'richtext', required: true, placeholder: 'Describe the role and responsibilities...', helpText: 'Be specific about day-to-day duties' },
+      { key: 'requirements', label: 'Requirements', type: 'richtext', placeholder: 'List qualifications, skills, certifications...', helpText: 'Include must-haves and nice-to-haves' },
+      { key: 'benefits', label: 'Benefits Summary', type: 'textarea', placeholder: '401k, health insurance, PTO...', helpText: 'Highlight key benefits', icon: Star },
+      { key: 'referral-bonus', label: 'Referral Bonus ($)', type: 'number', placeholder: '500', icon: DollarSign },
+      { key: 'apply-link', label: 'Application Link', type: 'url', placeholder: 'JotForm or external link', icon: Link },
+      { key: 'urgency', label: 'Hiring Urgency', type: 'select', options: ['Normal', 'Priority', 'Urgent'], icon: Zap },
+      { key: 'job-is-active', label: 'Active Posting', type: 'boolean', helpText: 'Deactivate to hide from listings' },
+      { key: 'is-remote', label: 'Remote Eligible', type: 'boolean', helpText: 'Can this role be done remotely?' },
+      { key: 'featured', label: 'Featured Position', type: 'boolean', helpText: 'Show prominently on careers page' },
     ]
   },
   cultureStories: {
@@ -74,13 +112,20 @@ const COLLECTIONS = {
     icon: Heart,
     color: 'pink',
     gradient: 'from-pink-500 to-rose-500',
+    description: 'Employee spotlights, team wins, and company culture',
     fields: [
-      { key: 'name', label: 'Title', type: 'text', required: true },
-      { key: 'type', label: 'Type', type: 'select', options: ['Spotlight', 'Win', 'Recognition', 'Value'] },
-      { key: 'content', label: 'Content', type: 'richtext' },
-      { key: 'excerpt', label: 'Short Excerpt', type: 'textarea' },
-      { key: 'author', label: 'Author/Attribution', type: 'text' },
-      { key: 'featured', label: 'Featured', type: 'boolean' },
+      { key: 'name', label: 'Story Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: Star },
+      { key: 'type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], icon: Tag },
+      { key: 'featured-image', label: 'Featured Image', type: 'image', placeholder: 'https://example.com/photo.jpg', helpText: 'Photo of employee or team', icon: Image },
+      { key: 'video-url', label: 'Video URL', type: 'url', placeholder: 'YouTube or Vimeo link', helpText: 'Optional video content', icon: Video },
+      { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', helpText: 'Write the full story content' },
+      { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards' },
+      { key: 'person-name', label: 'Featured Person', type: 'text', placeholder: 'Name of employee being featured', icon: Users },
+      { key: 'person-role', label: 'Their Role', type: 'text', placeholder: 'Job title', icon: Briefcase },
+      { key: 'person-tenure', label: 'Years at Company', type: 'text', placeholder: 'e.g., 5 years', icon: Clock },
+      { key: 'quote', label: 'Featured Quote', type: 'textarea', placeholder: 'A memorable quote from the person', icon: FileText },
+      { key: 'author', label: 'Written By', type: 'text', placeholder: 'Author name', icon: Users },
+      { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on dashboard' },
     ]
   },
   employees: {
@@ -88,14 +133,23 @@ const COLLECTIONS = {
     icon: Users,
     color: 'cyan',
     gradient: 'from-cyan-500 to-blue-500',
+    description: 'Employee directory and profiles',
     fields: [
-      { key: 'name', label: 'Full Name', type: 'text', required: true },
-      { key: 'role', label: 'Job Title', type: 'text', required: true },
-      { key: 'department', label: 'Department', type: 'text', required: true },
-      { key: 'email', label: 'Email', type: 'email' },
-      { key: 'phone', label: 'Phone', type: 'tel' },
-      { key: 'bio', label: 'Bio', type: 'textarea' },
-      { key: 'is-featured', label: 'Featured', type: 'boolean' },
+      { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: Users },
+      { key: 'photo', label: 'Profile Photo', type: 'image', placeholder: 'https://example.com/photo.jpg', helpText: 'Square photo recommended (400x400px)', icon: Image },
+      { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: Briefcase },
+      { key: 'department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: Building },
+      { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: MapPin },
+      { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: Mail },
+      { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: '(555) 123-4567', icon: Phone },
+      { key: 'extension', label: 'Phone Extension', type: 'text', placeholder: 'ext. 123', icon: Phone },
+      { key: 'linkedin', label: 'LinkedIn Profile', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: Linkedin },
+      { key: 'start-date', label: 'Start Date', type: 'datetime', helpText: 'When did they join the company?', icon: Calendar },
+      { key: 'bio', label: 'Bio / About', type: 'textarea', placeholder: 'Brief bio or description...', helpText: 'Professional background, interests, etc.' },
+      { key: 'skills', label: 'Skills & Expertise', type: 'text', placeholder: 'e.g., Project Management, OSHA, AutoCAD', helpText: 'Comma-separated list', icon: Award },
+      { key: 'certifications', label: 'Certifications', type: 'text', placeholder: 'e.g., PMP, LEED AP, CPA', icon: Award },
+      { key: 'is-featured', label: 'Featured Employee', type: 'boolean', helpText: 'Show on homepage spotlight' },
+      { key: 'is-leadership', label: 'Leadership Team', type: 'boolean', helpText: 'Part of leadership/management' },
     ]
   },
   resources: {
@@ -103,11 +157,20 @@ const COLLECTIONS = {
     icon: FolderOpen,
     color: 'amber',
     gradient: 'from-amber-500 to-orange-500',
+    description: 'Documents, links, and helpful resources',
     fields: [
-      { key: 'name', label: 'Resource Name', type: 'text', required: true },
-      { key: 'category', label: 'Category', type: 'select', options: ['Safety', 'HR', 'Project', 'IT', 'Other'] },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'external-link', label: 'External Link', type: 'url' },
+      { key: 'name', label: 'Resource Name', type: 'text', required: true, placeholder: 'e.g., Employee Handbook', icon: FileText },
+      { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', placeholder: 'https://example.com/thumbnail.jpg', helpText: 'Preview image or icon', icon: Image },
+      { key: 'category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: Tag },
+      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content' },
+      { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: FileText },
+      { key: 'external-link', label: 'Resource Link', type: 'url', placeholder: 'https://...', helpText: 'Link to document or external resource', icon: Link },
+      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: FileText },
+      { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: Clock },
+      { key: 'version', label: 'Version', type: 'text', placeholder: 'e.g., v2.1', icon: Tag },
+      { key: 'audience', label: 'Target Audience', type: 'select', options: ['All Employees', 'Field Staff', 'Office Staff', 'Management', 'New Hires', 'HR Only'], icon: Users },
+      { key: 'is-required', label: 'Required Reading', type: 'boolean', helpText: 'Is this required for all employees?' },
+      { key: 'is-new', label: 'Mark as New', type: 'boolean', helpText: 'Show "New" badge' },
     ]
   },
 };
@@ -507,12 +570,47 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           : 'text-slate-300 hover:bg-slate-700/50'
                       }`}
                     >
-                      <ColIcon className="h-5 w-5" />
-                      <span className="font-medium">{col.name}</span>
+                      <ColIcon className="h-5 w-5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-medium block">{col.name}</span>
+                        {isActive && col.description && (
+                          <span className="text-xs opacity-75 block truncate">{col.description}</span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
               </div>
+
+              {/* Quick stats */}
+              <div className="p-4 border-t border-slate-700/50 bg-slate-800/30">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500">Total fields:</span>
+                  <span className="text-slate-300 font-medium">{config.fields.length}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick tips */}
+            <div className="mt-4 bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="h-4 w-4 text-amber-400" />
+                <span className="text-sm font-medium text-white">Quick Tips</span>
+              </div>
+              <ul className="text-xs text-slate-400 space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 mt-0.5">•</span>
+                  <span>Use "Save as Draft" to preview before publishing</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-400 mt-0.5">•</span>
+                  <span>Images need a direct URL (upload to Cloudinary/Imgur first)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-purple-400 mt-0.5">•</span>
+                  <span>Click "Publish Site" to make all changes live</span>
+                </li>
+              </ul>
             </div>
           </aside>
 
@@ -543,89 +641,149 @@ export function AdminDashboard({}: AdminDashboardProps) {
                 </div>
 
                 <div className="p-6 space-y-6">
-                  {config.fields.map((field) => (
-                    <div key={field.key}>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        {field.label}
-                        {field.required && <span className="text-rose-400 ml-1">*</span>}
-                      </label>
+                  {config.fields.map((field) => {
+                    const FieldIcon = field.icon;
+                    return (
+                      <div key={field.key} className="group">
+                        <label className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
+                          {FieldIcon && <FieldIcon className="h-4 w-4 text-slate-500" />}
+                          {field.label}
+                          {field.required && <span className="text-rose-400 ml-1">*</span>}
+                        </label>
 
-                      {(field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url') && (
-                        <input
-                          type={field.type === 'url' ? 'url' : field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : 'text'}
-                          value={formData[field.key] || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                        />
-                      )}
+                        {/* Image field with preview */}
+                        {field.type === 'image' && (
+                          <div className="space-y-3">
+                            <div className="relative">
+                              <input
+                                type="url"
+                                value={formData[field.key] || ''}
+                                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                                placeholder={field.placeholder || 'https://example.com/image.jpg'}
+                                className="w-full px-4 py-3 pr-12 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                              />
+                              <Image className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                            </div>
+                            {formData[field.key] && (
+                              <div className="relative rounded-xl overflow-hidden border border-slate-700/50 bg-slate-900/50">
+                                <img
+                                  src={formData[field.key]}
+                                  alt="Preview"
+                                  className="w-full h-40 object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData({ ...formData, [field.key]: '' })}
+                                  className="absolute top-2 right-2 p-1.5 bg-slate-900/80 hover:bg-rose-600 text-white rounded-lg transition-colors"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
-                      {field.type === 'number' && (
-                        <input
-                          type="number"
-                          value={formData[field.key] || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: parseInt(e.target.value) || 0 })}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                        />
-                      )}
-
-                      {field.type === 'textarea' && (
-                        <textarea
-                          value={formData[field.key] || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          rows={3}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none"
-                        />
-                      )}
-
-                      {field.type === 'richtext' && (
-                        <textarea
-                          value={formData[field.key] || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          rows={5}
-                          placeholder="Supports basic HTML formatting"
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none font-mono text-sm"
-                        />
-                      )}
-
-                      {field.type === 'datetime' && (
-                        <input
-                          type="datetime-local"
-                          value={formData[field.key]?.slice(0, 16) || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: new Date(e.target.value).toISOString() })}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                        />
-                      )}
-
-                      {field.type === 'select' && (
-                        <select
-                          value={formData[field.key] || ''}
-                          onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                        >
-                          <option value="">Select...</option>
-                          {field.options?.map((opt) => (
-                            <option key={opt} value={opt.toLowerCase()}>{opt}</option>
-                          ))}
-                        </select>
-                      )}
-
-                      {field.type === 'boolean' && (
-                        <label className="flex items-center gap-3 cursor-pointer group">
+                        {/* Text, email, tel, url fields */}
+                        {(field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url') && (
                           <div className="relative">
                             <input
-                              type="checkbox"
-                              checked={formData[field.key] || false}
-                              onChange={(e) => setFormData({ ...formData, [field.key]: e.target.checked })}
-                              className="sr-only peer"
+                              type={field.type === 'url' ? 'url' : field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : 'text'}
+                              value={formData[field.key] || ''}
+                              onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                              placeholder={field.placeholder}
+                              className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                             />
-                            <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-cyan-500 transition-all"></div>
-                            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
                           </div>
-                          <span className="text-slate-300 group-hover:text-white transition-colors">Enable</span>
-                        </label>
-                      )}
-                    </div>
-                  ))}
+                        )}
+
+                        {/* Number field */}
+                        {field.type === 'number' && (
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={formData[field.key] || ''}
+                              onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value ? parseInt(e.target.value) : '' })}
+                              placeholder={field.placeholder}
+                              className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                            />
+                          </div>
+                        )}
+
+                        {/* Textarea */}
+                        {field.type === 'textarea' && (
+                          <textarea
+                            value={formData[field.key] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                            rows={3}
+                            placeholder={field.placeholder}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none"
+                          />
+                        )}
+
+                        {/* Rich text */}
+                        {field.type === 'richtext' && (
+                          <textarea
+                            value={formData[field.key] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                            rows={6}
+                            placeholder={field.placeholder || "Supports basic HTML formatting"}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none font-mono text-sm"
+                          />
+                        )}
+
+                        {/* Datetime */}
+                        {field.type === 'datetime' && (
+                          <input
+                            type="datetime-local"
+                            value={formData[field.key]?.slice(0, 16) || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                          />
+                        )}
+
+                        {/* Select dropdown */}
+                        {field.type === 'select' && (
+                          <select
+                            value={formData[field.key] || ''}
+                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all appearance-none cursor-pointer"
+                          >
+                            <option value="">Select {field.label.toLowerCase()}...</option>
+                            {field.options?.map((opt) => (
+                              <option key={opt} value={opt.toLowerCase().replace(/\s+/g, '-')}>{opt}</option>
+                            ))}
+                          </select>
+                        )}
+
+                        {/* Boolean toggle */}
+                        {field.type === 'boolean' && (
+                          <label className="flex items-center gap-3 cursor-pointer group/toggle">
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={formData[field.key] || false}
+                                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-12 h-6 bg-slate-700 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-cyan-500 transition-all"></div>
+                              <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-6 transition-transform"></div>
+                            </div>
+                            <span className="text-slate-400 group-hover/toggle:text-white transition-colors">
+                              {formData[field.key] ? 'Enabled' : 'Disabled'}
+                            </span>
+                          </label>
+                        )}
+
+                        {/* Help text */}
+                        {field.helpText && (
+                          <p className="mt-1.5 text-xs text-slate-500">{field.helpText}</p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50">
@@ -707,47 +865,84 @@ export function AdminDashboard({}: AdminDashboardProps) {
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-700/50">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-5 flex items-center justify-between hover:bg-slate-700/20 transition-colors group"
-                      >
-                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className={`w-10 h-10 bg-gradient-to-br ${config.gradient}/20 rounded-lg flex items-center justify-center`}>
-                            <Icon className={`h-5 w-5 text-${config.color}-400`} />
+                    {items.map((item) => {
+                      // Get image from various possible fields
+                      const imageUrl = item.fieldData?.image || item.fieldData?.['banner-image'] || item.fieldData?.['featured-image'] || item.fieldData?.photo || item.fieldData?.thumbnail;
+                      // Get subtitle info based on collection type
+                      const subtitle = item.fieldData?.department || item.fieldData?.category || item.fieldData?.type || item.fieldData?.role;
+                      const location = item.fieldData?.location || item.fieldData?.['office-location'];
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-5 flex items-center justify-between hover:bg-slate-700/20 transition-colors group"
+                        >
+                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                            {/* Show image thumbnail if available */}
+                            {imageUrl ? (
+                              <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-slate-700/50">
+                                <img
+                                  src={imageUrl}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-br ${config.gradient}/20 flex items-center justify-center"><svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>`;
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className={`w-12 h-12 bg-gradient-to-br ${config.gradient}/20 rounded-xl flex items-center justify-center flex-shrink-0`}>
+                                <Icon className={`h-5 w-5 text-${config.color}-400`} />
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-medium text-white truncate">
+                                {item.fieldData?.name || item.fieldData?.title || 'Untitled'}
+                              </h3>
+                              <div className="flex items-center gap-2 text-sm text-slate-500">
+                                {subtitle && (
+                                  <span className="truncate">{subtitle}</span>
+                                )}
+                                {subtitle && location && <span>•</span>}
+                                {location && (
+                                  <span className="truncate flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    {location}
+                                  </span>
+                                )}
+                                {!subtitle && !location && (
+                                  <span className="truncate">ID: {item.id.slice(0, 12)}...</span>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <h3 className="font-medium text-white truncate">
-                              {item.fieldData?.name || item.fieldData?.title || 'Untitled'}
-                            </h3>
-                            <p className="text-sm text-slate-500 truncate">
-                              ID: {item.id}
-                            </p>
+                          <div className="flex items-center gap-3 ml-4">
+                            <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
+                              item.isDraft
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            }`}>
+                              {item.isDraft ? 'Draft' : 'Published'}
+                            </span>
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className="p-2.5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors"
+                              title="Edit"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="p-2.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 ml-4">
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                            item.isDraft
-                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                              : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                          }`}>
-                            {item.isDraft ? 'Draft' : 'Published'}
-                          </span>
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
