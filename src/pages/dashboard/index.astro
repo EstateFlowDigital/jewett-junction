@@ -4,28 +4,45 @@ import '../../../generated/webflow.css';
 import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
-import { getAnnouncements, getEvents, getJobPostings, getCultureStories } from '../../lib/webflow-cms';
+import { getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets } from '../../lib/webflow-cms';
 
 // Fetch CMS data
 let announcements: any[] = [];
 let events: any[] = [];
 let jobs: any[] = [];
 let cultureStories: any[] = [];
+let hrContent: any[] = [];
+let safetyContent: any[] = [];
+let itArticles: any[] = [];
+let marketingAssets: any[] = [];
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes] = await Promise.all([
     getAnnouncements({ limit: 5 }),
     getEvents({ limit: 4, upcoming: true }),
     getJobPostings({ limit: 5 }),
     getCultureStories({ limit: 1 }),
+    getHRContent({ limit: 3, featured: true }),
+    getSafetyContent({ limit: 3, featured: true }),
+    getITKnowledgeBase({ limit: 3, featured: true }),
+    getMarketingAssets({ limit: 3, featured: true }),
   ]);
   announcements = announcementsRes.items;
   events = eventsRes.items;
   jobs = jobsRes.items;
   cultureStories = cultureRes.items;
+  hrContent = hrRes.items;
+  safetyContent = safetyRes.items;
+  itArticles = itRes.items;
+  marketingAssets = marketingRes.items;
 } catch (error) {
   console.error('Error fetching CMS data:', error);
 }
+
+// Get featured items from new collections
+const featuredHR = hrContent[0];
+const featuredSafety = safetyContent.find(s => s.priority === 'Urgent') || safetyContent[0];
+const featuredIT = itArticles[0];
 
 // Format date helper
 function formatDate(dateStr: string) {
@@ -208,8 +225,17 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                   <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 </div>
               </div>
-              <div class="text-2xl font-bold text-white">4EverSafe</div>
-              <div class="text-sm text-emerald-400 mt-1">View Resources →</div>
+              {featuredSafety ? (
+                <>
+                  <div class="text-lg font-bold text-white truncate">{featuredSafety.name}</div>
+                  <div class="text-sm text-emerald-400 mt-1">{featuredSafety.priority === 'Urgent' ? '⚠️ Alert' : 'View Resources →'}</div>
+                </>
+              ) : (
+                <>
+                  <div class="text-2xl font-bold text-white">4EverSafe</div>
+                  <div class="text-sm text-emerald-400 mt-1">View Resources →</div>
+                </>
+              )}
             </a>
             <a href="/jewett-junction/culture" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-pink-500/30">
               <div class="flex items-center justify-between mb-3">
@@ -241,6 +267,51 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             </a>
           </div>
         </div>
+
+        <!-- Important Updates from HR, Safety, IT -->
+        {(featuredHR || featuredSafety || featuredIT) && (
+          <div class="mb-10">
+            <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Important Updates</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featuredHR && (
+                <a href="/jewett-junction/hr" class="glass rounded-2xl p-4 border border-purple-500/30 hover:border-purple-500/50 transition-all group">
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                      <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-purple-400 font-medium uppercase">HR Update</span>
+                  </div>
+                  <h3 class="font-medium text-white group-hover:text-purple-300 transition-colors truncate">{featuredHR.name}</h3>
+                  <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredHR.description || featuredHR.content)?.substring(0, 80)}...</p>
+                </a>
+              )}
+              {featuredSafety && (
+                <a href="/jewett-junction/safety" class={`glass rounded-2xl p-4 border transition-all group ${featuredSafety.priority === 'Urgent' ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/70' : 'border-emerald-500/30 hover:border-emerald-500/50'}`}>
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class={`w-8 h-8 rounded-lg flex items-center justify-center ${featuredSafety.priority === 'Urgent' ? 'bg-red-500/20' : 'bg-emerald-500/20'}`}>
+                      <svg class={`w-4 h-4 ${featuredSafety.priority === 'Urgent' ? 'text-red-400' : 'text-emerald-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <span class={`text-xs font-medium uppercase ${featuredSafety.priority === 'Urgent' ? 'text-red-400' : 'text-emerald-400'}`}>{featuredSafety.priority === 'Urgent' ? '⚠️ Safety Alert' : 'Safety Update'}</span>
+                  </div>
+                  <h3 class={`font-medium transition-colors truncate ${featuredSafety.priority === 'Urgent' ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
+                  <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredSafety.description || featuredSafety.content)?.substring(0, 80)}...</p>
+                </a>
+              )}
+              {featuredIT && (
+                <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl p-4 border border-blue-500/30 hover:border-blue-500/50 transition-all group">
+                  <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-blue-400 font-medium uppercase">IT Tip</span>
+                  </div>
+                  <h3 class="font-medium text-white group-hover:text-blue-300 transition-colors truncate">{featuredIT.name}</h3>
+                  <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredIT.summary || featuredIT.content)?.substring(0, 80)}...</p>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
 
         <!-- Quick Links -->
         <div class="mb-10">
