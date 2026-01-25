@@ -22,12 +22,30 @@ function generateToken(password: string): string {
   return `admin_${Math.abs(hash).toString(36)}_${timestamp.toString(36)}`;
 }
 
-// Handle OPTIONS preflight requests
-export const OPTIONS: APIRoute = async () => {
-  return new Response(null, { status: 204, headers: corsHeaders });
-};
+// Verify token helper
+function verifyToken(token: string | null): { valid: boolean; reason?: string } {
+  if (!token || !token.startsWith('admin_')) {
+    return { valid: false };
+  }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+  const parts = token.split('_');
+  if (parts.length !== 3) {
+    return { valid: false };
+  }
+
+  const timestamp = parseInt(parts[2], 36);
+  const now = Date.now();
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
+  if (now - timestamp > maxAge) {
+    return { valid: false, reason: 'Token expired' };
+  }
+
+  return { valid: true };
+}
+
+// Handle login POST request
+async function handlePost(request: Request, locals: any): Promise<Response> {
   try {
     let body;
     try {
@@ -90,36 +108,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
       { status: 500, headers: corsHeaders }
     );
   }
-};
+}
 
-// Verify token endpoint
-export const GET: APIRoute = async ({ request }) => {
+// Handle token verification GET request
+function handleGet(request: Request): Response {
   const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '');
+  const token = authHeader?.replace('Bearer ', '') || null;
+  const result = verifyToken(token);
 
-  if (!token || !token.startsWith('admin_')) {
+  if (!result.valid) {
     return new Response(
-      JSON.stringify({ valid: false }),
-      { status: 401, headers: corsHeaders }
-    );
-  }
-
-  // Extract timestamp from token and check if expired (24 hours)
-  const parts = token.split('_');
-  if (parts.length !== 3) {
-    return new Response(
-      JSON.stringify({ valid: false }),
-      { status: 401, headers: corsHeaders }
-    );
-  }
-
-  const timestamp = parseInt(parts[2], 36);
-  const now = Date.now();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-
-  if (now - timestamp > maxAge) {
-    return new Response(
-      JSON.stringify({ valid: false, reason: 'Token expired' }),
+      JSON.stringify({ valid: false, reason: result.reason }),
       { status: 401, headers: corsHeaders }
     );
   }
@@ -128,4 +127,43 @@ export const GET: APIRoute = async ({ request }) => {
     JSON.stringify({ valid: true }),
     { status: 200, headers: corsHeaders }
   );
+}
+
+// Unified handler that works better with Cloudflare adapter
+export const ALL: APIRoute = async ({ request, locals }) => {
+  const method = request.method.toUpperCase();
+
+  // Handle OPTIONS preflight
+  if (method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
+  // Handle POST (login)
+  if (method === 'POST') {
+    return handlePost(request, locals);
+  }
+
+  // Handle GET (verify token)
+  if (method === 'GET') {
+    return handleGet(request);
+  }
+
+  // Method not allowed
+  return new Response(
+    JSON.stringify({ error: 'Method not allowed' }),
+    { status: 405, headers: corsHeaders }
+  );
+};
+
+// Also export individual methods for compatibility
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, { status: 204, headers: corsHeaders });
+};
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  return handlePost(request, locals);
+};
+
+export const GET: APIRoute = async ({ request }) => {
+  return handleGet(request);
 };
