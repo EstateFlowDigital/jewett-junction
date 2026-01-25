@@ -1,7 +1,10 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { ResourcesContent } from '../../components/pages/ResourcesContent';
-import { getResources } from '../../lib/webflow-cms';
+import { initCMS, getResources } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch resources from CMS
 let resources: any[] = [];

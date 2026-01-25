@@ -5,8 +5,35 @@
  * The client can edit these items directly in Webflow's visual editor.
  */
 
-const WEBFLOW_API_TOKEN = import.meta.env.WEBFLOW_API_TOKEN;
-const SITE_ID = import.meta.env.WEBFLOW_SITE_ID || '67a464bc7184fcb8aacb0e8d';
+// Runtime credentials (set via initCMS for Cloudflare Workers)
+let runtimeApiToken: string | undefined;
+let runtimeSiteId: string | undefined;
+
+/**
+ * Initialize CMS with runtime credentials from Cloudflare Workers
+ * Call this from Astro pages before fetching CMS data:
+ * ---
+ * import { initCMS } from '../lib/webflow-cms';
+ * initCMS(Astro.locals);
+ * ---
+ */
+export function initCMS(locals: any): void {
+  const runtime = locals?.runtime;
+  if (runtime?.env) {
+    runtimeApiToken = runtime.env.WEBFLOW_API_TOKEN;
+    runtimeSiteId = runtime.env.WEBFLOW_SITE_ID;
+  }
+}
+
+// Get API token - checks runtime first, then import.meta.env
+function getApiToken(): string | undefined {
+  return runtimeApiToken || import.meta.env.WEBFLOW_API_TOKEN;
+}
+
+// Get Site ID - checks runtime first, then import.meta.env, then default
+function getSiteId(): string {
+  return runtimeSiteId || import.meta.env.WEBFLOW_SITE_ID || '67a464bc7184fcb8aacb0e8d';
+}
 
 interface WebflowItem {
   id: string;
@@ -35,7 +62,8 @@ export async function getCollection<T = Record<string, unknown>>(
   collectionId: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<{ items: (T & { id: string })[]; total: number }> {
-  if (!WEBFLOW_API_TOKEN) {
+  const apiToken = getApiToken();
+  if (!apiToken) {
     console.warn('WEBFLOW_API_TOKEN not set. Using mock data.');
     return { items: [], total: 0 };
   }
@@ -48,7 +76,7 @@ export async function getCollection<T = Record<string, unknown>>(
     `https://api.webflow.com/v2/collections/${collectionId}/items?${params}`,
     {
       headers: {
-        Authorization: `Bearer ${WEBFLOW_API_TOKEN}`,
+        Authorization: `Bearer ${apiToken}`,
         'accept-version': '2.0.0',
       },
     }
@@ -78,7 +106,8 @@ export async function getCollectionItem<T = Record<string, unknown>>(
   collectionId: string,
   itemId: string
 ): Promise<T & { id: string } | null> {
-  if (!WEBFLOW_API_TOKEN) {
+  const apiToken = getApiToken();
+  if (!apiToken) {
     console.warn('WEBFLOW_API_TOKEN not set. Using mock data.');
     return null;
   }
@@ -87,7 +116,7 @@ export async function getCollectionItem<T = Record<string, unknown>>(
     `https://api.webflow.com/v2/collections/${collectionId}/items/${itemId}`,
     {
       headers: {
-        Authorization: `Bearer ${WEBFLOW_API_TOKEN}`,
+        Authorization: `Bearer ${apiToken}`,
         'accept-version': '2.0.0',
       },
     }
@@ -112,16 +141,17 @@ export async function getCollectionItem<T = Record<string, unknown>>(
  * Get all collections for the site
  */
 export async function listCollections(): Promise<{ id: string; displayName: string; slug: string }[]> {
-  if (!WEBFLOW_API_TOKEN) {
+  const apiToken = getApiToken();
+  if (!apiToken) {
     console.warn('WEBFLOW_API_TOKEN not set.');
     return [];
   }
 
   const response = await fetch(
-    `https://api.webflow.com/v2/sites/${SITE_ID}/collections`,
+    `https://api.webflow.com/v2/sites/${getSiteId()}/collections`,
     {
       headers: {
-        Authorization: `Bearer ${WEBFLOW_API_TOKEN}`,
+        Authorization: `Bearer ${apiToken}`,
         'accept-version': '2.0.0',
       },
     }

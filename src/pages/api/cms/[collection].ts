@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import {
+  initCMS,
   getHRContent,
   getSafetyContent,
   getITKnowledgeBase,
@@ -14,7 +15,9 @@ import {
 } from '../../../lib/webflow-cms';
 
 // Public API for fetching CMS content (no auth required)
-export const GET: APIRoute = async ({ params, url }) => {
+export const GET: APIRoute = async ({ params, url, locals }) => {
+  // Initialize CMS with Cloudflare runtime context
+  initCMS(locals);
   const collection = params.collection;
   const limit = url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : undefined;
   const type = url.searchParams.get('type') || undefined;

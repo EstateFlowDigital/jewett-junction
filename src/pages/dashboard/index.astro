@@ -4,7 +4,10 @@ import '../../../generated/webflow.css';
 import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
-import { getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch CMS data
 let announcements: any[] = [];

@@ -1,7 +1,10 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { EventsContent } from '../../components/pages/EventsContent';
-import { getEvents } from '../../lib/webflow-cms';
+import { initCMS, getEvents } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch events from CMS
 let events: any[] = [];

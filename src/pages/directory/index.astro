@@ -1,7 +1,10 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { DirectoryContent } from '../../components/pages/DirectoryContent';
-import { getEmployees } from '../../lib/webflow-cms';
+import { initCMS, getEmployees } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch employees from CMS
 let employees: any[] = [];

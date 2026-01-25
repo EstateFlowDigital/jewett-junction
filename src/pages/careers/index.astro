@@ -1,7 +1,10 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CareersContent } from '../../components/pages/CareersContent';
-import { getJobPostings } from '../../lib/webflow-cms';
+import { initCMS, getJobPostings } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch job postings from CMS
 let jobs: any[] = [];

@@ -1,15 +1,26 @@
 import type { APIRoute } from 'astro';
-import { getAnnouncements, getEvents, getJobPostings, getEmployees, getCultureStories } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getEmployees, getCultureStories } from '../../lib/webflow-cms';
 
-export const GET: APIRoute = async () => {
-  const hasToken = !!import.meta.env.WEBFLOW_API_TOKEN;
-  const tokenPreview = import.meta.env.WEBFLOW_API_TOKEN
-    ? `${import.meta.env.WEBFLOW_API_TOKEN.substring(0, 8)}...`
+export const GET: APIRoute = async ({ locals }) => {
+  // Initialize CMS with Cloudflare runtime context
+  initCMS(locals);
+
+  // Check for token in both runtime context and import.meta.env
+  const runtime = (locals as any)?.runtime;
+  const runtimeToken = runtime?.env?.WEBFLOW_API_TOKEN;
+  const metaToken = import.meta.env.WEBFLOW_API_TOKEN;
+  const token = runtimeToken || metaToken;
+
+  const hasToken = !!token;
+  const tokenPreview = token
+    ? `${token.substring(0, 8)}...`
     : 'NOT SET';
+  const tokenSource = runtimeToken ? 'runtime.env' : metaToken ? 'import.meta.env' : 'none';
 
   let results: Record<string, any> = {
     hasToken,
     tokenPreview,
+    tokenSource,
     collections: {}
   };
 

@@ -1,7 +1,10 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CultureContent } from '../../components/pages/CultureContent';
-import { getCultureStories } from '../../lib/webflow-cms';
+import { initCMS, getCultureStories } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
 
 // Fetch culture stories from CMS
 let stories: any[] = [];
