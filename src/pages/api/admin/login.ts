@@ -14,14 +14,16 @@ function generateToken(password: string): string {
   return `admin_${Math.abs(hash).toString(36)}_${timestamp.toString(36)}`;
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const { password } = await request.json();
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
+    // Access env vars from Cloudflare runtime context, fallback to import.meta.env for local dev
+    const runtime = (locals as any).runtime;
+    const adminPassword = runtime?.env?.ADMIN_PASSWORD || import.meta.env.ADMIN_PASSWORD;
 
     if (!adminPassword) {
       return new Response(
-        JSON.stringify({ error: 'Admin password not configured' }),
+        JSON.stringify({ error: 'Admin password not configured. Check environment variables.' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }

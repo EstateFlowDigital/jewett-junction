@@ -1,8 +1,13 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 
-const API_TOKEN = import.meta.env.WEBFLOW_API_TOKEN;
 const BASE_URL = 'https://api.webflow.com/v2';
+
+// Get API token from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
+function getApiToken(locals: any): string {
+  const runtime = locals?.runtime;
+  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
+}
 
 // Verify admin token
 function verifyToken(request: Request): boolean {
@@ -24,7 +29,7 @@ function verifyToken(request: Request): boolean {
 }
 
 // GET - List items from a collection
-export const GET: APIRoute = async ({ request, url }) => {
+export const GET: APIRoute = async ({ request, url, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -41,11 +46,12 @@ export const GET: APIRoute = async ({ request, url }) => {
   }
 
   const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
+  const apiToken = getApiToken(locals);
 
   try {
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json'
       }
     });
@@ -69,13 +75,15 @@ export const GET: APIRoute = async ({ request, url }) => {
 };
 
 // POST - Create new item
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
+
+  const apiToken = getApiToken(locals);
 
   try {
     const { collection, fields, isLive = false } = await request.json();
@@ -93,7 +101,7 @@ export const POST: APIRoute = async ({ request }) => {
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items${isLive ? '?live=true' : ''}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json',
         'content-type': 'application/json'
       },
@@ -122,13 +130,15 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 // PATCH - Update item
-export const PATCH: APIRoute = async ({ request }) => {
+export const PATCH: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
+
+  const apiToken = getApiToken(locals);
 
   try {
     const { collection, itemId, fields, isLive = false } = await request.json();
@@ -152,7 +162,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '?live=true' : ''}`, {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json',
         'content-type': 'application/json'
       },
@@ -181,13 +191,15 @@ export const PATCH: APIRoute = async ({ request }) => {
 };
 
 // DELETE - Delete item
-export const DELETE: APIRoute = async ({ request }) => {
+export const DELETE: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
+
+  const apiToken = getApiToken(locals);
 
   try {
     const { collection, itemId } = await request.json();
@@ -211,7 +223,7 @@ export const DELETE: APIRoute = async ({ request }) => {
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items/${itemId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json'
       }
     });

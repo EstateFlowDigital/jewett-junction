@@ -1,8 +1,12 @@
 import type { APIRoute } from 'astro';
 
-const API_TOKEN = import.meta.env.WEBFLOW_API_TOKEN;
-const SITE_ID = import.meta.env.WEBFLOW_SITE_ID;
 const BASE_URL = 'https://api.webflow.com/v2';
+
+// Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
+function getEnvVar(locals: any, key: string): string {
+  const runtime = (locals as any)?.runtime;
+  return runtime?.env?.[key] || (import.meta.env as any)[key];
+}
 
 // Verify admin token
 function verifyToken(request: Request): boolean {
@@ -24,7 +28,7 @@ function verifyToken(request: Request): boolean {
 }
 
 // POST - Publish site
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -32,7 +36,10 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  if (!SITE_ID) {
+  const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
+  const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
+
+  if (!siteId) {
     return new Response(JSON.stringify({ error: 'Site ID not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -41,10 +48,10 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     // Publish the site
-    const response = await fetch(`${BASE_URL}/sites/${SITE_ID}/publish`, {
+    const response = await fetch(`${BASE_URL}/sites/${siteId}/publish`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json',
         'content-type': 'application/json'
       },
@@ -77,7 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 // GET - Check publish status / site info
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -85,10 +92,13 @@ export const GET: APIRoute = async ({ request }) => {
     });
   }
 
+  const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
+  const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
+
   try {
-    const response = await fetch(`${BASE_URL}/sites/${SITE_ID}`, {
+    const response = await fetch(`${BASE_URL}/sites/${siteId}`, {
       headers: {
-        'Authorization': `Bearer ${API_TOKEN}`,
+        'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json'
       }
     });
