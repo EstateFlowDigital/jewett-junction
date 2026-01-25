@@ -51,6 +51,9 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
+// Base path for API calls - matches the deployment path
+const API_BASE = '/jewett-junction';
+
 // Collection configurations with expanded fields
 const COLLECTIONS = {
   announcements: {
@@ -349,7 +352,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
   const verifyToken = async (token: string) => {
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -368,7 +371,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setLoginError('');
 
     try {
-      const response = await fetch('/api/admin/login', {
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -454,7 +457,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/admin/items', {
+      const response = await fetch(`${API_BASE}/api/admin/items`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -490,7 +493,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
         body.itemId = editingItem.id;
       }
 
-      const response = await fetch('/api/admin/items', {
+      const response = await fetch(`${API_BASE}/api/admin/items`, {
         method,
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -523,7 +526,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setError('');
 
     try {
-      const response = await fetch('/api/admin/publish', {
+      const response = await fetch(`${API_BASE}/api/admin/publish`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
@@ -542,7 +545,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const fetchCollections = async () => {
     setSyncStatus('loading');
     try {
-      const response = await fetch('/api/admin/collections', {
+      const response = await fetch(`${API_BASE}/api/admin/collections`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
 
@@ -575,7 +578,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setSyncResults([]);
 
     try {
-      const response = await fetch('/api/admin/collections', {
+      const response = await fetch(`${API_BASE}/api/admin/collections`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -637,7 +640,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/api/admin/upload', {
+      const response = await fetch(`${API_BASE}/api/admin/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`
