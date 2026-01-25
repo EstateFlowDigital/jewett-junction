@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 
+export const prerender = false;
+
 const BASE_URL = 'https://api.webflow.com/v2';
 
 // Get API token from runtime context (Cloudflare) or fallback to import.meta.env (local dev)

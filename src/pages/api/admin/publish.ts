@@ -1,5 +1,7 @@
 import type { APIRoute } from 'astro';
 
+export const prerender = false;
+
 const BASE_URL = 'https://api.webflow.com/v2';
 
 // Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
