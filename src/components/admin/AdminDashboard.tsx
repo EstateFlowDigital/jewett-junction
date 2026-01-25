@@ -374,17 +374,30 @@ export function AdminDashboard({}: AdminDashboardProps) {
         body: JSON.stringify({ password })
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        setLoginError(`Server error (${response.status}): Invalid response`);
+        return;
+      }
 
       if (response.ok) {
         localStorage.setItem('admin_token', data.token);
         setIsAuthenticated(true);
         setPassword('');
       } else {
-        setLoginError(data.error || 'Invalid password');
+        // Show detailed error including hints if available
+        let errorMsg = data.error || 'Invalid password';
+        if (data.hint) {
+          errorMsg += `. ${data.hint}`;
+        }
+        setLoginError(errorMsg);
       }
-    } catch (err) {
-      setLoginError('Connection error. Please try again.');
+    } catch (err: any) {
+      // Network/fetch error
+      console.error('Login fetch error:', err);
+      setLoginError(`Connection error: ${err?.message || 'Unable to reach server'}. Make sure the site is deployed and try again.`);
     } finally {
       setIsLoggingIn(false);
     }
