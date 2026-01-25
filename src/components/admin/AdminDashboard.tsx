@@ -419,7 +419,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/items?collection=${activeCollection}`, {
+      const response = await fetch(`${API_BASE}/api/admin/items?collection=${activeCollection}`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
 
