@@ -1,12 +1,18 @@
 import type { APIRoute } from 'astro';
 
-// CORS headers for all responses
-const corsHeaders = {
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+// Helper to add CORS headers to any response
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set('Access-Control-Allow-Origin', '*');
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
 
 // Simple token generation - in production, use a proper JWT library
 function generateToken(password: string): string {
@@ -44,26 +50,57 @@ function verifyToken(token: string | null): { valid: boolean; reason?: string } 
   return { valid: true };
 }
 
+// Handle CORS preflight
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    }
+  });
+};
+
+// Handle token verification GET request
+export const GET: APIRoute = async ({ request }) => {
+  const authHeader = request.headers.get('Authorization');
+  const token = authHeader?.replace('Bearer ', '') || null;
+  const result = verifyToken(token);
+
+  if (!result.valid) {
+    return withCors(new Response(
+      JSON.stringify({ valid: false, reason: result.reason }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    ));
+  }
+
+  return withCors(new Response(
+    JSON.stringify({ valid: true }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } }
+  ));
+};
+
 // Handle login POST request
-async function handlePost(request: Request, locals: any): Promise<Response> {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     let body;
     try {
       body = await request.json();
     } catch (parseError) {
-      return new Response(
+      return withCors(new Response(
         JSON.stringify({ error: 'Invalid JSON in request body' }),
-        { status: 400, headers: corsHeaders }
-      );
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      ));
     }
 
     const { password } = body;
 
     if (!password) {
-      return new Response(
+      return withCors(new Response(
         JSON.stringify({ error: 'Password is required' }),
-        { status: 400, headers: corsHeaders }
-      );
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      ));
     }
 
     // Access env vars from Cloudflare runtime context, fallback to import.meta.env for local dev
@@ -72,98 +109,40 @@ async function handlePost(request: Request, locals: any): Promise<Response> {
 
     if (!adminPassword) {
       console.error('ADMIN_PASSWORD not found in environment variables');
-      return new Response(
+      return withCors(new Response(
         JSON.stringify({
           error: 'Admin password not configured',
           hint: 'Set ADMIN_PASSWORD in Webflow Cloud environment variables'
         }),
-        { status: 500, headers: corsHeaders }
-      );
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      ));
     }
 
     if (password !== adminPassword) {
-      return new Response(
+      return withCors(new Response(
         JSON.stringify({ error: 'Invalid password' }),
-        { status: 401, headers: corsHeaders }
-      );
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      ));
     }
 
     const token = generateToken(password);
 
-    return new Response(
+    return withCors(new Response(
       JSON.stringify({
         success: true,
         token,
         expiresIn: 24 * 60 * 60 * 1000 // 24 hours
       }),
-      { status: 200, headers: corsHeaders }
-    );
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    ));
   } catch (error: any) {
     console.error('Login error:', error);
-    return new Response(
+    return withCors(new Response(
       JSON.stringify({
         error: 'Internal server error',
         message: error?.message || 'Unknown error'
       }),
-      { status: 500, headers: corsHeaders }
-    );
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    ));
   }
-}
-
-// Handle token verification GET request
-function handleGet(request: Request): Response {
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '') || null;
-  const result = verifyToken(token);
-
-  if (!result.valid) {
-    return new Response(
-      JSON.stringify({ valid: false, reason: result.reason }),
-      { status: 401, headers: corsHeaders }
-    );
-  }
-
-  return new Response(
-    JSON.stringify({ valid: true }),
-    { status: 200, headers: corsHeaders }
-  );
-}
-
-// Unified handler that works better with Cloudflare adapter
-export const ALL: APIRoute = async ({ request, locals }) => {
-  const method = request.method.toUpperCase();
-
-  // Handle OPTIONS preflight
-  if (method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  // Handle POST (login)
-  if (method === 'POST') {
-    return handlePost(request, locals);
-  }
-
-  // Handle GET (verify token)
-  if (method === 'GET') {
-    return handleGet(request);
-  }
-
-  // Method not allowed
-  return new Response(
-    JSON.stringify({ error: 'Method not allowed' }),
-    { status: 405, headers: corsHeaders }
-  );
-};
-
-// Also export individual methods for compatibility
-export const OPTIONS: APIRoute = async () => {
-  return new Response(null, { status: 204, headers: corsHeaders });
-};
-
-export const POST: APIRoute = async ({ request, locals }) => {
-  return handlePost(request, locals);
-};
-
-export const GET: APIRoute = async ({ request }) => {
-  return handleGet(request);
 };
