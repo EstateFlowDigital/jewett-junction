@@ -22,7 +22,10 @@ import {
   User,
   Mail,
   Phone,
-  FileText
+  FileText,
+  Search,
+  ChevronDown,
+  DollarSign
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -38,7 +41,12 @@ interface JobPosting {
   'referral-bonus'?: number;
   'apply-link'?: string;
   'employment-type'?: string;
-  'is-active'?: boolean;
+  'job-is-active'?: boolean;
+}
+
+function stripHtml(html: string | undefined) {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
 }
 
 interface CareersContentProps {
@@ -413,7 +421,23 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
 }
 
 export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
-  const displayJobs = jobs && jobs.length > 0 ? jobs : sampleJobs;
+  const allJobs = jobs && jobs.length > 0 ? jobs : sampleJobs;
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedDept, setSelectedDept] = React.useState('All Departments');
+  const [expandedJob, setExpandedJob] = React.useState<string | null>(null);
+
+  // Get unique departments
+  const departments = ['All Departments', ...new Set(allJobs.map(j => j.department || 'General'))];
+
+  // Filter jobs
+  const displayJobs = allJobs.filter(job => {
+    const matchesSearch = searchTerm === '' ||
+      job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (job.department?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (job.location?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesDept = selectedDept === 'All Departments' || job.department === selectedDept;
+    return matchesSearch && matchesDept;
+  });
 
   return (
     <div className="space-y-12 pb-12">
@@ -542,17 +566,45 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
 
       {/* Open Positions */}
       <div id="positions" className="scroll-mt-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Open Positions</h2>
             <p className="text-slate-400">
               Find your next opportunity with us
             </p>
           </div>
-          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-            {displayJobs.length} Openings
+          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 self-start md:self-auto">
+            {displayJobs.length} Opening{displayJobs.length !== 1 ? 's' : ''}
           </Badge>
         </div>
+
+        {/* Search and Filter */}
+        <Card className="bg-slate-800/50 border-slate-700 mb-6">
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search positions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-md text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <select
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
+                className="px-3 py-2 border rounded-md text-sm bg-slate-900/50 border-slate-600 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+              >
+                {departments.map(dept => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayJobs.map((job) => (
             <Card
@@ -567,7 +619,12 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
                   >
                     {job.department || 'General'}
                   </Badge>
-                  <ExternalLink className="h-4 w-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                  {job['referral-bonus'] && job['referral-bonus'] > 0 && (
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs">
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      {job['referral-bonus'].toLocaleString()} Referral
+                    </Badge>
+                  )}
                 </div>
                 <h3 className="font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
                   {job.name}
@@ -582,22 +639,72 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
                     <span>{job['employment-type'] || 'Full-time'}</span>
                   </div>
                 </div>
+
+                {/* Expandable Description */}
+                {job.description && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => setExpandedJob(expandedJob === job.id ? null : job.id)}
+                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                    >
+                      {expandedJob === job.id ? 'Hide Details' : 'View Details'}
+                      <ChevronDown className={`h-3 w-3 transition-transform ${expandedJob === job.id ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedJob === job.id && (
+                      <div className="mt-2 text-sm text-slate-400 bg-slate-900/50 p-3 rounded-lg">
+                        {stripHtml(job.description).substring(0, 200)}
+                        {stripHtml(job.description).length > 200 ? '...' : ''}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="mt-4 pt-4 border-t border-slate-700">
-                  <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    size="sm"
-                    asChild
-                  >
-                    <a href="#apply">
-                      Apply Now
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </a>
-                  </Button>
+                  {job['apply-link'] ? (
+                    <Button
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      size="sm"
+                      asChild
+                    >
+                      <a href={job['apply-link']} target="_blank" rel="noopener noreferrer">
+                        Apply Now
+                        <ExternalLink className="h-4 w-4 ml-1" />
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      size="sm"
+                      asChild
+                    >
+                      <a href="#apply">
+                        Apply Now
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {displayJobs.length === 0 && (searchTerm || selectedDept !== 'All Departments') && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="py-12 text-center">
+              <Briefcase className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">No positions found</h3>
+              <p className="text-slate-400 mb-4">Try adjusting your search or filter criteria</p>
+              <Button
+                variant="outline"
+                onClick={() => { setSearchTerm(''); setSelectedDept('All Departments'); }}
+                className="border-slate-600 text-slate-300"
+              >
+                Clear Filters
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Referral Program Banner */}

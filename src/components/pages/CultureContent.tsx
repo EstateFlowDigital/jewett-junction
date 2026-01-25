@@ -14,6 +14,8 @@ interface CMSCultureStory {
   author?: string;
   'published-date'?: string;
   category?: string;
+  type?: string;
+  featured?: boolean;
 }
 
 interface CultureContentProps {
@@ -21,11 +23,32 @@ interface CultureContentProps {
   stories?: CMSCultureStory[];
 }
 
+function stripHtml(html: string | undefined) {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+function getInitials(name: string) {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
 export function CultureContent({ theme = 'modern', stories: cmsStories = [] }: CultureContentProps) {
   const isDark = theme === 'dark';
 
-  // Get featured story from CMS or use default
-  const featuredStory = cmsStories.length > 0 ? cmsStories[0] : null;
+  // Filter stories by type
+  const spotlightStories = cmsStories.filter(s => s.type?.toLowerCase() === 'spotlight' || s.category?.toLowerCase() === 'spotlight');
+  const recognitionStories = cmsStories.filter(s => s.type?.toLowerCase() === 'recognition' || s.category?.toLowerCase() === 'recognition');
+  const winStories = cmsStories.filter(s => s.type?.toLowerCase() === 'win' || s.category?.toLowerCase() === 'win');
+  const otherStories = cmsStories.filter(s =>
+    !['spotlight', 'recognition', 'win'].includes(s.type?.toLowerCase() || '') &&
+    !['spotlight', 'recognition', 'win'].includes(s.category?.toLowerCase() || '')
+  );
+
+  // Get current spotlight (featured one or first spotlight story)
+  const currentSpotlight = spotlightStories.find(s => s.featured) || spotlightStories[0];
+
+  // Get current month for spotlight badge
+  const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
     <div className="space-y-6">
@@ -69,55 +92,119 @@ export function CultureContent({ theme = 'modern', stories: cmsStories = [] }: C
               <CardDescription className={isDark ? 'text-slate-400' : ''}>Celebrating our amazing team members</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className={`p-6 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-gradient-to-br from-amber-50 to-orange-50'}`}>
-                <div className="flex items-start gap-4">
-                  <div className="w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center text-2xl font-bold text-amber-700 shrink-0">
-                    JD
-                  </div>
-                  <div>
-                    <Badge className="bg-amber-100 text-amber-700 mb-2">January 2026</Badge>
-                    <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : ''}`}>Jennifer Davis</h3>
-                    <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Project Manager • 8 Years</p>
-                    <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-muted-foreground'}`}>
-                      "Jennifer's leadership on the Downtown Office Complex project exemplifies our commitment to excellence. Her dedication to safety and quality has set a new standard for our team."
-                    </p>
+              {currentSpotlight ? (
+                <div className={`p-6 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-gradient-to-br from-amber-50 to-orange-50'}`}>
+                  <div className="flex items-start gap-4">
+                    {currentSpotlight.image?.url ? (
+                      <img
+                        src={currentSpotlight.image.url}
+                        alt={currentSpotlight.image.alt || currentSpotlight.name}
+                        className="w-20 h-20 rounded-full object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center text-2xl font-bold text-amber-700 shrink-0">
+                        {getInitials(currentSpotlight.name)}
+                      </div>
+                    )}
+                    <div>
+                      <Badge className="bg-amber-100 text-amber-700 mb-2">{currentMonth}</Badge>
+                      <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : ''}`}>{currentSpotlight.name}</h3>
+                      {currentSpotlight.author && (
+                        <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{currentSpotlight.author}</p>
+                      )}
+                      <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-muted-foreground'}`}>
+                        {stripHtml(currentSpotlight.content) || currentSpotlight.excerpt || 'Outstanding contribution to our team!'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className={`p-6 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-gradient-to-br from-amber-50 to-orange-50'}`}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center text-2xl font-bold text-amber-700 shrink-0">
+                      JD
+                    </div>
+                    <div>
+                      <Badge className="bg-amber-100 text-amber-700 mb-2">{currentMonth}</Badge>
+                      <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : ''}`}>Jennifer Davis</h3>
+                      <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Project Manager • 8 Years</p>
+                      <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-muted-foreground'}`}>
+                        "Jennifer's leadership on the Downtown Office Complex project exemplifies our commitment to excellence. Her dedication to safety and quality has set a new standard for our team."
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Recent Recognitions */}
+          {/* Recent Recognitions / Team Wins */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>Recent Recognitions</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>Kudos from the team</CardDescription>
+                <CardTitle className={isDark ? 'text-white' : ''}>
+                  {recognitionStories.length > 0 || winStories.length > 0 ? 'Team Highlights' : 'Recent Recognitions'}
+                </CardTitle>
+                <CardDescription className={isDark ? 'text-slate-400' : ''}>
+                  {recognitionStories.length > 0 || winStories.length > 0 ? 'Celebrating wins and recognitions' : 'Kudos from the team'}
+                </CardDescription>
               </div>
               <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
                 <Sparkles className="h-4 w-4 mr-2" /> Give Recognition
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {[
-                { from: 'Mike Thompson', to: 'Sarah Chen', message: 'Amazing work on the client presentation!', icon: Star },
-                { from: 'Lisa Wang', to: 'Team Alpha', message: 'Thanks for staying late to meet the deadline!', icon: Trophy },
-                { from: 'James Miller', to: 'Safety Team', message: '300 days without incident - incredible!', icon: Award },
-              ].map((rec, i) => (
-                <div key={i} className={`p-4 rounded-lg border ${isDark ? 'border-slate-600' : ''}`}>
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 ${isDark ? 'bg-amber-900' : 'bg-amber-100'} rounded-full flex items-center justify-center`}>
-                      <rec.icon className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                        <span className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{rec.from}</span> recognized <span className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{rec.to}</span>
-                      </p>
-                      <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : ''}`}>"{rec.message}"</p>
+              {[...winStories, ...recognitionStories, ...otherStories].length > 0 ? (
+                [...winStories, ...recognitionStories, ...otherStories].slice(0, 5).map((story, i) => (
+                  <div key={story.id || i} className={`p-4 rounded-lg border ${isDark ? 'border-slate-600' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      {story.image?.url ? (
+                        <img src={story.image.url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className={`w-10 h-10 ${isDark ? 'bg-amber-900' : 'bg-amber-100'} rounded-full flex items-center justify-center`}>
+                          {story.type?.toLowerCase() === 'win' || story.category?.toLowerCase() === 'win' ? (
+                            <Trophy className="h-5 w-5 text-amber-600" />
+                          ) : (
+                            <Star className="h-5 w-5 text-amber-600" />
+                          )}
+                        </div>
+                      )}
+                      <div>
+                        <p className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{story.name}</p>
+                        <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : 'text-muted-foreground'}`}>
+                          {stripHtml(story.content) || story.excerpt || ''}
+                        </p>
+                        {story.author && (
+                          <p className={`text-xs mt-2 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
+                            — {story.author}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                // Fallback sample recognitions when no CMS data
+                [
+                  { from: 'Mike Thompson', to: 'Sarah Chen', message: 'Amazing work on the client presentation!', icon: Star },
+                  { from: 'Lisa Wang', to: 'Team Alpha', message: 'Thanks for staying late to meet the deadline!', icon: Trophy },
+                  { from: 'James Miller', to: 'Safety Team', message: '300 days without incident - incredible!', icon: Award },
+                ].map((rec, i) => (
+                  <div key={i} className={`p-4 rounded-lg border ${isDark ? 'border-slate-600' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 ${isDark ? 'bg-amber-900' : 'bg-amber-100'} rounded-full flex items-center justify-center`}>
+                        <rec.icon className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                          <span className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{rec.from}</span> recognized <span className={`font-medium ${isDark ? 'text-white' : 'text-foreground'}`}>{rec.to}</span>
+                        </p>
+                        <p className={`text-sm mt-1 ${isDark ? 'text-slate-300' : ''}`}>"{rec.message}"</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>
@@ -126,17 +213,38 @@ export function CultureContent({ theme = 'modern', stories: cmsStories = [] }: C
         <div className="space-y-6">
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Community Impact</CardTitle>
+              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>
+                {cmsStories.length > 0 ? 'Culture Stats' : 'Community Impact'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className={`text-4xl font-bold ${isDark ? 'text-pink-400' : 'text-pink-600'}`}>$125K</div>
-                <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Donated in 2025</div>
-              </div>
-              <div className="text-center">
-                <div className={`text-4xl font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>450</div>
-                <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Volunteer Hours</div>
-              </div>
+              {cmsStories.length > 0 ? (
+                <>
+                  <div className="text-center">
+                    <div className={`text-4xl font-bold ${isDark ? 'text-pink-400' : 'text-pink-600'}`}>{cmsStories.length}</div>
+                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Total Stories</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-4xl font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>{spotlightStories.length}</div>
+                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Team Spotlights</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-4xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{winStories.length}</div>
+                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Team Wins</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-center">
+                    <div className={`text-4xl font-bold ${isDark ? 'text-pink-400' : 'text-pink-600'}`}>$125K</div>
+                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Donated in 2025</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-4xl font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>450</div>
+                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Volunteer Hours</div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 

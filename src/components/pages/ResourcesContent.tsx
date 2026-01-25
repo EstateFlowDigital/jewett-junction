@@ -44,6 +44,8 @@ const categoryColors: Record<string, string> = {
 
 export function ResourcesContent({ theme = 'modern', resources: cmsResources = [] }: ResourcesContentProps) {
   const isDark = theme === 'dark';
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
 
   // Group CMS resources by category
   const resourcesByCategory = cmsResources.reduce((acc, r) => {
@@ -67,13 +69,25 @@ export function ResourcesContent({ theme = 'modern', resources: cmsResources = [
         { name: 'IT Guides', icon: Wrench, count: 15, color: 'orange' },
       ];
 
-  const recentDocs = cmsResources.length > 0
-    ? cmsResources.slice(0, 4).map(r => ({
+  // Filter resources based on search and category
+  const filteredResources = cmsResources.filter(r => {
+    const matchesSearch = searchTerm === '' ||
+      r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (r.description?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (r.category?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesCategory = !selectedCategory || r.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const recentDocs = (selectedCategory || searchTerm ? filteredResources : cmsResources).length > 0
+    ? (selectedCategory || searchTerm ? filteredResources : cmsResources).slice(0, 6).map(r => ({
         name: r.name,
+        description: r.description,
         type: r.file?.url?.split('.').pop()?.toUpperCase() || 'Link',
         size: '',
         date: '',
         url: r.file?.url || r['external-link'],
+        category: r.category,
       }))
     : [
         { name: 'Safety Manual 2026', type: 'PDF', size: '2.4 MB', date: 'Jan 10, 2026' },
@@ -103,12 +117,20 @@ export function ResourcesContent({ theme = 'modern', resources: cmsResources = [
               <input
                 type="text"
                 placeholder="Search documents..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border rounded-md text-sm ${isDark ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-400' : ''}`}
               />
             </div>
-            <Button variant="outline" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
-              <Filter className="h-4 w-4 mr-2" /> Filters
-            </Button>
+            {selectedCategory && (
+              <Button
+                variant="outline"
+                onClick={() => setSelectedCategory(null)}
+                className={isDark ? 'border-slate-600 text-slate-300' : ''}
+              >
+                Clear Filter
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -116,7 +138,19 @@ export function ResourcesContent({ theme = 'modern', resources: cmsResources = [
       {/* Categories */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {categories.map((cat) => (
-          <Card key={cat.name} className={`cursor-pointer transition-all hover:shadow-lg ${isDark ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'hover:border-slate-300'}`}>
+          <Card
+            key={cat.name}
+            onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+            className={`cursor-pointer transition-all hover:shadow-lg ${
+              selectedCategory === cat.name
+                ? isDark
+                  ? 'bg-slate-700 border-amber-500 ring-2 ring-amber-500/50'
+                  : 'border-amber-500 ring-2 ring-amber-500/50'
+                : isDark
+                ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
+                : 'hover:border-slate-300'
+            }`}
+          >
             <CardContent className="pt-6 text-center">
               <div className={`w-12 h-12 ${isDark ? `bg-${cat.color}-900` : `bg-${cat.color}-100`} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
                 <cat.icon className={`h-6 w-6 text-${cat.color}-600`} />
@@ -133,26 +167,50 @@ export function ResourcesContent({ theme = 'modern', resources: cmsResources = [
           {/* Recent Documents */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>Recently Updated</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>Latest documents and resources</CardDescription>
+              <CardTitle className={isDark ? 'text-white' : ''}>
+                {selectedCategory ? selectedCategory : searchTerm ? 'Search Results' : 'Recently Updated'}
+              </CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : ''}>
+                {selectedCategory || searchTerm
+                  ? `Showing ${recentDocs.length} document${recentDocs.length !== 1 ? 's' : ''}`
+                  : 'Latest documents and resources'}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {recentDocs.map((doc) => (
-                <div key={doc.name} className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+              {recentDocs.map((doc, i) => (
+                <div key={doc.name + i} className={`flex items-center gap-4 p-4 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
                   <div className={`w-10 h-10 ${isDark ? 'bg-amber-900' : 'bg-amber-100'} rounded-lg flex items-center justify-center`}>
                     <FileText className="h-5 w-5 text-amber-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className={`font-medium truncate ${isDark ? 'text-white' : ''}`}>{doc.name}</div>
                     <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                      {doc.type} • {doc.size} • {doc.date}
+                      {doc.type}{doc.size ? ` • ${doc.size}` : ''}{doc.date ? ` • ${doc.date}` : ''}{(doc as any).category ? ` • ${(doc as any).category}` : ''}
                     </div>
+                    {(doc as any).description && (
+                      <div className={`text-xs mt-1 truncate ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
+                        {(doc as any).description}
+                      </div>
+                    )}
                   </div>
-                  <Button size="sm" variant="ghost" className={isDark ? 'text-slate-400 hover:text-white' : ''}>
-                    <Download className="h-4 w-4" />
-                  </Button>
+                  {(doc as any).url ? (
+                    <a href={(doc as any).url} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="ghost" className={isDark ? 'text-slate-400 hover:text-white' : ''}>
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </a>
+                  ) : (
+                    <Button size="sm" variant="ghost" disabled className={isDark ? 'text-slate-600' : ''}>
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
+              {recentDocs.length === 0 && (searchTerm || selectedCategory) && (
+                <div className={`text-center py-8 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                  No documents found matching your criteria
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -170,12 +228,14 @@ export function ResourcesContent({ theme = 'modern', resources: cmsResources = [
               </div>
               <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
                 <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Categories</div>
-                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{categories.length || 12}</div>
+                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{categories.length}</div>
               </div>
-              <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
-                <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Updated This Month</div>
-                <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>8</div>
-              </div>
+              {(searchTerm || selectedCategory) && (
+                <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
+                  <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Showing</div>
+                  <div className={`text-2xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>{filteredResources.length}</div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

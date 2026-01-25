@@ -40,6 +40,10 @@ function formatEventDate(dateStr: string) {
 export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: EventsContentProps) {
   const isDark = theme === 'dark';
 
+  // Get current month/year for calendar header
+  const now = new Date();
+  const currentMonthYear = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
   // Transform CMS events to display format, fallback to sample data if empty
   const events = cmsEvents.length > 0
     ? cmsEvents.map(e => {
@@ -50,7 +54,9 @@ export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: Even
           time,
           location: e.location || 'TBD',
           type: e.category || 'Company',
-          color: categoryColors[e.category || 'company'] || 'blue',
+          color: categoryColors[e.category?.toLowerCase() || 'company'] || 'blue',
+          description: e.description,
+          registrationLink: e['registration-link'],
         };
       })
     : [
@@ -59,6 +65,19 @@ export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: Even
         { title: 'New Hire Orientation', date: 'Jan 20', time: '9:00 AM', location: 'HR Office', type: 'HR', color: 'purple' },
         { title: 'Project Kickoff', date: 'Jan 22', time: '1:00 PM', location: 'Boardroom', type: 'Project', color: 'orange' },
       ];
+
+  // Calculate category counts from actual events
+  const categoryCounts = events.reduce((acc, e) => {
+    const cat = e.type || 'Other';
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const eventCategories = Object.entries(categoryCounts).map(([name, count]) => ({
+    name,
+    count,
+    color: categoryColors[name.toLowerCase()] || 'blue',
+  }));
 
   return (
     <div className="space-y-6">
@@ -116,7 +135,7 @@ export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: Even
           {/* Calendar Grid (Simplified) */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>January 2026</CardTitle>
+              <CardTitle className={isDark ? 'text-white' : ''}>{currentMonthYear}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-7 gap-1 text-center">
@@ -140,12 +159,7 @@ export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: Even
               <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Event Categories</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {[
-                { name: 'Company Wide', count: 4, color: 'blue' },
-                { name: 'Training', count: 8, color: 'green' },
-                { name: 'HR Events', count: 3, color: 'purple' },
-                { name: 'Social', count: 2, color: 'orange' },
-              ].map((cat) => (
+              {eventCategories.map((cat) => (
                 <div key={cat.name} className={`flex items-center justify-between p-2 rounded-lg cursor-pointer ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full bg-${cat.color}-500`}></div>
