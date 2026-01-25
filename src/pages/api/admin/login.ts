@@ -1,4 +1,7 @@
-import type { APIRoute } from 'astro';
+import type { APIRoute, APIContext } from 'astro';
+
+// Ensure this route is server-rendered
+export const prerender = false;
 
 // Helper to add CORS headers to any response
 function withCors(response: Response): Response {
@@ -82,7 +85,7 @@ export const GET: APIRoute = async ({ request }) => {
 };
 
 // Handle login POST request
-export const POST: APIRoute = async ({ request, locals }) => {
+async function handlePost(request: Request, locals: any): Promise<Response> {
   try {
     let body;
     try {
@@ -145,4 +148,51 @@ export const POST: APIRoute = async ({ request, locals }) => {
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     ));
   }
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  return handlePost(request, locals);
+};
+
+// Fallback handler for all methods - needed for some Cloudflare deployments
+export const ALL: APIRoute = async ({ request, locals }) => {
+  const method = request.method.toUpperCase();
+
+  if (method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
+    });
+  }
+
+  if (method === 'GET') {
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.replace('Bearer ', '') || null;
+    const result = verifyToken(token);
+
+    if (!result.valid) {
+      return withCors(new Response(
+        JSON.stringify({ valid: false, reason: result.reason }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      ));
+    }
+
+    return withCors(new Response(
+      JSON.stringify({ valid: true }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    ));
+  }
+
+  if (method === 'POST') {
+    return handlePost(request, locals);
+  }
+
+  return withCors(new Response(
+    JSON.stringify({ error: 'Method not allowed' }),
+    { status: 405, headers: { 'Content-Type': 'application/json' } }
+  ));
 };
