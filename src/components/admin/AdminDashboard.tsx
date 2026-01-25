@@ -17,7 +17,10 @@ import {
   FolderOpen,
   Check,
   AlertCircle,
-  Loader2
+  Loader2,
+  Settings,
+  Sparkles,
+  Shield
 } from 'lucide-react';
 
 // Collection configurations
@@ -26,6 +29,7 @@ const COLLECTIONS = {
     name: 'Announcements',
     icon: Megaphone,
     color: 'blue',
+    gradient: 'from-blue-500 to-cyan-500',
     fields: [
       { key: 'name', label: 'Title', type: 'text', required: true },
       { key: 'content', label: 'Content', type: 'richtext', required: true },
@@ -38,6 +42,7 @@ const COLLECTIONS = {
     name: 'Events',
     icon: Calendar,
     color: 'indigo',
+    gradient: 'from-indigo-500 to-purple-500',
     fields: [
       { key: 'name', label: 'Event Title', type: 'text', required: true },
       { key: 'event-date', label: 'Date', type: 'datetime', required: true },
@@ -51,6 +56,7 @@ const COLLECTIONS = {
     name: 'Job Postings',
     icon: Briefcase,
     color: 'emerald',
+    gradient: 'from-emerald-500 to-teal-500',
     fields: [
       { key: 'name', label: 'Job Title', type: 'text', required: true },
       { key: 'department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT'] },
@@ -67,6 +73,7 @@ const COLLECTIONS = {
     name: 'Culture Stories',
     icon: Heart,
     color: 'pink',
+    gradient: 'from-pink-500 to-rose-500',
     fields: [
       { key: 'name', label: 'Title', type: 'text', required: true },
       { key: 'type', label: 'Type', type: 'select', options: ['Spotlight', 'Win', 'Recognition', 'Value'] },
@@ -80,6 +87,7 @@ const COLLECTIONS = {
     name: 'Employees',
     icon: Users,
     color: 'cyan',
+    gradient: 'from-cyan-500 to-blue-500',
     fields: [
       { key: 'name', label: 'Full Name', type: 'text', required: true },
       { key: 'role', label: 'Job Title', type: 'text', required: true },
@@ -94,6 +102,7 @@ const COLLECTIONS = {
     name: 'Resources',
     icon: FolderOpen,
     color: 'amber',
+    gradient: 'from-amber-500 to-orange-500',
     fields: [
       { key: 'name', label: 'Resource Name', type: 'text', required: true },
       { key: 'category', label: 'Category', type: 'select', options: ['Safety', 'HR', 'Project', 'IT', 'Other'] },
@@ -329,74 +338,100 @@ export function AdminDashboard({}: AdminDashboardProps) {
     }
   }, [success, error]);
 
-  // Login Screen
+  // Login Screen - styled like dashboard
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Lock className="h-8 w-8 text-blue-400" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="w-full max-w-md relative z-10">
+          {/* Logo/Branding */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <Shield className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">Admin Access</h1>
-              <p className="text-slate-400 mt-2">Enter password to manage content</p>
+              <div className="text-left">
+                <h2 className="text-xl font-bold text-white">Jewett Junction</h2>
+                <p className="text-sm text-slate-400">Content Management</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Login Card */}
+          <div className="bg-slate-800/50 backdrop-blur-xl rounded-3xl p-8 border border-slate-700/50 shadow-2xl shadow-black/20">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-3xl flex items-center justify-center mx-auto mb-5 border border-blue-500/20">
+                <Lock className="h-10 w-10 text-blue-400" />
+              </div>
+              <h1 className="text-2xl font-bold text-white mb-2">Admin Access</h1>
+              <p className="text-slate-400">Enter your password to continue</p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="relative">
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter admin password"
-                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                  className="w-full px-5 py-4 bg-slate-900/50 border border-slate-600/50 rounded-2xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-lg"
                   autoFocus
                 />
               </div>
 
               {loginError && (
-                <div className="flex items-center gap-2 p-3 bg-rose-500/20 border border-rose-500/50 rounded-lg">
-                  <AlertCircle className="h-4 w-4 text-rose-400" />
-                  <span className="text-rose-300 text-sm">{loginError}</span>
+                <div className="flex items-center gap-3 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl">
+                  <AlertCircle className="h-5 w-5 text-rose-400 flex-shrink-0" />
+                  <span className="text-rose-300">{loginError}</span>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={isLoggingIn || !password}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
               >
                 {isLoggingIn ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                     Verifying...
                   </>
                 ) : (
                   <>
-                    <Lock className="h-4 w-4" />
+                    <Lock className="h-5 w-5" />
                     Access Admin Panel
                   </>
                 )}
               </button>
             </form>
+
+            <p className="text-center text-slate-500 text-sm mt-6">
+              Protected area for authorized personnel only
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Admin Dashboard
+  // Admin Dashboard - styled like main dashboard
   const config = COLLECTIONS[activeCollection];
+  const Icon = config.icon;
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Lock className="h-5 w-5 text-blue-400" />
+            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Settings className="h-5 w-5 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">Content Admin</h1>
@@ -408,7 +443,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
             <button
               onClick={handlePublishSite}
               disabled={isPublishing}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20"
             >
               {isPublishing ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -420,7 +455,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-sm flex items-center gap-2 transition-colors"
+              className="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 rounded-xl text-sm flex items-center gap-2 transition-colors border border-slate-700/50"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -431,33 +466,33 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
       {/* Messages */}
       {(success || error) && (
-        <div className="max-w-7xl mx-auto px-4 pt-4">
+        <div className="max-w-7xl mx-auto px-6 pt-4">
           {success && (
-            <div className="flex items-center gap-2 p-3 bg-emerald-500/20 border border-emerald-500/50 rounded-lg">
-              <Check className="h-4 w-4 text-emerald-400" />
-              <span className="text-emerald-300 text-sm">{success}</span>
+            <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl backdrop-blur-sm">
+              <Check className="h-5 w-5 text-emerald-400" />
+              <span className="text-emerald-300">{success}</span>
             </div>
           )}
           {error && (
-            <div className="flex items-center gap-2 p-3 bg-rose-500/20 border border-rose-500/50 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-rose-400" />
-              <span className="text-rose-300 text-sm">{error}</span>
+            <div className="flex items-center gap-3 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-sm">
+              <AlertCircle className="h-5 w-5 text-rose-400" />
+              <span className="text-rose-300">{error}</span>
             </div>
           )}
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex gap-8">
           {/* Sidebar - Collections */}
-          <aside className="w-64 flex-shrink-0">
-            <nav className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-              <div className="p-3 border-b border-slate-700">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Collections</span>
+          <aside className="w-72 flex-shrink-0">
+            <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden sticky top-24">
+              <div className="p-4 border-b border-slate-700/50 bg-slate-800/50">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Collections</span>
               </div>
-              <div className="p-2">
+              <div className="p-3 space-y-1">
                 {Object.entries(COLLECTIONS).map(([key, col]) => {
-                  const Icon = col.icon;
+                  const ColIcon = col.icon;
                   const isActive = activeCollection === key;
                   return (
                     <button
@@ -466,43 +501,48 @@ export function AdminDashboard({}: AdminDashboardProps) {
                         setActiveCollection(key as CollectionKey);
                         setIsEditing(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                         isActive
-                          ? 'bg-blue-500/20 text-blue-400'
-                          : 'text-slate-300 hover:bg-slate-700'
+                          ? `bg-gradient-to-r ${col.gradient} text-white shadow-lg`
+                          : 'text-slate-300 hover:bg-slate-700/50'
                       }`}
                     >
-                      <Icon className="h-4 w-4" />
-                      <span className="text-sm font-medium">{col.name}</span>
+                      <ColIcon className="h-5 w-5" />
+                      <span className="font-medium">{col.name}</span>
                     </button>
                   );
                 })}
               </div>
-            </nav>
+            </div>
           </aside>
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
             {isEditing ? (
               // Edit/Create Form
-              <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-white">
-                    {editingItem ? `Edit ${config.name.slice(0, -1)}` : `New ${config.name.slice(0, -1)}`}
-                  </h2>
+              <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/50">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center`}>
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-white">
+                      {editingItem ? `Edit ${config.name.slice(0, -1)}` : `New ${config.name.slice(0, -1)}`}
+                    </h2>
+                  </div>
                   <button
                     onClick={() => {
                       setIsEditing(false);
                       setEditingItem(null);
                       setFormData({});
                     }}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
                   >
                     <X className="h-5 w-5" />
                   </button>
                 </div>
 
-                <div className="p-6 space-y-5">
+                <div className="p-6 space-y-6">
                   {config.fields.map((field) => (
                     <div key={field.key}>
                       <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -515,7 +555,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           type={field.type === 'url' ? 'url' : field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : 'text'}
                           value={formData[field.key] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:border-blue-500 outline-none"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                         />
                       )}
 
@@ -524,7 +564,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           type="number"
                           value={formData[field.key] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.key]: parseInt(e.target.value) || 0 })}
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:border-blue-500 outline-none"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                         />
                       )}
 
@@ -533,7 +573,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           value={formData[field.key] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
                           rows={3}
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:border-blue-500 outline-none resize-none"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none"
                         />
                       )}
 
@@ -543,7 +583,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
                           rows={5}
                           placeholder="Supports basic HTML formatting"
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder:text-slate-500 focus:border-blue-500 outline-none resize-none font-mono text-sm"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none font-mono text-sm"
                         />
                       )}
 
@@ -552,7 +592,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           type="datetime-local"
                           value={formData[field.key]?.slice(0, 16) || ''}
                           onChange={(e) => setFormData({ ...formData, [field.key]: new Date(e.target.value).toISOString() })}
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:border-blue-500 outline-none"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                         />
                       )}
 
@@ -560,7 +600,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                         <select
                           value={formData[field.key] || ''}
                           onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:border-blue-500 outline-none"
+                          className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                         >
                           <option value="">Select...</option>
                           {field.options?.map((opt) => (
@@ -570,25 +610,29 @@ export function AdminDashboard({}: AdminDashboardProps) {
                       )}
 
                       {field.type === 'boolean' && (
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData[field.key] || false}
-                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.checked })}
-                            className="w-5 h-5 rounded border-slate-600 bg-slate-900/50 text-blue-500 focus:ring-blue-500"
-                          />
-                          <span className="text-slate-300">Enable</span>
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                          <div className="relative">
+                            <input
+                              type="checkbox"
+                              checked={formData[field.key] || false}
+                              onChange={(e) => setFormData({ ...formData, [field.key]: e.target.checked })}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-cyan-500 transition-all"></div>
+                            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
+                          </div>
+                          <span className="text-slate-300 group-hover:text-white transition-colors">Enable</span>
                         </label>
                       )}
                     </div>
                   ))}
                 </div>
 
-                <div className="p-4 border-t border-slate-700 flex items-center justify-end gap-3">
+                <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50">
                   <button
                     onClick={() => handleSave(false)}
                     disabled={isLoading}
-                    className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+                    className="px-5 py-2.5 bg-slate-700/80 hover:bg-slate-600/80 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-colors border border-slate-600/50"
                   >
                     <Save className="h-4 w-4" />
                     Save as Draft
@@ -596,7 +640,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                   <button
                     onClick={() => handleSave(true)}
                     disabled={isLoading}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+                    className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20"
                   >
                     {isLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -609,81 +653,95 @@ export function AdminDashboard({}: AdminDashboardProps) {
               </div>
             ) : (
               // Items List
-              <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <config.icon className={`h-5 w-5 text-${config.color}-400`} />
-                    <h2 className="text-lg font-semibold text-white">{config.name}</h2>
-                    <span className="px-2 py-0.5 bg-slate-700 text-slate-300 text-xs rounded-full">
-                      {items.length} items
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={loadItems}
-                      disabled={isLoading}
-                      className="p-2 text-slate-400 hover:text-white transition-colors"
-                    >
-                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    </button>
-                    <button
-                      onClick={handleCreate}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add New
-                    </button>
+              <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+                {/* Header with gradient */}
+                <div className={`p-5 border-b border-slate-700/50 bg-gradient-to-r ${config.gradient}/10`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-white">{config.name}</h2>
+                        <p className="text-sm text-slate-400">{items.length} items in collection</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={loadItems}
+                        disabled={isLoading}
+                        className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors"
+                      >
+                        <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
+                      </button>
+                      <button
+                        onClick={handleCreate}
+                        className={`px-5 py-2.5 bg-gradient-to-r ${config.gradient} text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg hover:shadow-xl`}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add New
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {isLoading && items.length === 0 ? (
-                  <div className="p-12 text-center">
-                    <Loader2 className="h-8 w-8 text-slate-500 animate-spin mx-auto mb-3" />
+                  <div className="p-16 text-center">
+                    <Loader2 className="h-10 w-10 text-slate-500 animate-spin mx-auto mb-4" />
                     <p className="text-slate-400">Loading items...</p>
                   </div>
                 ) : items.length === 0 ? (
-                  <div className="p-12 text-center">
-                    <config.icon className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                    <p className="text-slate-400 mb-4">No {config.name.toLowerCase()} yet</p>
+                  <div className="p-16 text-center">
+                    <div className={`w-20 h-20 bg-gradient-to-br ${config.gradient}/20 rounded-2xl flex items-center justify-center mx-auto mb-5`}>
+                      <Icon className="h-10 w-10 text-slate-500" />
+                    </div>
+                    <h3 className="text-lg font-medium text-white mb-2">No {config.name.toLowerCase()} yet</h3>
+                    <p className="text-slate-400 mb-6">Get started by creating your first item</p>
                     <button
                       onClick={handleCreate}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
+                      className={`px-6 py-3 bg-gradient-to-r ${config.gradient} text-white rounded-xl font-medium inline-flex items-center gap-2 shadow-lg`}
                     >
+                      <Sparkles className="h-4 w-4" />
                       Create First {config.name.slice(0, -1)}
                     </button>
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-700">
+                  <div className="divide-y divide-slate-700/50">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
+                        className="p-5 flex items-center justify-between hover:bg-slate-700/20 transition-colors group"
                       >
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-white truncate">
-                            {item.fieldData?.name || item.fieldData?.title || 'Untitled'}
-                          </h3>
-                          <p className="text-sm text-slate-400 truncate">
-                            {item.fieldData?.slug || item.id}
-                          </p>
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                          <div className={`w-10 h-10 bg-gradient-to-br ${config.gradient}/20 rounded-lg flex items-center justify-center`}>
+                            <Icon className={`h-5 w-5 text-${config.color}-400`} />
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="font-medium text-white truncate">
+                              {item.fieldData?.name || item.fieldData?.title || 'Untitled'}
+                            </h3>
+                            <p className="text-sm text-slate-500 truncate">
+                              ID: {item.id}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${
+                        <div className="flex items-center gap-3 ml-4">
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                             item.isDraft
-                              ? 'bg-amber-500/20 text-amber-400'
-                              : 'bg-emerald-500/20 text-emerald-400'
+                              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                              : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                           }`}>
                             {item.isDraft ? 'Draft' : 'Published'}
                           </span>
                           <button
                             onClick={() => handleEdit(item)}
-                            className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
+                            className="p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="p-2 text-slate-400 hover:text-rose-400 transition-colors"
+                            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
