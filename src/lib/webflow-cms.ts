@@ -211,12 +211,19 @@ export interface Resource {
 // ============================================
 
 export const COLLECTIONS = {
+  // Existing collections (update IDs after syncing)
   employees: '69738d872d19741af9e461a1',
   announcements: '69738dd73f2d71626fcc6b0a',
   events: '69738e25a192594f2ba185f3',
   jobPostings: '69738e490bd2a14f9c7f1885',
   cultureStories: '69738e5ef6e68b6b209e404c',
   resources: '69738e7aaef2bb2746f8d943',
+  // New collections (add IDs after syncing via admin panel)
+  hrContent: '', // HR policies, benefits, forms
+  safetyContent: '', // Safety protocols, training, alerts
+  itKnowledgeBase: '', // IT help articles and guides
+  marketingAssets: '', // Brand assets and templates
+  submittedIdeas: '', // Employee suggestions
 } as const;
 
 // ============================================

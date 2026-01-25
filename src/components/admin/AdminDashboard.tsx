@@ -39,7 +39,16 @@ import {
   Award,
   Zap,
   Upload,
-  ImagePlus
+  ImagePlus,
+  HardHat,
+  HeartHandshake,
+  Monitor,
+  Palette,
+  Lightbulb,
+  Database,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle
 } from 'lucide-react';
 
 // Collection configurations with expanded fields
@@ -175,6 +184,117 @@ const COLLECTIONS = {
       { key: 'is-new', label: 'Mark as New', type: 'boolean', helpText: 'Show "New" badge' },
     ]
   },
+  hrContent: {
+    name: 'HR Content',
+    icon: HeartHandshake,
+    color: 'violet',
+    gradient: 'from-violet-500 to-purple-500',
+    slug: 'hr-content',
+    description: 'HR policies, benefits, and employee resources',
+    fields: [
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., PTO Policy', icon: FileText },
+      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Policy', 'Benefit', 'Form', 'FAQ', 'Announcement', 'Training', 'Procedure'], icon: Tag },
+      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Small icon for display', icon: Image },
+      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...', helpText: 'Shows in card preview' },
+      { key: 'content', label: 'Full Content', type: 'richtext', placeholder: 'Full policy or content text...' },
+      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', helpText: 'Link to PDF or external document', icon: Link },
+      { key: 'effective-date', label: 'Effective Date', type: 'datetime', helpText: 'When does this take effect?', icon: Calendar },
+      { key: 'applies-to', label: 'Applies To', type: 'select', options: ['All Employees', 'Full-time', 'Part-time', 'Management', 'Field Staff', 'Office Staff'], icon: Users },
+      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on HR page' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+    ]
+  },
+  safetyContent: {
+    name: 'Safety Content',
+    icon: HardHat,
+    color: 'orange',
+    gradient: 'from-orange-500 to-red-500',
+    slug: 'safety-content',
+    description: 'Safety protocols, training, and alerts',
+    fields: [
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Fall Protection Protocol', icon: FileText },
+      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Alert', 'Training', 'Protocol', 'Certification', 'Incident Report', 'Best Practice', 'Equipment'], icon: Tag },
+      { key: 'image', label: 'Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Safety-related image', icon: Image },
+      { key: 'severity', label: 'Severity Level', type: 'select', options: ['Info', 'Warning', 'Critical', 'Emergency'], icon: AlertCircle },
+      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...' },
+      { key: 'content', label: 'Full Content', type: 'richtext', placeholder: 'Full safety content...' },
+      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', icon: Link },
+      { key: 'video-link', label: 'Training Video', type: 'url', placeholder: 'YouTube or Vimeo link', icon: Video },
+      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'When does this expire?', icon: Clock },
+      { key: 'required-for', label: 'Required For', type: 'select', options: ['All Employees', 'Field Workers', 'Supervisors', 'New Hires', 'Specific Trades'], icon: Users },
+      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+    ]
+  },
+  itKnowledgeBase: {
+    name: 'IT Knowledge Base',
+    icon: Monitor,
+    color: 'sky',
+    gradient: 'from-sky-500 to-blue-500',
+    slug: 'it-knowledge-base',
+    description: 'IT help articles, guides, and FAQs',
+    fields: [
+      { key: 'name', label: 'Article Title', type: 'text', required: true, placeholder: 'e.g., How to Reset Your Password', icon: FileText },
+      { key: 'article-type', label: 'Article Type', type: 'select', options: ['FAQ', 'How-To Guide', 'Troubleshooting', 'Software', 'Hardware', 'Security', 'Policy'], icon: Tag },
+      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', icon: Image },
+      { key: 'summary', label: 'Summary', type: 'textarea', placeholder: 'Brief description of this article...' },
+      { key: 'content', label: 'Full Content', type: 'richtext', placeholder: 'Step-by-step instructions...' },
+      { key: 'video-link', label: 'Video Tutorial', type: 'url', placeholder: 'YouTube or Loom link', icon: Video },
+      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'Link to software or file', icon: Link },
+      { key: 'platform', label: 'Platform', type: 'select', options: ['Windows', 'Mac', 'Mobile', 'Web', 'All'], icon: Monitor },
+      { key: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Intermediate', 'Advanced'], icon: Award },
+      { key: 'views', label: 'View Count', type: 'number', placeholder: '0', helpText: 'Tracks article popularity' },
+      { key: 'helpful-votes', label: 'Helpful Votes', type: 'number', placeholder: '0' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show on IT Helpdesk homepage' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+    ]
+  },
+  marketingAssets: {
+    name: 'Marketing Assets',
+    icon: Palette,
+    color: 'fuchsia',
+    gradient: 'from-fuchsia-500 to-pink-500',
+    slug: 'marketing-assets',
+    description: 'Brand assets, templates, and marketing materials',
+    fields: [
+      { key: 'name', label: 'Asset Name', type: 'text', required: true, placeholder: 'e.g., Company Logo - Primary', icon: FileText },
+      { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], icon: Tag },
+      { key: 'thumbnail', label: 'Thumbnail', type: 'image', placeholder: 'https://example.com/thumb.jpg', helpText: 'Small preview image', icon: Image },
+      { key: 'preview-image', label: 'Full Preview', type: 'image', placeholder: 'https://example.com/preview.jpg', helpText: 'Larger preview image', icon: Image },
+      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this asset for?' },
+      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'https://...', icon: Link },
+      { key: 'file-format', label: 'File Format', type: 'select', options: ['PNG', 'JPG', 'SVG', 'PDF', 'PPTX', 'DOCX', 'AI', 'PSD', 'MP4'], icon: FileText },
+      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB' },
+      { key: 'usage-guidelines', label: 'Usage Guidelines', type: 'richtext', placeholder: 'How and when to use this asset...' },
+      { key: 'tags', label: 'Tags', type: 'text', placeholder: 'logo, primary, blue', helpText: 'Comma-separated keywords' },
+      { key: 'version', label: 'Version', type: 'text', placeholder: 'v1.0' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Available for download' },
+    ]
+  },
+  submittedIdeas: {
+    name: 'Submitted Ideas',
+    icon: Lightbulb,
+    color: 'yellow',
+    gradient: 'from-yellow-500 to-amber-500',
+    slug: 'submitted-ideas',
+    description: 'Employee suggestions and improvement ideas',
+    fields: [
+      { key: 'name', label: 'Idea Title', type: 'text', required: true, placeholder: 'Brief title for the idea', icon: Lightbulb },
+      { key: 'category', label: 'Category', type: 'select', options: ['Process Improvement', 'Safety', 'Cost Savings', 'Culture', 'Technology', 'Training', 'Other'], icon: Tag },
+      { key: 'description', label: 'Full Description', type: 'richtext', placeholder: 'Detailed description of the idea...' },
+      { key: 'submitted-by', label: 'Submitted By', type: 'text', placeholder: 'Employee name', icon: Users },
+      { key: 'submitter-email', label: 'Submitter Email', type: 'email', placeholder: 'email@company.com', icon: Mail },
+      { key: 'department', label: 'Department', type: 'text', placeholder: 'Which department?', icon: Building },
+      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Approved', 'In Progress', 'Implemented', 'Declined'], icon: Tag },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['Low', 'Medium', 'High'], icon: Zap },
+      { key: 'admin-notes', label: 'Admin Notes', type: 'richtext', placeholder: 'Internal notes about this idea...', helpText: 'Not visible to submitter' },
+      { key: 'votes', label: 'Votes', type: 'number', placeholder: '0', helpText: 'Employee upvotes' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Highlight this idea' },
+    ]
+  },
 };
 
 type CollectionKey = keyof typeof COLLECTIONS;
@@ -204,6 +324,14 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const [uploadProgress, setUploadProgress] = React.useState<number>(0);
   const [dragOverField, setDragOverField] = React.useState<string | null>(null);
 
+  // Sync collections state
+  const [showSyncModal, setShowSyncModal] = React.useState(false);
+  const [syncStatus, setSyncStatus] = React.useState<'idle' | 'loading' | 'syncing' | 'done'>('idle');
+  const [existingCollections, setExistingCollections] = React.useState<any[]>([]);
+  const [definedCollections, setDefinedCollections] = React.useState<any[]>([]);
+  const [selectedToSync, setSelectedToSync] = React.useState<string[]>([]);
+  const [syncResults, setSyncResults] = React.useState<any[]>([]);
+
   // Check for existing token on mount
   React.useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -221,7 +349,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
   const verifyToken = async (token: string) => {
     try {
-      const response = await fetch('/jewett-junction/api/admin/login', {
+      const response = await fetch('/api/admin/login', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -240,7 +368,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setLoginError('');
 
     try {
-      const response = await fetch('/jewett-junction/api/admin/login', {
+      const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -275,7 +403,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setError('');
 
     try {
-      const response = await fetch(`/jewett-junction/api/admin/items?collection=${activeCollection}`, {
+      const response = await fetch(`/api/admin/items?collection=${activeCollection}`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
 
@@ -313,7 +441,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/jewett-junction/api/admin/items', {
+      const response = await fetch('/api/admin/items', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -349,7 +477,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
         body.itemId = editingItem.id;
       }
 
-      const response = await fetch('/jewett-junction/api/admin/items', {
+      const response = await fetch('/api/admin/items', {
         method,
         headers: {
           'Authorization': `Bearer ${getToken()}`,
@@ -382,7 +510,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setError('');
 
     try {
-      const response = await fetch('/jewett-junction/api/admin/publish', {
+      const response = await fetch('/api/admin/publish', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
@@ -395,6 +523,74 @@ export function AdminDashboard({}: AdminDashboardProps) {
     } finally {
       setIsPublishing(false);
     }
+  };
+
+  // Fetch existing collections from Webflow
+  const fetchCollections = async () => {
+    setSyncStatus('loading');
+    try {
+      const response = await fetch('/api/admin/collections', {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch collections');
+
+      const data = await response.json();
+      setExistingCollections(data.existing || []);
+      setDefinedCollections(data.defined || []);
+
+      // Pre-select collections that don't exist yet
+      const existingSlugs = new Set(data.existing.map((c: any) => c.slug));
+      const missing = data.defined.filter((d: any) => !existingSlugs.has(d.slug)).map((d: any) => d.slug);
+      setSelectedToSync(missing);
+
+      setSyncStatus('idle');
+    } catch (err: any) {
+      setError(err.message);
+      setSyncStatus('idle');
+    }
+  };
+
+  // Sync selected collections to Webflow
+  const syncCollections = async () => {
+    if (selectedToSync.length === 0) {
+      setError('Please select at least one collection to sync');
+      return;
+    }
+
+    setSyncStatus('syncing');
+    setSyncResults([]);
+
+    try {
+      const response = await fetch('/api/admin/collections', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ collections: selectedToSync })
+      });
+
+      if (!response.ok) throw new Error('Failed to sync collections');
+
+      const data = await response.json();
+      setSyncResults(data.results || []);
+      setSyncStatus('done');
+      setSuccess(`Synced ${data.summary.created} collections successfully!`);
+
+      // Refresh the collections list
+      await fetchCollections();
+    } catch (err: any) {
+      setError(err.message);
+      setSyncStatus('idle');
+    }
+  };
+
+  // Open sync modal and fetch collections
+  const openSyncModal = () => {
+    setShowSyncModal(true);
+    setSyncResults([]);
+    fetchCollections();
   };
 
   // Handle file upload for image fields
@@ -428,7 +624,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      const response = await fetch('/jewett-junction/api/admin/upload', {
+      const response = await fetch('/api/admin/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`
@@ -588,45 +784,248 @@ export function AdminDashboard({}: AdminDashboardProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
       <header className="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <Settings className="h-5 w-5 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-white">Content Admin</h1>
-              <p className="text-xs text-slate-400">Jewett Junction CMS</p>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-bold text-white truncate">Content Admin</h1>
+              <p className="text-xs text-slate-400 hidden sm:block">Jewett Junction CMS</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <button
+              onClick={openSyncModal}
+              className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-violet-500/20"
+            >
+              <Database className="h-4 w-4" />
+              <span className="hidden sm:inline">Sync Collections</span>
+              <span className="sm:hidden">Sync</span>
+            </button>
+
             <button
               onClick={handlePublishSite}
               disabled={isPublishing}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20"
             >
               {isPublishing ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              Publish Site
+              <span className="hidden sm:inline">Publish Site</span>
+              <span className="sm:hidden">Publish</span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 rounded-xl text-sm flex items-center gap-2 transition-colors border border-slate-700/50"
+              className="p-2 sm:px-4 sm:py-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 rounded-xl text-sm flex items-center gap-2 transition-colors border border-slate-700/50"
+              title="Logout"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
       </header>
 
+      {/* Sync Collections Modal */}
+      {showSyncModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-gradient-to-r from-violet-600/10 to-purple-600/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center">
+                  <Database className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">Sync Collections</h2>
+                  <p className="text-sm text-slate-400">Create CMS collections in Webflow</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowSyncModal(false)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 overflow-y-auto max-h-[50vh]">
+              {syncStatus === 'loading' ? (
+                <div className="text-center py-10">
+                  <Loader2 className="h-10 w-10 text-violet-400 animate-spin mx-auto mb-4" />
+                  <p className="text-slate-400">Fetching collections from Webflow...</p>
+                </div>
+              ) : syncStatus === 'syncing' ? (
+                <div className="text-center py-10">
+                  <Loader2 className="h-10 w-10 text-violet-400 animate-spin mx-auto mb-4" />
+                  <p className="text-slate-400">Creating collections...</p>
+                  <p className="text-xs text-slate-500 mt-2">This may take a moment</p>
+                </div>
+              ) : syncStatus === 'done' && syncResults.length > 0 ? (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-white mb-3">Sync Results</h3>
+                  {syncResults.map((result: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className={`p-3 rounded-xl border flex items-center gap-3 ${
+                        result.status === 'created'
+                          ? 'bg-emerald-500/10 border-emerald-500/30'
+                          : result.status === 'exists'
+                          ? 'bg-blue-500/10 border-blue-500/30'
+                          : 'bg-rose-500/10 border-rose-500/30'
+                      }`}
+                    >
+                      {result.status === 'created' ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
+                      ) : result.status === 'exists' ? (
+                        <Check className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-rose-400 flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium">{result.slug}</p>
+                        <p className={`text-xs ${
+                          result.status === 'created' ? 'text-emerald-400' :
+                          result.status === 'exists' ? 'text-blue-400' : 'text-rose-400'
+                        }`}>
+                          {result.message}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setSyncStatus('idle');
+                      setSyncResults([]);
+                    }}
+                    className="w-full mt-4 px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white rounded-xl text-sm transition-colors"
+                  >
+                    Sync More Collections
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Legend */}
+                  <div className="flex items-center gap-4 text-xs text-slate-400 mb-4">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Exists
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span> Missing
+                    </span>
+                  </div>
+
+                  {/* Collections List */}
+                  {definedCollections.map((col: any) => {
+                    const exists = existingCollections.some((e: any) => e.slug === col.slug);
+                    const isSelected = selectedToSync.includes(col.slug);
+
+                    return (
+                      <div
+                        key={col.slug}
+                        className={`p-4 rounded-xl border transition-all ${
+                          exists
+                            ? 'bg-emerald-500/5 border-emerald-500/20'
+                            : isSelected
+                            ? 'bg-violet-500/10 border-violet-500/50'
+                            : 'bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {!exists && (
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedToSync([...selectedToSync, col.slug]);
+                                } else {
+                                  setSelectedToSync(selectedToSync.filter(s => s !== col.slug));
+                                }
+                              }}
+                              className="w-5 h-5 rounded-lg border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white">{col.displayName}</span>
+                              {exists ? (
+                                <span className="px-2 py-0.5 text-xs bg-emerald-500/20 text-emerald-400 rounded-full">
+                                  Exists
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded-full">
+                                  Missing
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {col.fieldCount} fields • slug: {col.slug}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {definedCollections.length === 0 && (
+                    <div className="text-center py-8 text-slate-500">
+                      <AlertTriangle className="h-10 w-10 mx-auto mb-3 text-amber-500/50" />
+                      <p>Could not load collection definitions</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            {syncStatus !== 'loading' && syncStatus !== 'syncing' && syncStatus !== 'done' && (
+              <div className="p-5 border-t border-slate-700/50 flex items-center justify-between bg-slate-800/30">
+                <p className="text-sm text-slate-400">
+                  {selectedToSync.length} collection{selectedToSync.length !== 1 ? 's' : ''} selected
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowSyncModal(false)}
+                    className="px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={syncCollections}
+                    disabled={selectedToSync.length === 0}
+                    className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-violet-500/20"
+                  >
+                    <Database className="h-4 w-4" />
+                    Create Collections
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {syncStatus === 'done' && (
+              <div className="p-5 border-t border-slate-700/50 flex justify-end bg-slate-800/30">
+                <button
+                  onClick={() => setShowSyncModal(false)}
+                  className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl text-sm font-medium transition-all"
+                >
+                  Done
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
       {(success || error) && (
-        <div className="max-w-7xl mx-auto px-6 pt-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
           {success && (
             <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl backdrop-blur-sm">
               <Check className="h-5 w-5 text-emerald-400" />
@@ -642,72 +1041,96 @@ export function AdminDashboard({}: AdminDashboardProps) {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar - Collections */}
-          <aside className="w-72 flex-shrink-0">
-            <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden sticky top-24">
-              <div className="p-4 border-b border-slate-700/50 bg-slate-800/50">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Collections</span>
-              </div>
-              <div className="p-3 space-y-1">
-                {Object.entries(COLLECTIONS).map(([key, col]) => {
-                  const ColIcon = col.icon;
-                  const isActive = activeCollection === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setActiveCollection(key as CollectionKey);
-                        setIsEditing(false);
-                      }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-                        isActive
-                          ? `bg-gradient-to-r ${col.gradient} text-white shadow-lg`
-                          : 'text-slate-300 hover:bg-slate-700/50'
-                      }`}
-                    >
-                      <ColIcon className="h-5 w-5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <span className="font-medium block">{col.name}</span>
-                        {isActive && col.description && (
-                          <span className="text-xs opacity-75 block truncate">{col.description}</span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {/* Mobile Collection Selector */}
+        <div className="lg:hidden mb-4">
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Collection</label>
+          <select
+            value={activeCollection}
+            onChange={(e) => {
+              setActiveCollection(e.target.value as CollectionKey);
+              setIsEditing(false);
+            }}
+            className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all appearance-none cursor-pointer"
+          >
+            {Object.entries(COLLECTIONS).map(([key, col]) => (
+              <option key={key} value={key}>{col.name}</option>
+            ))}
+          </select>
+        </div>
 
-              {/* Quick stats */}
-              <div className="p-4 border-t border-slate-700/50 bg-slate-800/30">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Total fields:</span>
-                  <span className="text-slate-300 font-medium">{config.fields.length}</span>
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+          {/* Sidebar - Collections (hidden on mobile) */}
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <div className="sticky top-24 space-y-4">
+              {/* Collections list */}
+              <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div className="p-4 border-b border-slate-700/50 bg-slate-800/50">
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Collections</span>
+                </div>
+                <div className="p-3 space-y-1">
+                  {Object.entries(COLLECTIONS).map(([key, col]) => {
+                    const ColIcon = col.icon;
+                    const isActive = activeCollection === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setActiveCollection(key as CollectionKey);
+                          setIsEditing(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+                          isActive
+                            ? `bg-gradient-to-r ${col.gradient} text-white shadow-lg`
+                            : 'text-slate-300 hover:bg-slate-700/50'
+                        }`}
+                      >
+                        <ColIcon className="h-5 w-5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium block">{col.name}</span>
+                          {isActive && col.description && (
+                            <span className="text-xs opacity-75 block truncate">{col.description}</span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Quick stats */}
+                <div className="p-4 border-t border-slate-700/50 bg-slate-800/30">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-500">Total fields:</span>
+                    <span className="text-slate-300 font-medium">{config.fields.length}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Quick tips */}
-            <div className="mt-4 bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium text-white">Quick Tips</span>
+              {/* Quick tips - now inside sticky container */}
+              <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                  <span className="text-sm font-medium text-white">Quick Tips</span>
+                </div>
+                <ul className="text-xs text-slate-400 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="text-violet-400 mt-0.5">•</span>
+                    <span>Click "Sync Collections" to create new CMS collections in Webflow</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-400 mt-0.5">•</span>
+                    <span>Use "Save as Draft" to preview before publishing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-400 mt-0.5">•</span>
+                    <span>Drag & drop images directly or click to upload (max 4MB)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-purple-400 mt-0.5">•</span>
+                    <span>Click "Publish Site" to make all changes live</span>
+                  </li>
+                </ul>
               </div>
-              <ul className="text-xs text-slate-400 space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-0.5">•</span>
-                  <span>Use "Save as Draft" to preview before publishing</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-0.5">•</span>
-                  <span>Drag & drop images directly or click to upload (max 4MB)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5">•</span>
-                  <span>Click "Publish Site" to make all changes live</span>
-                </li>
-              </ul>
             </div>
           </aside>
 
