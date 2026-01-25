@@ -1,6 +1,27 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Calendar, Clock, MapPin, Users, ChevronRight, Plus, Filter } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  ChevronRight,
+  Filter,
+  Video,
+  CalendarDays,
+  Bell,
+  ExternalLink,
+  Search,
+  ChevronDown,
+  ChevronLeft,
+  Star,
+  Sparkles,
+  PartyPopper,
+  GraduationCap,
+  Megaphone,
+  Shield,
+  Heart
+} from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -14,6 +35,11 @@ interface CMSEvent {
   location?: string;
   category?: string;
   'registration-link'?: string;
+  'banner-image'?: string;
+  'virtual-link'?: string;
+  'is-mandatory'?: boolean;
+  'is-virtual'?: boolean;
+  capacity?: number;
 }
 
 interface EventsContentProps {
@@ -21,12 +47,27 @@ interface EventsContentProps {
   events?: CMSEvent[];
 }
 
-const categoryColors: Record<string, string> = {
-  company: 'blue',
-  training: 'green',
-  social: 'orange',
-  safety: 'red',
+const categoryConfig: Record<string, { color: string; gradient: string; icon: any; label: string }> = {
+  'all-hands': { color: 'blue', gradient: 'from-blue-500 to-cyan-500', icon: Megaphone, label: 'All-Hands Meeting' },
+  'all-hands-meeting': { color: 'blue', gradient: 'from-blue-500 to-cyan-500', icon: Megaphone, label: 'All-Hands Meeting' },
+  'training': { color: 'emerald', gradient: 'from-emerald-500 to-teal-500', icon: GraduationCap, label: 'Training' },
+  'hr-session': { color: 'violet', gradient: 'from-violet-500 to-purple-500', icon: Heart, label: 'HR Session' },
+  'safety-meeting': { color: 'orange', gradient: 'from-orange-500 to-red-500', icon: Shield, label: 'Safety Meeting' },
+  'safety': { color: 'orange', gradient: 'from-orange-500 to-red-500', icon: Shield, label: 'Safety' },
+  'social-event': { color: 'pink', gradient: 'from-pink-500 to-rose-500', icon: PartyPopper, label: 'Social Event' },
+  'social': { color: 'pink', gradient: 'from-pink-500 to-rose-500', icon: PartyPopper, label: 'Social Event' },
+  'workshop': { color: 'amber', gradient: 'from-amber-500 to-orange-500', icon: Sparkles, label: 'Workshop' },
+  'webinar': { color: 'cyan', gradient: 'from-cyan-500 to-blue-500', icon: Video, label: 'Webinar' },
+  'holiday': { color: 'rose', gradient: 'from-rose-500 to-pink-500', icon: Star, label: 'Holiday' },
+  'company': { color: 'indigo', gradient: 'from-indigo-500 to-violet-500', icon: Users, label: 'Company' },
+  'default': { color: 'slate', gradient: 'from-slate-500 to-slate-600', icon: Calendar, label: 'Event' },
 };
+
+function getCategoryConfig(category: string | undefined) {
+  if (!category) return categoryConfig['default'];
+  const normalized = category.toLowerCase().replace(/\s+/g, '-');
+  return categoryConfig[normalized] || categoryConfig['default'];
+}
 
 function formatEventDate(dateStr: string) {
   const date = new Date(dateStr);
@@ -34,153 +75,593 @@ function formatEventDate(dateStr: string) {
     month: date.toLocaleDateString('en-US', { month: 'short' }),
     day: date.getDate().toString(),
     time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
+    full: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
   };
 }
 
-export function EventsContent({ theme = 'modern', events: cmsEvents = [] }: EventsContentProps) {
-  const isDark = theme === 'dark';
+function isToday(dateStr: string) {
+  const eventDate = new Date(dateStr);
+  const today = new Date();
+  return eventDate.toDateString() === today.toDateString();
+}
+
+function isThisWeek(dateStr: string) {
+  const eventDate = new Date(dateStr);
+  const today = new Date();
+  const nextWeek = new Date(today);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  return eventDate >= today && eventDate <= nextWeek;
+}
+
+// Sample events for when CMS is not connected
+const sampleEvents: CMSEvent[] = [
+  {
+    id: '1',
+    name: 'Q1 2025 All-Hands Meeting',
+    description: 'Join us for our quarterly all-hands to review 2024 wins and discuss 2025 goals. Breakfast will be provided.',
+    'event-date': new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
+    location: 'Main Conference Room',
+    category: 'All-Hands Meeting',
+    'is-mandatory': true,
+  },
+  {
+    id: '2',
+    name: 'Safety Certification Training',
+    description: 'Annual safety certification renewal training. All field staff must complete this training by end of month.',
+    'event-date': new Date(Date.now() + 86400000 * 5).toISOString(),
+    location: 'Training Center',
+    category: 'Training',
+    'is-mandatory': true,
+  },
+  {
+    id: '3',
+    name: 'Team Happy Hour',
+    description: 'Celebrate our successful quarter with the team! Appetizers and drinks provided.',
+    'event-date': new Date(Date.now() + 86400000 * 7).toISOString(),
+    location: 'The Pub Downtown',
+    category: 'Social Event',
+  },
+  {
+    id: '4',
+    name: 'Benefits Q&A Session',
+    description: 'HR will answer your questions about benefits enrollment and explain the new healthcare options.',
+    'event-date': new Date(Date.now() + 86400000 * 10).toISOString(),
+    location: 'Virtual (Teams)',
+    category: 'HR Session',
+    'is-virtual': true,
+    'virtual-link': 'https://teams.microsoft.com/...',
+  },
+  {
+    id: '5',
+    name: 'Project Management Workshop',
+    description: 'Learn best practices for project management from our senior PMs. Open to all departments.',
+    'event-date': new Date(Date.now() + 86400000 * 14).toISOString(),
+    location: 'Room 201',
+    category: 'Workshop',
+  },
+];
+
+export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: EventsContentProps) {
+  const allEvents = cmsEvents.length > 0 ? cmsEvents : sampleEvents;
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedCategory, setSelectedCategory] = React.useState('All Events');
+  const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
 
   // Get current month/year for calendar header
-  const now = new Date();
-  const currentMonthYear = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
-  // Transform CMS events to display format, fallback to sample data if empty
-  const events = cmsEvents.length > 0
-    ? cmsEvents.map(e => {
-        const { month, day, time } = formatEventDate(e['event-date']);
-        return {
-          title: e.name,
-          date: `${month} ${day}`,
-          time,
-          location: e.location || 'TBD',
-          type: e.category || 'Company',
-          color: categoryColors[e.category?.toLowerCase() || 'company'] || 'blue',
-          description: e.description,
-          registrationLink: e['registration-link'],
-        };
-      })
-    : [
-        { title: 'All-Hands Meeting', date: 'Jan 15', time: '10:00 AM', location: 'Main Conference', type: 'Company', color: 'blue' },
-        { title: 'Safety Training', date: 'Jan 17', time: '2:00 PM', location: 'Training Center', type: 'Training', color: 'green' },
-        { title: 'New Hire Orientation', date: 'Jan 20', time: '9:00 AM', location: 'HR Office', type: 'HR', color: 'purple' },
-        { title: 'Project Kickoff', date: 'Jan 22', time: '1:00 PM', location: 'Boardroom', type: 'Project', color: 'orange' },
-      ];
+  // Get unique categories
+  const categories = ['All Events', ...new Set(allEvents.map(e => {
+    const config = getCategoryConfig(e.category);
+    return config.label;
+  }))];
 
-  // Calculate category counts from actual events
-  const categoryCounts = events.reduce((acc, e) => {
-    const cat = e.type || 'Other';
-    acc[cat] = (acc[cat] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Filter events
+  const filteredEvents = allEvents.filter(event => {
+    const matchesSearch = searchTerm === '' ||
+      event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (event.location?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (event.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const config = getCategoryConfig(event.category);
+    const matchesCategory = selectedCategory === 'All Events' || config.label === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const eventCategories = Object.entries(categoryCounts).map(([name, count]) => ({
-    name,
-    count,
-    color: categoryColors[name.toLowerCase()] || 'blue',
-  }));
+  // Sort events by date
+  const sortedEvents = [...filteredEvents].sort((a, b) =>
+    new Date(a['event-date']).getTime() - new Date(b['event-date']).getTime()
+  );
+
+  // Get featured/upcoming events for hero
+  const upcomingEvents = sortedEvents.slice(0, 3);
+  const featuredEvent = upcomingEvents[0];
+
+  // Calendar helper functions
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    return { daysInMonth, firstDayOfMonth };
+  };
+
+  const { daysInMonth, firstDayOfMonth } = getDaysInMonth(currentMonth);
+
+  const getEventsForDay = (day: number) => {
+    return sortedEvents.filter(event => {
+      const eventDate = new Date(event['event-date']);
+      return eventDate.getDate() === day &&
+             eventDate.getMonth() === currentMonth.getMonth() &&
+             eventDate.getFullYear() === currentMonth.getFullYear();
+    });
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+      return newDate;
+    });
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
-            <Calendar className="h-7 w-7 text-indigo-600" />
-            Company Events
-          </h1>
-          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-            Meetings, trainings, and company gatherings
-          </p>
+    <div className="space-y-8 pb-12">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-12">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
+
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left side - intro */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                <CalendarDays className="h-3 w-3 mr-1" />
+                {sortedEvents.length} Upcoming Events
+              </Badge>
+              {sortedEvents.some(e => e['is-mandatory']) && (
+                <Badge className="bg-amber-500/30 text-amber-100 border-amber-400/30">
+                  <Bell className="h-3 w-3 mr-1" />
+                  Mandatory Events
+                </Badge>
+              )}
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+              Company Events<br />&amp; Gatherings
+            </h1>
+            <p className="text-lg text-purple-100 mb-6 max-w-xl">
+              Stay connected with meetings, trainings, team celebrations, and important company-wide events.
+              Never miss what's happening at Jewett.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="lg"
+                className="bg-white text-indigo-700 hover:bg-indigo-50"
+                onClick={() => document.getElementById('events-list')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View All Events
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Add to Calendar
+              </Button>
+            </div>
+          </div>
+
+          {/* Right side - featured event */}
+          {featuredEvent && (
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="flex items-center gap-2 mb-4">
+                <Badge className="bg-white/20 text-white border-white/30">
+                  <Star className="h-3 w-3 mr-1" />
+                  Next Up
+                </Badge>
+                {featuredEvent['is-mandatory'] && (
+                  <Badge className="bg-amber-500/30 text-amber-100 border-amber-400/30">
+                    Required
+                  </Badge>
+                )}
+              </div>
+
+              <h3 className="text-xl font-bold text-white mb-3">{featuredEvent.name}</h3>
+
+              {featuredEvent.description && (
+                <p className="text-purple-100 text-sm mb-4 line-clamp-2">{featuredEvent.description}</p>
+              )}
+
+              <div className="space-y-2 mb-5">
+                <div className="flex items-center gap-3 text-white/90">
+                  <Calendar className="h-4 w-4 text-purple-200" />
+                  <span className="text-sm">{formatEventDate(featuredEvent['event-date']).full}</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/90">
+                  <Clock className="h-4 w-4 text-purple-200" />
+                  <span className="text-sm">{formatEventDate(featuredEvent['event-date']).time}</span>
+                </div>
+                <div className="flex items-center gap-3 text-white/90">
+                  {featuredEvent['is-virtual'] ? (
+                    <Video className="h-4 w-4 text-purple-200" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-purple-200" />
+                  )}
+                  <span className="text-sm">{featuredEvent.location || 'TBD'}</span>
+                </div>
+              </div>
+
+              {(featuredEvent['registration-link'] || featuredEvent['virtual-link']) && (
+                <Button
+                  className="w-full bg-white text-indigo-700 hover:bg-indigo-50"
+                  asChild
+                >
+                  <a href={featuredEvent['registration-link'] || featuredEvent['virtual-link']} target="_blank" rel="noopener noreferrer">
+                    {featuredEvent['is-virtual'] ? 'Join Meeting' : 'Register Now'}
+                    <ExternalLink className="h-4 w-4 ml-2" />
+                  </a>
+                </Button>
+              )}
+            </div>
+          )}
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
-            <Filter className="h-4 w-4 mr-2" /> Filter
-          </Button>
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
-            <Plus className="h-4 w-4 mr-2" /> Add Event
-          </Button>
-        </div>
+
+        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-10 -left-10 w-48 h-48 bg-pink-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Upcoming Events */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>Upcoming Events</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>What's happening this month</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {events.map((event, i) => (
-                <div key={i} className={`flex gap-4 p-4 rounded-lg border transition-colors cursor-pointer ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                  <div className={`w-14 h-14 bg-${event.color}-${isDark ? '900' : '100'} rounded-lg flex flex-col items-center justify-center text-${event.color}-600 shrink-0`}>
-                    <span className="text-xs font-medium">{event.date.split(' ')[0]}</span>
-                    <span className="text-lg font-bold">{event.date.split(' ')[1]}</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{event.title}</h3>
-                      <Badge variant="secondary" className={`bg-${event.color}-100 text-${event.color}-700`}>{event.type}</Badge>
-                    </div>
-                    <div className={`flex items-center gap-4 text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                      <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {event.time}</span>
-                      <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {event.location}</span>
-                    </div>
-                  </div>
-                  <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Calendar Grid (Simplified) */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>{currentMonthYear}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className={`text-xs font-medium py-2 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{day}</div>
-                ))}
-                {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                  <div key={day} className={`py-2 text-sm rounded-lg ${day === 15 ? (isDark ? 'bg-blue-900 text-blue-400' : 'bg-blue-100 text-blue-700') : (isDark ? 'hover:bg-slate-700' : 'hover:bg-muted')} cursor-pointer ${isDark ? 'text-white' : ''}`}>
-                    {day}
-                  </div>
-                ))}
+      {/* Quick Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'This Week', count: sortedEvents.filter(e => isThisWeek(e['event-date'])).length, icon: Calendar, color: 'blue' },
+          { label: 'Mandatory', count: sortedEvents.filter(e => e['is-mandatory']).length, icon: Bell, color: 'amber' },
+          { label: 'Virtual', count: sortedEvents.filter(e => e['is-virtual']).length, icon: Video, color: 'cyan' },
+          { label: 'Training', count: sortedEvents.filter(e => getCategoryConfig(e.category).label === 'Training').length, icon: GraduationCap, color: 'emerald' },
+        ].map((stat) => (
+          <Card key={stat.label} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
+                <stat.icon className={`h-6 w-6 text-${stat.color}-400`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">{stat.count}</p>
+                <p className="text-sm text-slate-400">{stat.label}</p>
               </div>
             </CardContent>
           </Card>
-        </div>
+        ))}
+      </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Event Categories</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {eventCategories.map((cat) => (
-                <div key={cat.name} className={`flex items-center justify-between p-2 rounded-lg cursor-pointer ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full bg-${cat.color}-500`}></div>
-                    <span className={`text-sm ${isDark ? 'text-white' : ''}`}>{cat.name}</span>
-                  </div>
-                  <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{cat.count}</span>
+      {/* Search and Filters */}
+      <Card id="events-list" className="bg-slate-800/50 border-slate-700 scroll-mt-8">
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                />
+              </div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+              >
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-900/50 rounded-xl p-1 border border-slate-600">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'list' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  viewMode === 'calendar' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Calendar
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Events Display */}
+      {viewMode === 'list' ? (
+        /* List View */
+        <div className="space-y-4">
+          {sortedEvents.length > 0 ? (
+            sortedEvents.map((event) => {
+              const config = getCategoryConfig(event.category);
+              const dateInfo = formatEventDate(event['event-date']);
+              const IconComponent = config.icon;
+
+              return (
+                <Card
+                  key={event.id}
+                  className="bg-slate-800/50 border-slate-700 hover:border-indigo-500/50 transition-all group"
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Date Column */}
+                      <div className={`md:w-28 flex-shrink-0 p-4 md:p-6 bg-gradient-to-br ${config.gradient} md:rounded-l-lg flex flex-row md:flex-col items-center justify-center gap-2 md:gap-1`}>
+                        <span className="text-sm font-medium text-white/80">{dateInfo.weekday}</span>
+                        <span className="text-3xl md:text-4xl font-bold text-white">{dateInfo.day}</span>
+                        <span className="text-sm font-medium text-white/80">{dateInfo.month}</span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 p-4 md:p-6">
+                        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge className={`bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30`}>
+                              <IconComponent className="h-3 w-3 mr-1" />
+                              {config.label}
+                            </Badge>
+                            {event['is-mandatory'] && (
+                              <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
+                                Required
+                              </Badge>
+                            )}
+                            {event['is-virtual'] && (
+                              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                                <Video className="h-3 w-3 mr-1" />
+                                Virtual
+                              </Badge>
+                            )}
+                            {isToday(event['event-date']) && (
+                              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 animate-pulse">
+                                Today
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-indigo-400 transition-colors">
+                          {event.name}
+                        </h3>
+
+                        {event.description && (
+                          <p className="text-sm text-slate-400 mb-4 line-clamp-2">{event.description}</p>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4" />
+                            {dateInfo.time}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            {event['is-virtual'] ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                            {event.location || 'TBD'}
+                          </span>
+                          {event.capacity && (
+                            <span className="flex items-center gap-1.5">
+                              <Users className="h-4 w-4" />
+                              {event.capacity} spots
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action */}
+                      <div className="flex items-center p-4 md:p-6 md:pl-0">
+                        {(event['registration-link'] || event['virtual-link']) ? (
+                          <Button
+                            className="bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+                            asChild
+                          >
+                            <a href={event['registration-link'] || event['virtual-link']} target="_blank" rel="noopener noreferrer">
+                              {event['is-virtual'] ? 'Join' : 'Register'}
+                              <ExternalLink className="h-4 w-4 ml-2" />
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            className="border-slate-600 text-slate-300 hover:bg-slate-700 w-full md:w-auto"
+                          >
+                            Details
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          ) : (
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardContent className="py-12 text-center">
+                <Calendar className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No events found</h3>
+                <p className="text-slate-400 mb-4">Try adjusting your search or filter criteria</p>
+                <Button
+                  variant="outline"
+                  onClick={() => { setSearchTerm(''); setSelectedCategory('All Events'); }}
+                  className="border-slate-600 text-slate-300"
+                >
+                  Clear Filters
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        /* Calendar View */
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="border-b border-slate-700">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-white">
+                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('prev')}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentMonth(new Date())}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  Today
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateMonth('next')}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4">
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="text-center text-xs font-medium text-slate-400 py-2">
+                  {day}
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card className={isDark ? 'bg-indigo-900/30 border-indigo-800' : 'bg-indigo-50 border-indigo-200'}>
-            <CardContent className="pt-6 text-center">
-              <Calendar className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
-              <h3 className={`font-semibold mb-2 ${isDark ? 'text-indigo-300' : 'text-indigo-900'}`}>Subscribe to Calendar</h3>
-              <p className={`text-sm mb-4 ${isDark ? 'text-indigo-400' : 'text-indigo-700'}`}>Get events in your calendar app</p>
-              <Button className="w-full bg-indigo-600 hover:bg-indigo-700">Add to Calendar</Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            {/* Calendar grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {/* Empty cells for days before the first of the month */}
+              {Array.from({ length: firstDayOfMonth }, (_, i) => (
+                <div key={`empty-${i}`} className="h-24 p-1"></div>
+              ))}
+
+              {/* Days of the month */}
+              {Array.from({ length: daysInMonth }, (_, i) => {
+                const day = i + 1;
+                const dayEvents = getEventsForDay(day);
+                const isCurrentDay = new Date().getDate() === day &&
+                                     new Date().getMonth() === currentMonth.getMonth() &&
+                                     new Date().getFullYear() === currentMonth.getFullYear();
+
+                return (
+                  <div
+                    key={day}
+                    className={`h-24 p-1 rounded-lg border transition-colors ${
+                      isCurrentDay
+                        ? 'border-indigo-500 bg-indigo-500/10'
+                        : dayEvents.length > 0
+                        ? 'border-slate-600 bg-slate-700/30 hover:bg-slate-700/50'
+                        : 'border-slate-700/50 hover:bg-slate-700/30'
+                    }`}
+                  >
+                    <div className={`text-sm font-medium mb-1 ${
+                      isCurrentDay ? 'text-indigo-400' : 'text-slate-300'
+                    }`}>
+                      {day}
+                    </div>
+                    <div className="space-y-1 overflow-hidden">
+                      {dayEvents.slice(0, 2).map((event) => {
+                        const config = getCategoryConfig(event.category);
+                        return (
+                          <div
+                            key={event.id}
+                            className={`text-xs px-1.5 py-0.5 rounded bg-${config.color}-500/20 text-${config.color}-400 truncate`}
+                            title={event.name}
+                          >
+                            {event.name}
+                          </div>
+                        );
+                      })}
+                      {dayEvents.length > 2 && (
+                        <div className="text-xs text-slate-500 pl-1">
+                          +{dayEvents.length - 2} more
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Categories Legend */}
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-white text-base">Event Categories</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            {Object.entries(categoryConfig)
+              .filter(([key]) => key !== 'default')
+              .slice(0, 8)
+              .map(([key, config]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedCategory(config.label)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                    selectedCategory === config.label
+                      ? `bg-${config.color}-500/20 border-${config.color}-500/50 text-${config.color}-400`
+                      : 'border-slate-600 text-slate-400 hover:bg-slate-700/50'
+                  }`}
+                >
+                  <config.icon className="h-4 w-4" />
+                  <span className="text-sm">{config.label}</span>
+                </button>
+              ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Subscribe CTA */}
+      <Card className="bg-gradient-to-r from-indigo-600 to-purple-600 border-0 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
+        <CardContent className="py-8 px-6 md:px-8 relative">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Bell className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
+                  Never Miss an Event
+                </h2>
+                <p className="text-purple-100">
+                  Subscribe to get event reminders and updates delivered to your calendar.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="lg"
+              className="bg-white text-indigo-700 hover:bg-indigo-50 flex-shrink-0"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Subscribe to Calendar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
