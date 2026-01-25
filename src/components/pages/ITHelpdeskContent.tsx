@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock, ChevronRight, HelpCircle, Settings, AlertTriangle } from 'lucide-react';
+import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock, ChevronRight, HelpCircle, Settings, AlertTriangle, Loader2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -8,9 +8,58 @@ interface ITHelpdeskContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
 }
 
+interface ITArticle {
+  id: string;
+  name: string;
+  category?: string;
+  description?: string;
+  content?: string;
+  'article-link'?: string;
+  featured?: boolean;
+}
+
 export function ITHelpdeskContent({ theme = 'modern' }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
-  const resourcesLink = `/jewett-junction/resources/${theme}`;
+  const resourcesLink = `/jewett-junction/resources`;
+
+  // CMS state
+  const [articles, setArticles] = React.useState<ITArticle[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch IT content from CMS
+  React.useEffect(() => {
+    async function fetchITContent() {
+      try {
+        const response = await fetch('/api/cms/it?limit=20');
+        if (!response.ok) throw new Error('Failed to load content');
+        const data = await response.json();
+        setArticles(data.items || []);
+      } catch (err: any) {
+        console.error('Error fetching IT content:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchITContent();
+  }, []);
+
+  // Filter articles by category
+  const howToArticles = articles.filter(a => a.category === 'How-To' || a.category === 'Troubleshooting');
+  const softwareArticles = articles.filter(a => a.category === 'Software');
+
+  // Helper to strip HTML
+  const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
+
+  // Icon mapping for article categories
+  const getCategoryIcon = (title: string) => {
+    if (title.toLowerCase().includes('password')) return Shield;
+    if (title.toLowerCase().includes('vpn') || title.toLowerCase().includes('wifi')) return Wifi;
+    if (title.toLowerCase().includes('email')) return Mail;
+    if (title.toLowerCase().includes('print')) return Monitor;
+    return HelpCircle;
+  };
 
   return (
     <div className="space-y-6">
@@ -73,23 +122,34 @@ export function ITHelpdeskContent({ theme = 'modern' }: ITHelpdeskContentProps) 
               <CardDescription className={isDark ? 'text-slate-400' : ''}>Resolve issues yourself with these guides</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {[
-                { title: 'Password Reset', desc: 'Reset your network password', icon: Shield },
-                { title: 'VPN Connection Issues', desc: 'Troubleshoot remote access', icon: Wifi },
-                { title: 'Email Setup', desc: 'Configure email on mobile devices', icon: Mail },
-                { title: 'Printer Problems', desc: 'Fix common printing issues', icon: Monitor },
-              ].map((item) => (
-                <a key={item.title} href={resourcesLink} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                  <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}>
-                    <item.icon className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{item.title}</div>
-                    <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{item.desc}</div>
-                  </div>
-                  <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
-                </a>
-              ))}
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                </div>
+              ) : (
+                (howToArticles.length > 0 ? howToArticles.slice(0, 4).map((article) => ({
+                  title: article.name,
+                  desc: stripHtml(article.description)?.substring(0, 60) || 'Quick fix guide',
+                  link: article['article-link'] || resourcesLink,
+                  icon: getCategoryIcon(article.name)
+                })) : [
+                  { title: 'Password Reset', desc: 'Reset your network password', link: resourcesLink, icon: Shield },
+                  { title: 'VPN Connection Issues', desc: 'Troubleshoot remote access', link: resourcesLink, icon: Wifi },
+                  { title: 'Email Setup', desc: 'Configure email on mobile devices', link: resourcesLink, icon: Mail },
+                  { title: 'Printer Problems', desc: 'Fix common printing issues', link: resourcesLink, icon: Monitor },
+                ]).map((item) => (
+                  <a key={item.title} href={item.link} target={item.link.startsWith('http') ? '_blank' : undefined} rel={item.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                    <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}>
+                      <item.icon className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{item.title}</div>
+                      <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{item.desc}</div>
+                    </div>
+                    <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
+                  </a>
+                ))
+              )}
             </CardContent>
           </Card>
 

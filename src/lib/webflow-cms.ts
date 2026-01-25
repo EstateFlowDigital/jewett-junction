@@ -304,3 +304,164 @@ export async function getResources(options?: { limit?: number; category?: string
   }
   return result;
 }
+
+// ============================================
+// New collection types and helpers
+// ============================================
+
+export interface HRContent {
+  name: string;
+  slug: string;
+  'content-type'?: string;
+  icon?: { url: string };
+  description?: string;
+  content?: string;
+  'document-link'?: string;
+  'effective-date'?: string;
+  'applies-to'?: string;
+  'priority-order'?: number;
+  featured?: boolean;
+  'is-active'?: boolean;
+}
+
+export interface SafetyContent {
+  name: string;
+  slug: string;
+  'content-type'?: string;
+  image?: { url: string };
+  severity?: string;
+  description?: string;
+  content?: string;
+  'document-link'?: string;
+  'video-link'?: string;
+  'expiration-date'?: string;
+  'required-for'?: string;
+  'priority-order'?: number;
+  featured?: boolean;
+  'is-active'?: boolean;
+}
+
+export interface ITArticle {
+  name: string;
+  slug: string;
+  'article-type'?: string;
+  icon?: { url: string };
+  summary?: string;
+  content?: string;
+  'video-link'?: string;
+  'download-link'?: string;
+  platform?: string;
+  difficulty?: string;
+  views?: number;
+  'helpful-votes'?: number;
+  featured?: boolean;
+  'is-active'?: boolean;
+}
+
+export interface MarketingAsset {
+  name: string;
+  slug: string;
+  'asset-type'?: string;
+  thumbnail?: { url: string };
+  'preview-image'?: { url: string };
+  description?: string;
+  'download-link'?: string;
+  'file-format'?: string;
+  'file-size'?: string;
+  'usage-guidelines'?: string;
+  tags?: string;
+  version?: string;
+  featured?: boolean;
+  'is-active'?: boolean;
+}
+
+export interface SubmittedIdea {
+  name: string;
+  slug: string;
+  category?: string;
+  description?: string;
+  'submitted-by'?: string;
+  'submitter-email'?: string;
+  department?: string;
+  status?: string;
+  priority?: string;
+  'admin-notes'?: string;
+  votes?: number;
+  featured?: boolean;
+}
+
+export async function getHRContent(options?: { limit?: number; type?: string; featured?: boolean }) {
+  if (!COLLECTIONS.hrContent) return { items: [], total: 0 };
+  const result = await getCollection<HRContent>(COLLECTIONS.hrContent, options);
+  let items = result.items.filter(item => item['is-active'] !== false);
+
+  // Sort by priority order
+  items.sort((a, b) => (a['priority-order'] || 999) - (b['priority-order'] || 999));
+
+  if (options?.type) {
+    items = items.filter(item => item['content-type'] === options.type);
+  }
+  if (options?.featured) {
+    items = items.filter(item => item.featured === true);
+  }
+  return { ...result, items };
+}
+
+export async function getSafetyContent(options?: { limit?: number; type?: string; featured?: boolean }) {
+  if (!COLLECTIONS.safetyContent) return { items: [], total: 0 };
+  const result = await getCollection<SafetyContent>(COLLECTIONS.safetyContent, options);
+  let items = result.items.filter(item => item['is-active'] !== false);
+
+  // Sort by priority order
+  items.sort((a, b) => (a['priority-order'] || 999) - (b['priority-order'] || 999));
+
+  if (options?.type) {
+    items = items.filter(item => item['content-type'] === options.type);
+  }
+  if (options?.featured) {
+    items = items.filter(item => item.featured === true);
+  }
+  return { ...result, items };
+}
+
+export async function getITKnowledgeBase(options?: { limit?: number; type?: string; featured?: boolean }) {
+  if (!COLLECTIONS.itKnowledgeBase) return { items: [], total: 0 };
+  const result = await getCollection<ITArticle>(COLLECTIONS.itKnowledgeBase, options);
+  let items = result.items.filter(item => item['is-active'] !== false);
+
+  if (options?.type) {
+    items = items.filter(item => item['article-type'] === options.type);
+  }
+  if (options?.featured) {
+    items = items.filter(item => item.featured === true);
+  }
+  return { ...result, items };
+}
+
+export async function getMarketingAssets(options?: { limit?: number; type?: string; featured?: boolean }) {
+  if (!COLLECTIONS.marketingAssets) return { items: [], total: 0 };
+  const result = await getCollection<MarketingAsset>(COLLECTIONS.marketingAssets, options);
+  let items = result.items.filter(item => item['is-active'] !== false);
+
+  if (options?.type) {
+    items = items.filter(item => item['asset-type'] === options.type);
+  }
+  if (options?.featured) {
+    items = items.filter(item => item.featured === true);
+  }
+  return { ...result, items };
+}
+
+export async function getSubmittedIdeas(options?: { limit?: number; status?: string; featured?: boolean }) {
+  if (!COLLECTIONS.submittedIdeas) return { items: [], total: 0 };
+  const result = await getCollection<SubmittedIdea>(COLLECTIONS.submittedIdeas, options);
+  let items = result.items;
+
+  if (options?.status) {
+    items = items.filter(item => item.status === options.status);
+  }
+  if (options?.featured) {
+    items = items.filter(item => item.featured === true);
+  }
+  return { ...result, items };
+}

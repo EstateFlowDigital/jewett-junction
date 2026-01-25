@@ -1,15 +1,59 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe } from 'lucide-react';
+import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface HRContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
 }
 
+interface HRItem {
+  id: string;
+  name: string;
+  'content-type'?: string;
+  description?: string;
+  content?: string;
+  'document-link'?: string;
+  'effective-date'?: string;
+  featured?: boolean;
+}
+
 export function HRContent({ theme = 'modern' }: HRContentProps) {
   const isDark = theme === 'dark';
-  const resourcesLink = `/jewett-junction/resources/${theme}`;
+  const resourcesLink = `/jewett-junction/resources`;
+
+  // CMS state
+  const [hrItems, setHrItems] = React.useState<HRItem[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch HR content from CMS
+  React.useEffect(() => {
+    async function fetchHRContent() {
+      try {
+        const response = await fetch('/api/cms/hr?limit=20');
+        if (!response.ok) throw new Error('Failed to load content');
+        const data = await response.json();
+        setHrItems(data.items || []);
+      } catch (err: any) {
+        console.error('Error fetching HR content:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchHRContent();
+  }, []);
+
+  // Filter items by type
+  const announcements = hrItems.filter(item => item['content-type'] === 'Announcement' && item.featured);
+  const policies = hrItems.filter(item => item['content-type'] === 'Policy');
+  const benefits = hrItems.filter(item => item['content-type'] === 'Benefit');
+  const forms = hrItems.filter(item => item['content-type'] === 'Form');
+  const featuredItem = announcements[0] || hrItems.find(item => item.featured);
+
+  // Helper to strip HTML
+  const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
   return (
     <div className="space-y-6">
@@ -25,25 +69,50 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
         </div>
       </div>
 
-      {/* Open Enrollment Alert */}
-      <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
-        <CardContent className="py-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                <Clock className="h-7 w-7" />
+      {/* Featured Announcement - CMS or Static Fallback */}
+      {featuredItem ? (
+        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
+          <CardContent className="py-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                  <AlertCircle className="h-7 w-7" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">{featuredItem.name}</h2>
+                  <p className="text-purple-100">{stripHtml(featuredItem.description || featuredItem.content)?.substring(0, 150)}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-xl font-bold">Open Enrollment Ends January 31st</h2>
-                <p className="text-purple-100">Don't miss your chance to update your benefits selections for 2026.</p>
-              </div>
+              {featuredItem['document-link'] && (
+                <a href={featuredItem['document-link']} target="_blank" rel="noopener">
+                  <Button className="bg-white text-purple-700 hover:bg-purple-50">
+                    Learn More
+                  </Button>
+                </a>
+              )}
             </div>
-            <Button className="bg-white text-purple-700 hover:bg-purple-50">
-              Review Benefits
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
+          <CardContent className="py-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                  <Clock className="h-7 w-7" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Open Enrollment Ends January 31st</h2>
+                  <p className="text-purple-100">Don't miss your chance to update your benefits selections for 2026.</p>
+                </div>
+              </div>
+              <Button className="bg-white text-purple-700 hover:bg-purple-50">
+                Review Benefits
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -100,36 +169,27 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className={`border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-10 h-10 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center`}>
-                        <Heart className="h-5 w-5 text-red-600" />
+                {(benefits.length > 0 ? benefits.slice(0, 2).map((benefit, i) => ({
+                  name: benefit.name,
+                  desc: stripHtml(benefit.description || benefit.content)?.substring(0, 100),
+                  icon: i === 0 ? Heart : DollarSign,
+                  color: i === 0 ? 'red' : 'green'
+                })) : [
+                  { name: 'Medical Insurance', desc: 'Comprehensive health coverage through Blue Cross Blue Shield.', icon: Heart, color: 'red' },
+                  { name: '401(k) Retirement', desc: 'Secure your future with competitive retirement savings.', icon: DollarSign, color: 'green' }
+                ]).map((benefit, index) => (
+                  <Card key={benefit.name} className={`border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`w-10 h-10 ${isDark ? `bg-${benefit.color}-900` : `bg-${benefit.color}-100`} rounded-lg flex items-center justify-center`}>
+                          <benefit.icon className={`h-5 w-5 text-${benefit.color}-600`} />
+                        </div>
+                        <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
                       </div>
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Medical Insurance</h3>
-                    </div>
-                    <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Comprehensive health coverage through Blue Cross Blue Shield.</p>
-                    <ul className={`text-sm space-y-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                      <li>• PPO and HMO options available</li>
-                      <li>• Low deductibles and copays</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className={`border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-10 h-10 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
-                        <DollarSign className="h-5 w-5 text-green-600" />
-                      </div>
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>401(k) Retirement</h3>
-                    </div>
-                    <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Secure your future with competitive retirement savings.</p>
-                    <ul className={`text-sm space-y-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                      <li>• Company matches up to 6%</li>
-                      <li>• Immediate vesting</li>
-                    </ul>
-                  </CardContent>
-                </Card>
+                      <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{benefit.desc}</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -147,13 +207,17 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {[
-                  { name: 'Employee Handbook', desc: 'PDF - 2026 Edition' },
-                  { name: 'Direct Deposit Form', desc: 'PDF - Fillable' },
-                  { name: 'W-4 Form', desc: 'PDF - Tax Withholding' },
-                  { name: 'Address Change', desc: 'Online Form' },
-                ].map((form) => (
-                  <a key={form.name} href={resourcesLink} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                {(forms.length > 0 ? forms.slice(0, 4).map((form) => ({
+                  name: form.name,
+                  desc: stripHtml(form.description) || 'HR Form',
+                  link: form['document-link'] || resourcesLink
+                })) : [
+                  { name: 'Employee Handbook', desc: 'PDF - 2026 Edition', link: resourcesLink },
+                  { name: 'Direct Deposit Form', desc: 'PDF - Fillable', link: resourcesLink },
+                  { name: 'W-4 Form', desc: 'PDF - Tax Withholding', link: resourcesLink },
+                  { name: 'Address Change', desc: 'Online Form', link: resourcesLink },
+                ]).map((form) => (
+                  <a key={form.name} href={form.link} target={form.link.startsWith('http') ? '_blank' : undefined} rel={form.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
                     <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
                       <FileText className="h-5 w-5 text-blue-600" />
                     </div>

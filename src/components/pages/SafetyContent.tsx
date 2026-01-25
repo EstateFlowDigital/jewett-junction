@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap } from 'lucide-react';
+import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap, Loader2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -8,9 +8,54 @@ interface SafetyContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
 }
 
+interface SafetyItem {
+  id: string;
+  name: string;
+  'content-type'?: string;
+  description?: string;
+  content?: string;
+  'document-link'?: string;
+  priority?: string;
+  'effective-date'?: string;
+  featured?: boolean;
+}
+
 export function SafetyContent({ theme = 'modern' }: SafetyContentProps) {
   const isDark = theme === 'dark';
-  const resourcesLink = `/jewett-junction/resources/${theme}`;
+  const resourcesLink = `/jewett-junction/resources`;
+
+  // CMS state
+  const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Fetch Safety content from CMS
+  React.useEffect(() => {
+    async function fetchSafetyContent() {
+      try {
+        const response = await fetch('/api/cms/safety?limit=20');
+        if (!response.ok) throw new Error('Failed to load content');
+        const data = await response.json();
+        setSafetyItems(data.items || []);
+      } catch (err: any) {
+        console.error('Error fetching Safety content:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSafetyContent();
+  }, []);
+
+  // Filter items by type
+  const alerts = safetyItems.filter(item => item['content-type'] === 'Alert');
+  const protocols = safetyItems.filter(item => item['content-type'] === 'Protocol');
+  const training = safetyItems.filter(item => item['content-type'] === 'Training');
+  const urgentAlerts = alerts.filter(item => item.priority === 'Urgent');
+  const regularAlerts = alerts.filter(item => item.priority !== 'Urgent');
+
+  // Helper to strip HTML
+  const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
   return (
     <div className="space-y-6">
@@ -99,36 +144,84 @@ export function SafetyContent({ theme = 'modern' }: SafetyContentProps) {
               <CardTitle className={isDark ? 'text-white' : ''}>Safety Alerts & Updates</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className={`p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
-                <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className="bg-red-200 text-red-800 hover:bg-red-200">URGENT</Badge>
-                      <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Jan 14, 2026</span>
-                    </div>
-                    <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Cold Weather Safety Advisory</h3>
-                    <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Temperatures expected to drop below 20°F this week. Review cold weather protocols and ensure all crews have proper gear.</p>
-                  </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-green-600" />
                 </div>
-              </div>
-              <div className={`p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                    <Clock className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Reminder</Badge>
-                      <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Jan 12, 2026</span>
+              ) : alerts.length > 0 ? (
+                <>
+                  {/* Urgent Alerts */}
+                  {urgentAlerts.map((alert) => (
+                    <div key={alert.id} className={`p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`w-10 h-10 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                          <AlertTriangle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className="bg-red-200 text-red-800 hover:bg-red-200">URGENT</Badge>
+                            {alert['effective-date'] && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{new Date(alert['effective-date']).toLocaleDateString()}</span>}
+                          </div>
+                          <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>PPE Inspection Due</h3>
-                    <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Monthly PPE inspection is due by January 20th. All supervisors must complete and submit inspection forms.</p>
+                  ))}
+                  {/* Regular Alerts */}
+                  {regularAlerts.slice(0, 2).map((alert) => (
+                    <div key={alert.id} className={`p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`w-10 h-10 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                          <Clock className="h-5 w-5 text-yellow-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Alert</Badge>
+                            {alert['effective-date'] && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{new Date(alert['effective-date']).toLocaleDateString()}</span>}
+                          </div>
+                          <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                /* Fallback static content */
+                <>
+                  <div className={`p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
+                    <div className="flex items-start gap-4">
+                      <div className={`w-10 h-10 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className="bg-red-200 text-red-800 hover:bg-red-200">URGENT</Badge>
+                          <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Jan 14, 2026</span>
+                        </div>
+                        <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Cold Weather Safety Advisory</h3>
+                        <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Temperatures expected to drop below 20°F this week. Review cold weather protocols and ensure all crews have proper gear.</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                  <div className={`p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                    <div className="flex items-start gap-4">
+                      <div className={`w-10 h-10 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                        <Clock className="h-5 w-5 text-yellow-600" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Reminder</Badge>
+                          <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Jan 12, 2026</span>
+                        </div>
+                        <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>PPE Inspection Due</h3>
+                        <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Monthly PPE inspection is due by January 20th. All supervisors must complete and submit inspection forms.</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -146,38 +239,39 @@ export function SafetyContent({ theme = 'modern' }: SafetyContentProps) {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className={`border transition-colors ${isDark ? 'bg-slate-700 border-slate-600 hover:border-green-600' : 'hover:border-green-300'}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-10 h-10 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-lg flex items-center justify-center`}>
-                        <Shield className="h-5 w-5 text-green-600" />
+                {(training.length > 0 ? training.slice(0, 2).map((item, i) => ({
+                  name: item.name,
+                  desc: stripHtml(item.description || item.content)?.substring(0, 80),
+                  link: item['document-link'],
+                  color: i === 0 ? 'green' : 'blue',
+                  icon: i === 0 ? Shield : HardHat
+                })) : [
+                  { name: 'OSHA 30-Hour Construction', desc: 'Comprehensive construction safety training.', link: '#', color: 'green', icon: Shield },
+                  { name: 'Fall Protection Certification', desc: 'Essential training for working at heights.', link: '#', color: 'blue', icon: HardHat }
+                ]).map((course) => (
+                  <Card key={course.name} className={`border transition-colors ${isDark ? `bg-slate-700 border-slate-600 hover:border-${course.color}-600` : `hover:border-${course.color}-300`}`}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className={`w-10 h-10 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
+                          <course.icon className={`h-5 w-5 text-${course.color}-600`} />
+                        </div>
+                        <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
                       </div>
-                      <Badge className="bg-green-100 text-green-700">Required</Badge>
-                    </div>
-                    <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : ''}`}>OSHA 30-Hour Construction</h3>
-                    <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Comprehensive construction safety training.</p>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>30 hours</span>
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700">Start Course</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className={`border transition-colors ${isDark ? 'bg-slate-700 border-slate-600 hover:border-blue-600' : 'hover:border-blue-300'}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}>
-                        <HardHat className="h-5 w-5 text-blue-600" />
+                      <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : ''}`}>{course.name}</h3>
+                      <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Required</span>
+                        {course.link ? (
+                          <a href={course.link} target="_blank" rel="noopener">
+                            <Button size="sm" className={`bg-${course.color}-600 hover:bg-${course.color}-700`}>Start Course</Button>
+                          </a>
+                        ) : (
+                          <Button size="sm" className={`bg-${course.color}-600 hover:bg-${course.color}-700`}>Start Course</Button>
+                        )}
                       </div>
-                      <Badge className="bg-blue-100 text-blue-700">Required</Badge>
-                    </div>
-                    <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : ''}`}>Fall Protection Certification</h3>
-                    <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Essential training for working at heights.</p>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>4 hours</span>
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700">Start Course</Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </CardContent>
           </Card>
