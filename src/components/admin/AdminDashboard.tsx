@@ -37,7 +37,9 @@ import {
   Mail,
   Building,
   Award,
-  Zap
+  Zap,
+  Upload,
+  ImagePlus
 } from 'lucide-react';
 
 // Collection configurations with expanded fields
@@ -196,6 +198,11 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const [formData, setFormData] = React.useState<Record<string, any>>({});
 
   const [isPublishing, setIsPublishing] = React.useState(false);
+
+  // Upload state - tracks which field is currently uploading
+  const [uploadingField, setUploadingField] = React.useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = React.useState<number>(0);
+  const [dragOverField, setDragOverField] = React.useState<string | null>(null);
 
   // Check for existing token on mount
   React.useEffect(() => {
@@ -388,6 +395,96 @@ export function AdminDashboard({}: AdminDashboardProps) {
     } finally {
       setIsPublishing(false);
     }
+  };
+
+  // Handle file upload for image fields
+  const handleFileUpload = async (file: File, fieldKey: string) => {
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG');
+      return;
+    }
+
+    // Validate file size (max 4MB)
+    const maxSize = 4 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError('File too large. Maximum size is 4MB');
+      return;
+    }
+
+    setUploadingField(fieldKey);
+    setUploadProgress(0);
+    setError('');
+
+    try {
+      // Create form data
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('folder', activeCollection);
+
+      // Simulate progress for better UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      const response = await fetch('/jewett-junction/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        },
+        body: uploadFormData
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      setUploadProgress(100);
+
+      // Set the URL in form data
+      setFormData({ ...formData, [fieldKey]: data.url });
+      setSuccess('Image uploaded successfully!');
+
+      // Reset progress after a moment
+      setTimeout(() => {
+        setUploadProgress(0);
+        setUploadingField(null);
+      }, 500);
+
+    } catch (err: any) {
+      setError(err.message);
+      setUploadingField(null);
+      setUploadProgress(0);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDrop = (e: React.DragEvent, fieldKey: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverField(null);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0], fieldKey);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, fieldKey: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverField(fieldKey);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverField(null);
   };
 
   // Clear messages after 3 seconds
@@ -604,7 +701,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-400 mt-0.5">•</span>
-                  <span>Images need a direct URL (upload to Cloudinary/Imgur first)</span>
+                  <span>Drag & drop images directly or click to upload (max 4MB)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-400 mt-0.5">•</span>
@@ -651,37 +748,109 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           {field.required && <span className="text-rose-400 ml-1">*</span>}
                         </label>
 
-                        {/* Image field with preview */}
+                        {/* Image field with upload and preview */}
                         {field.type === 'image' && (
                           <div className="space-y-3">
-                            <div className="relative">
-                              <input
-                                type="url"
-                                value={formData[field.key] || ''}
-                                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                                placeholder={field.placeholder || 'https://example.com/image.jpg'}
-                                className="w-full px-4 py-3 pr-12 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                              />
-                              <Image className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
-                            </div>
-                            {formData[field.key] && (
+                            {/* Show preview if we have an image */}
+                            {formData[field.key] ? (
                               <div className="relative rounded-xl overflow-hidden border border-slate-700/50 bg-slate-900/50">
                                 <img
                                   src={formData[field.key]}
                                   alt="Preview"
-                                  className="w-full h-40 object-cover"
+                                  className="w-full h-48 object-cover"
                                   onError={(e) => {
-                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
                                   }}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={() => setFormData({ ...formData, [field.key]: '' })}
-                                  className="absolute top-2 right-2 p-1.5 bg-slate-900/80 hover:bg-rose-600 text-white rounded-lg transition-colors"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity">
+                                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                    <span className="text-white text-xs truncate max-w-[60%]">{formData[field.key].split('/').pop()}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setFormData({ ...formData, [field.key]: '' })}
+                                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                      Remove
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
+                            ) : (
+                              /* Upload zone when no image */
+                              <div
+                                onDrop={(e) => handleDrop(e, field.key)}
+                                onDragOver={(e) => handleDragOver(e, field.key)}
+                                onDragLeave={handleDragLeave}
+                                className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
+                                  dragOverField === field.key
+                                    ? 'border-blue-500 bg-blue-500/10'
+                                    : 'border-slate-600/50 hover:border-slate-500 bg-slate-900/30'
+                                } ${uploadingField === field.key ? 'pointer-events-none' : ''}`}
+                              >
+                                {uploadingField === field.key ? (
+                                  /* Upload progress */
+                                  <div className="text-center">
+                                    <Loader2 className="h-10 w-10 text-blue-400 animate-spin mx-auto mb-3" />
+                                    <p className="text-sm text-white font-medium mb-2">Uploading...</p>
+                                    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                                      <div
+                                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300"
+                                        style={{ width: `${uploadProgress}%` }}
+                                      ></div>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mt-2">{uploadProgress}%</p>
+                                  </div>
+                                ) : (
+                                  /* Upload prompt */
+                                  <div className="text-center">
+                                    <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3 border border-slate-700">
+                                      <ImagePlus className="h-7 w-7 text-slate-400" />
+                                    </div>
+                                    <p className="text-sm text-white font-medium mb-1">
+                                      Drag & drop an image here
+                                    </p>
+                                    <p className="text-xs text-slate-500 mb-4">or</p>
+                                    <label className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-sm font-medium rounded-xl cursor-pointer transition-all shadow-lg shadow-blue-500/20">
+                                      <Upload className="h-4 w-4" />
+                                      Choose File
+                                      <input
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) handleFileUpload(file, field.key);
+                                          e.target.value = '';
+                                        }}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                    <p className="text-xs text-slate-500 mt-3">
+                                      JPEG, PNG, GIF, WebP, SVG • Max 4MB
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* URL input toggle (collapsed by default) */}
+                            {!formData[field.key] && !uploadingField && (
+                              <details className="group">
+                                <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-400 flex items-center gap-1">
+                                  <Link className="h-3 w-3" />
+                                  Or paste image URL
+                                </summary>
+                                <div className="mt-2 relative">
+                                  <input
+                                    type="url"
+                                    value={formData[field.key] || ''}
+                                    onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="w-full px-4 py-2.5 pr-10 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white text-sm placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                                  />
+                                  <Image className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                </div>
+                              </details>
                             )}
                           </div>
                         )}
