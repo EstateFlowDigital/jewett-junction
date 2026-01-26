@@ -22,13 +22,13 @@ let marketingAssets: any[] = [];
 try {
   const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes] = await Promise.all([
     getAnnouncements({ limit: 5 }),
-    getEvents({ limit: 4, upcoming: true }),
+    getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
-    getCultureStories({ limit: 1 }),
+    getCultureStories({ limit: 4 }),
     getHRContent({ limit: 3, featured: true }),
     getSafetyContent({ limit: 3, featured: true }),
     getITKnowledgeBase({ limit: 3, featured: true }),
-    getMarketingAssets({ limit: 3, featured: true }),
+    getMarketingAssets({ limit: 6, featured: true }),
   ]);
   announcements = announcementsRes.items;
   events = eventsRes.items;
@@ -269,11 +269,17 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                   {events.slice(0, 2).map((event) => {
                     const dayInfo = getDayInfo(event['event-date']);
                     return (
-                      <a href={`/jewett-junction/events/${event.slug || event.id}`} class="flex gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-800/50 transition-colors">
-                        <div class="w-12 h-12 bg-purple-500 rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0">
-                          <span class="text-xs font-medium">{dayInfo.weekday}</span>
-                          <span class="text-lg font-bold">{dayInfo.day}</span>
-                        </div>
+                      <a href={`/jewett-junction/events/${event.slug || event.id}`} class="flex gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-800/50 transition-colors group">
+                        {event['event-image']?.url ? (
+                          <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                            <img src={event['event-image'].url} alt={event.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                          </div>
+                        ) : (
+                          <div class="w-12 h-12 bg-purple-500 rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0">
+                            <span class="text-xs font-medium">{dayInfo.weekday}</span>
+                            <span class="text-lg font-bold">{dayInfo.day}</span>
+                          </div>
+                        )}
                         <div class="min-w-0">
                           <div class="font-medium text-white truncate">{event.name}</div>
                           <div class="text-sm text-slate-400">{formatTime(event['event-date'])} • {event.location || 'TBD'}</div>
@@ -406,6 +412,30 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
           </div>
         )}
 
+        <!-- Photo Gallery -->
+        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && (
+          <div class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">Photo Gallery</h2>
+              <a href="/jewett-junction/resources" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {marketingAssets.filter(asset => asset['preview-image']?.url || asset.image?.url).slice(0, 6).map((asset) => (
+                <a href="/jewett-junction/resources" class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all">
+                  <img
+                    src={asset['preview-image']?.url || asset.image?.url}
+                    alt={asset.name || 'Company photo'}
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <span class="text-white text-xs font-medium truncate">{asset.name}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         <!-- Quick Links -->
         <div class="mb-10">
           <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Links</h2>
@@ -465,12 +495,18 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             <div class="divide-y divide-slate-800/50">
               {otherAnnouncements.length > 0 ? (
                 otherAnnouncements.map((announcement) => (
-                  <a href={`/jewett-junction/announcements/${announcement.slug || announcement.id}`} class="p-4 flex items-center gap-4 hover:bg-slate-800/30 transition-colors block">
-                    <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      announcement.priority === 'high' ? 'bg-rose-500/20' : 'bg-blue-500/20'
-                    }`}>
-                      <svg class={`w-5 h-5 ${announcement.priority === 'high' ? 'text-rose-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                    </div>
+                  <a href={`/jewett-junction/announcements/${announcement.slug || announcement.id}`} class="p-4 flex items-center gap-4 hover:bg-slate-800/30 transition-colors block group">
+                    {announcement.image?.url ? (
+                      <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                        <img src={announcement.image.url} alt={announcement.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      </div>
+                    ) : (
+                      <div class={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        announcement.priority === 'high' ? 'bg-rose-500/20' : 'bg-blue-500/20'
+                      }`}>
+                        <svg class={`w-5 h-5 ${announcement.priority === 'high' ? 'text-rose-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                      </div>
+                    )}
                     <div class="flex-1 min-w-0">
                       <span class={`text-xs font-medium ${announcement.priority === 'high' ? 'text-rose-400' : 'text-blue-400'}`}>
                         {announcement.priority === 'high' ? 'Important' : 'Update'}
@@ -502,15 +538,21 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             </div>
             <div class="p-4 space-y-3">
               {events.length > 0 ? (
-                events.slice(0, 3).map((event, index) => {
+                events.slice(0, 4).map((event, index) => {
                   const dayInfo = getDayInfo(event['event-date']);
                   const colors = ['bg-blue-500', 'bg-amber-500', 'bg-emerald-500', 'bg-purple-500'];
                   return (
-                    <a href={`/jewett-junction/events/${event.slug || event.id}`} class={`flex gap-4 p-3 rounded-xl transition-colors ${index === 0 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-slate-800/30'}`}>
-                      <div class={`w-14 h-14 ${colors[index % colors.length]} rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0`}>
-                        <span class="text-xs font-medium">{dayInfo.weekday}</span>
-                        <span class="text-xl font-bold">{dayInfo.day}</span>
-                      </div>
+                    <a href={`/jewett-junction/events/${event.slug || event.id}`} class={`flex gap-4 p-3 rounded-xl transition-colors group ${index === 0 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-slate-800/30'}`}>
+                      {event['event-image']?.url ? (
+                        <div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                          <img src={event['event-image'].url} alt={event.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                        </div>
+                      ) : (
+                        <div class={`w-14 h-14 ${colors[index % colors.length]} rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0`}>
+                          <span class="text-xs font-medium">{dayInfo.weekday}</span>
+                          <span class="text-xl font-bold">{dayInfo.day}</span>
+                        </div>
+                      )}
                       <div>
                         <div class="font-medium text-white">{event.name}</div>
                         <div class="text-sm text-slate-400">{formatTime(event['event-date'])}</div>
@@ -536,30 +578,31 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
               <h2 class="font-semibold text-white text-sm sm:text-base">Culture Corner</h2>
               <a href="/jewett-junction/culture" class="text-sm text-pink-400 hover:text-pink-300">View All</a>
             </div>
-            <div class="p-6">
+            <div class="p-4">
               {cultureStories.length > 0 ? (
-                <a href={`/jewett-junction/culture/${cultureStories[0].slug || cultureStories[0].id}`} class="block group">
-                  <div class="flex items-start gap-5">
-                    {cultureStories[0]['featured-image']?.url ? (
-                      <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
-                        <img src={cultureStories[0]['featured-image'].url} alt={cultureStories[0].name} class="w-full h-full object-cover" />
+                <div class="grid grid-cols-2 gap-3">
+                  {cultureStories.slice(0, 4).map((story, index) => (
+                    <a href={`/jewett-junction/culture/${story.slug || story.id}`} class={`block group ${index === 0 ? 'col-span-2' : ''}`}>
+                      <div class={`relative rounded-xl overflow-hidden ${index === 0 ? 'h-32' : 'h-24'}`}>
+                        {story['featured-image']?.url ? (
+                          <img src={story['featured-image'].url} alt={story.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        ) : (
+                          <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                            <span class="text-white text-2xl font-bold">{story.name?.substring(0, 2).toUpperCase() || 'JC'}</span>
+                          </div>
+                        )}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
+                          <div>
+                            <h3 class="text-white font-medium text-sm truncate group-hover:text-pink-300 transition-colors">{story.name}</h3>
+                            <p class="text-slate-300 text-xs">{story.category || 'Story'}</p>
+                          </div>
+                        </div>
                       </div>
-                    ) : (
-                      <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-                        {cultureStories[0].name?.substring(0, 2).toUpperCase() || 'JC'}
-                      </div>
-                    )}
-                    <div>
-                      <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-pink-400 transition-colors">{cultureStories[0].name}</h3>
-                      <p class="text-slate-400 text-xs sm:text-sm mb-3">{cultureStories[0].category || 'Story'}</p>
-                      <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                        {cultureStories[0].excerpt || stripHtml(cultureStories[0].content)?.substring(0, 150)}...
-                      </p>
-                    </div>
-                  </div>
-                </a>
+                    </a>
+                  ))}
+                </div>
               ) : (
-                <div class="flex items-start gap-5">
+                <div class="flex items-start gap-5 p-2">
                   <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                     JC
                   </div>
@@ -572,7 +615,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                   </div>
                 </div>
               )}
-              <div class="mt-5 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+              <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
                 <span class="text-sm text-slate-400">Have a story to share?</span>
                 <a href="/jewett-junction/submit-idea" class="text-sm text-pink-400 hover:text-pink-300 font-medium">Submit →</a>
               </div>
