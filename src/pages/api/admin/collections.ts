@@ -940,6 +940,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
           for (const sampleItem of sampleItems) {
             try {
+              // Remove 'slug' field - Webflow auto-generates it from 'name'
+              const { slug: _slug, ...fieldData } = sampleItem;
+
               const itemResponse = await fetch(`${BASE_URL}/collections/${existing.id}/items`, {
                 method: 'POST',
                 headers: {
@@ -948,7 +951,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                   'content-type': 'application/json'
                 },
                 body: JSON.stringify({
-                  fieldData: sampleItem,
+                  fieldData,
                   isArchived: false,
                   isDraft: false
                 })
@@ -958,7 +961,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
               if (itemResponse.ok) {
                 itemsCreated++;
               } else {
-                itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemData.message || 'Unknown error'}`);
+                itemErrors.push(`${sampleItem.name || _slug}: ${itemData.message || itemData.msg || JSON.stringify(itemData)}`);
               }
 
               // Longer delay to avoid Cloudflare Worker limits
@@ -1063,6 +1066,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         for (const sampleItem of sampleItems) {
           try {
+            // Remove 'slug' field - Webflow auto-generates it from 'name'
+            const { slug: _slug, ...fieldData } = sampleItem;
+
             const itemResponse = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
               method: 'POST',
               headers: {
@@ -1071,7 +1077,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 'content-type': 'application/json'
               },
               body: JSON.stringify({
-                fieldData: sampleItem,
+                fieldData,
                 isArchived: false,
                 isDraft: false
               })
@@ -1081,7 +1087,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             if (itemResponse.ok) {
               itemsCreated++;
             } else {
-              itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemData.message || 'Unknown error'}`);
+              itemErrors.push(`${sampleItem.name || _slug}: ${itemData.message || itemData.msg || JSON.stringify(itemData)}`);
             }
 
             // Longer delay to avoid Cloudflare Worker limits

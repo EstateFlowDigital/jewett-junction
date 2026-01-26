@@ -603,18 +603,30 @@ export function AdminDashboard({}: AdminDashboardProps) {
         },
         body: JSON.stringify({
           collections: predefinedSlugs,
-          customCollections: customToSync
+          customCollections: customToSync,
+          addSampleItems: true
         })
       });
 
-      if (!response.ok) throw new Error('Failed to sync collections');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to sync collections');
+      }
 
       const data = await response.json();
       setSyncResults(data.results || []);
       setSyncStatus('done');
 
-      const totalCreated = data.summary.created + (data.summary.customCreated || 0);
-      setSuccess(`Synced ${totalCreated} collections successfully!`);
+      const totalCollections = data.summary.created + (data.summary.customCreated || 0) + data.summary.existing;
+      const totalItems = data.summary.itemsCreated || 0;
+
+      if (totalItems > 0) {
+        setSuccess(`Processed ${totalCollections} collections, created ${totalItems} sample items!`);
+      } else if (totalCollections > 0) {
+        setSuccess(`Synced ${data.summary.created} collections successfully!`);
+      } else {
+        setSuccess('Collections are up to date.');
+      }
 
       // Clear custom collections that were successfully synced
       const successfulSlugs = data.results
