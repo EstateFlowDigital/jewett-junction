@@ -115,6 +115,12 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
       .card-hover:hover { transform: translateY(-2px); }
       .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
       @media (max-width: 767px) { .mobile-safe-area { padding-top: 4.5rem; } }
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-marquee { animation: marquee 30s linear infinite; }
+      .animate-marquee:hover { animation-play-state: paused; }
     </style>
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">
@@ -157,6 +163,47 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
 
     <!-- Main -->
     <main class="md:pl-20 min-h-screen">
+      <!-- Mission Statement Banner -->
+      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 overflow-hidden relative">
+        <div class="py-3 overflow-hidden whitespace-nowrap">
+          <div class="animate-marquee inline-flex">
+            <span class="mx-8 text-white font-medium flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+              Building Excellence. Delivering Results. Creating Futures.
+            </span>
+            <span class="mx-8 text-white/80 flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Safety First - 4EverSafe
+            </span>
+            <span class="mx-8 text-white font-medium flex items-center gap-2">
+              <svg class="w-5 h-5 text-pink-300" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              People. Integrity. Excellence. Teamwork.
+            </span>
+            <span class="mx-8 text-white/80 flex items-center gap-2">
+              <svg class="w-5 h-5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              Building Ohio Since 1972
+            </span>
+            <!-- Duplicate for seamless loop -->
+            <span class="mx-8 text-white font-medium flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+              Building Excellence. Delivering Results. Creating Futures.
+            </span>
+            <span class="mx-8 text-white/80 flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Safety First - 4EverSafe
+            </span>
+            <span class="mx-8 text-white font-medium flex items-center gap-2">
+              <svg class="w-5 h-5 text-pink-300" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              People. Integrity. Excellence. Teamwork.
+            </span>
+            <span class="mx-8 text-white/80 flex items-center gap-2">
+              <svg class="w-5 h-5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              Building Ohio Since 1972
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
         <!-- Header Row -->
         <div class="flex items-start justify-between mb-10">
