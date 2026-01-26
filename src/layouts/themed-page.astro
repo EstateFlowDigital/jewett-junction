@@ -3,6 +3,7 @@ import '../../generated/fonts.css';
 import '../../generated/webflow.css';
 import '../site-components/global.css';
 import '../styles/global.css';
+import { MobileNav } from '../components/layout/MobileNav';
 
 interface Props {
   title?: string;
@@ -11,6 +12,9 @@ interface Props {
 }
 
 const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
+
+// Map section to full path for MobileNav
+const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/jewett-junction/dashboard';
 ---
 
 <html lang="en" class="dark">
@@ -21,12 +25,19 @@ const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
     <title>{title}</title>
     <style>
       .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
+      @media (max-width: 767px) { .mobile-safe-area { padding-top: max(4.5rem, env(safe-area-inset-top, 0px)); } }
     </style>
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">
+    <!-- Mobile Navigation -->
+    <MobileNav client:load currentTheme="dark" currentPath={currentPath} />
+
+    <!-- Background -->
     <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 -z-10"></div>
     <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
     <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
+
+    <!-- Desktop Sidebar -->
     <aside class="fixed left-0 top-0 bottom-0 w-20 glass border-r border-slate-800/50 z-40 hidden md:flex flex-col items-center py-6">
       <a href="/jewett-junction" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-blue-500/30">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -57,7 +68,7 @@ const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
       <div class="w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center text-sm font-medium border border-slate-600">JC</div>
     </aside>
     <main class="md:pl-20 min-h-screen">
-      <div class="p-6 md:p-8 lg:p-10">
+      <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
         <slot />
       </div>
     </main>
