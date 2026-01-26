@@ -432,9 +432,11 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
                           </div>
                         </div>
 
-                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-indigo-400 transition-colors">
-                          {event.name}
-                        </h3>
+                        <a href={`/jewett-junction/events/${event.slug || event.id}`} className="block">
+                          <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-indigo-400 transition-colors">
+                            {event.name}
+                          </h3>
+                        </a>
 
                         {event.description && (
                           <p className="text-sm text-slate-400 mb-4 line-clamp-2">{event.description}</p>
@@ -460,25 +462,29 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
 
                       {/* Action */}
                       <div className="flex items-center p-4 md:p-6 md:pl-0">
-                        {(event['registration-link'] || event['virtual-link']) ? (
-                          <Button
-                            className="bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
-                            asChild
-                          >
-                            <a href={event['registration-link'] || event['virtual-link']} target="_blank" rel="noopener noreferrer">
-                              {event['is-virtual'] ? 'Join' : 'Register'}
-                              <ExternalLink className="h-4 w-4 ml-2" />
-                            </a>
-                          </Button>
-                        ) : (
+                        <div className="flex items-center gap-2">
+                          {(event['registration-link'] || event['virtual-link']) && (
+                            <Button
+                              className="bg-indigo-600 hover:bg-indigo-700"
+                              asChild
+                            >
+                              <a href={event['registration-link'] || event['virtual-link']} target="_blank" rel="noopener noreferrer">
+                                {event['is-virtual'] ? 'Join' : 'Register'}
+                                <ExternalLink className="h-4 w-4 ml-2" />
+                              </a>
+                            </Button>
+                          )}
                           <Button
                             variant="outline"
-                            className="border-slate-600 text-slate-300 hover:bg-slate-700 w-full md:w-auto"
+                            className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                            asChild
                           >
-                            Details
-                            <ChevronRight className="h-4 w-4 ml-1" />
+                            <a href={`/jewett-junction/events/${event.slug || event.id}`}>
+                              Details
+                              <ChevronRight className="h-4 w-4 ml-1" />
+                            </a>
                           </Button>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>

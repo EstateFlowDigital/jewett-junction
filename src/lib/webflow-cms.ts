@@ -495,3 +495,43 @@ export async function getSubmittedIdeas(options?: { limit?: number; status?: str
   }
   return { ...result, items };
 }
+
+// ============================================
+// Get single items by slug
+// ============================================
+
+export async function getEventBySlug(slug: string): Promise<(Event & { id: string }) | null> {
+  if (!COLLECTIONS.events) return null;
+  const result = await getCollection<Event>(COLLECTIONS.events);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getAnnouncementBySlug(slug: string): Promise<(Announcement & { id: string }) | null> {
+  if (!COLLECTIONS.announcements) return null;
+  const result = await getCollection<Announcement>(COLLECTIONS.announcements);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getJobPostingBySlug(slug: string): Promise<(JobPosting & { id: string }) | null> {
+  if (!COLLECTIONS.jobPostings) return null;
+  const result = await getCollection<JobPosting>(COLLECTIONS.jobPostings);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getEmployeeBySlug(slug: string): Promise<(Employee & { id: string }) | null> {
+  if (!COLLECTIONS.employees) return null;
+  const result = await getCollection<Employee>(COLLECTIONS.employees);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getCultureStoryBySlug(slug: string): Promise<(CultureStory & { id: string }) | null> {
+  if (!COLLECTIONS.cultureStories) return null;
+  const result = await getCollection<CultureStory>(COLLECTIONS.cultureStories);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getResourceBySlug(slug: string): Promise<(Resource & { id: string }) | null> {
+  if (!COLLECTIONS.resources) return null;
+  const result = await getCollection<Resource>(COLLECTIONS.resources);
+  return result.items.find(item => item.slug === slug) || null;
+}

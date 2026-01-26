@@ -220,9 +220,11 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
-                          {emp.name}
-                        </h3>
+                        <a href={`/jewett-junction/directory/${emp.slug || emp.id}`} className="block">
+                          <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+                            {emp.name}
+                          </h3>
+                        </a>
                         <p className="text-sm text-slate-400 truncate">{emp.role}</p>
                         <Badge className={`mt-1 bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30 text-xs`}>
                           {config.label}
@@ -372,9 +374,11 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                   <div className="pt-10 px-4 pb-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
-                          {emp.name}
-                        </h3>
+                        <a href={`/jewett-junction/directory/${emp.slug || emp.id}`} className="block">
+                          <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+                            {emp.name}
+                          </h3>
+                        </a>
                         <p className="text-sm text-slate-400 truncate">{emp.role}</p>
                       </div>
                       {emp['is-featured'] && (

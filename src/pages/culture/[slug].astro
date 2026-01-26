@@ -1,0 +1,150 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { initCMS, getCultureStoryBySlug, getCultureStories } from '../../lib/webflow-cms';
+
+export const prerender = false;
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
+
+const { slug } = Astro.params;
+
+// Fetch the culture story by slug
+let story: any = null;
+let relatedStories: any[] = [];
+
+try {
+  if (slug) {
+    story = await getCultureStoryBySlug(slug);
+
+    // Also fetch other culture stories
+    const result = await getCultureStories({ limit: 4 });
+    relatedStories = result.items.filter(s => s.slug !== slug).slice(0, 3);
+  }
+} catch (error) {
+  console.error('Error fetching culture story:', error);
+}
+
+// If story not found, redirect
+if (!story) {
+  return Astro.redirect('/jewett-junction/culture');
+}
+
+// Format date
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+---
+
+<ThemedPage title={`${story.name} | Culture | Jewett Junction`} theme="dark" currentSection="culture">
+  <div class="max-w-4xl mx-auto">
+    <!-- Back link -->
+    <a href="/jewett-junction/culture" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Culture
+    </a>
+
+    <!-- Story Content -->
+    <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
+      <!-- Hero Image -->
+      {story.image?.url && (
+        <div class="aspect-video relative">
+          <img
+            src={story.image.url}
+            alt={story.image.alt || story.name}
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+        </div>
+      )}
+
+      <div class="p-8">
+        <header class="mb-6">
+          {story.category && (
+            <span class="inline-block px-3 py-1 text-xs font-medium bg-purple-500/20 text-purple-400 rounded-full border border-purple-500/30 mb-3">
+              {story.category}
+            </span>
+          )}
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{story.name}</h1>
+          <div class="flex items-center gap-6 text-slate-400">
+            {story.author && (
+              <span class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                  {story.author.charAt(0).toUpperCase()}
+                </div>
+                {story.author}
+              </span>
+            )}
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {formatDate(story['published-date'])}
+            </span>
+          </div>
+        </header>
+
+        <!-- Excerpt -->
+        {story.excerpt && (
+          <div class="mb-6">
+            <p class="text-xl text-slate-300 leading-relaxed italic border-l-4 border-purple-500 pl-4">
+              {story.excerpt}
+            </p>
+          </div>
+        )}
+
+        <!-- Full Content -->
+        <div class="prose prose-invert max-w-none">
+          <div class="text-slate-300 leading-relaxed whitespace-pre-wrap" set:html={story.content} />
+        </div>
+      </div>
+    </article>
+
+    <!-- Related Stories -->
+    {relatedStories.length > 0 && (
+      <div class="glass rounded-2xl p-6 border border-slate-800/50">
+        <h2 class="text-xl font-semibold text-white mb-4">More Stories</h2>
+        <div class="grid gap-4">
+          {relatedStories.map((related) => (
+            <a
+              href={`/jewett-junction/culture/${related.slug}`}
+              class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-colors group"
+            >
+              {related.image?.url ? (
+                <img
+                  src={related.image.url}
+                  alt={related.name}
+                  class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                />
+              ) : (
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+              )}
+              <div class="flex-1 min-w-0">
+                <h3 class="font-medium text-white group-hover:text-purple-400 transition-colors truncate">
+                  {related.name}
+                </h3>
+                <p class="text-sm text-slate-400 line-clamp-1">
+                  {related.excerpt}
+                </p>
+              </div>
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</ThemedPage>

@@ -1,0 +1,134 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { initCMS, getAnnouncementBySlug, getAnnouncements } from '../../lib/webflow-cms';
+
+export const prerender = false;
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
+
+const { slug } = Astro.params;
+
+// Fetch the announcement by slug
+let announcement: any = null;
+let relatedAnnouncements: any[] = [];
+
+try {
+  if (slug) {
+    announcement = await getAnnouncementBySlug(slug);
+
+    // Also fetch other recent announcements
+    const result = await getAnnouncements({ limit: 4 });
+    relatedAnnouncements = result.items.filter(a => a.slug !== slug).slice(0, 3);
+  }
+} catch (error) {
+  console.error('Error fetching announcement:', error);
+}
+
+// If announcement not found, redirect
+if (!announcement) {
+  return Astro.redirect('/jewett-junction/announcements');
+}
+
+// Format date
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+// Priority badge colors
+const priorityColors: Record<string, string> = {
+  high: 'bg-red-500/20 text-red-400 border-red-500/30',
+  normal: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  low: 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+};
+---
+
+<ThemedPage title={`${announcement.name} | Announcements | Jewett Junction`} theme="dark" currentSection="dashboard">
+  <div class="max-w-4xl mx-auto">
+    <!-- Back link -->
+    <a href="/jewett-junction/announcements" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Announcements
+    </a>
+
+    <!-- Announcement Content -->
+    <article class="glass rounded-2xl p-8 mb-8 border border-slate-800/50">
+      <header class="mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          {announcement['is-pinned'] && (
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+              </svg>
+              Pinned
+            </span>
+          )}
+          <span class={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${priorityColors[announcement.priority] || priorityColors.normal}`}>
+            {announcement.priority === 'high' ? 'High Priority' : announcement.priority === 'low' ? 'Low Priority' : 'Announcement'}
+          </span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{announcement.name}</h1>
+        <div class="flex items-center gap-6 text-slate-400">
+          {announcement.author && (
+            <span class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {announcement.author.charAt(0).toUpperCase()}
+              </div>
+              {announcement.author}
+            </span>
+          )}
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {formatDate(announcement['published-date'])}
+          </span>
+        </div>
+      </header>
+
+      <div class="prose prose-invert max-w-none">
+        <p class="text-slate-300 leading-relaxed whitespace-pre-wrap text-lg">{announcement.content}</p>
+      </div>
+    </article>
+
+    <!-- Related Announcements -->
+    {relatedAnnouncements.length > 0 && (
+      <div class="glass rounded-2xl p-6 border border-slate-800/50">
+        <h2 class="text-xl font-semibold text-white mb-4">More Announcements</h2>
+        <div class="space-y-3">
+          {relatedAnnouncements.map((related) => (
+            <a
+              href={`/jewett-junction/announcements/${related.slug}`}
+              class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-colors group"
+            >
+              <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-medium text-white group-hover:text-blue-400 transition-colors truncate">
+                  {related.name}
+                </h3>
+                <p class="text-sm text-slate-400">
+                  {formatDate(related['published-date'])}
+                </p>
+              </div>
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</ThemedPage>

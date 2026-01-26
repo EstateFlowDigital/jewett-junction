@@ -235,9 +235,11 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                     <Badge className={`mb-2 bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30`}>
                       {config.label}
                     </Badge>
-                    <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors mb-1">
-                      {resource.name}
-                    </h3>
+                    <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block">
+                      <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors mb-1">
+                        {resource.name}
+                      </h3>
+                    </a>
                     {resource.description && (
                       <p className="text-sm text-slate-400 line-clamp-2 mb-3">{resource.description}</p>
                     )}
@@ -387,9 +389,11 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
-                            {resource.name}
-                          </h3>
+                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block">
+                            <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
+                              {resource.name}
+                            </h3>
+                          </a>
                           {resource.featured && <Star className="h-3 w-3 text-amber-400 flex-shrink-0" />}
                         </div>
                         <Badge className={`bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30 text-xs`}>
@@ -450,9 +454,11 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                     <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 items-center">
                       <div className="md:col-span-2">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
-                            {resource.name}
-                          </h3>
+                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block">
+                            <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
+                              {resource.name}
+                            </h3>
+                          </a>
                           {resource.featured && <Star className="h-3 w-3 text-amber-400 flex-shrink-0" />}
                         </div>
                         {resource.description && (

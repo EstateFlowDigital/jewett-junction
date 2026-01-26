@@ -419,9 +419,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
                       <config.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
-                        {story.name}
-                      </h4>
+                      <a href={`/jewett-junction/culture/${story.slug || story.id}`} className="block">
+                        <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
+                          {story.name}
+                        </h4>
+                      </a>
                       <p className="text-sm text-slate-400 line-clamp-2">
                         {stripHtml(story.content) || story.excerpt}
                       </p>
@@ -464,9 +466,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
                       <config.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
-                        {story.name}
-                      </h4>
+                      <a href={`/jewett-junction/culture/${story.slug || story.id}`} className="block">
+                        <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
+                          {story.name}
+                        </h4>
+                      </a>
                       <p className="text-sm text-slate-400 line-clamp-2">
                         {stripHtml(story.content) || story.excerpt}
                       </p>

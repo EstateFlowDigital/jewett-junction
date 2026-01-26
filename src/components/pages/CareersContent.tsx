@@ -626,9 +626,11 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
                     </Badge>
                   )}
                 </div>
-                <h3 className="font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
-                  {job.name}
-                </h3>
+                <a href={`/jewett-junction/careers/${job.slug || job.id}`} className="block">
+                  <h3 className="font-semibold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                    {job.name}
+                  </h3>
+                </a>
                 <div className="space-y-2 text-sm text-slate-400">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
@@ -659,27 +661,36 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
                   </div>
                 )}
 
-                <div className="mt-4 pt-4 border-t border-slate-700">
+                <div className="mt-4 pt-4 border-t border-slate-700 flex gap-2">
+                  <Button
+                    className="flex-1 bg-slate-700 hover:bg-slate-600"
+                    size="sm"
+                    asChild
+                  >
+                    <a href={`/jewett-junction/careers/${job.slug || job.id}`}>
+                      View Details
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </a>
+                  </Button>
                   {job['apply-link'] ? (
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
                       size="sm"
                       asChild
                     >
                       <a href={job['apply-link']} target="_blank" rel="noopener noreferrer">
-                        Apply Now
+                        Apply
                         <ExternalLink className="h-4 w-4 ml-1" />
                       </a>
                     </Button>
                   ) : (
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
                       size="sm"
                       asChild
                     >
                       <a href="#apply">
-                        Apply Now
-                        <ChevronRight className="h-4 w-4 ml-1" />
+                        Apply
                       </a>
                     </Button>
                   )}
