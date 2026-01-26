@@ -900,7 +900,7 @@ async function getCollectionFields(collectionId: string, apiToken: string): Prom
   }
 }
 
-// Helper to filter sample data to only include existing fields
+// Helper to filter sample data to only include existing fields with valid values
 function filterFieldData(fieldData: Record<string, any>, existingFields: Map<string, any>): Record<string, any> {
   const filtered: Record<string, any> = {};
 
@@ -912,11 +912,23 @@ function filterFieldData(fieldData: Record<string, any>, existingFields: Map<str
     }
 
     // Only include if the field exists in the collection
-    if (existingFields.has(key)) {
-      filtered[key] = value;
-    } else {
+    if (!existingFields.has(key)) {
       console.log(`  Skipping field '${key}' - not in collection schema`);
+      continue;
     }
+
+    const fieldInfo = existingFields.get(key);
+
+    // For Option fields, validate the value is in allowed options
+    if (fieldInfo?.type === 'Option' && fieldInfo?.validations?.options) {
+      const allowedOptions = fieldInfo.validations.options.map((opt: any) => opt.name);
+      if (!allowedOptions.includes(value)) {
+        console.log(`  Skipping field '${key}' - value '${value}' not in allowed options: [${allowedOptions.join(', ')}]`);
+        continue;
+      }
+    }
+
+    filtered[key] = value;
   }
 
   return filtered;
