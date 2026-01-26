@@ -4,6 +4,26 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Helper to add CORS headers to any response
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 // Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
 function getEnvVar(locals: any, key: string): string {
   const runtime = (locals as any)?.runtime;
@@ -29,23 +49,31 @@ function verifyToken(request: Request): boolean {
   return now - timestamp <= maxAge;
 }
 
+// OPTIONS - Handle CORS preflight
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+};
+
 // POST - Publish site
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   if (!siteId) {
-    return new Response(JSON.stringify({ error: 'Site ID not configured' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Site ID not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   try {
@@ -68,30 +96,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify({
+    return withCors(new Response(JSON.stringify({
       success: true,
       message: 'Site published successfully',
       ...data
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error publishing site:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
 // GET - Check publish status / site info
 export const GET: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
@@ -110,15 +138,15 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify(data), {
+    return withCors(new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error getting site info:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
