@@ -835,6 +835,20 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 };
 
+// Helper to safely consume a response body
+async function consumeResponse(response: Response): Promise<any> {
+  try {
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { message: text };
+    }
+  } catch {
+    return { message: 'Failed to read response' };
+  }
+}
+
 // POST - Create/sync collections
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
@@ -856,7 +870,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     const body = await request.json();
-    const { collections: collectionsToSync, addSampleItems = true } = body;
+    const { collections: collectionsToSync = [], customCollections = [], addSampleItems = true } = body;
 
     // Get existing collections first
     const existingResponse = await fetch(`${BASE_URL}/sites/${siteId}/collections`, {
@@ -911,14 +925,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 })
               });
 
+              const itemData = await consumeResponse(itemResponse);
               if (itemResponse.ok) {
                 itemsCreated++;
               } else {
-                const itemError = await itemResponse.json();
-                itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemError.message || 'Unknown error'}`);
+                itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemData.message || 'Unknown error'}`);
               }
 
-              await new Promise(resolve => setTimeout(resolve, 150));
+              // Longer delay to avoid Cloudflare Worker limits
+              await new Promise(resolve => setTimeout(resolve, 300));
             } catch (itemErr: any) {
               itemErrors.push(`${sampleItem.name || 'item'}: ${itemErr.message}`);
             }
@@ -998,15 +1013,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
               body: JSON.stringify(fieldBody)
             });
 
+            const fieldData = await consumeResponse(fieldResponse);
             if (fieldResponse.ok) {
               fieldsCreated++;
             } else {
-              const fieldError = await fieldResponse.json();
-              fieldErrors.push(`${field.slug}: ${fieldError.message || 'Unknown error'}`);
+              fieldErrors.push(`${field.slug}: ${fieldData.message || 'Unknown error'}`);
             }
 
-            // Small delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Delay to avoid rate limiting and Cloudflare Worker limits
+            await new Promise(resolve => setTimeout(resolve, 200));
           } catch (fieldErr: any) {
             fieldErrors.push(`${field.slug}: ${fieldErr.message}`);
           }
@@ -1033,15 +1048,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
               })
             });
 
+            const itemData = await consumeResponse(itemResponse);
             if (itemResponse.ok) {
               itemsCreated++;
             } else {
-              const itemError = await itemResponse.json();
-              itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemError.message || 'Unknown error'}`);
+              itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemData.message || 'Unknown error'}`);
             }
 
-            // Small delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 150));
+            // Longer delay to avoid Cloudflare Worker limits
+            await new Promise(resolve => setTimeout(resolve, 300));
           } catch (itemErr: any) {
             itemErrors.push(`${sampleItem.name || 'item'}: ${itemErr.message}`);
           }
@@ -1069,7 +1084,102 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       // Delay between collections to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 750));
+    }
+
+    // Process custom collections (user-created from the UI)
+    for (const customCol of customCollections) {
+      // Check if collection already exists
+      if (existingSlugs.has(customCol.slug)) {
+        results.push({
+          slug: customCol.slug,
+          status: 'exists',
+          message: 'Collection already exists',
+          isCustom: true
+        });
+        continue;
+      }
+
+      try {
+        // Create the collection
+        const createResponse = await fetch(`${BASE_URL}/sites/${siteId}/collections`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'accept': 'application/json',
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            displayName: customCol.displayName,
+            singularName: customCol.singularName || customCol.displayName,
+            slug: customCol.slug
+          })
+        });
+
+        const createData = await consumeResponse(createResponse);
+        if (!createResponse.ok) {
+          throw new Error(createData.message || `Failed to create collection: ${createResponse.status}`);
+        }
+
+        const collectionId = createData.id;
+
+        // Add fields to the collection
+        let fieldsCreated = 0;
+        let fieldErrors: string[] = [];
+
+        for (const field of (customCol.fields || [])) {
+          try {
+            const fieldBody: any = {
+              displayName: field.displayName,
+              slug: field.slug,
+              type: field.type,
+              isRequired: field.isRequired || false
+            };
+
+            const fieldResponse = await fetch(`${BASE_URL}/collections/${collectionId}/fields`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'accept': 'application/json',
+                'content-type': 'application/json'
+              },
+              body: JSON.stringify(fieldBody)
+            });
+
+            const fieldData = await consumeResponse(fieldResponse);
+            if (fieldResponse.ok) {
+              fieldsCreated++;
+            } else {
+              fieldErrors.push(`${field.slug}: ${fieldData.message || 'Unknown error'}`);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+          } catch (fieldErr: any) {
+            fieldErrors.push(`${field.slug}: ${fieldErr.message}`);
+          }
+        }
+
+        results.push({
+          slug: customCol.slug,
+          status: 'created',
+          message: `Created with ${fieldsCreated}/${customCol.fields?.length || 0} fields (no sample data)`,
+          id: collectionId,
+          fieldsCreated,
+          totalFields: customCol.fields?.length || 0,
+          fieldErrors: fieldErrors.length > 0 ? fieldErrors : undefined,
+          isCustom: true
+        });
+
+      } catch (createErr: any) {
+        results.push({
+          slug: customCol.slug,
+          status: 'error',
+          message: createErr.message,
+          isCustom: true
+        });
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 750));
     }
 
     // Calculate total items created
@@ -1080,8 +1190,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       success: true,
       results,
       summary: {
-        total: collectionsToSync.length,
+        total: collectionsToSync.length + customCollections.length,
         created: results.filter(r => r.status === 'created').length,
+        customCreated: results.filter(r => r.status === 'created' && r.isCustom).length,
         existing: results.filter(r => r.status === 'exists').length,
         errors: results.filter(r => r.status === 'error').length,
         itemsCreated: totalItemsCreated,

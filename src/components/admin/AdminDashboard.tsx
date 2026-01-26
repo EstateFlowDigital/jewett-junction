@@ -335,6 +335,15 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const [selectedToSync, setSelectedToSync] = React.useState<string[]>([]);
   const [syncResults, setSyncResults] = React.useState<any[]>([]);
 
+  // Custom collection creation state
+  const [showNewCollectionForm, setShowNewCollectionForm] = React.useState(false);
+  const [customCollections, setCustomCollections] = React.useState<any[]>([]);
+  const [newCollectionName, setNewCollectionName] = React.useState('');
+  const [newCollectionSingular, setNewCollectionSingular] = React.useState('');
+  const [newCollectionFields, setNewCollectionFields] = React.useState<{name: string, type: string}[]>([
+    { name: '', type: 'PlainText' }
+  ]);
+
   // Check for existing token on mount
   React.useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -578,13 +587,24 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setSyncResults([]);
 
     try {
+      // Separate predefined and custom collections
+      const predefinedSlugs = selectedToSync.filter(
+        slug => !customCollections.some(c => c.slug === slug)
+      );
+      const customToSync = customCollections.filter(
+        c => selectedToSync.includes(c.slug)
+      );
+
       const response = await fetch(`${API_BASE}/api/admin/collections`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ collections: selectedToSync })
+        body: JSON.stringify({
+          collections: predefinedSlugs,
+          customCollections: customToSync
+        })
       });
 
       if (!response.ok) throw new Error('Failed to sync collections');
@@ -592,7 +612,15 @@ export function AdminDashboard({}: AdminDashboardProps) {
       const data = await response.json();
       setSyncResults(data.results || []);
       setSyncStatus('done');
-      setSuccess(`Synced ${data.summary.created} collections successfully!`);
+
+      const totalCreated = data.summary.created + (data.summary.customCreated || 0);
+      setSuccess(`Synced ${totalCreated} collections successfully!`);
+
+      // Clear custom collections that were successfully synced
+      const successfulSlugs = data.results
+        .filter((r: any) => r.status === 'created')
+        .map((r: any) => r.slug);
+      setCustomCollections(customCollections.filter(c => !successfulSlugs.includes(c.slug)));
 
       // Refresh the collections list
       await fetchCollections();
@@ -606,7 +634,83 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const openSyncModal = () => {
     setShowSyncModal(true);
     setSyncResults([]);
+    setShowNewCollectionForm(false);
     fetchCollections();
+  };
+
+  // Add a custom collection to the list
+  const handleAddCustomCollection = () => {
+    if (!newCollectionName.trim()) {
+      setError('Collection name is required');
+      return;
+    }
+
+    // Generate slug from name
+    const slug = newCollectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+    // Check if slug already exists
+    const allSlugs = [
+      ...definedCollections.map(c => c.slug),
+      ...customCollections.map(c => c.slug),
+      ...existingCollections.map(c => c.slug)
+    ];
+
+    if (allSlugs.includes(slug)) {
+      setError('A collection with this name already exists');
+      return;
+    }
+
+    // Filter out empty fields
+    const validFields = newCollectionFields.filter(f => f.name.trim());
+
+    const newCollection = {
+      displayName: newCollectionName.trim(),
+      singularName: newCollectionSingular.trim() || newCollectionName.trim().replace(/s$/, ''),
+      slug,
+      fieldCount: validFields.length,
+      fields: validFields.map(f => ({
+        displayName: f.name,
+        slug: f.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        type: f.type,
+        isRequired: false
+      })),
+      isCustom: true
+    };
+
+    setCustomCollections([...customCollections, newCollection]);
+    setSelectedToSync([...selectedToSync, slug]);
+
+    // Reset form
+    setNewCollectionName('');
+    setNewCollectionSingular('');
+    setNewCollectionFields([{ name: '', type: 'PlainText' }]);
+    setShowNewCollectionForm(false);
+    setSuccess(`Added "${newCollectionName}" to sync list`);
+  };
+
+  // Add a field to the new collection form
+  const addFieldToNewCollection = () => {
+    setNewCollectionFields([...newCollectionFields, { name: '', type: 'PlainText' }]);
+  };
+
+  // Remove a field from the new collection form
+  const removeFieldFromNewCollection = (index: number) => {
+    if (newCollectionFields.length > 1) {
+      setNewCollectionFields(newCollectionFields.filter((_, i) => i !== index));
+    }
+  };
+
+  // Update a field in the new collection form
+  const updateNewCollectionField = (index: number, key: 'name' | 'type', value: string) => {
+    const updated = [...newCollectionFields];
+    updated[index][key] = value;
+    setNewCollectionFields(updated);
+  };
+
+  // Remove a custom collection
+  const removeCustomCollection = (slug: string) => {
+    setCustomCollections(customCollections.filter(c => c.slug !== slug));
+    setSelectedToSync(selectedToSync.filter(s => s !== slug));
   };
 
   // Handle file upload for image fields
@@ -949,19 +1053,175 @@ export function AdminDashboard({}: AdminDashboardProps) {
                     Sync More Collections
                   </button>
                 </div>
+              ) : showNewCollectionForm ? (
+                /* New Collection Form */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-white">Create New Collection</h3>
+                    <button
+                      onClick={() => setShowNewCollectionForm(false)}
+                      className="text-slate-400 hover:text-white text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  {/* Collection Name */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Collection Name *</label>
+                    <input
+                      type="text"
+                      value={newCollectionName}
+                      onChange={(e) => setNewCollectionName(e.target.value)}
+                      placeholder="e.g., News Articles, Projects, Team Members"
+                      className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none text-sm"
+                    />
+                  </div>
+
+                  {/* Singular Name */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Singular Name (optional)</label>
+                    <input
+                      type="text"
+                      value={newCollectionSingular}
+                      onChange={(e) => setNewCollectionSingular(e.target.value)}
+                      placeholder="e.g., News Article, Project, Team Member"
+                      className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none text-sm"
+                    />
+                  </div>
+
+                  {/* Fields */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Fields</label>
+                    <div className="space-y-2">
+                      {newCollectionFields.map((field, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={field.name}
+                            onChange={(e) => updateNewCollectionField(idx, 'name', e.target.value)}
+                            placeholder="Field name"
+                            className="flex-1 px-3 py-2 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white placeholder:text-slate-500 focus:border-violet-500/50 outline-none text-sm"
+                          />
+                          <select
+                            value={field.type}
+                            onChange={(e) => updateNewCollectionField(idx, 'type', e.target.value)}
+                            className="px-3 py-2 bg-slate-900/50 border border-slate-600/50 rounded-lg text-white text-sm focus:border-violet-500/50 outline-none"
+                          >
+                            <option value="PlainText">Text</option>
+                            <option value="RichText">Rich Text</option>
+                            <option value="Number">Number</option>
+                            <option value="Bool">Yes/No</option>
+                            <option value="DateTime">Date/Time</option>
+                            <option value="Image">Image</option>
+                            <option value="Link">Link/URL</option>
+                            <option value="Email">Email</option>
+                            <option value="Phone">Phone</option>
+                          </select>
+                          {newCollectionFields.length > 1 && (
+                            <button
+                              onClick={() => removeFieldFromNewCollection(idx)}
+                              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={addFieldToNewCollection}
+                      className="mt-2 text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Field
+                    </button>
+                  </div>
+
+                  {/* Add Collection Button */}
+                  <button
+                    onClick={handleAddCustomCollection}
+                    disabled={!newCollectionName.trim()}
+                    className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add to Sync List
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-4">
+                  {/* Add New Collection Button */}
+                  <button
+                    onClick={() => setShowNewCollectionForm(true)}
+                    className="w-full p-4 border-2 border-dashed border-slate-600/50 hover:border-violet-500/50 rounded-xl text-slate-400 hover:text-violet-400 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Plus className="h-5 w-5" />
+                    <span>Create New Collection</span>
+                  </button>
+
                   {/* Legend */}
-                  <div className="flex items-center gap-4 text-xs text-slate-400 mb-4">
+                  <div className="flex items-center gap-4 text-xs text-slate-400">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Exists (add sample data)
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Exists
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span> Missing (create + add data)
+                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span> New
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-violet-500 rounded-full"></span> Custom
                     </span>
                   </div>
 
-                  {/* Collections List */}
+                  {/* Custom Collections (user-created) */}
+                  {customCollections.map((col: any) => {
+                    const isSelected = selectedToSync.includes(col.slug);
+
+                    return (
+                      <div
+                        key={col.slug}
+                        className={`p-4 rounded-xl border transition-all ${
+                          isSelected
+                            ? 'bg-violet-500/10 border-violet-500/50'
+                            : 'bg-violet-500/5 border-violet-500/20 hover:border-violet-500/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedToSync([...selectedToSync, col.slug]);
+                              } else {
+                                setSelectedToSync(selectedToSync.filter(s => s !== col.slug));
+                              }
+                            }}
+                            className="w-5 h-5 rounded-lg border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white">{col.displayName}</span>
+                              <span className="px-2 py-0.5 text-xs bg-violet-500/20 text-violet-400 rounded-full">
+                                Custom
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {col.fieldCount} fields • Will create collection (no sample data)
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeCustomCollection(col.slug)}
+                            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Predefined Collections List */}
                   {definedCollections.map((col: any) => {
                     const exists = existingCollections.some((e: any) => e.slug === col.slug);
                     const isSelected = selectedToSync.includes(col.slug);
@@ -973,7 +1233,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           isSelected
                             ? exists
                               ? 'bg-emerald-500/10 border-emerald-500/50'
-                              : 'bg-violet-500/10 border-violet-500/50'
+                              : 'bg-amber-500/10 border-amber-500/50'
                             : exists
                             ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40'
                             : 'bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50'
@@ -1014,7 +1274,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                               )}
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
-                              {col.fieldCount} fields • {exists ? 'Select to add sample items' : 'Will create collection + sample items'}
+                              {col.fieldCount} fields • {exists ? 'Select to add sample items' : 'Will create + add sample items'}
                             </p>
                           </div>
                         </div>
