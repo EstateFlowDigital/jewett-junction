@@ -629,7 +629,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
       if (itemsCreated > 0) {
         message += `Added ${itemsCreated} sample items. `;
       }
-      if (existing > 0 && itemsCreated === 0) {
+      if (existing > 0) {
         message += `${existing} collection${existing > 1 ? 's' : ''} already exist${existing === 1 ? 's' : ''}. `;
       }
       if (errors > 0) {
@@ -1042,10 +1042,12 @@ export function AdminDashboard({}: AdminDashboardProps) {
                             {result.message}
                           </p>
                           {/* Show item creation stats */}
-                          {(result.itemsCreated !== undefined && result.itemsCreated > 0) && (
+                          {result.totalSampleItems !== undefined && result.totalSampleItems > 0 && (
                             <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
                               <Sparkles className="h-3 w-3 text-amber-400" />
-                              <span>{result.itemsCreated} sample items created</span>
+                              <span>
+                                {result.itemsCreated || 0}/{result.totalSampleItems} sample items created
+                              </span>
                             </div>
                           )}
                           {/* Show any errors */}

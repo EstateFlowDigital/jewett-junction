@@ -935,6 +935,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         // If addSampleItems is true, add sample items to existing collection
         if (addSampleItems && existing?.id) {
           const sampleItems = SAMPLE_DATA[definition.slug] || [];
+          console.log(`Adding ${sampleItems.length} sample items to existing collection ${definition.slug} (${existing.id})`);
           let itemsCreated = 0;
           let itemErrors: string[] = [];
 
@@ -942,6 +943,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
             try {
               // Remove 'slug' field - Webflow auto-generates it from 'name'
               const { slug: _slug, ...fieldData } = sampleItem;
+              console.log(`Creating item: ${sampleItem.name}`, JSON.stringify(fieldData).slice(0, 200));
 
               const itemResponse = await fetch(`${BASE_URL}/collections/${existing.id}/items`, {
                 method: 'POST',
@@ -958,10 +960,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
               });
 
               const itemData = await consumeResponse(itemResponse);
+              console.log(`Item response for ${sampleItem.name}: ${itemResponse.status}`, JSON.stringify(itemData).slice(0, 300));
               if (itemResponse.ok) {
                 itemsCreated++;
+                console.log(`Successfully created item: ${sampleItem.name}`);
               } else {
-                itemErrors.push(`${sampleItem.name || _slug}: ${itemData.message || itemData.msg || JSON.stringify(itemData)}`);
+                const errorMsg = `${sampleItem.name || _slug}: ${itemData.message || itemData.msg || JSON.stringify(itemData)}`;
+                console.error(`Failed to create item: ${errorMsg}`);
+                itemErrors.push(errorMsg);
               }
 
               // Longer delay to avoid Cloudflare Worker limits
