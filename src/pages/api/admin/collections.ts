@@ -353,6 +353,7 @@ const COLLECTION_DEFINITIONS = {
 };
 
 // Sample data for each collection - created when syncing
+// IMPORTANT: Option field values must match EXACTLY the option names defined in COLLECTION_DEFINITIONS
 const SAMPLE_DATA: Record<string, any[]> = {
   announcements: [
     {
@@ -360,8 +361,8 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'q1-2025-all-hands-meeting',
       content: '<p>Join us for our quarterly all-hands meeting to review our 2024 accomplishments and discuss our exciting plans for 2025. Breakfast will be provided.</p>',
       author: 'CEO Office',
-      category: 'company-news',
-      priority: 'high',
+      category: 'Company News',
+      priority: 'High',
       'cta-text': 'Add to Calendar',
       'is-pinned': true
     },
@@ -370,8 +371,8 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'new-safety-training-portal',
       content: '<p>We\'ve upgraded our safety training system with a new, user-friendly portal. All employees must complete their annual safety certification by February 28th.</p>',
       author: 'Safety Team',
-      category: 'safety-alert',
-      priority: 'urgent',
+      category: 'Safety Alert',
+      priority: 'Urgent',
       'cta-text': 'Start Training',
       'is-pinned': true
     },
@@ -380,8 +381,8 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'benefits-open-enrollment',
       content: '<p>Open enrollment for 2025 benefits runs January 15-31. Review your options and make any changes to your health, dental, and vision coverage.</p>',
       author: 'HR Team',
-      category: 'hr-update',
-      priority: 'normal',
+      category: 'HR Update',
+      priority: 'Normal',
       'cta-text': 'Review Benefits'
     }
   ],
@@ -391,7 +392,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'q1-all-hands-meeting',
       'event-date': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       location: 'Main Conference Room, Building A',
-      category: 'all-hands-meeting',
+      category: 'All-Hands Meeting',
       description: '<p>Quarterly company meeting to review progress and discuss upcoming initiatives. All employees are expected to attend.</p>',
       'is-mandatory': true,
       'is-virtual': false
@@ -401,7 +402,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'osha-safety-training',
       'event-date': new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       location: 'Training Center',
-      category: 'training',
+      category: 'Training',
       description: '<p>Annual OSHA 30-hour safety certification course. Mandatory for all field personnel.</p>',
       capacity: 25,
       'is-mandatory': true
@@ -411,7 +412,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'team-building-happy-hour',
       'event-date': new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
       location: 'The Pub Downtown',
-      category: 'social-event',
+      category: 'Social Event',
       description: '<p>Join your colleagues for an evening of fun and networking. First round on the company!</p>',
       'is-mandatory': false
     },
@@ -420,7 +421,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       slug: 'benefits-qa-webinar',
       'event-date': new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
       location: 'Microsoft Teams',
-      category: 'hr-session',
+      category: 'HR Session',
       description: '<p>Live Q&A session with HR about your 2025 benefits options. Get your questions answered!</p>',
       'is-virtual': true
     }
@@ -429,48 +430,48 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Senior Project Manager',
       slug: 'senior-project-manager',
-      department: 'commercial',
+      department: 'Commercial',
       location: 'Columbus, OH',
-      'employment-type': 'full-time',
-      'experience-level': 'senior',
+      'employment-type': 'Full-time',
+      'experience-level': 'Senior',
       'salary-min': 95000,
       'salary-max': 125000,
       description: '<p>Lead large-scale commercial construction projects from inception to completion. Manage client relationships, budgets, and cross-functional teams.</p>',
       requirements: '<ul><li>10+ years construction experience</li><li>PMP certification preferred</li><li>Strong leadership skills</li></ul>',
       benefits: '401k match, health/dental/vision, company vehicle, performance bonus',
-      urgency: 'priority',
+      urgency: 'Priority',
       'job-is-active': true,
       featured: true
     },
     {
       name: 'Safety Coordinator',
       slug: 'safety-coordinator',
-      department: 'safety',
+      department: 'Safety',
       location: 'Cleveland, OH',
-      'employment-type': 'full-time',
-      'experience-level': 'mid-level',
+      'employment-type': 'Full-time',
+      'experience-level': 'Mid Level',
       'salary-min': 65000,
       'salary-max': 80000,
       description: '<p>Ensure compliance with OSHA regulations across multiple job sites. Conduct safety training and incident investigations.</p>',
       requirements: '<ul><li>OSHA 30-hour certification</li><li>5+ years safety experience</li><li>Excellent communication skills</li></ul>',
       benefits: '401k match, health/dental/vision, PTO, training budget',
-      urgency: 'normal',
+      urgency: 'Normal',
       'job-is-active': true,
       featured: true
     },
     {
       name: 'Field Engineer',
       slug: 'field-engineer',
-      department: 'engineering',
+      department: 'Engineering',
       location: 'Cincinnati, OH',
-      'employment-type': 'full-time',
-      'experience-level': 'entry-level',
+      'employment-type': 'Full-time',
+      'experience-level': 'Entry Level',
       'salary-min': 55000,
       'salary-max': 70000,
       description: '<p>Support project teams with technical coordination, RFIs, and quality control on active construction sites.</p>',
       requirements: '<ul><li>BS in Civil Engineering or Construction Management</li><li>0-3 years experience</li><li>AutoCAD proficiency</li></ul>',
       benefits: '401k match, health/dental/vision, mentorship program',
-      urgency: 'normal',
+      urgency: 'Normal',
       'job-is-active': true,
       'is-remote': false
     }
@@ -479,7 +480,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Employee Spotlight: Sarah Martinez',
       slug: 'employee-spotlight-sarah-martinez',
-      type: 'employee-spotlight',
+      type: 'Employee Spotlight',
       content: '<p>Sarah joined Jewett Construction 8 years ago as a project coordinator and has grown into one of our most respected project managers. Her dedication to excellence and team mentorship exemplifies our core values.</p>',
       excerpt: 'From project coordinator to senior PM, Sarah\'s journey showcases what\'s possible at Jewett.',
       'person-name': 'Sarah Martinez',
@@ -492,7 +493,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Team Win: Downtown Plaza Completed Early',
       slug: 'team-win-downtown-plaza',
-      type: 'team-win',
+      type: 'Team Win',
       content: '<p>Congratulations to the Downtown Plaza project team for completing Phase 2 structural work two weeks ahead of schedule! This milestone achievement demonstrates our commitment to excellence and collaboration.</p>',
       excerpt: 'The Downtown Plaza team delivered Phase 2 two weeks early through exceptional teamwork.',
       author: 'Marketing Team',
@@ -501,7 +502,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Core Value: Safety First',
       slug: 'core-value-safety-first',
-      type: 'core-value',
+      type: 'Core Value',
       content: '<p>At Jewett Construction, nothing is more important than everyone going home safe. Our 4EverSafe commitment guides every decision we make, from planning to execution.</p>',
       excerpt: 'Safety isn\'t just a priority—it\'s our foundation.',
       author: 'Safety Team',
@@ -513,7 +514,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       name: 'John Richardson',
       slug: 'john-richardson',
       role: 'Chief Executive Officer',
-      department: 'executive',
+      department: 'Executive',
       'office-location': 'Columbus HQ',
       email: 'jrichardson@jewettconstruction.com',
       phone: '(614) 555-0100',
@@ -525,7 +526,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       name: 'Maria Santos',
       slug: 'maria-santos',
       role: 'VP of Operations',
-      department: 'operations',
+      department: 'Operations',
       'office-location': 'Columbus HQ',
       email: 'msantos@jewettconstruction.com',
       phone: '(614) 555-0101',
@@ -537,7 +538,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       name: 'Robert Chen',
       slug: 'robert-chen',
       role: 'Director of Safety',
-      department: 'safety',
+      department: 'Safety',
       'office-location': 'Columbus HQ',
       email: 'rchen@jewettconstruction.com',
       phone: '(614) 555-0102',
@@ -549,7 +550,7 @@ const SAMPLE_DATA: Record<string, any[]> = {
       name: 'Jennifer Williams',
       slug: 'jennifer-williams',
       role: 'HR Director',
-      department: 'hr',
+      department: 'HR',
       'office-location': 'Columbus HQ',
       email: 'jwilliams@jewettconstruction.com',
       phone: '(614) 555-0103',
@@ -561,55 +562,55 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Employee Handbook 2025',
       slug: 'employee-handbook-2025',
-      category: 'hr-policies',
+      category: 'HR Policies',
       description: 'Complete guide to company policies, procedures, and employee expectations.',
-      'file-type': 'pdf',
+      'file-type': 'PDF',
       'file-size': '2.4 MB',
       version: 'v2025.1',
-      audience: 'all-employees',
+      audience: 'All Employees',
       'is-required': true,
       'is-new': true
     },
     {
       name: 'Safety Procedures Manual',
       slug: 'safety-procedures-manual',
-      category: 'safety',
+      category: 'Safety',
       description: 'Comprehensive safety guidelines and emergency procedures for all job sites.',
-      'file-type': 'pdf',
+      'file-type': 'PDF',
       'file-size': '5.1 MB',
       version: 'v3.2',
-      audience: 'all-employees',
+      audience: 'All Employees',
       'is-required': true
     },
     {
       name: 'Benefits Summary Guide',
       slug: 'benefits-summary-guide',
-      category: 'benefits',
+      category: 'Benefits',
       description: 'Overview of all employee benefits including health, dental, vision, and 401k.',
-      'file-type': 'pdf',
+      'file-type': 'PDF',
       'file-size': '1.8 MB',
       version: 'v2025',
-      audience: 'all-employees',
+      audience: 'All Employees',
       'is-new': true
     },
     {
       name: 'IT Setup Guide for New Employees',
       slug: 'it-setup-guide',
-      category: 'it-support',
+      category: 'IT Support',
       description: 'Step-by-step guide to setting up your computer, email, and required software.',
-      'file-type': 'pdf',
+      'file-type': 'PDF',
       'file-size': '3.2 MB',
-      audience: 'new-hires'
+      audience: 'New Hires'
     }
   ],
   'hr-content': [
     {
       name: 'PTO Policy',
       slug: 'pto-policy',
-      'content-type': 'policy',
+      'content-type': 'Policy',
       description: 'Guidelines for requesting and using paid time off.',
       content: '<p>Full-time employees receive 15 days PTO annually, plus 10 paid holidays. PTO must be requested at least 2 weeks in advance for planned absences.</p>',
-      'applies-to': 'all-employees',
+      'applies-to': 'All Employees',
       'priority-order': 1,
       featured: true,
       'is-active': true
@@ -617,10 +618,10 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Health Insurance Options',
       slug: 'health-insurance-options',
-      'content-type': 'benefit',
+      'content-type': 'Benefit',
       description: 'Overview of available health insurance plans and coverage levels.',
       content: '<p>We offer three tiers of health coverage: Bronze, Silver, and Gold. All plans include preventive care at no cost and competitive copays.</p>',
-      'applies-to': 'full-time',
+      'applies-to': 'Full-time',
       'priority-order': 2,
       featured: true,
       'is-active': true
@@ -628,10 +629,10 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: '401(k) Retirement Plan',
       slug: '401k-retirement-plan',
-      'content-type': 'benefit',
+      'content-type': 'Benefit',
       description: 'Details about our 401(k) plan and company matching.',
       content: '<p>Jewett matches 100% of contributions up to 4% of salary. Vesting is immediate for employee contributions and gradual over 3 years for company match.</p>',
-      'applies-to': 'all-employees',
+      'applies-to': 'All Employees',
       featured: true,
       'is-active': true
     }
@@ -640,11 +641,11 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Fall Protection Protocol',
       slug: 'fall-protection-protocol',
-      'content-type': 'protocol',
-      severity: 'critical',
+      'content-type': 'Protocol',
+      severity: 'Critical',
       description: 'Required fall protection procedures for all elevated work.',
       content: '<p>All work at heights of 6 feet or more requires fall protection. This includes guardrails, safety nets, or personal fall arrest systems.</p>',
-      'required-for': 'field-workers',
+      'required-for': 'Field Workers',
       'priority-order': 1,
       featured: true,
       'is-active': true
@@ -652,11 +653,11 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'PPE Requirements',
       slug: 'ppe-requirements',
-      'content-type': 'protocol',
-      severity: 'warning',
+      'content-type': 'Protocol',
+      severity: 'Warning',
       description: 'Personal protective equipment requirements by job site area.',
       content: '<p>Hard hats, safety glasses, and steel-toed boots are required at all times on active job sites. Additional PPE may be required based on specific tasks.</p>',
-      'required-for': 'all-employees',
+      'required-for': 'All Employees',
       'priority-order': 2,
       featured: true,
       'is-active': true
@@ -664,11 +665,11 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Heat Illness Prevention',
       slug: 'heat-illness-prevention',
-      'content-type': 'best-practice',
-      severity: 'info',
+      'content-type': 'Best Practice',
+      severity: 'Info',
       description: 'Guidelines for preventing heat-related illness during summer months.',
       content: '<p>Stay hydrated, take regular breaks in shaded areas, and know the signs of heat exhaustion. Work schedules may be adjusted during extreme heat.</p>',
-      'required-for': 'field-workers',
+      'required-for': 'Field Workers',
       'is-active': true
     }
   ],
@@ -676,33 +677,33 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'How to Reset Your Password',
       slug: 'how-to-reset-password',
-      'article-type': 'how-to-guide',
+      'article-type': 'How-To Guide',
       summary: 'Step-by-step instructions for resetting your network password.',
       content: '<p>1. Go to password.jewettconstruction.com<br>2. Enter your email address<br>3. Click "Reset Password"<br>4. Check your email for the reset link<br>5. Create a new password following the requirements</p>',
-      platform: 'all',
-      difficulty: 'easy',
+      platform: 'All',
+      difficulty: 'Easy',
       featured: true,
       'is-active': true
     },
     {
       name: 'VPN Setup Guide',
       slug: 'vpn-setup-guide',
-      'article-type': 'how-to-guide',
+      'article-type': 'How-To Guide',
       summary: 'How to connect to the company VPN for remote work.',
       content: '<p>Download the GlobalProtect app from the IT portal and enter vpn.jewettconstruction.com as the portal address. Use your network credentials to log in.</p>',
-      platform: 'all',
-      difficulty: 'intermediate',
+      platform: 'All',
+      difficulty: 'Intermediate',
       featured: true,
       'is-active': true
     },
     {
       name: 'Microsoft Teams Quick Start',
       slug: 'microsoft-teams-quick-start',
-      'article-type': 'software',
+      'article-type': 'Software',
       summary: 'Getting started with Microsoft Teams for communication and collaboration.',
       content: '<p>Teams is our primary tool for chat, video calls, and file sharing. Download from the Microsoft 365 portal and sign in with your work email.</p>',
-      platform: 'all',
-      difficulty: 'easy',
+      platform: 'All',
+      difficulty: 'Easy',
       featured: true,
       'is-active': true
     }
@@ -711,9 +712,9 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Jewett Logo - Primary',
       slug: 'jewett-logo-primary',
-      'asset-type': 'logo',
+      'asset-type': 'Logo',
       description: 'Primary company logo for standard use on white/light backgrounds.',
-      'file-format': 'svg',
+      'file-format': 'SVG',
       'file-size': '24 KB',
       tags: 'logo, primary, color',
       version: 'v2.0',
@@ -723,9 +724,9 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Jewett Logo - White',
       slug: 'jewett-logo-white',
-      'asset-type': 'logo',
+      'asset-type': 'Logo',
       description: 'White version of company logo for use on dark backgrounds.',
-      'file-format': 'svg',
+      'file-format': 'SVG',
       'file-size': '22 KB',
       tags: 'logo, white, reversed',
       version: 'v2.0',
@@ -734,9 +735,9 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Brand Guidelines',
       slug: 'brand-guidelines',
-      'asset-type': 'brand-guide',
+      'asset-type': 'Brand Guide',
       description: 'Complete brand standards including colors, typography, and logo usage.',
-      'file-format': 'pdf',
+      'file-format': 'PDF',
       'file-size': '8.5 MB',
       version: 'v2025',
       featured: true,
@@ -745,9 +746,9 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'PowerPoint Template',
       slug: 'powerpoint-template',
-      'asset-type': 'template',
+      'asset-type': 'Template',
       description: 'Official company presentation template with branded slides.',
-      'file-format': 'pptx',
+      'file-format': 'PPTX',
       'file-size': '4.2 MB',
       version: 'v1.3',
       'is-active': true
@@ -757,25 +758,25 @@ const SAMPLE_DATA: Record<string, any[]> = {
     {
       name: 'Digital Timesheet App',
       slug: 'digital-timesheet-app',
-      category: 'technology',
+      category: 'Technology',
       description: '<p>Develop a mobile app for field workers to submit timesheets instead of paper forms. Would save time and reduce errors.</p>',
       'submitted-by': 'Mike Thompson',
       'submitter-email': 'mthompson@jewettconstruction.com',
       department: 'Operations',
-      status: 'under-review',
-      priority: 'high',
+      status: 'Under Review',
+      priority: 'High',
       votes: 24,
       featured: true
     },
     {
       name: 'Tool Tracking System',
       slug: 'tool-tracking-system',
-      category: 'process-improvement',
+      category: 'Process Improvement',
       description: '<p>Implement QR codes on tools and equipment for easy tracking. Would help reduce lost equipment and improve accountability.</p>',
       'submitted-by': 'Jennifer Adams',
       department: 'Safety',
-      status: 'approved',
-      priority: 'medium',
+      status: 'Approved',
+      priority: 'Medium',
       votes: 18
     }
   ]
