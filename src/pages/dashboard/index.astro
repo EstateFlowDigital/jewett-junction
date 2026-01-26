@@ -168,7 +168,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
 
         <!-- Featured Announcement -->
         {featuredAnnouncement && (
-          <a href="/jewett-junction/resources" class="block bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-3xl mb-10 border border-blue-500/30 glow-blue relative overflow-hidden hover:from-blue-600 hover:to-purple-600 transition-all">
+          <a href={`/jewett-junction/announcements/${featuredAnnouncement.slug || featuredAnnouncement.id}`} class="block bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-3xl mb-10 border border-blue-500/30 glow-blue relative overflow-hidden hover:from-blue-600 hover:to-purple-600 transition-all">
             {featuredAnnouncement.image?.url ? (
               <div class="flex flex-col md:flex-row">
                 <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
@@ -222,7 +222,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                   {events.slice(0, 2).map((event) => {
                     const dayInfo = getDayInfo(event['event-date']);
                     return (
-                      <a href="/jewett-junction/events" class="flex gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-800/50 transition-colors">
+                      <a href={`/jewett-junction/events/${event.slug || event.id}`} class="flex gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-800/50 transition-colors">
                         <div class="w-12 h-12 bg-purple-500 rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0">
                           <span class="text-xs font-medium">{dayInfo.weekday}</span>
                           <span class="text-lg font-bold">{dayInfo.day}</span>
@@ -413,12 +413,12 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                 </div>
                 <h2 class="font-semibold text-white text-sm sm:text-base">News & Updates</h2>
               </div>
-              <a href="/jewett-junction/resources" class="text-sm text-blue-400 hover:text-blue-300">View All</a>
+              <a href="/jewett-junction/announcements" class="text-sm text-blue-400 hover:text-blue-300">View All</a>
             </div>
             <div class="divide-y divide-slate-800/50">
               {otherAnnouncements.length > 0 ? (
                 otherAnnouncements.map((announcement) => (
-                  <a href="/jewett-junction/resources" class="p-4 flex items-center gap-4 hover:bg-slate-800/30 transition-colors block">
+                  <a href={`/jewett-junction/announcements/${announcement.slug || announcement.id}`} class="p-4 flex items-center gap-4 hover:bg-slate-800/30 transition-colors block">
                     <div class={`w-10 h-10 rounded-xl flex items-center justify-center ${
                       announcement.priority === 'high' ? 'bg-rose-500/20' : 'bg-blue-500/20'
                     }`}>
@@ -459,7 +459,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                   const dayInfo = getDayInfo(event['event-date']);
                   const colors = ['bg-blue-500', 'bg-amber-500', 'bg-emerald-500', 'bg-purple-500'];
                   return (
-                    <a href="/jewett-junction/events" class={`flex gap-4 p-3 rounded-xl transition-colors ${index === 0 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-slate-800/30'}`}>
+                    <a href={`/jewett-junction/events/${event.slug || event.id}`} class={`flex gap-4 p-3 rounded-xl transition-colors ${index === 0 ? 'bg-blue-500/10 border border-blue-500/20' : 'hover:bg-slate-800/30'}`}>
                       <div class={`w-14 h-14 ${colors[index % colors.length]} rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0`}>
                         <span class="text-xs font-medium">{dayInfo.weekday}</span>
                         <span class="text-xl font-bold">{dayInfo.day}</span>
@@ -491,7 +491,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             </div>
             <div class="p-6">
               {cultureStories.length > 0 ? (
-                <a href="/jewett-junction/culture" class="block group">
+                <a href={`/jewett-junction/culture/${cultureStories[0].slug || cultureStories[0].id}`} class="block group">
                   <div class="flex items-start gap-5">
                     {cultureStories[0]['featured-image']?.url ? (
                       <div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
@@ -541,7 +541,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             <div class="divide-y divide-slate-800/50">
               {jobs.length > 0 ? (
                 jobs.slice(0, 3).map((job) => (
-                  <a href="/jewett-junction/careers" class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
+                  <a href={`/jewett-junction/careers/${job.slug || job.id}`} class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
                     <div>
                       <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>
                       <div class="text-sm text-slate-500">{job.department || 'General'} • {job.location || 'Remote'}</div>
