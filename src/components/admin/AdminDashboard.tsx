@@ -614,19 +614,31 @@ export function AdminDashboard({}: AdminDashboardProps) {
       }
 
       const data = await response.json();
+      console.log('Sync response:', data);
       setSyncResults(data.results || []);
       setSyncStatus('done');
 
-      const totalCollections = data.summary.created + (data.summary.customCreated || 0) + data.summary.existing;
-      const totalItems = data.summary.itemsCreated || 0;
+      const { created = 0, customCreated = 0, existing = 0, itemsCreated = 0, errors = 0 } = data.summary || {};
+      const totalProcessed = created + customCreated + existing;
 
-      if (totalItems > 0) {
-        setSuccess(`Processed ${totalCollections} collections, created ${totalItems} sample items!`);
-      } else if (totalCollections > 0) {
-        setSuccess(`Synced ${data.summary.created} collections successfully!`);
-      } else {
-        setSuccess('Collections are up to date.');
+      // Build informative success message
+      let message = '';
+      if (created > 0) {
+        message += `Created ${created} new collection${created > 1 ? 's' : ''}. `;
       }
+      if (itemsCreated > 0) {
+        message += `Added ${itemsCreated} sample items. `;
+      }
+      if (existing > 0 && itemsCreated === 0) {
+        message += `${existing} collection${existing > 1 ? 's' : ''} already exist${existing === 1 ? 's' : ''}. `;
+      }
+      if (errors > 0) {
+        message += `${errors} error${errors > 1 ? 's' : ''} occurred.`;
+      }
+      if (!message) {
+        message = 'No collections to process.';
+      }
+      setSuccess(message.trim());
 
       // Clear custom collections that were successfully synced
       const successfulSlugs = data.results
