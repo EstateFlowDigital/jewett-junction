@@ -352,6 +352,435 @@ const COLLECTION_DEFINITIONS = {
   },
 };
 
+// Sample data for each collection - created when syncing
+const SAMPLE_DATA: Record<string, any[]> = {
+  announcements: [
+    {
+      name: 'Q1 2025 All-Hands Meeting',
+      slug: 'q1-2025-all-hands-meeting',
+      content: '<p>Join us for our quarterly all-hands meeting to review our 2024 accomplishments and discuss our exciting plans for 2025. Breakfast will be provided.</p>',
+      author: 'CEO Office',
+      category: 'company-news',
+      priority: 'high',
+      'cta-text': 'Add to Calendar',
+      'is-pinned': true
+    },
+    {
+      name: 'New Safety Training Portal Launched',
+      slug: 'new-safety-training-portal',
+      content: '<p>We\'ve upgraded our safety training system with a new, user-friendly portal. All employees must complete their annual safety certification by February 28th.</p>',
+      author: 'Safety Team',
+      category: 'safety-alert',
+      priority: 'urgent',
+      'cta-text': 'Start Training',
+      'is-pinned': true
+    },
+    {
+      name: 'Benefits Open Enrollment Now Open',
+      slug: 'benefits-open-enrollment',
+      content: '<p>Open enrollment for 2025 benefits runs January 15-31. Review your options and make any changes to your health, dental, and vision coverage.</p>',
+      author: 'HR Team',
+      category: 'hr-update',
+      priority: 'normal',
+      'cta-text': 'Review Benefits'
+    }
+  ],
+  events: [
+    {
+      name: 'Q1 All-Hands Meeting',
+      slug: 'q1-all-hands-meeting',
+      'event-date': new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      location: 'Main Conference Room, Building A',
+      category: 'all-hands-meeting',
+      description: '<p>Quarterly company meeting to review progress and discuss upcoming initiatives. All employees are expected to attend.</p>',
+      'is-mandatory': true,
+      'is-virtual': false
+    },
+    {
+      name: 'OSHA Safety Certification Training',
+      slug: 'osha-safety-training',
+      'event-date': new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      location: 'Training Center',
+      category: 'training',
+      description: '<p>Annual OSHA 30-hour safety certification course. Mandatory for all field personnel.</p>',
+      capacity: 25,
+      'is-mandatory': true
+    },
+    {
+      name: 'Team Building Happy Hour',
+      slug: 'team-building-happy-hour',
+      'event-date': new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+      location: 'The Pub Downtown',
+      category: 'social-event',
+      description: '<p>Join your colleagues for an evening of fun and networking. First round on the company!</p>',
+      'is-mandatory': false
+    },
+    {
+      name: 'Benefits Q&A Webinar',
+      slug: 'benefits-qa-webinar',
+      'event-date': new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+      location: 'Microsoft Teams',
+      category: 'hr-session',
+      description: '<p>Live Q&A session with HR about your 2025 benefits options. Get your questions answered!</p>',
+      'is-virtual': true
+    }
+  ],
+  'job-postings': [
+    {
+      name: 'Senior Project Manager',
+      slug: 'senior-project-manager',
+      department: 'commercial',
+      location: 'Columbus, OH',
+      'employment-type': 'full-time',
+      'experience-level': 'senior',
+      'salary-min': 95000,
+      'salary-max': 125000,
+      description: '<p>Lead large-scale commercial construction projects from inception to completion. Manage client relationships, budgets, and cross-functional teams.</p>',
+      requirements: '<ul><li>10+ years construction experience</li><li>PMP certification preferred</li><li>Strong leadership skills</li></ul>',
+      benefits: '401k match, health/dental/vision, company vehicle, performance bonus',
+      urgency: 'priority',
+      'job-is-active': true,
+      featured: true
+    },
+    {
+      name: 'Safety Coordinator',
+      slug: 'safety-coordinator',
+      department: 'safety',
+      location: 'Cleveland, OH',
+      'employment-type': 'full-time',
+      'experience-level': 'mid-level',
+      'salary-min': 65000,
+      'salary-max': 80000,
+      description: '<p>Ensure compliance with OSHA regulations across multiple job sites. Conduct safety training and incident investigations.</p>',
+      requirements: '<ul><li>OSHA 30-hour certification</li><li>5+ years safety experience</li><li>Excellent communication skills</li></ul>',
+      benefits: '401k match, health/dental/vision, PTO, training budget',
+      urgency: 'normal',
+      'job-is-active': true,
+      featured: true
+    },
+    {
+      name: 'Field Engineer',
+      slug: 'field-engineer',
+      department: 'engineering',
+      location: 'Cincinnati, OH',
+      'employment-type': 'full-time',
+      'experience-level': 'entry-level',
+      'salary-min': 55000,
+      'salary-max': 70000,
+      description: '<p>Support project teams with technical coordination, RFIs, and quality control on active construction sites.</p>',
+      requirements: '<ul><li>BS in Civil Engineering or Construction Management</li><li>0-3 years experience</li><li>AutoCAD proficiency</li></ul>',
+      benefits: '401k match, health/dental/vision, mentorship program',
+      urgency: 'normal',
+      'job-is-active': true,
+      'is-remote': false
+    }
+  ],
+  'culture-stories': [
+    {
+      name: 'Employee Spotlight: Sarah Martinez',
+      slug: 'employee-spotlight-sarah-martinez',
+      type: 'employee-spotlight',
+      content: '<p>Sarah joined Jewett Construction 8 years ago as a project coordinator and has grown into one of our most respected project managers. Her dedication to excellence and team mentorship exemplifies our core values.</p>',
+      excerpt: 'From project coordinator to senior PM, Sarah\'s journey showcases what\'s possible at Jewett.',
+      'person-name': 'Sarah Martinez',
+      'person-role': 'Senior Project Manager',
+      'person-tenure': '8 years',
+      quote: 'What I love most about Jewett is the culture of continuous improvement. Every day is an opportunity to learn and grow.',
+      author: 'HR Team',
+      featured: true
+    },
+    {
+      name: 'Team Win: Downtown Plaza Completed Early',
+      slug: 'team-win-downtown-plaza',
+      type: 'team-win',
+      content: '<p>Congratulations to the Downtown Plaza project team for completing Phase 2 structural work two weeks ahead of schedule! This milestone achievement demonstrates our commitment to excellence and collaboration.</p>',
+      excerpt: 'The Downtown Plaza team delivered Phase 2 two weeks early through exceptional teamwork.',
+      author: 'Marketing Team',
+      featured: true
+    },
+    {
+      name: 'Core Value: Safety First',
+      slug: 'core-value-safety-first',
+      type: 'core-value',
+      content: '<p>At Jewett Construction, nothing is more important than everyone going home safe. Our 4EverSafe commitment guides every decision we make, from planning to execution.</p>',
+      excerpt: 'Safety isn\'t just a priority—it\'s our foundation.',
+      author: 'Safety Team',
+      featured: true
+    }
+  ],
+  employees: [
+    {
+      name: 'John Richardson',
+      slug: 'john-richardson',
+      role: 'Chief Executive Officer',
+      department: 'executive',
+      'office-location': 'Columbus HQ',
+      email: 'jrichardson@jewettconstruction.com',
+      phone: '(614) 555-0100',
+      bio: 'John has led Jewett Construction for over 15 years, growing the company from a regional builder to a nationally recognized construction firm.',
+      'is-featured': true,
+      'is-leadership': true
+    },
+    {
+      name: 'Maria Santos',
+      slug: 'maria-santos',
+      role: 'VP of Operations',
+      department: 'operations',
+      'office-location': 'Columbus HQ',
+      email: 'msantos@jewettconstruction.com',
+      phone: '(614) 555-0101',
+      bio: 'Maria oversees all field operations and ensures projects are delivered on time and within budget.',
+      'is-featured': true,
+      'is-leadership': true
+    },
+    {
+      name: 'Robert Chen',
+      slug: 'robert-chen',
+      role: 'Director of Safety',
+      department: 'safety',
+      'office-location': 'Columbus HQ',
+      email: 'rchen@jewettconstruction.com',
+      phone: '(614) 555-0102',
+      certifications: 'OSHA 500, CSP, CHST',
+      bio: 'Robert leads our 4EverSafe program and has helped maintain our industry-leading safety record.',
+      'is-leadership': true
+    },
+    {
+      name: 'Jennifer Williams',
+      slug: 'jennifer-williams',
+      role: 'HR Director',
+      department: 'hr',
+      'office-location': 'Columbus HQ',
+      email: 'jwilliams@jewettconstruction.com',
+      phone: '(614) 555-0103',
+      bio: 'Jennifer manages all HR functions including recruitment, benefits, and employee development programs.',
+      'is-leadership': true
+    }
+  ],
+  resources: [
+    {
+      name: 'Employee Handbook 2025',
+      slug: 'employee-handbook-2025',
+      category: 'hr-policies',
+      description: 'Complete guide to company policies, procedures, and employee expectations.',
+      'file-type': 'pdf',
+      'file-size': '2.4 MB',
+      version: 'v2025.1',
+      audience: 'all-employees',
+      'is-required': true,
+      'is-new': true
+    },
+    {
+      name: 'Safety Procedures Manual',
+      slug: 'safety-procedures-manual',
+      category: 'safety',
+      description: 'Comprehensive safety guidelines and emergency procedures for all job sites.',
+      'file-type': 'pdf',
+      'file-size': '5.1 MB',
+      version: 'v3.2',
+      audience: 'all-employees',
+      'is-required': true
+    },
+    {
+      name: 'Benefits Summary Guide',
+      slug: 'benefits-summary-guide',
+      category: 'benefits',
+      description: 'Overview of all employee benefits including health, dental, vision, and 401k.',
+      'file-type': 'pdf',
+      'file-size': '1.8 MB',
+      version: 'v2025',
+      audience: 'all-employees',
+      'is-new': true
+    },
+    {
+      name: 'IT Setup Guide for New Employees',
+      slug: 'it-setup-guide',
+      category: 'it-support',
+      description: 'Step-by-step guide to setting up your computer, email, and required software.',
+      'file-type': 'pdf',
+      'file-size': '3.2 MB',
+      audience: 'new-hires'
+    }
+  ],
+  'hr-content': [
+    {
+      name: 'PTO Policy',
+      slug: 'pto-policy',
+      'content-type': 'policy',
+      description: 'Guidelines for requesting and using paid time off.',
+      content: '<p>Full-time employees receive 15 days PTO annually, plus 10 paid holidays. PTO must be requested at least 2 weeks in advance for planned absences.</p>',
+      'applies-to': 'all-employees',
+      'priority-order': 1,
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'Health Insurance Options',
+      slug: 'health-insurance-options',
+      'content-type': 'benefit',
+      description: 'Overview of available health insurance plans and coverage levels.',
+      content: '<p>We offer three tiers of health coverage: Bronze, Silver, and Gold. All plans include preventive care at no cost and competitive copays.</p>',
+      'applies-to': 'full-time',
+      'priority-order': 2,
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: '401(k) Retirement Plan',
+      slug: '401k-retirement-plan',
+      'content-type': 'benefit',
+      description: 'Details about our 401(k) plan and company matching.',
+      content: '<p>Jewett matches 100% of contributions up to 4% of salary. Vesting is immediate for employee contributions and gradual over 3 years for company match.</p>',
+      'applies-to': 'all-employees',
+      featured: true,
+      'is-active': true
+    }
+  ],
+  'safety-content': [
+    {
+      name: 'Fall Protection Protocol',
+      slug: 'fall-protection-protocol',
+      'content-type': 'protocol',
+      severity: 'critical',
+      description: 'Required fall protection procedures for all elevated work.',
+      content: '<p>All work at heights of 6 feet or more requires fall protection. This includes guardrails, safety nets, or personal fall arrest systems.</p>',
+      'required-for': 'field-workers',
+      'priority-order': 1,
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'PPE Requirements',
+      slug: 'ppe-requirements',
+      'content-type': 'protocol',
+      severity: 'warning',
+      description: 'Personal protective equipment requirements by job site area.',
+      content: '<p>Hard hats, safety glasses, and steel-toed boots are required at all times on active job sites. Additional PPE may be required based on specific tasks.</p>',
+      'required-for': 'all-employees',
+      'priority-order': 2,
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'Heat Illness Prevention',
+      slug: 'heat-illness-prevention',
+      'content-type': 'best-practice',
+      severity: 'info',
+      description: 'Guidelines for preventing heat-related illness during summer months.',
+      content: '<p>Stay hydrated, take regular breaks in shaded areas, and know the signs of heat exhaustion. Work schedules may be adjusted during extreme heat.</p>',
+      'required-for': 'field-workers',
+      'is-active': true
+    }
+  ],
+  'it-knowledge-base': [
+    {
+      name: 'How to Reset Your Password',
+      slug: 'how-to-reset-password',
+      'article-type': 'how-to-guide',
+      summary: 'Step-by-step instructions for resetting your network password.',
+      content: '<p>1. Go to password.jewettconstruction.com<br>2. Enter your email address<br>3. Click "Reset Password"<br>4. Check your email for the reset link<br>5. Create a new password following the requirements</p>',
+      platform: 'all',
+      difficulty: 'easy',
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'VPN Setup Guide',
+      slug: 'vpn-setup-guide',
+      'article-type': 'how-to-guide',
+      summary: 'How to connect to the company VPN for remote work.',
+      content: '<p>Download the GlobalProtect app from the IT portal and enter vpn.jewettconstruction.com as the portal address. Use your network credentials to log in.</p>',
+      platform: 'all',
+      difficulty: 'intermediate',
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'Microsoft Teams Quick Start',
+      slug: 'microsoft-teams-quick-start',
+      'article-type': 'software',
+      summary: 'Getting started with Microsoft Teams for communication and collaboration.',
+      content: '<p>Teams is our primary tool for chat, video calls, and file sharing. Download from the Microsoft 365 portal and sign in with your work email.</p>',
+      platform: 'all',
+      difficulty: 'easy',
+      featured: true,
+      'is-active': true
+    }
+  ],
+  'marketing-assets': [
+    {
+      name: 'Jewett Logo - Primary',
+      slug: 'jewett-logo-primary',
+      'asset-type': 'logo',
+      description: 'Primary company logo for standard use on white/light backgrounds.',
+      'file-format': 'svg',
+      'file-size': '24 KB',
+      tags: 'logo, primary, color',
+      version: 'v2.0',
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'Jewett Logo - White',
+      slug: 'jewett-logo-white',
+      'asset-type': 'logo',
+      description: 'White version of company logo for use on dark backgrounds.',
+      'file-format': 'svg',
+      'file-size': '22 KB',
+      tags: 'logo, white, reversed',
+      version: 'v2.0',
+      'is-active': true
+    },
+    {
+      name: 'Brand Guidelines',
+      slug: 'brand-guidelines',
+      'asset-type': 'brand-guide',
+      description: 'Complete brand standards including colors, typography, and logo usage.',
+      'file-format': 'pdf',
+      'file-size': '8.5 MB',
+      version: 'v2025',
+      featured: true,
+      'is-active': true
+    },
+    {
+      name: 'PowerPoint Template',
+      slug: 'powerpoint-template',
+      'asset-type': 'template',
+      description: 'Official company presentation template with branded slides.',
+      'file-format': 'pptx',
+      'file-size': '4.2 MB',
+      version: 'v1.3',
+      'is-active': true
+    }
+  ],
+  'submitted-ideas': [
+    {
+      name: 'Digital Timesheet App',
+      slug: 'digital-timesheet-app',
+      category: 'technology',
+      description: '<p>Develop a mobile app for field workers to submit timesheets instead of paper forms. Would save time and reduce errors.</p>',
+      'submitted-by': 'Mike Thompson',
+      'submitter-email': 'mthompson@jewettconstruction.com',
+      department: 'Operations',
+      status: 'under-review',
+      priority: 'high',
+      votes: 24,
+      featured: true
+    },
+    {
+      name: 'Tool Tracking System',
+      slug: 'tool-tracking-system',
+      category: 'process-improvement',
+      description: '<p>Implement QR codes on tools and equipment for easy tracking. Would help reduce lost equipment and improve accountability.</p>',
+      'submitted-by': 'Jennifer Adams',
+      department: 'Safety',
+      status: 'approved',
+      priority: 'medium',
+      votes: 18
+    }
+  ]
+};
+
 // GET - Fetch existing collections
 export const GET: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
@@ -427,7 +856,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     const body = await request.json();
-    const { collections: collectionsToSync } = body;
+    const { collections: collectionsToSync, addSampleItems = true } = body;
 
     // Get existing collections first
     const existingResponse = await fetch(`${BASE_URL}/sites/${siteId}/collections`, {
@@ -459,12 +888,61 @@ export const POST: APIRoute = async ({ request, locals }) => {
       if (existingSlugs.has(definition.slug)) {
         // Find the existing collection to get its ID
         const existing = existingCollections.find((c: any) => c.slug === definition.slug);
-        results.push({
-          slug: definition.slug,
-          status: 'exists',
-          message: 'Collection already exists',
-          id: existing?.id
-        });
+
+        // If addSampleItems is true, add sample items to existing collection
+        if (addSampleItems && existing?.id) {
+          const sampleItems = SAMPLE_DATA[definition.slug] || [];
+          let itemsCreated = 0;
+          let itemErrors: string[] = [];
+
+          for (const sampleItem of sampleItems) {
+            try {
+              const itemResponse = await fetch(`${BASE_URL}/collections/${existing.id}/items`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${apiToken}`,
+                  'accept': 'application/json',
+                  'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  fieldData: sampleItem,
+                  isArchived: false,
+                  isDraft: false
+                })
+              });
+
+              if (itemResponse.ok) {
+                itemsCreated++;
+              } else {
+                const itemError = await itemResponse.json();
+                itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemError.message || 'Unknown error'}`);
+              }
+
+              await new Promise(resolve => setTimeout(resolve, 150));
+            } catch (itemErr: any) {
+              itemErrors.push(`${sampleItem.name || 'item'}: ${itemErr.message}`);
+            }
+          }
+
+          results.push({
+            slug: definition.slug,
+            status: 'exists',
+            message: sampleItems.length > 0
+              ? `Collection exists, added ${itemsCreated}/${sampleItems.length} sample items`
+              : 'Collection already exists',
+            id: existing.id,
+            itemsCreated,
+            totalSampleItems: sampleItems.length,
+            itemErrors: itemErrors.length > 0 ? itemErrors : undefined
+          });
+        } else {
+          results.push({
+            slug: definition.slug,
+            status: 'exists',
+            message: 'Collection already exists',
+            id: existing?.id
+          });
+        }
         continue;
       }
 
@@ -534,14 +1012,52 @@ export const POST: APIRoute = async ({ request, locals }) => {
           }
         }
 
+        // Now create sample items for this collection
+        let itemsCreated = 0;
+        let itemErrors: string[] = [];
+        const sampleItems = SAMPLE_DATA[definition.slug] || [];
+
+        for (const sampleItem of sampleItems) {
+          try {
+            const itemResponse = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'accept': 'application/json',
+                'content-type': 'application/json'
+              },
+              body: JSON.stringify({
+                fieldData: sampleItem,
+                isArchived: false,
+                isDraft: false
+              })
+            });
+
+            if (itemResponse.ok) {
+              itemsCreated++;
+            } else {
+              const itemError = await itemResponse.json();
+              itemErrors.push(`${sampleItem.name || sampleItem.slug}: ${itemError.message || 'Unknown error'}`);
+            }
+
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 150));
+          } catch (itemErr: any) {
+            itemErrors.push(`${sampleItem.name || 'item'}: ${itemErr.message}`);
+          }
+        }
+
         results.push({
           slug: definition.slug,
           status: 'created',
-          message: `Created with ${fieldsCreated}/${definition.fields.length} fields`,
+          message: `Created with ${fieldsCreated}/${definition.fields.length} fields and ${itemsCreated}/${sampleItems.length} sample items`,
           id: collectionId,
           fieldsCreated,
           totalFields: definition.fields.length,
-          fieldErrors: fieldErrors.length > 0 ? fieldErrors : undefined
+          fieldErrors: fieldErrors.length > 0 ? fieldErrors : undefined,
+          itemsCreated,
+          totalSampleItems: sampleItems.length,
+          itemErrors: itemErrors.length > 0 ? itemErrors : undefined
         });
 
       } catch (createErr: any) {
@@ -556,6 +1072,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
     }
 
+    // Calculate total items created
+    const totalItemsCreated = results.reduce((sum, r) => sum + (r.itemsCreated || 0), 0);
+    const totalSampleItems = results.reduce((sum, r) => sum + (r.totalSampleItems || 0), 0);
+
     return new Response(JSON.stringify({
       success: true,
       results,
@@ -563,7 +1083,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
         total: collectionsToSync.length,
         created: results.filter(r => r.status === 'created').length,
         existing: results.filter(r => r.status === 'exists').length,
-        errors: results.filter(r => r.status === 'error').length
+        errors: results.filter(r => r.status === 'error').length,
+        itemsCreated: totalItemsCreated,
+        totalSampleItems: totalSampleItems
       }
     }), {
       status: 200,

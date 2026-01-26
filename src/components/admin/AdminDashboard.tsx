@@ -880,8 +880,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
               ) : syncStatus === 'syncing' ? (
                 <div className="text-center py-10">
                   <Loader2 className="h-10 w-10 text-violet-400 animate-spin mx-auto mb-4" />
-                  <p className="text-slate-400">Creating collections...</p>
-                  <p className="text-xs text-slate-500 mt-2">This may take a moment</p>
+                  <p className="text-slate-400">Creating collections & sample items...</p>
+                  <p className="text-xs text-slate-500 mt-2">This may take a moment as we populate your CMS</p>
                 </div>
               ) : syncStatus === 'done' && syncResults.length > 0 ? (
                 <div className="space-y-3">
@@ -889,7 +889,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                   {syncResults.map((result: any, idx: number) => (
                     <div
                       key={idx}
-                      className={`p-3 rounded-xl border flex items-center gap-3 ${
+                      className={`p-4 rounded-xl border ${
                         result.status === 'created'
                           ? 'bg-emerald-500/10 border-emerald-500/30'
                           : result.status === 'exists'
@@ -897,21 +897,44 @@ export function AdminDashboard({}: AdminDashboardProps) {
                           : 'bg-rose-500/10 border-rose-500/30'
                       }`}
                     >
-                      {result.status === 'created' ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
-                      ) : result.status === 'exists' ? (
-                        <Check className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-rose-400 flex-shrink-0" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium">{result.slug}</p>
-                        <p className={`text-xs ${
-                          result.status === 'created' ? 'text-emerald-400' :
-                          result.status === 'exists' ? 'text-blue-400' : 'text-rose-400'
-                        }`}>
-                          {result.message}
-                        </p>
+                      <div className="flex items-start gap-3">
+                        {result.status === 'created' ? (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        ) : result.status === 'exists' ? (
+                          <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-rose-400 flex-shrink-0 mt-0.5" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium">{result.slug}</p>
+                          <p className={`text-xs mt-1 ${
+                            result.status === 'created' ? 'text-emerald-400' :
+                            result.status === 'exists' ? 'text-blue-400' : 'text-rose-400'
+                          }`}>
+                            {result.message}
+                          </p>
+                          {/* Show item creation stats */}
+                          {(result.itemsCreated !== undefined && result.itemsCreated > 0) && (
+                            <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                              <Sparkles className="h-3 w-3 text-amber-400" />
+                              <span>{result.itemsCreated} sample items created</span>
+                            </div>
+                          )}
+                          {/* Show any errors */}
+                          {result.itemErrors && result.itemErrors.length > 0 && (
+                            <div className="mt-2 p-2 bg-rose-500/10 rounded-lg">
+                              <p className="text-xs text-rose-400 font-medium mb-1">Some items failed:</p>
+                              <ul className="text-xs text-rose-300 space-y-0.5">
+                                {result.itemErrors.slice(0, 3).map((err: string, i: number) => (
+                                  <li key={i}>• {err}</li>
+                                ))}
+                                {result.itemErrors.length > 3 && (
+                                  <li>...and {result.itemErrors.length - 3} more</li>
+                                )}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -919,6 +942,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                     onClick={() => {
                       setSyncStatus('idle');
                       setSyncResults([]);
+                      fetchCollections(); // Refresh the list
                     }}
                     className="w-full mt-4 px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 text-white rounded-xl text-sm transition-colors"
                   >
@@ -930,10 +954,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
                   {/* Legend */}
                   <div className="flex items-center gap-4 text-xs text-slate-400 mb-4">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Exists
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> Exists (add sample data)
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span> Missing
+                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span> Missing (create + add data)
                     </span>
                   </div>
 
@@ -945,29 +969,37 @@ export function AdminDashboard({}: AdminDashboardProps) {
                     return (
                       <div
                         key={col.slug}
-                        className={`p-4 rounded-xl border transition-all ${
-                          exists
-                            ? 'bg-emerald-500/5 border-emerald-500/20'
-                            : isSelected
-                            ? 'bg-violet-500/10 border-violet-500/50'
+                        className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                          isSelected
+                            ? exists
+                              ? 'bg-emerald-500/10 border-emerald-500/50'
+                              : 'bg-violet-500/10 border-violet-500/50'
+                            : exists
+                            ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40'
                             : 'bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50'
                         }`}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedToSync(selectedToSync.filter(s => s !== col.slug));
+                          } else {
+                            setSelectedToSync([...selectedToSync, col.slug]);
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-3">
-                          {!exists && (
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedToSync([...selectedToSync, col.slug]);
-                                } else {
-                                  setSelectedToSync(selectedToSync.filter(s => s !== col.slug));
-                                }
-                              }}
-                              className="w-5 h-5 rounded-lg border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20"
-                            />
-                          )}
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              if (e.target.checked) {
+                                setSelectedToSync([...selectedToSync, col.slug]);
+                              } else {
+                                setSelectedToSync(selectedToSync.filter(s => s !== col.slug));
+                              }
+                            }}
+                            className="w-5 h-5 rounded-lg border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20"
+                          />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-white">{col.displayName}</span>
@@ -977,12 +1009,12 @@ export function AdminDashboard({}: AdminDashboardProps) {
                                 </span>
                               ) : (
                                 <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded-full">
-                                  Missing
+                                  New
                                 </span>
                               )}
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
-                              {col.fieldCount} fields • slug: {col.slug}
+                              {col.fieldCount} fields • {exists ? 'Select to add sample items' : 'Will create collection + sample items'}
                             </p>
                           </div>
                         </div>
@@ -1019,7 +1051,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                     className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg shadow-violet-500/20"
                   >
                     <Database className="h-4 w-4" />
-                    Create Collections
+                    Sync & Add Sample Data
                   </button>
                 </div>
               </div>
