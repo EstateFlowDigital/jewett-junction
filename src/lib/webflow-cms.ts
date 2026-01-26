@@ -5,6 +5,51 @@
  * The client can edit these items directly in Webflow's visual editor.
  */
 
+/**
+ * Decode HTML entities in a string
+ * Webflow sometimes returns HTML-encoded content (e.g., &lt;p&gt; instead of <p>)
+ */
+export function decodeHtmlEntities(html: string | undefined): string {
+  if (!html) return '';
+
+  // Common HTML entities
+  const entities: Record<string, string> = {
+    '&lt;': '<',
+    '&gt;': '>',
+    '&amp;': '&',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&apos;': "'",
+    '&nbsp;': ' ',
+    '&#x2F;': '/',
+    '&#x27;': "'",
+    '&#x60;': '`',
+  };
+
+  let decoded = html;
+
+  // Replace named entities
+  for (const [entity, char] of Object.entries(entities)) {
+    decoded = decoded.split(entity).join(char);
+  }
+
+  // Replace numeric entities (&#123; or &#x7B;)
+  decoded = decoded.replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)));
+  decoded = decoded.replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
+
+  return decoded;
+}
+
+/**
+ * Strip HTML tags from content (for previews)
+ */
+export function stripHtml(html: string | undefined): string {
+  if (!html) return '';
+  // First decode entities, then strip tags
+  const decoded = decodeHtmlEntities(html);
+  return decoded.replace(/<[^>]*>/g, '').trim();
+}
+
 // Runtime credentials (set via initCMS for Cloudflare Workers)
 let runtimeApiToken: string | undefined;
 let runtimeSiteId: string | undefined;

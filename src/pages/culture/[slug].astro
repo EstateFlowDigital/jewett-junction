@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getCultureStoryBySlug, getCultureStories } from '../../lib/webflow-cms';
+import { initCMS, getCultureStoryBySlug, getCultureStories, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -102,7 +102,7 @@ const formatDate = (dateStr: string) => {
 
         <!-- Full Content -->
         <div class="prose prose-invert max-w-none">
-          <div class="text-slate-300 leading-relaxed whitespace-pre-wrap" set:html={story.content} />
+          <div class="text-slate-300 leading-relaxed whitespace-pre-wrap" set:html={decodeHtmlEntities(story.content)} />
         </div>
       </div>
     </article>

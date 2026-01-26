@@ -83,6 +83,11 @@ function getFileIcon(fileType: string | undefined, url: string | undefined) {
   return FileText;
 }
 
+function stripHtml(html: string | undefined) {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
 // Sample resources when CMS is not connected
 const sampleResources: CMSResource[] = [
   { id: '1', name: 'Safety Manual 2026', description: 'Complete company safety guidelines and procedures', category: 'Safety', 'file-type': 'PDF', 'file-size': '2.4 MB', 'last-updated': '2026-01-10', featured: true, 'view-count': 245 },
@@ -241,7 +246,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                       </h3>
                     </a>
                     {resource.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2 mb-3">{resource.description}</p>
+                      <p className="text-sm text-slate-400 line-clamp-2 mb-3">{stripHtml(resource.description)}</p>
                     )}
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-500">
@@ -403,7 +408,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                     </div>
 
                     {resource.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2 mb-4">{resource.description}</p>
+                      <p className="text-sm text-slate-400 line-clamp-2 mb-4">{stripHtml(resource.description)}</p>
                     )}
 
                     <div className="flex items-center justify-between text-xs text-slate-500 mb-4">
@@ -462,7 +467,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                           {resource.featured && <Star className="h-3 w-3 text-amber-400 flex-shrink-0" />}
                         </div>
                         {resource.description && (
-                          <p className="text-sm text-slate-400 truncate">{resource.description}</p>
+                          <p className="text-sm text-slate-400 truncate">{stripHtml(resource.description)}</p>
                         )}
                       </div>
 

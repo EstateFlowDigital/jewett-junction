@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getJobPostingBySlug, getJobPostings } from '../../lib/webflow-cms';
+import { initCMS, getJobPostingBySlug, getJobPostings, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -109,7 +109,7 @@ const salaryRange = formatSalary(job['salary-min'], job['salary-max']);
       <div class="glass rounded-2xl p-8 border border-slate-800/50">
         <h2 class="text-xl font-semibold text-white mb-4">Job Description</h2>
         <div class="prose prose-invert max-w-none prose-li:marker:text-blue-400">
-          <div class="text-slate-300 leading-relaxed" set:html={job.description} />
+          <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(job.description)} />
         </div>
       </div>
 
@@ -118,7 +118,7 @@ const salaryRange = formatSalary(job['salary-min'], job['salary-max']);
         <div class="glass rounded-2xl p-8 border border-slate-800/50">
           <h2 class="text-xl font-semibold text-white mb-4">Requirements</h2>
           <div class="prose prose-invert max-w-none prose-li:marker:text-blue-400">
-            <div class="text-slate-300 leading-relaxed" set:html={job.requirements} />
+            <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(job.requirements)} />
           </div>
         </div>
       )}
@@ -127,7 +127,9 @@ const salaryRange = formatSalary(job['salary-min'], job['salary-max']);
       {job.benefits && (
         <div class="glass rounded-2xl p-8 border border-slate-800/50">
           <h2 class="text-xl font-semibold text-white mb-4">Benefits</h2>
-          <div class="text-slate-300 leading-relaxed">{job.benefits}</div>
+          <div class="prose prose-invert max-w-none prose-li:marker:text-blue-400">
+            <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(job.benefits)} />
+          </div>
         </div>
       )}
     </div>

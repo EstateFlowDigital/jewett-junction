@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getAnnouncementBySlug, getAnnouncements } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncementBySlug, getAnnouncements, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -104,7 +104,7 @@ const priorityColors: Record<string, string> = {
       </header>
 
       <div class="prose prose-invert max-w-none">
-        <div class="text-slate-300 leading-relaxed text-lg" set:html={announcement.content} />
+        <div class="text-slate-300 leading-relaxed text-lg" set:html={decodeHtmlEntities(announcement.content)} />
       </div>
 
       <!-- CTA Button -->

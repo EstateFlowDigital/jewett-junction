@@ -6,7 +6,6 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Button } from "@/components/ui/button";
 import {
   Menu,
-  X,
   LayoutDashboard,
   Shield,
   Users,
@@ -18,8 +17,8 @@ import {
   BookUser,
   FolderOpen,
   Settings,
-  Palette,
   HardHat,
+  Lightbulb,
 } from "lucide-react";
 
 interface NavItem {
@@ -47,11 +46,8 @@ interface MobileNavProps {
   className?: string;
 }
 
-export function MobileNav({ currentTheme = "modern", currentPath = "", className }: MobileNavProps) {
+export function MobileNav({ currentTheme = "dark", currentPath = "", className }: MobileNavProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-
-  // Build URLs with theme suffix
-  const getThemedHref = (baseHref: string) => `${baseHref}/${currentTheme}`;
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -61,33 +57,33 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
           size="icon"
           className={cn(
             "fixed top-4 left-4 z-50 md:hidden",
-            "bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200",
-            "hover:bg-gray-50 active:bg-gray-100",
+            "bg-slate-800/95 backdrop-blur-sm shadow-lg border border-slate-700",
+            "hover:bg-slate-700 active:bg-slate-600",
             "h-12 w-12 rounded-xl",
             className
           )}
           aria-label="Open navigation menu"
         >
-          <Menu className="h-6 w-6 text-gray-700" />
+          <Menu className="h-6 w-6 text-white" />
         </Button>
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[85vw] max-w-[320px] p-0 border-r-0"
+        className="w-[85vw] max-w-[320px] p-0 border-r-0 bg-slate-900 border-slate-800"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-        <div className="flex h-full flex-col bg-white">
+        <div className="flex h-full flex-col bg-slate-900">
           {/* Header */}
-          <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
+          <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
             <a
-              href="/jewett-junction"
+              href="/jewett-junction/dashboard"
               className="flex items-center gap-3"
               onClick={() => setIsOpen(false)}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                 <HardHat className="h-5 w-5" />
               </div>
-              <span className="font-semibold text-gray-900">Jewett Junction</span>
+              <span className="font-semibold text-white">Jewett Junction</span>
             </a>
           </div>
 
@@ -96,20 +92,19 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
             <ul className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const themedHref = getThemedHref(item.href);
                 const isActive = currentPath.startsWith(item.href);
 
                 return (
                   <li key={item.href}>
                     <a
-                      href={themedHref}
+                      href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={cn(
                         "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
                         "active:scale-[0.98]",
                         isActive
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          ? "bg-blue-500/20 text-blue-400"
+                          : "text-slate-300 hover:bg-slate-800 hover:text-white"
                       )}
                     >
                       <Icon className="h-5 w-5 flex-shrink-0" />
@@ -122,19 +117,19 @@ export function MobileNav({ currentTheme = "modern", currentPath = "", className
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-gray-100 p-3 space-y-1">
+          <div className="border-t border-slate-800 p-3 space-y-1">
             <a
-              href="/jewett-junction"
+              href="/jewett-junction/submit-idea"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
-              <Palette className="h-5 w-5" />
-              <span>Theme Selector</span>
+              <Lightbulb className="h-5 w-5" />
+              <span>Submit an Idea</span>
             </a>
             <a
-              href={`/jewett-junction/settings/${currentTheme}`}
+              href="/jewett-junction/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
             >
               <Settings className="h-5 w-5" />
               <span>Settings</span>

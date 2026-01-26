@@ -32,10 +32,16 @@ const priorityColors: Record<string, string> = {
   normal: 'bg-blue-500/20 text-blue-400',
   low: 'bg-slate-500/20 text-slate-400'
 };
+
+// Strip HTML tags for preview text
+const stripHtml = (html: string | undefined) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+};
 ---
 
 <ThemedPage title="Announcements | Jewett Junction" theme="dark" currentSection="dashboard">
-  <div class="max-w-4xl mx-auto">
+  <div>
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="text-3xl font-bold text-white mb-2">Company Announcements</h1>
@@ -81,7 +87,7 @@ const priorityColors: Record<string, string> = {
                 <h2 class="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors mb-2">
                   {announcement.name}
                 </h2>
-                <p class="text-slate-400 line-clamp-2">{announcement.content}</p>
+                <p class="text-slate-400 line-clamp-2">{stripHtml(announcement.content)}</p>
                 <div class="flex items-center gap-4 mt-4 text-sm text-slate-500">
                   {announcement.author && (
                     <span class="flex items-center gap-1">

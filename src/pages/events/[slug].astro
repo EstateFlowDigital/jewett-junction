@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getEventBySlug, getEvents } from '../../lib/webflow-cms';
+import { initCMS, getEventBySlug, getEvents, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -155,7 +155,7 @@ const formatTime = (dateStr: string) => {
         {event.description && (
           <div class="prose prose-invert max-w-none mb-6">
             <h2 class="text-xl font-semibold text-white mb-3">About This Event</h2>
-            <div class="text-slate-300 leading-relaxed" set:html={event.description} />
+            <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(event.description)} />
           </div>
         )}
 

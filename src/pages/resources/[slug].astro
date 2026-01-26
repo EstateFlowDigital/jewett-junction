@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getResourceBySlug, getResources } from '../../lib/webflow-cms';
+import { initCMS, getResourceBySlug, getResources, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -74,8 +74,8 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
 
       <!-- Description -->
       {resource.description && (
-        <div class="mb-8">
-          <p class="text-slate-300 leading-relaxed text-lg">{resource.description}</p>
+        <div class="mb-8 prose prose-invert max-w-none">
+          <div class="text-slate-300 leading-relaxed text-lg" set:html={decodeHtmlEntities(resource.description)} />
         </div>
       )}
 
