@@ -102,7 +102,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Publish: Webflow error:', errorData);
-      throw new Error(errorData.message || `Webflow API error: ${response.status}`);
+
+      // Provide clearer error messages for common issues
+      if (response.status === 403) {
+        throw new Error('Permission denied. Please ensure your Webflow API token has "Site Publish" permissions. You may need to regenerate your token in Webflow and update it in Cloudflare.');
+      } else if (response.status === 401) {
+        throw new Error('Invalid API token. Please update WEBFLOW_API_TOKEN in your Cloudflare environment settings.');
+      } else {
+        throw new Error(errorData.message || `Webflow API error: ${response.status}`);
+      }
     }
 
     const data = await response.json();

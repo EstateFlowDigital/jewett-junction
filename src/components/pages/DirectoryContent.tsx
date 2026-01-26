@@ -236,7 +236,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+                          className="flex-1 min-h-[44px] border-slate-600 text-slate-300 hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                           asChild
                         >
                           <a href={`tel:${emp.phone}`}>
@@ -249,7 +249,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+                          className="flex-1 min-h-[44px] border-slate-600 text-slate-300 hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800"
                           asChild
                         >
                           <a href={`mailto:${emp.email}`}>
@@ -314,7 +314,9 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
             <div className="flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
+                aria-label="Grid view"
+                aria-pressed={viewMode === 'grid'}
+                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                   viewMode === 'grid' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -322,7 +324,9 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
+                aria-label="List view"
+                aria-pressed={viewMode === 'list'}
+                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                   viewMode === 'list' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >

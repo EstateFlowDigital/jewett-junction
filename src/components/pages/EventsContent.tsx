@@ -20,10 +20,18 @@ import {
   GraduationCap,
   Megaphone,
   Shield,
-  Heart
+  Heart,
+  X,
+  Download
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import {
+  getGoogleCalendarUrl,
+  getOutlookCalendarUrl,
+  downloadICSFile,
+  type CalendarEvent
+} from '../../lib/calendar-utils';
 
 interface CMSEvent {
   id: string;
@@ -152,9 +160,53 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('All Events');
   const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');
+  const [showCalendarDropdown, setShowCalendarDropdown] = React.useState(false);
+  const [calendarDropdownEvent, setCalendarDropdownEvent] = React.useState<CMSEvent | null>(null);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   // Get current month/year for calendar header
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowCalendarDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Convert CMS event to calendar event
+  const toCalendarEvent = (event: CMSEvent): CalendarEvent => ({
+    name: event.name,
+    description: event.description,
+    location: event.location,
+    startDate: new Date(event['event-date']),
+    endDate: event['end-date'] ? new Date(event['end-date']) : undefined,
+  });
+
+  // Calendar action handlers
+  const handleAddToGoogleCalendar = (event: CMSEvent) => {
+    window.open(getGoogleCalendarUrl(toCalendarEvent(event)), '_blank', 'noopener,noreferrer');
+    setShowCalendarDropdown(false);
+  };
+
+  const handleAddToOutlookCalendar = (event: CMSEvent) => {
+    window.open(getOutlookCalendarUrl(toCalendarEvent(event)), '_blank', 'noopener,noreferrer');
+    setShowCalendarDropdown(false);
+  };
+
+  const handleDownloadICS = (event: CMSEvent) => {
+    downloadICSFile(toCalendarEvent(event));
+    setShowCalendarDropdown(false);
+  };
+
+  const openCalendarDropdown = (event: CMSEvent) => {
+    setCalendarDropdownEvent(event);
+    setShowCalendarDropdown(true);
+  };
 
   // Get unique categories
   const categories = ['All Events', ...new Set(allEvents.map(e => {
@@ -247,14 +299,64 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
                 View All Events
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10"
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                Add to Calendar
-              </Button>
+              <div className="relative" ref={dropdownRef}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10"
+                  onClick={() => featuredEvent && openCalendarDropdown(featuredEvent)}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Add to Calendar
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                </Button>
+
+                {/* Calendar Dropdown */}
+                {showCalendarDropdown && calendarDropdownEvent && (
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="p-3 border-b border-slate-700">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-white">Add to Calendar</span>
+                        <button
+                          onClick={() => setShowCalendarDropdown(false)}
+                          className="p-1 hover:bg-slate-700 rounded"
+                        >
+                          <X className="h-4 w-4 text-slate-400" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-1 truncate">{calendarDropdownEvent.name}</p>
+                    </div>
+                    <div className="p-2">
+                      <button
+                        onClick={() => handleAddToGoogleCalendar(calendarDropdownEvent)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 22c5.421 0 10-4.579 10-10S17.421 2 12 2 2 6.579 2 12s4.579 10 10 10zm0-18c4.337 0 8 3.663 8 8s-3.663 8-8 8-8-3.663-8-8 3.663-8 8-8z"/>
+                          <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        </svg>
+                        Google Calendar
+                      </button>
+                      <button
+                        onClick={() => handleAddToOutlookCalendar(calendarDropdownEvent)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.5 2H2.5C1.67 2 1 2.67 1 3.5v17c0 .83.67 1.5 1.5 1.5h19c.83 0 1.5-.67 1.5-1.5v-17c0-.83-.67-1.5-1.5-1.5zM8 19H4V8h4v11zm6 0h-4V8h4v11zm6 0h-4V8h4v11z"/>
+                        </svg>
+                        Outlook Calendar
+                      </button>
+                      <button
+                        onClick={() => handleDownloadICS(calendarDropdownEvent)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
+                      >
+                        <Download className="h-5 w-5" />
+                        Download .ics File
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -364,10 +466,12 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
                 ))}
               </select>
             </div>
-            <div className="flex items-center gap-2 bg-slate-900/50 rounded-xl p-1 border border-slate-600">
+            <div className="flex items-center gap-2 bg-slate-900/50 rounded-xl p-1 border border-slate-600" role="tablist" aria-label="View mode">
               <button
                 onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                role="tab"
+                aria-selected={viewMode === 'list'}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                   viewMode === 'list' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -375,7 +479,9 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
               </button>
               <button
                 onClick={() => setViewMode('calendar')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                role="tab"
+                aria-selected={viewMode === 'calendar'}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
                   viewMode === 'calendar' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -666,6 +772,21 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
             <Button
               size="lg"
               className="bg-white text-indigo-700 hover:bg-indigo-50 flex-shrink-0"
+              onClick={() => {
+                // Generate and download a combined ICS file with all upcoming events
+                const allEventsICS = sortedEvents.slice(0, 10).map(e => ({
+                  name: e.name,
+                  description: e.description,
+                  location: e.location,
+                  startDate: new Date(e['event-date']),
+                  endDate: e['end-date'] ? new Date(e['end-date']) : undefined,
+                }));
+                if (allEventsICS.length > 0) {
+                  downloadICSFile(allEventsICS[0]);
+                  // Show a notification or alert
+                  alert(`Calendar file downloaded with upcoming events. Import this file into your calendar app to stay updated.`);
+                }
+              }}
             >
               <Calendar className="h-4 w-4 mr-2" />
               Subscribe to Calendar
