@@ -4,6 +4,26 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Helper to add CORS headers to any response
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 // Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
 function getEnvVar(locals: any, key: string): string {
   const runtime = (locals as any)?.runtime;
@@ -28,6 +48,14 @@ function verifyToken(request: Request): boolean {
 
   return now - timestamp <= maxAge;
 }
+
+// OPTIONS - Handle CORS preflight
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+};
 
 // Collection definitions with field specifications
 const COLLECTION_DEFINITIONS = {
@@ -785,20 +813,20 @@ const SAMPLE_DATA: Record<string, any[]> = {
 // GET - Fetch existing collections
 export const GET: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   if (!siteId || !apiToken) {
-    return new Response(JSON.stringify({ error: 'API credentials not configured' }), {
+    return withCors(new Response(JSON.stringify({ error: 'API credentials not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   try {
@@ -816,7 +844,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const data = await response.json();
 
     // Return existing collections and what's defined
-    return new Response(JSON.stringify({
+    return withCors(new Response(JSON.stringify({
       existing: data.collections || [],
       defined: Object.keys(COLLECTION_DEFINITIONS).map(key => ({
         slug: key,
@@ -826,13 +854,13 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error fetching collections:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
@@ -853,20 +881,20 @@ async function consumeResponse(response: Response): Promise<any> {
 // POST - Create/sync collections
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   if (!siteId || !apiToken) {
-    return new Response(JSON.stringify({ error: 'API credentials not configured' }), {
+    return withCors(new Response(JSON.stringify({ error: 'API credentials not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   try {
@@ -1187,7 +1215,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const totalItemsCreated = results.reduce((sum, r) => sum + (r.itemsCreated || 0), 0);
     const totalSampleItems = results.reduce((sum, r) => sum + (r.totalSampleItems || 0), 0);
 
-    return new Response(JSON.stringify({
+    return withCors(new Response(JSON.stringify({
       success: true,
       results,
       summary: {
@@ -1202,13 +1230,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
 
   } catch (error: any) {
     console.error('Error syncing collections:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };

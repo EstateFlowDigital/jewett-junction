@@ -5,6 +5,26 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Helper to add CORS headers to any response
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 // Get API token from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
 function getApiToken(locals: any): string {
   const runtime = locals?.runtime;
@@ -30,21 +50,29 @@ function verifyToken(request: Request): boolean {
   return now - timestamp <= maxAge;
 }
 
+// OPTIONS - Handle CORS preflight
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+};
+
 // GET - List items from a collection
 export const GET: APIRoute = async ({ request, url, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const collection = url.searchParams.get('collection');
   if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-    return new Response(JSON.stringify({ error: 'Invalid collection' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
@@ -63,26 +91,26 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify(data), {
+    return withCors(new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error fetching items:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
 // POST - Create new item
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getApiToken(locals);
@@ -91,10 +119,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const { collection, fields, isLive = false } = await request.json();
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-      return new Response(JSON.stringify({ error: 'Invalid collection' }), {
+      return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
@@ -118,26 +146,26 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify({ success: true, item: data }), {
+    return withCors(new Response(JSON.stringify({ success: true, item: data }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error creating item:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
 // PATCH - Update item
 export const PATCH: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getApiToken(locals);
@@ -146,17 +174,17 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     const { collection, itemId, fields, isLive = false } = await request.json();
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-      return new Response(JSON.stringify({ error: 'Invalid collection' }), {
+      return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     if (!itemId) {
-      return new Response(JSON.stringify({ error: 'Item ID required' }), {
+      return withCors(new Response(JSON.stringify({ error: 'Item ID required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
@@ -179,26 +207,26 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify({ success: true, item: data }), {
+    return withCors(new Response(JSON.stringify({ success: true, item: data }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error updating item:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
 // DELETE - Delete item
 export const DELETE: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getApiToken(locals);
@@ -207,17 +235,17 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
     const { collection, itemId } = await request.json();
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-      return new Response(JSON.stringify({ error: 'Invalid collection' }), {
+      return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     if (!itemId) {
-      return new Response(JSON.stringify({ error: 'Item ID required' }), {
+      return withCors(new Response(JSON.stringify({ error: 'Item ID required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
@@ -235,15 +263,15 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
       throw new Error(errorData.message || `Webflow API error: ${response.status}`);
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return withCors(new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   } catch (error: any) {
     console.error('Error deleting item:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };

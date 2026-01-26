@@ -4,6 +4,26 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Helper to add CORS headers to any response
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    headers.set(key, value);
+  });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 // Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
 function getEnvVar(locals: any, key: string): string {
   const runtime = (locals as any)?.runtime;
@@ -29,23 +49,31 @@ function verifyToken(request: Request): boolean {
   return now - timestamp <= maxAge;
 }
 
+// OPTIONS - Handle CORS preflight
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+};
+
 // POST - Upload asset to Webflow
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   if (!siteId || !apiToken) {
-    return new Response(JSON.stringify({ error: 'API credentials not configured' }), {
+    return withCors(new Response(JSON.stringify({ error: 'API credentials not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 
   try {
@@ -55,32 +83,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const folder = formData.get('folder') as string || 'admin-uploads';
 
     if (!file) {
-      return new Response(JSON.stringify({ error: 'No file provided' }), {
+      return withCors(new Response(JSON.stringify({ error: 'No file provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
-      return new Response(JSON.stringify({
+      return withCors(new Response(JSON.stringify({
         error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     // Validate file size (max 4MB for images)
     const maxSize = 4 * 1024 * 1024; // 4MB
     if (file.size > maxSize) {
-      return new Response(JSON.stringify({
+      return withCors(new Response(JSON.stringify({
         error: 'File too large. Maximum size is 4MB'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     // Generate unique filename
@@ -113,7 +141,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Check if asset already exists (Webflow returns existing URL if hash matches)
     if (uploadData.url) {
-      return new Response(JSON.stringify({
+      return withCors(new Response(JSON.stringify({
         success: true,
         url: uploadData.url,
         id: uploadData.id,
@@ -121,7 +149,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     // Step 2: Upload file to the provided S3 URL
@@ -142,7 +170,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       // Return the final CDN URL
-      return new Response(JSON.stringify({
+      return withCors(new Response(JSON.stringify({
         success: true,
         url: uploadData.url || uploadData.hostedUrl,
         id: uploadData.id,
@@ -150,17 +178,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
-      });
+      }));
     }
 
     throw new Error('No upload URL received from Webflow');
 
   } catch (error: any) {
     console.error('Error uploading asset:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    }));
   }
 };
 
