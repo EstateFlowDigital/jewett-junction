@@ -59,7 +59,10 @@ export const OPTIONS: APIRoute = async () => {
 
 // POST - Publish site
 export const POST: APIRoute = async ({ request, locals }) => {
+  console.log('=== PUBLISH REQUEST ===');
+
   if (!verifyToken(request)) {
+    console.log('Publish: Unauthorized - invalid token');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -69,6 +72,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
+  console.log('Publish: siteId =', siteId ? 'present' : 'MISSING');
+  console.log('Publish: apiToken =', apiToken ? 'present' : 'MISSING');
+
   if (!siteId) {
     return withCors(new Response(JSON.stringify({ error: 'Site ID not configured' }), {
       status: 500,
@@ -77,6 +83,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   try {
+    console.log(`Publish: Calling Webflow API for site ${siteId}...`);
     // Publish the site
     const response = await fetch(`${BASE_URL}/sites/${siteId}/publish`, {
       method: 'POST',
@@ -90,12 +97,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
       })
     });
 
+    console.log('Publish: Webflow response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Publish: Webflow error:', errorData);
       throw new Error(errorData.message || `Webflow API error: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Publish: Success!', data);
     return withCors(new Response(JSON.stringify({
       success: true,
       message: 'Site published successfully',

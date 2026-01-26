@@ -864,6 +864,64 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 };
 
+// Helper to fetch collection fields from Webflow
+async function getCollectionFields(collectionId: string, apiToken: string): Promise<Map<string, any>> {
+  try {
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}`, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.log(`Failed to fetch collection schema: ${response.status}`);
+      return new Map();
+    }
+
+    const data = await response.json();
+    const fieldMap = new Map<string, any>();
+
+    // Map field slugs to their details
+    if (data.fields) {
+      for (const field of data.fields) {
+        fieldMap.set(field.slug, {
+          type: field.type,
+          validations: field.validations
+        });
+      }
+    }
+
+    console.log(`Collection ${collectionId} has fields:`, Array.from(fieldMap.keys()));
+    return fieldMap;
+  } catch (err) {
+    console.error('Error fetching collection fields:', err);
+    return new Map();
+  }
+}
+
+// Helper to filter sample data to only include existing fields
+function filterFieldData(fieldData: Record<string, any>, existingFields: Map<string, any>): Record<string, any> {
+  const filtered: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(fieldData)) {
+    // 'name' is always valid (built-in field)
+    if (key === 'name') {
+      filtered[key] = value;
+      continue;
+    }
+
+    // Only include if the field exists in the collection
+    if (existingFields.has(key)) {
+      filtered[key] = value;
+    } else {
+      console.log(`  Skipping field '${key}' - not in collection schema`);
+    }
+  }
+
+  return filtered;
+}
+
 // Helper to safely consume a response body
 async function consumeResponse(response: Response): Promise<any> {
   try {
@@ -901,6 +959,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const body = await request.json();
     const { collections: collectionsToSync = [], customCollections = [], addSampleItems = true } = body;
 
+    console.log('=== SYNC REQUEST ===');
+    console.log('Collections to sync:', collectionsToSync);
+    console.log('addSampleItems:', addSampleItems);
+
     // Get existing collections first
     const existingResponse = await fetch(`${BASE_URL}/sites/${siteId}/collections`, {
       headers: {
@@ -917,24 +979,49 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const existingCollections = existingData.collections || [];
     const existingSlugs = new Set(existingCollections.map((c: any) => c.slug));
 
+    console.log('Existing collections from Webflow:', existingCollections.map((c: any) => ({ slug: c.slug, id: c.id, displayName: c.displayName })));
+    console.log('Existing slugs:', Array.from(existingSlugs));
+
     const results: any[] = [];
 
     // Process each collection to sync
     for (const collectionKey of collectionsToSync) {
+      console.log(`\n--- Processing collection: ${collectionKey} ---`);
       const definition = COLLECTION_DEFINITIONS[collectionKey as keyof typeof COLLECTION_DEFINITIONS];
       if (!definition) {
+        console.log(`Unknown collection key: ${collectionKey}`);
         results.push({ slug: collectionKey, status: 'error', message: 'Unknown collection' });
         continue;
       }
+      console.log(`Definition found: slug=${definition.slug}, displayName=${definition.displayName}`);
 
       // Check if collection already exists
-      if (existingSlugs.has(definition.slug)) {
+      const collectionExistsInWebflow = existingSlugs.has(definition.slug);
+      console.log(`Collection exists in Webflow: ${collectionExistsInWebflow}`);
+
+      if (collectionExistsInWebflow) {
         // Find the existing collection to get its ID
         const existing = existingCollections.find((c: any) => c.slug === definition.slug);
+        console.log(`Found existing collection: id=${existing?.id}`);
 
         // If addSampleItems is true, add sample items to existing collection
+        console.log(`Checking addSampleItems (${addSampleItems}) && existing?.id (${existing?.id})`);
         if (addSampleItems && existing?.id) {
           const sampleItems = SAMPLE_DATA[definition.slug] || [];
+          console.log(`SAMPLE_DATA key used: '${definition.slug}', found ${sampleItems.length} sample items`);
+          console.log(`Available SAMPLE_DATA keys:`, Object.keys(SAMPLE_DATA));
+          if (sampleItems.length === 0) {
+            console.log(`WARNING: No sample data found for '${definition.slug}'`);
+          }
+
+          // Fetch the collection's actual field schema
+          console.log(`Fetching field schema for collection ${existing.id}...`);
+          const existingFields = await getCollectionFields(existing.id, apiToken);
+
+          if (existingFields.size === 0) {
+            console.log(`WARNING: Could not fetch fields for collection. Will try with all fields.`);
+          }
+
           console.log(`Adding ${sampleItems.length} sample items to existing collection ${definition.slug} (${existing.id})`);
           let itemsCreated = 0;
           let itemErrors: string[] = [];
@@ -942,7 +1029,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
           for (const sampleItem of sampleItems) {
             try {
               // Remove 'slug' field - Webflow auto-generates it from 'name'
-              const { slug: _slug, ...fieldData } = sampleItem;
+              const { slug: _slug, ...rawFieldData } = sampleItem;
+
+              // Filter to only include fields that exist in the collection
+              const fieldData = existingFields.size > 0
+                ? filterFieldData(rawFieldData, existingFields)
+                : rawFieldData;
+
               console.log(`Creating item: ${sampleItem.name}`, JSON.stringify(fieldData).slice(0, 200));
 
               const itemResponse = await fetch(`${BASE_URL}/collections/${existing.id}/items`, {
@@ -989,10 +1082,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             itemErrors: itemErrors.length > 0 ? itemErrors : undefined
           });
         } else {
+          console.log(`SKIPPING sample items: addSampleItems=${addSampleItems}, existing?.id=${existing?.id}`);
           results.push({
             slug: definition.slug,
             status: 'exists',
-            message: 'Collection already exists',
+            message: 'Collection already exists (sample items skipped)',
             id: existing?.id
           });
         }

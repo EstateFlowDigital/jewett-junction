@@ -535,15 +535,22 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setError('');
 
     try {
+      console.log('Publishing site...');
       const response = await fetch(`${API_BASE}/api/admin/publish`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
 
-      if (!response.ok) throw new Error('Failed to publish site');
+      const data = await response.json().catch(() => ({}));
+      console.log('Publish response:', response.status, data);
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `Failed to publish site (${response.status})`);
+      }
 
       setSuccess('Site published successfully!');
     } catch (err: any) {
+      console.error('Publish error:', err);
       setError(err.message);
     } finally {
       setIsPublishing(false);
@@ -595,17 +602,23 @@ export function AdminDashboard({}: AdminDashboardProps) {
         c => selectedToSync.includes(c.slug)
       );
 
+      const requestBody = {
+        collections: predefinedSlugs,
+        customCollections: customToSync,
+        addSampleItems: true
+      };
+      console.log('=== FRONTEND SYNC REQUEST ===');
+      console.log('Selected collections:', selectedToSync);
+      console.log('Predefined slugs being sent:', predefinedSlugs);
+      console.log('Request body:', requestBody);
+
       const response = await fetch(`${API_BASE}/api/admin/collections`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          collections: predefinedSlugs,
-          customCollections: customToSync,
-          addSampleItems: true
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
