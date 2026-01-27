@@ -105,6 +105,37 @@ export const GET: APIRoute = async ({ locals }) => {
     results.registeredScriptsError = error.message;
   }
 
+  // Test 5: Actually test the publish endpoint
+  try {
+    const publishResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/publish`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        publishToWebflowSubdomain: true
+      })
+    });
+
+    results.publishStatus = publishResponse.status;
+
+    if (!publishResponse.ok) {
+      const errorText = await publishResponse.text();
+      try {
+        results.publishError = JSON.parse(errorText);
+      } catch {
+        results.publishErrorRaw = errorText;
+      }
+    } else {
+      results.publishSuccess = true;
+      results.publishResponse = await publishResponse.json();
+    }
+  } catch (error: any) {
+    results.publishError = error.message;
+  }
+
   return new Response(JSON.stringify(results, null, 2), {
     status: 200,
     headers: {
