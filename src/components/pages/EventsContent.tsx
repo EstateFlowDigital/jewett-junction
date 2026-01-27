@@ -79,6 +79,16 @@ function getCategoryConfig(category: string | undefined) {
 
 function formatEventDate(dateStr: string) {
   const date = new Date(dateStr);
+  // Handle invalid dates
+  if (isNaN(date.getTime())) {
+    return {
+      month: '',
+      day: '',
+      time: '',
+      weekday: '',
+      full: '',
+    };
+  }
   return {
     month: date.toLocaleDateString('en-US', { month: 'short' }),
     day: date.getDate().toString(),

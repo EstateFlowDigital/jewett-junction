@@ -30,9 +30,12 @@ if (!event) {
   return Astro.redirect('/jewett-junction/events');
 }
 
-// Format date
+// Format date safely
 const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  // Handle invalid dates
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -42,7 +45,10 @@ const formatDate = (dateStr: string) => {
 };
 
 const formatTime = (dateStr: string) => {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  // Handle invalid dates
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',

@@ -47,19 +47,25 @@ const featuredHR = hrContent[0];
 const featuredSafety = safetyContent.find(s => s.priority === 'Urgent') || safetyContent[0];
 const featuredIT = itArticles[0];
 
-// Format date helper
+// Format date helper - safely handles invalid dates
 function formatDate(dateStr: string) {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
 function formatTime(dateStr: string) {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
 function getRelativeTime(dateStr: string) {
+  if (!dateStr) return '';
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -72,7 +78,9 @@ function getRelativeTime(dateStr: string) {
 }
 
 function getDayInfo(dateStr: string) {
+  if (!dateStr) return { weekday: '', day: '' };
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return { weekday: '', day: '' };
   return {
     weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
     day: date.getDate(),

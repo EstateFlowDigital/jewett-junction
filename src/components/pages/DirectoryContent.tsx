@@ -78,6 +78,8 @@ function getInitials(name: string) {
 function formatTenure(startDate: string | undefined) {
   if (!startDate) return null;
   const start = new Date(startDate);
+  // Handle invalid dates
+  if (isNaN(start.getTime())) return null;
   const now = new Date();
   const years = Math.floor((now.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
   if (years < 1) return 'New hire';

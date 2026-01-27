@@ -141,6 +141,8 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
   function formatDate(dateStr: string | undefined) {
     if (!dateStr) return '';
     const date = new Date(dateStr);
+    // Handle invalid dates
+    if (isNaN(date.getTime())) return '';
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
@@ -174,14 +176,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                 Browse Resources
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/30 text-white hover:bg-white/10"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Request Document
-              </Button>
+              <a href="/jewett-junction/submit-idea">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Request Document
+                </Button>
+              </a>
             </div>
           </div>
 
@@ -539,13 +543,15 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                 </p>
               </div>
             </div>
-            <Button
-              size="lg"
-              className="bg-white text-amber-700 hover:bg-amber-50 flex-shrink-0"
-            >
-              <FolderPlus className="h-4 w-4 mr-2" />
-              Request Document
-            </Button>
+            <a href="/jewett-junction/submit-idea">
+              <Button
+                size="lg"
+                className="bg-white text-amber-700 hover:bg-amber-50 flex-shrink-0"
+              >
+                <FolderPlus className="h-4 w-4 mr-2" />
+                Request Document
+              </Button>
+            </a>
           </div>
         </CardContent>
       </Card>

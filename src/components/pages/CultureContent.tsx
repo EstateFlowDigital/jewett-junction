@@ -228,14 +228,16 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
               Meet Our Team
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
-            >
-              <Award className="h-4 w-4 mr-2" />
-              Nominate a Teammate
-            </Button>
+            <a href="/jewett-junction/submit-idea">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                <Award className="h-4 w-4 mr-2" />
+                Nominate a Teammate
+              </Button>
+            </a>
           </div>
         </div>
 
@@ -520,10 +522,12 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
               </div>
             </div>
             <div className="text-center md:text-right">
-              <Button size="lg" className="bg-white text-cyan-700 hover:bg-cyan-50">
-                <Gift className="h-4 w-4 mr-2" />
-                Get Involved
-              </Button>
+              <a href="/jewett-junction/submit-idea">
+                <Button size="lg" className="bg-white text-cyan-700 hover:bg-cyan-50">
+                  <Gift className="h-4 w-4 mr-2" />
+                  Get Involved
+                </Button>
+              </a>
             </div>
           </div>
         </CardContent>
@@ -547,13 +551,15 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
                 </p>
               </div>
             </div>
-            <Button
-              size="lg"
-              className="bg-white text-pink-700 hover:bg-pink-50 flex-shrink-0"
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Submit Nomination
-            </Button>
+            <a href="/jewett-junction/submit-idea">
+              <Button
+                size="lg"
+                className="bg-white text-pink-700 hover:bg-pink-50 flex-shrink-0"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Submit Nomination
+              </Button>
+            </a>
           </div>
         </CardContent>
       </Card>

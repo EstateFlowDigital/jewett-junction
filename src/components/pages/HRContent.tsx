@@ -16,6 +16,7 @@ interface HRItem {
   'document-link'?: string;
   'effective-date'?: string;
   featured?: boolean;
+  icon?: { url: string };
 }
 
 export function HRContent({ theme = 'modern' }: HRContentProps) {
@@ -75,9 +76,13 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
           <CardContent className="py-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                  <AlertCircle className="h-7 w-7" />
-                </div>
+                {featuredItem.icon?.url ? (
+                  <img src={featuredItem.icon.url} alt={featuredItem.name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
+                ) : (
+                  <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                    <AlertCircle className="h-7 w-7" />
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-bold">{featuredItem.name}</h2>
                   <p className="text-purple-100">{stripHtml(featuredItem.description || featuredItem.content)?.substring(0, 150)}</p>
@@ -106,9 +111,11 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
                   <p className="text-purple-100">Don't miss your chance to update your benefits selections for 2026.</p>
                 </div>
               </div>
-              <Button className="bg-white text-purple-700 hover:bg-purple-50">
-                Review Benefits
-              </Button>
+              <a href="https://bcbs.com" target="_blank" rel="noopener">
+                <Button className="bg-white text-purple-700 hover:bg-purple-50">
+                  Review Benefits
+                </Button>
+              </a>
             </div>
           </CardContent>
         </Card>
@@ -138,24 +145,28 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
             </CardContent>
           </Card>
         </a>
-        <Card className={`hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-purple-800 hover:border-purple-600' : 'border-purple-200 bg-purple-50/50 hover:border-purple-400'}`}>
-          <CardContent className="py-4 text-center">
-            <div className={`w-12 h-12 ${isDark ? 'bg-purple-900' : 'bg-purple-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-              <Heart className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-900'}`}>Benefits</div>
-            <div className={`text-sm ${isDark ? 'text-purple-500' : 'text-purple-700'}`}>Health & wellness</div>
-          </CardContent>
-        </Card>
-        <Card className={`hover:shadow-lg transition-all cursor-pointer ${isDark ? 'bg-slate-800 border-orange-800 hover:border-orange-600' : 'border-orange-200 bg-orange-50/50 hover:border-orange-400'}`}>
-          <CardContent className="py-4 text-center">
-            <div className={`w-12 h-12 ${isDark ? 'bg-orange-900' : 'bg-orange-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-              <Phone className="h-6 w-6 text-orange-600" />
-            </div>
-            <div className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-900'}`}>Get Help</div>
-            <div className={`text-sm ${isDark ? 'text-orange-500' : 'text-orange-700'}`}>EAP & support</div>
-          </CardContent>
-        </Card>
+        <a href="https://bcbs.com" target="_blank" rel="noopener">
+          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-purple-800 hover:border-purple-600' : 'border-purple-200 bg-purple-50/50 hover:border-purple-400'}`}>
+            <CardContent className="py-4 text-center">
+              <div className={`w-12 h-12 ${isDark ? 'bg-purple-900' : 'bg-purple-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
+                <Heart className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-900'}`}>Benefits</div>
+              <div className={`text-sm ${isDark ? 'text-purple-500' : 'text-purple-700'}`}>Health & wellness</div>
+            </CardContent>
+          </Card>
+        </a>
+        <a href="tel:1-800-327-4968">
+          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-orange-800 hover:border-orange-600' : 'border-orange-200 bg-orange-50/50 hover:border-orange-400'}`}>
+            <CardContent className="py-4 text-center">
+              <div className={`w-12 h-12 ${isDark ? 'bg-orange-900' : 'bg-orange-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
+                <Phone className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-900'}`}>Get Help</div>
+              <div className={`text-sm ${isDark ? 'text-orange-500' : 'text-orange-700'}`}>EAP & support</div>
+            </CardContent>
+          </Card>
+        </a>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

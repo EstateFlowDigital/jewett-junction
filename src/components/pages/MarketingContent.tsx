@@ -80,9 +80,11 @@ export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
               <h2 className="text-xl font-bold">Jewett Construction Brand Guidelines</h2>
               <p className="text-rose-100">Ensure brand consistency across all materials</p>
             </div>
-            <Button className="bg-white text-rose-700 hover:bg-rose-50">
-              Download Brand Guide
-            </Button>
+            <a href="/jewett-junction/resources" target="_blank" rel="noopener">
+              <Button className="bg-white text-rose-700 hover:bg-rose-50">
+                Download Brand Guide
+              </Button>
+            </a>
           </div>
         </CardContent>
       </Card>
@@ -159,7 +161,9 @@ export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
                 </div>
                 <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Lisa Wang</h3>
                 <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Marketing Director</p>
-                <Button className="w-full" variant="outline">Contact Marketing</Button>
+                <a href="mailto:marketing@jewettconstruction.com" className="w-full">
+                  <Button className="w-full" variant="outline">Contact Marketing</Button>
+                </a>
               </div>
             </CardContent>
           </Card>
@@ -169,7 +173,9 @@ export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
               <PenTool className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-rose-400' : 'text-rose-600'}`} />
               <h3 className={`font-semibold mb-2 ${isDark ? 'text-rose-300' : 'text-rose-900'}`}>Custom Request?</h3>
               <p className={`text-sm mb-4 ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>Need something custom designed?</p>
-              <Button className="w-full bg-rose-600 hover:bg-rose-700">Submit Request</Button>
+              <a href="/jewett-junction/submit-idea" className="w-full">
+                <Button className="w-full bg-rose-600 hover:bg-rose-700">Submit Request</Button>
+              </a>
             </CardContent>
           </Card>
         </div>
