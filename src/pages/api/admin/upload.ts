@@ -70,7 +70,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   if (!siteId || !apiToken) {
-    return withCors(new Response(JSON.stringify({ error: 'API credentials not configured' }), {
+    const runtime = (locals as any)?.runtime;
+    return withCors(new Response(JSON.stringify({
+      error: 'API credentials not configured',
+      details: {
+        siteIdPresent: !!siteId,
+        apiTokenPresent: !!apiToken,
+        runtimeExists: !!runtime,
+        runtimeEnvKeys: runtime?.env ? Object.keys(runtime.env) : [],
+        hint: 'For local dev, create a .dev.vars file with WEBFLOW_API_TOKEN. For production, set it in Webflow Cloud environment settings.'
+      }
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     }));

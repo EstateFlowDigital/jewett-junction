@@ -92,6 +92,49 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     console.log(`Publish: Calling Webflow API for site ${siteId}...`);
+
+    // First, check if API token is actually present
+    if (!apiToken) {
+      return withCors(new Response(JSON.stringify({
+        error: 'WEBFLOW_API_TOKEN not configured',
+        details: 'The API token is missing. For local dev, create a .dev.vars file. For production, set it in Webflow Cloud environment settings.',
+        runtimeEnvKeys: runtime?.env ? Object.keys(runtime.env) : []
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }));
+    }
+
+    // Get custom domains first to include in publish request
+    let customDomainIds: string[] = [];
+    try {
+      const domainsResponse = await fetch(`${BASE_URL}/sites/${siteId}/custom_domains`, {
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'accept': 'application/json'
+        }
+      });
+      if (domainsResponse.ok) {
+        const domainsData = await domainsResponse.json();
+        customDomainIds = domainsData.customDomains?.map((d: any) => d.id) || [];
+        console.log('Publish: Found custom domains:', customDomainIds);
+      }
+    } catch (e) {
+      console.log('Publish: Could not fetch custom domains, publishing to subdomain only');
+    }
+
+    // Build publish request body
+    const publishBody: any = {
+      publishToWebflowSubdomain: true
+    };
+
+    // Include custom domains if available
+    if (customDomainIds.length > 0) {
+      publishBody.customDomains = customDomainIds;
+    }
+
+    console.log('Publish: Request body:', JSON.stringify(publishBody));
+
     // Publish the site
     const response = await fetch(`${BASE_URL}/sites/${siteId}/publish`, {
       method: 'POST',
@@ -100,25 +143,33 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'accept': 'application/json',
         'content-type': 'application/json'
       },
-      body: JSON.stringify({
-        publishToWebflowSubdomain: true
-      })
+      body: JSON.stringify(publishBody)
     });
 
     console.log('Publish: Webflow response status:', response.status);
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { rawResponse: errorText };
+      }
       console.error('Publish: Webflow error:', errorData);
 
-      // Provide clearer error messages for common issues
-      if (response.status === 403) {
-        throw new Error('Permission denied. Please ensure your Webflow API token has "Site Publish" permissions. You may need to regenerate your token in Webflow and update it in Cloudflare.');
-      } else if (response.status === 401) {
-        throw new Error('Invalid API token. Please update WEBFLOW_API_TOKEN in your Cloudflare environment settings.');
-      } else {
-        throw new Error(errorData.message || `Webflow API error: ${response.status}`);
-      }
+      // Return detailed error for debugging
+      return withCors(new Response(JSON.stringify({
+        error: `Webflow API returned ${response.status}`,
+        status: response.status,
+        webflowError: errorData,
+        tokenPresent: !!apiToken,
+        tokenLength: apiToken?.length,
+        siteId: siteId
+      }), {
+        status: response.status === 401 || response.status === 403 ? response.status : 500,
+        headers: { 'Content-Type': 'application/json' }
+      }));
     }
 
     const data = await response.json();
@@ -133,7 +184,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }));
   } catch (error: any) {
     console.error('Error publishing site:', error);
-    return withCors(new Response(JSON.stringify({ error: error.message }), {
+    return withCors(new Response(JSON.stringify({
+      error: error.message,
+      stack: error.stack
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     }));
