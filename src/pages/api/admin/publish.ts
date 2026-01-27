@@ -61,6 +61,14 @@ export const OPTIONS: APIRoute = async () => {
 export const POST: APIRoute = async ({ request, locals }) => {
   console.log('=== PUBLISH REQUEST ===');
 
+  // Debug: Log what's available in locals
+  const runtime = (locals as any)?.runtime;
+  console.log('Publish: runtime exists =', !!runtime);
+  console.log('Publish: runtime.env exists =', !!runtime?.env);
+  if (runtime?.env) {
+    console.log('Publish: Available env keys =', Object.keys(runtime.env));
+  }
+
   if (!verifyToken(request)) {
     console.log('Publish: Unauthorized - invalid token');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -73,7 +81,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
   console.log('Publish: siteId =', siteId ? 'present' : 'MISSING');
-  console.log('Publish: apiToken =', apiToken ? 'present' : 'MISSING');
+  console.log('Publish: apiToken =', apiToken ? `present (length: ${apiToken.length})` : 'MISSING');
 
   if (!siteId) {
     return withCors(new Response(JSON.stringify({ error: 'Site ID not configured' }), {
