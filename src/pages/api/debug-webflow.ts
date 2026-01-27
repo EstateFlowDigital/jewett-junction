@@ -14,8 +14,11 @@ export const GET: APIRoute = async ({ locals }) => {
     timestamp: new Date().toISOString(),
     tokenPresent: !!apiToken,
     tokenLength: apiToken?.length || 0,
-    tokenPrefix: apiToken?.substring(0, 8) + '...',
+    tokenPrefix: apiToken ? apiToken.substring(0, 8) + '...' : 'none',
     siteId: siteId,
+    runtimeExists: !!runtime,
+    runtimeEnvExists: !!runtime?.env,
+    availableEnvKeys: runtime?.env ? Object.keys(runtime.env) : [],
   };
 
   // Test 1: Get site info (requires sites:read)
@@ -36,12 +39,14 @@ export const GET: APIRoute = async ({ locals }) => {
       const siteData = await siteResponse.json();
       results.siteName = siteData.displayName;
       results.siteShortName = siteData.shortName;
+      results.siteLastPublished = siteData.lastPublished;
+      results.siteCustomDomains = siteData.customDomains;
     }
   } catch (error: any) {
     results.siteInfoError = error.message;
   }
 
-  // Test 2: Try to get authorized user info
+  // Test 2: Try to get token scopes
   try {
     const userResponse = await fetch('https://api.webflow.com/v2/token/introspect', {
       method: 'POST',
@@ -56,11 +61,48 @@ export const GET: APIRoute = async ({ locals }) => {
     if (userResponse.ok) {
       const userData = await userResponse.json();
       results.tokenScopes = userData.authorization?.scopes || 'unknown';
+      results.tokenAuthorizedUser = userData.authorization?.authorizedTo;
     } else {
       results.tokenIntrospectError = await userResponse.json();
     }
   } catch (error: any) {
     results.tokenIntrospectError = error.message;
+  }
+
+  // Test 3: Test actual publish capability (dry-run style - just check endpoint access)
+  try {
+    // First, get site's domains info which is needed for publishing
+    const domainsResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/custom_domains`, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json'
+      }
+    });
+
+    results.domainsStatus = domainsResponse.status;
+
+    if (domainsResponse.ok) {
+      const domainsData = await domainsResponse.json();
+      results.customDomains = domainsData.customDomains?.map((d: any) => d.url) || [];
+    } else {
+      results.domainsError = await domainsResponse.json();
+    }
+  } catch (error: any) {
+    results.domainsError = error.message;
+  }
+
+  // Test 4: Check authorized apps
+  try {
+    const appsResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/registered_scripts`, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json'
+      }
+    });
+
+    results.registeredScriptsStatus = appsResponse.status;
+  } catch (error: any) {
+    results.registeredScriptsError = error.message;
   }
 
   return new Response(JSON.stringify(results, null, 2), {
