@@ -64,7 +64,7 @@ const priorityColors: Record<string, string> = {
       <!-- Hero Image -->
       {announcement.image?.url && (
         <div class="h-64 w-full overflow-hidden relative">
-          <img src={announcement.image.url} alt={`Image for ${announcement.name}`} class="w-full h-full object-cover" />
+          <img src={announcement.image.url} alt={`Image for ${announcement.name}`} class="w-full h-full object-cover" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
         </div>
       )}

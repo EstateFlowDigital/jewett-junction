@@ -1,250 +1,379 @@
 ---
-import DashboardLayout from '../../layouts/dashboard.astro';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Settings, Bell, Lock, User, Palette, Globe, Monitor, Mail, Shield, Eye, ChevronRight, Check } from 'lucide-react';
+import ThemedPage from '../../layouts/themed-page.astro';
 ---
 
-<DashboardLayout title="Settings | Jewett Junction">
-  <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3">
-        <Settings className="h-7 w-7 text-gray-600" />
-        Settings
-      </h1>
-      <p class="text-muted-foreground mt-1">
-        Manage your account preferences and portal settings
-      </p>
+<ThemedPage title="Settings | Jewett Junction" theme="dark" currentSection="settings">
+  <div>
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex items-center gap-3">
+          <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Settings
+        </h1>
+        <p class="text-slate-400">Manage your account preferences and portal settings</p>
+      </div>
+      <a href="/jewett-junction/dashboard" class="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Dashboard
+      </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Main Settings -->
       <div class="lg:col-span-2 space-y-6">
         <!-- Profile Settings -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+        <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50">
+            <h2 class="font-semibold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
               Profile Settings
-            </CardTitle>
-            <CardDescription>Manage your personal information</CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Manage your personal information</p>
+          </div>
+          <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
               <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span class="text-xl font-bold text-blue-600">JC</span>
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                  <span class="text-xl font-bold text-white">JC</span>
                 </div>
                 <div>
-                  <div class="font-medium">Jewett Construction Admin</div>
-                  <div class="text-sm text-muted-foreground">admin@jewettconstruction.com</div>
+                  <div class="font-medium text-white">Jewett Construction</div>
+                  <div class="text-sm text-slate-400">admin@jewettconstruction.com</div>
                 </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="text-sm font-medium text-muted-foreground">Display Name</label>
-                <input type="text" value="Jewett Construction" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+                <label class="text-sm font-medium text-slate-300">Display Name</label>
+                <input type="text" value="Jewett Construction" class="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
               </div>
               <div>
-                <label class="text-sm font-medium text-muted-foreground">Department</label>
-                <input type="text" value="Administration" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+                <label class="text-sm font-medium text-slate-300">Department</label>
+                <input type="text" value="Administration" class="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <!-- Notification Settings -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
+        <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50">
+            <h2 class="font-semibold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
               Notification Preferences
-            </CardTitle>
-            <CardDescription>Choose what updates you want to receive</CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            {[
-              { title: 'Company Announcements', desc: 'Important updates from leadership', enabled: true },
-              { title: 'Safety Alerts', desc: 'Critical safety notifications', enabled: true },
-              { title: 'HR Updates', desc: 'Benefits, policies, and HR news', enabled: true },
-              { title: 'Event Reminders', desc: 'Upcoming meetings and events', enabled: false },
-              { title: 'New Job Postings', desc: 'Open positions and referral opportunities', enabled: false },
-            ].map((item) => (
-              <div class="flex items-center justify-between p-3 rounded-lg border">
-                <div>
-                  <div class="font-medium text-sm">{item.title}</div>
-                  <div class="text-xs text-muted-foreground">{item.desc}</div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" checked={item.enabled} class="sr-only peer" />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Choose what updates you want to receive</p>
+          </div>
+          <div class="p-5 space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div>
+                <div class="font-medium text-sm text-white">Company Announcements</div>
+                <div class="text-xs text-slate-400">Important updates from leadership</div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <!-- Appearance Settings -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
-              Appearance
-            </CardTitle>
-            <CardDescription>Customize how the portal looks</CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div>
-              <label class="text-sm font-medium">Dashboard Theme</label>
-              <p class="text-xs text-muted-foreground mb-3">Select your preferred dashboard style</p>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  { id: 'modern', name: 'Modern', colors: ['#3b82f6', '#0ea5e9'] },
-                  { id: 'classic', name: 'Classic', colors: ['#1e40af', '#1d4ed8'] },
-                  { id: 'minimal', name: 'Minimal', colors: ['#374151', '#6b7280'] },
-                  { id: 'warm', name: 'Warm', colors: ['#d97706', '#ea580c'] },
-                  { id: 'dark', name: 'Dark', colors: ['#6366f1', '#8b5cf6'] },
-                  { id: 'patriotic', name: 'Patriotic', colors: ['#dc2626', '#1d4ed8'] },
-                ].map((theme) => (
-                  <a
-                    href={theme.id === 'modern' ? '/jewett-junction/dashboard' : `/jewett-junction/dashboard/${theme.id}`}
-                    class="p-3 rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors group"
-                  >
-                    <div class="flex items-center gap-2 mb-2">
-                      <div class="flex gap-1">
-                        <div class="w-4 h-4 rounded-full" style={`background-color: ${theme.colors[0]}`}></div>
-                        <div class="w-4 h-4 rounded-full" style={`background-color: ${theme.colors[1]}`}></div>
-                      </div>
-                    </div>
-                    <div class="text-sm font-medium group-hover:text-blue-600">{theme.name}</div>
-                  </a>
-                ))}
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer" />
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div>
+                <div class="font-medium text-sm text-white">Safety Alerts</div>
+                <div class="text-xs text-slate-400">Critical safety notifications</div>
               </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer" />
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
-            <div class="pt-4 border-t">
-              <a href="/jewett-junction/preview" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
-                <Eye className="h-4 w-4" />
-                Preview all themes in full screen
-              </a>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div>
+                <div class="font-medium text-sm text-white">HR Updates</div>
+                <div class="text-xs text-slate-400">Benefits, policies, and HR news</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer" />
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
-          </CardContent>
-        </Card>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div>
+                <div class="font-medium text-sm text-white">Event Reminders</div>
+                <div class="text-xs text-slate-400">Upcoming meetings and events</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" />
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div>
+                <div class="font-medium text-sm text-white">New Job Postings</div>
+                <div class="text-xs text-slate-400">Open positions and referral opportunities</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" />
+                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
 
         <!-- Security Settings -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
+        <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50">
+            <h2 class="font-semibold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
               Security
-            </CardTitle>
-            <CardDescription>Manage your security preferences</CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Manage your security preferences</p>
+          </div>
+          <div class="p-5 space-y-3">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-colors cursor-pointer">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-green-600" />
+                <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
                 </div>
                 <div>
-                  <div class="font-medium">Two-Factor Authentication</div>
-                  <div class="text-sm text-muted-foreground">Add an extra layer of security</div>
+                  <div class="font-medium text-white">Two-Factor Authentication</div>
+                  <div class="text-sm text-slate-400">Add an extra layer of security</div>
                 </div>
               </div>
-              <Badge className="bg-green-100 text-green-700">Enabled</Badge>
+              <span class="px-2 py-1 text-xs font-medium bg-emerald-500/20 text-emerald-400 rounded-full">Enabled</span>
             </div>
-            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-colors cursor-pointer">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Lock className="h-5 w-5 text-blue-600" />
+                <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
                 </div>
                 <div>
-                  <div class="font-medium">Change Password</div>
-                  <div class="text-sm text-muted-foreground">Last changed 30 days ago</div>
+                  <div class="font-medium text-white">Change Password</div>
+                  <div class="text-sm text-slate-400">Last changed 30 days ago</div>
                 </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
-            <div class="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-colors cursor-pointer">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Monitor className="h-5 w-5 text-purple-600" />
+                <div class="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
                 <div>
-                  <div class="font-medium">Active Sessions</div>
-                  <div class="text-sm text-muted-foreground">Manage devices where you're logged in</div>
+                  <div class="font-medium text-white">Active Sessions</div>
+                  <div class="text-sm text-slate-400">Manage devices where you're logged in</div>
                 </div>
               </div>
-              <Badge variant="secondary">2 devices</Badge>
+              <span class="px-2 py-1 text-xs font-medium bg-slate-700 text-slate-300 rounded-full">2 devices</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <!-- Sidebar -->
       <div class="space-y-6">
         <!-- Quick Links -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Quick Links</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-2">
-            <a href="/jewett-junction/it-helpdesk" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-              <Monitor className="h-5 w-5 text-blue-600" />
-              <span class="text-sm font-medium">IT Helpdesk</span>
+        <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50">
+            <h2 class="font-semibold text-white text-sm">Quick Links</h2>
+          </div>
+          <div class="p-3 space-y-1">
+            <a href="/jewett-junction/it-helpdesk" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors">
+              <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-slate-300">IT Helpdesk</span>
             </a>
-            <a href="/jewett-junction/hr" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-              <User className="h-5 w-5 text-green-600" />
-              <span class="text-sm font-medium">HR Resources</span>
+            <a href="/jewett-junction/hr" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors">
+              <div class="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-slate-300">HR Resources</span>
             </a>
-            <a href="/jewett-junction/directory" class="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-              <Globe className="h-5 w-5 text-purple-600" />
-              <span class="text-sm font-medium">Employee Directory</span>
+            <a href="/jewett-junction/directory" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors">
+              <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-slate-300">Employee Directory</span>
             </a>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <!-- Help Card -->
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-6">
-            <div class="text-center">
-              <div class="w-12 h-12 bg-blue-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                <Mail className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 class="font-semibold text-blue-900 mb-1">Need Help?</h3>
-              <p class="text-sm text-blue-700 mb-4">Contact IT for account or technical issues</p>
-              <a href="/jewett-junction/it-helpdesk">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                  Contact IT Support
-                </Button>
-              </a>
+        <div class="bg-gradient-to-br from-blue-600/30 to-purple-600/30 rounded-2xl border border-blue-500/30 p-6">
+          <div class="text-center">
+            <div class="w-12 h-12 bg-blue-500/20 rounded-full mx-auto mb-3 flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
             </div>
-          </CardContent>
-        </Card>
+            <h3 class="font-semibold text-white mb-1">Need Help?</h3>
+            <p class="text-sm text-blue-200 mb-4">Contact IT for account or technical issues</p>
+            <a href="/jewett-junction/it-helpdesk" class="block w-full px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors">
+              Contact IT Support
+            </a>
+          </div>
+        </div>
 
         <!-- Portal Info -->
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Portal Information</CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-3 text-sm">
+        <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50">
+            <h2 class="font-semibold text-white text-sm">Portal Information</h2>
+          </div>
+          <div class="p-5 space-y-3 text-sm">
             <div class="flex justify-between">
-              <span class="text-muted-foreground">Version</span>
-              <span class="font-medium">2.1.0</span>
+              <span class="text-slate-400">Version</span>
+              <span class="font-medium text-white">2.1.0</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-muted-foreground">Last Updated</span>
-              <span class="font-medium">Jan 14, 2026</span>
+              <span class="text-slate-400">Last Updated</span>
+              <span class="font-medium text-white">Jan 26, 2026</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-muted-foreground">Environment</span>
-              <Badge variant="secondary">Production</Badge>
+              <span class="text-slate-400">Environment</span>
+              <span class="px-2 py-0.5 text-xs font-medium bg-emerald-500/20 text-emerald-400 rounded">Production</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</DashboardLayout>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 px-4 py-3 bg-emerald-600 text-white rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toast-message">Settings saved</span>
+  </div>
+
+  <script>
+    // Settings keys for localStorage
+    const SETTINGS_KEY = 'jewett_junction_settings';
+
+    // Default settings
+    const defaultSettings = {
+      notifications: {
+        announcements: true,
+        safetyAlerts: true,
+        hrUpdates: true,
+        eventReminders: false,
+        jobPostings: false
+      },
+      profile: {
+        displayName: 'Jewett Construction',
+        department: 'Administration'
+      }
+    };
+
+    // Load settings from localStorage
+    function loadSettings() {
+      try {
+        const stored = localStorage.getItem(SETTINGS_KEY);
+        return stored ? { ...defaultSettings, ...JSON.parse(stored) } : defaultSettings;
+      } catch {
+        return defaultSettings;
+      }
+    }
+
+    // Save settings to localStorage
+    function saveSettings(settings: typeof defaultSettings) {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        showToast('Settings saved');
+      } catch (error) {
+        showToast('Failed to save settings', true);
+      }
+    }
+
+    // Show toast notification
+    function showToast(message: string, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      if (!toast || !toastMessage) return;
+
+      toastMessage.textContent = message;
+      toast.className = toast.className.replace('bg-emerald-600', isError ? 'bg-red-600' : 'bg-emerald-600');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const settings = loadSettings();
+
+      // Get all toggle checkboxes
+      const toggles = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+      const notificationKeys = ['announcements', 'safetyAlerts', 'hrUpdates', 'eventReminders', 'jobPostings'];
+
+      // Set initial toggle states
+      toggles.forEach((toggle, index) => {
+        if (index < notificationKeys.length) {
+          const key = notificationKeys[index] as keyof typeof settings.notifications;
+          toggle.checked = settings.notifications[key];
+        }
+      });
+
+      // Add change listeners to toggles
+      toggles.forEach((toggle, index) => {
+        toggle.addEventListener('change', () => {
+          if (index < notificationKeys.length) {
+            const key = notificationKeys[index] as keyof typeof settings.notifications;
+            settings.notifications[key] = toggle.checked;
+            saveSettings(settings);
+          }
+        });
+      });
+
+      // Profile inputs
+      const displayNameInput = document.querySelector<HTMLInputElement>('input[value="Jewett Construction"]');
+      const departmentInput = document.querySelector<HTMLInputElement>('input[value="Administration"]');
+
+      if (displayNameInput) {
+        displayNameInput.value = settings.profile.displayName;
+        displayNameInput.addEventListener('change', () => {
+          settings.profile.displayName = displayNameInput.value;
+          saveSettings(settings);
+        });
+      }
+
+      if (departmentInput) {
+        departmentInput.value = settings.profile.department;
+        departmentInput.addEventListener('change', () => {
+          settings.profile.department = departmentInput.value;
+          saveSettings(settings);
+        });
+      }
+    });
+  </script>
+</ThemedPage>

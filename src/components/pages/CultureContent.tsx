@@ -323,6 +323,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
                       src={currentSpotlight.image?.url || currentSpotlight['featured-image']?.url}
                       alt={currentSpotlight.image?.alt || currentSpotlight.name}
                       className="w-32 h-32 rounded-full object-cover border-4 border-white/30 shadow-xl mb-4"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center text-4xl font-bold text-white border-4 border-white/30 shadow-xl mb-4">

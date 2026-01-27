@@ -57,7 +57,7 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
       <div class="flex items-start gap-6 mb-6">
         <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center flex-shrink-0">
           {resource.icon ? (
-            <img src={resource.icon} alt="" class="w-8 h-8" />
+            <img src={resource.icon} alt="" class="w-8 h-8" loading="lazy" />
           ) : (
             <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(resource.category)} />

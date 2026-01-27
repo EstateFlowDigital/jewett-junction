@@ -10,7 +10,7 @@ initCMS(Astro.locals);
 // Fetch announcements from CMS
 let announcements: any[] = [];
 try {
-  const result = await getAnnouncements();
+  const result = await getAnnouncements({ limit: 20 });
   announcements = result.items;
 } catch (error) {
   console.error('Error fetching announcements:', error);
@@ -26,11 +26,18 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-// Priority badge colors
-const priorityColors: Record<string, string> = {
-  high: 'bg-red-500/20 text-red-400',
-  normal: 'bg-blue-500/20 text-blue-400',
-  low: 'bg-slate-500/20 text-slate-400'
+const getRelativeTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffHours < 1) return 'Just now';
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return formatDate(dateStr);
 };
 
 // Strip HTML tags for preview text
@@ -38,16 +45,21 @@ const stripHtml = (html: string | undefined) => {
   if (!html) return '';
   return html.replace(/<[^>]*>/g, '').trim();
 };
+
+// Get featured announcement (first pinned or first item)
+const featuredAnnouncement = announcements.find(a => a['is-pinned']) || announcements[0];
+const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnouncement?.id);
 ---
 
-<ThemedPage title="Announcements | Jewett Junction" theme="dark" currentSection="dashboard">
+<ThemedPage title="Announcements | Jewett Junction" theme="dark" currentSection="announcements">
   <div>
-    <div class="flex items-center justify-between mb-8">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-white mb-2">Company Announcements</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Company Announcements</h1>
         <p class="text-slate-400">Stay updated with the latest news and updates</p>
       </div>
-      <a href="/jewett-junction/dashboard" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 transition-colors">
+      <a href="/jewett-junction/dashboard" class="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
@@ -63,54 +75,139 @@ const stripHtml = (html: string | undefined) => {
         <p class="text-slate-400">No announcements available</p>
       </div>
     ) : (
-      <div class="space-y-4">
-        {announcements.map((announcement) => (
-          <a
-            href={`/jewett-junction/announcements/${announcement.slug}`}
-            class="block glass rounded-2xl p-6 border border-slate-800/50 hover:border-blue-500/30 transition-all group"
-          >
-            <div class="flex items-start justify-between gap-4">
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                  {announcement['is-pinned'] && (
-                    <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full">
-                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
-                      </svg>
-                      Pinned
-                    </span>
-                  )}
-                  <span class={`inline-block px-2 py-1 text-xs font-medium rounded-full ${priorityColors[announcement.priority] || priorityColors.normal}`}>
-                    {announcement.priority || 'normal'}
-                  </span>
+      <div class="space-y-6">
+        <!-- Featured Announcement -->
+        {featuredAnnouncement && (
+          <a href={`/jewett-junction/announcements/${featuredAnnouncement.slug}`} class="block bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-3xl border border-blue-500/30 relative overflow-hidden hover:from-blue-600 hover:to-purple-600 transition-all group">
+            {featuredAnnouncement.image?.url ? (
+              <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
+                  <img src={featuredAnnouncement.image.url} alt={featuredAnnouncement.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 </div>
-                <h2 class="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors mb-2">
-                  {announcement.name}
-                </h2>
-                <p class="text-slate-400 line-clamp-2">{stripHtml(announcement.content)}</p>
-                <div class="flex items-center gap-4 mt-4 text-sm text-slate-500">
-                  {announcement.author && (
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      {announcement.author}
-                    </span>
-                  )}
-                  <span class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {formatDate(announcement['published-date'])}
-                  </span>
+                <div class="p-6 md:w-2/3 relative">
+                  <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                  <div class="relative">
+                    <div class="flex items-center gap-2 mb-3">
+                      {featuredAnnouncement['is-pinned'] && (
+                        <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-amber-500/30 text-amber-200 rounded-full">
+                          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+                          </svg>
+                          Pinned
+                        </span>
+                      )}
+                      <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
+                    <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl line-clamp-2">{stripHtml(featuredAnnouncement.content)}</p>
+                    <div class="flex items-center gap-4">
+                      <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                      <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
+            ) : (
+              <div class="p-6 relative">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                <div class="relative">
+                  <div class="flex items-center gap-2 mb-3">
+                    {featuredAnnouncement['is-pinned'] && (
+                      <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-amber-500/30 text-amber-200 rounded-full">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+                        </svg>
+                        Pinned
+                      </span>
+                    )}
+                    <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
+                  <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl line-clamp-2">{stripHtml(featuredAnnouncement.content)}</p>
+                  <div class="flex items-center gap-4">
+                    <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                    <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </a>
-        ))}
+        )}
+
+        <!-- Other Announcements -->
+        {otherAnnouncements.length > 0 && (
+          <div class="glass rounded-2xl border border-slate-800/50 overflow-hidden">
+            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                </div>
+                <h2 class="font-semibold text-white text-sm sm:text-base">All Announcements</h2>
+              </div>
+              <span class="text-sm text-slate-400">{otherAnnouncements.length} items</span>
+            </div>
+            <div class="divide-y divide-slate-800/50">
+              {otherAnnouncements.map((announcement) => (
+                <a
+                  href={`/jewett-junction/announcements/${announcement.slug}`}
+                  class="p-4 flex items-start gap-4 hover:bg-slate-800/30 transition-colors block group"
+                >
+                  {announcement.image?.url ? (
+                    <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                      <img src={announcement.image.url} alt={announcement.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" />
+                    </div>
+                  ) : (
+                    <div class={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      announcement.priority === 'high' ? 'bg-rose-500/20' : announcement['is-pinned'] ? 'bg-amber-500/20' : 'bg-blue-500/20'
+                    }`}>
+                      {announcement['is-pinned'] ? (
+                        <svg class="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+                        </svg>
+                      ) : (
+                        <svg class={`w-6 h-6 ${announcement.priority === 'high' ? 'text-rose-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      {announcement['is-pinned'] && (
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded">
+                          Pinned
+                        </span>
+                      )}
+                      <span class={`inline-block px-1.5 py-0.5 text-xs font-medium rounded ${
+                        announcement.priority === 'high' ? 'bg-rose-500/20 text-rose-400' : 'bg-blue-500/20 text-blue-400'
+                      }`}>
+                        {announcement.priority === 'high' ? 'Important' : 'Update'}
+                      </span>
+                    </div>
+                    <h3 class="font-medium text-white group-hover:text-blue-400 transition-colors mb-1">{announcement.name}</h3>
+                    <p class="text-sm text-slate-400 line-clamp-2">{stripHtml(announcement.content)}</p>
+                    <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                      {announcement.author && (
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          {announcement.author}
+                        </span>
+                      )}
+                      <span>{getRelativeTime(announcement['published-date'])}</span>
+                    </div>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-600 group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )}
   </div>

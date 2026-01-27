@@ -213,6 +213,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                           src={emp.photo.url}
                           alt={emp.photo.alt || emp.name}
                           className="w-14 h-14 rounded-full object-cover border-2 border-slate-600"
+                          loading="lazy"
                         />
                       ) : (
                         <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold text-lg`}>
@@ -479,6 +480,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                         src={emp.photo.url}
                         alt={emp.photo.alt || emp.name}
                         className="w-12 h-12 rounded-xl object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold`}>
