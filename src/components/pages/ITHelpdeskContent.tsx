@@ -4,32 +4,42 @@ import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-interface ITHelpdeskContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
-}
-
 interface ITArticle {
   id: string;
   name: string;
+  slug?: string;
   category?: string;
+  'article-type'?: string;
   description?: string;
+  summary?: string;
   content?: string;
   'article-link'?: string;
+  'video-link'?: string;
+  'download-link'?: string;
+  platform?: string;
+  difficulty?: string;
   featured?: boolean;
   icon?: { url: string };
 }
 
-export function ITHelpdeskContent({ theme = 'modern' }: ITHelpdeskContentProps) {
+interface ITHelpdeskContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  initialItems?: ITArticle[];
+}
+
+export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
 
-  // CMS state
-  const [articles, setArticles] = React.useState<ITArticle[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  // CMS state - use initialItems if provided (server-side fetched)
+  const [articles, setArticles] = React.useState<ITArticle[]>(initialItems);
+  const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Fetch IT content from CMS
+  // Only fetch client-side if no initial items provided
   React.useEffect(() => {
+    if (initialItems.length > 0) return;
+
     async function fetchITContent() {
       try {
         const response = await fetch('/api/cms/it?limit=20');
@@ -44,11 +54,16 @@ export function ITHelpdeskContent({ theme = 'modern' }: ITHelpdeskContentProps) 
       }
     }
     fetchITContent();
-  }, []);
+  }, [initialItems.length]);
 
-  // Filter articles by category
-  const howToArticles = articles.filter(a => a.category === 'How-To' || a.category === 'Troubleshooting');
-  const softwareArticles = articles.filter(a => a.category === 'Software');
+  // Filter articles by category/article-type
+  const howToArticles = articles.filter(a =>
+    a['article-type'] === 'How-To' || a['article-type'] === 'Troubleshooting' ||
+    a.category === 'How-To' || a.category === 'Troubleshooting'
+  );
+  const softwareArticles = articles.filter(a =>
+    a['article-type'] === 'Software' || a.category === 'Software'
+  );
 
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';

@@ -3,13 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface HRContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
-}
-
 interface HRItem {
   id: string;
   name: string;
+  slug?: string;
   'content-type'?: string;
   description?: string;
   content?: string;
@@ -19,17 +16,24 @@ interface HRItem {
   icon?: { url: string };
 }
 
-export function HRContent({ theme = 'modern' }: HRContentProps) {
+interface HRContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  initialItems?: HRItem[];
+}
+
+export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
 
-  // CMS state
-  const [hrItems, setHrItems] = React.useState<HRItem[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  // CMS state - use initialItems if provided (server-side fetched)
+  const [hrItems, setHrItems] = React.useState<HRItem[]>(initialItems);
+  const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Fetch HR content from CMS
+  // Only fetch client-side if no initial items provided
   React.useEffect(() => {
+    if (initialItems.length > 0) return;
+
     async function fetchHRContent() {
       try {
         const response = await fetch('/api/cms/hr?limit=20');
@@ -44,7 +48,7 @@ export function HRContent({ theme = 'modern' }: HRContentProps) {
       }
     }
     fetchHRContent();
-  }, []);
+  }, [initialItems.length]);
 
   // Filter items by type
   const announcements = hrItems.filter(item => item['content-type'] === 'Announcement' && item.featured);

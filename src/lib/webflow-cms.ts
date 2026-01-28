@@ -580,3 +580,33 @@ export async function getResourceBySlug(slug: string): Promise<(Resource & { id:
   const result = await getCollection<Resource>(COLLECTIONS.resources);
   return result.items.find(item => item.slug === slug) || null;
 }
+
+export async function getHRContentBySlug(slug: string): Promise<(HRContent & { id: string }) | null> {
+  if (!COLLECTIONS.hrContent) return null;
+  const result = await getCollection<HRContent>(COLLECTIONS.hrContent);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getSafetyContentBySlug(slug: string): Promise<(SafetyContent & { id: string }) | null> {
+  if (!COLLECTIONS.safetyContent) return null;
+  const result = await getCollection<SafetyContent>(COLLECTIONS.safetyContent);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getITArticleBySlug(slug: string): Promise<(ITArticle & { id: string }) | null> {
+  if (!COLLECTIONS.itKnowledgeBase) return null;
+  const result = await getCollection<ITArticle>(COLLECTIONS.itKnowledgeBase);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getMarketingAssetBySlug(slug: string): Promise<(MarketingAsset & { id: string }) | null> {
+  if (!COLLECTIONS.marketingAssets) return null;
+  const result = await getCollection<MarketingAsset>(COLLECTIONS.marketingAssets);
+  return result.items.find(item => item.slug === slug) || null;
+}
+
+export async function getSubmittedIdeaBySlug(slug: string): Promise<(SubmittedIdea & { id: string }) | null> {
+  if (!COLLECTIONS.submittedIdeas) return null;
+  const result = await getCollection<SubmittedIdea>(COLLECTIONS.submittedIdeas);
+  return result.items.find(item => item.slug === slug) || null;
+}

@@ -4,34 +4,39 @@ import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper,
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
-interface SafetyContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
-}
-
 interface SafetyItem {
   id: string;
   name: string;
+  slug?: string;
   'content-type'?: string;
   description?: string;
   content?: string;
   'document-link'?: string;
   priority?: string;
+  severity?: string;
   'effective-date'?: string;
   featured?: boolean;
   image?: { url: string };
 }
 
-export function SafetyContent({ theme = 'modern' }: SafetyContentProps) {
+interface SafetyContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  initialItems?: SafetyItem[];
+}
+
+export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
 
-  // CMS state
-  const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  // CMS state - use initialItems if provided (server-side fetched)
+  const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>(initialItems);
+  const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Fetch Safety content from CMS
+  // Only fetch client-side if no initial items provided
   React.useEffect(() => {
+    if (initialItems.length > 0) return;
+
     async function fetchSafetyContent() {
       try {
         const response = await fetch('/api/cms/safety?limit=20');
@@ -46,7 +51,7 @@ export function SafetyContent({ theme = 'modern' }: SafetyContentProps) {
       }
     }
     fetchSafetyContent();
-  }, []);
+  }, [initialItems.length]);
 
   // Filter items by type
   const alerts = safetyItems.filter(item => item['content-type'] === 'Alert');

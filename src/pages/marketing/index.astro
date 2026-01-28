@@ -1,8 +1,16 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { MarketingContent } from '../../components/pages/MarketingContent';
+import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
+
+// Initialize CMS with runtime credentials
+initCMS(Astro.locals);
+
+// Fetch Marketing content server-side
+const marketingResult = await getMarketingAssets({ limit: 50 });
+const marketingAssets = marketingResult.items;
 ---
 
 <ThemedPage title="Marketing | Jewett Junction" theme="dark" currentSection="marketing">
-  <MarketingContent client:load theme="dark" />
+  <MarketingContent client:load theme="dark" initialItems={marketingAssets} />
 </ThemedPage>

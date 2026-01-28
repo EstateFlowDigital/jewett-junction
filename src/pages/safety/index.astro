@@ -1,8 +1,16 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { SafetyContent } from '../../components/pages/SafetyContent';
+import { initCMS, getSafetyContent } from '../../lib/webflow-cms';
+
+// Initialize CMS with runtime credentials
+initCMS(Astro.locals);
+
+// Fetch Safety content server-side
+const safetyResult = await getSafetyContent({ limit: 50 });
+const safetyItems = safetyResult.items;
 ---
 
 <ThemedPage title="Safety Hub | Jewett Junction" theme="dark" currentSection="safety">
-  <SafetyContent client:load theme="dark" />
+  <SafetyContent client:load theme="dark" initialItems={safetyItems} />
 </ThemedPage>

@@ -3,30 +3,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface MarketingContentProps {
-  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
-}
-
 interface MarketingAsset {
   id: string;
   name: string;
+  slug?: string;
   'asset-type'?: string;
   description?: string;
   'file-link'?: string;
+  'download-link'?: string;
   'preview-image'?: { url: string };
+  thumbnail?: { url: string };
+  'file-format'?: string;
+  'file-size'?: string;
   featured?: boolean;
 }
 
-export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
+interface MarketingContentProps {
+  theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
+  initialItems?: MarketingAsset[];
+}
+
+export function MarketingContent({ theme = 'modern', initialItems = [] }: MarketingContentProps) {
   const isDark = theme === 'dark';
 
-  // CMS state
-  const [assets, setAssets] = React.useState<MarketingAsset[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  // CMS state - use initialItems if provided (server-side fetched)
+  const [assets, setAssets] = React.useState<MarketingAsset[]>(initialItems);
+  const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Fetch Marketing content from CMS
+  // Only fetch client-side if no initial items provided
   React.useEffect(() => {
+    if (initialItems.length > 0) return;
+
     async function fetchMarketingContent() {
       try {
         const response = await fetch('/api/cms/marketing?limit=20');
@@ -41,7 +49,7 @@ export function MarketingContent({ theme = 'modern' }: MarketingContentProps) {
       }
     }
     fetchMarketingContent();
-  }, []);
+  }, [initialItems.length]);
 
   // Filter assets by type
   const recentAssets = assets.slice(0, 4);
