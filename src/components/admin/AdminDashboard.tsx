@@ -476,9 +476,31 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setIsEditing(true);
   };
 
+  // Helper to extract URL from image field (handles both string and object formats)
+  const getImageUrl = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value.url) return value.url;
+    return '';
+  };
+
+  // Normalize field data for editing - extract URLs from image objects
+  const normalizeFieldData = (fieldData: Record<string, any>, collectionKey: string): Record<string, any> => {
+    const config = COLLECTIONS[collectionKey];
+    if (!config) return fieldData;
+
+    const normalized = { ...fieldData };
+    config.fields.forEach(field => {
+      if (field.type === 'image' && normalized[field.key]) {
+        normalized[field.key] = getImageUrl(normalized[field.key]);
+      }
+    });
+    return normalized;
+  };
+
   const handleEdit = (item: any) => {
     setEditingItem(item);
-    setFormData(item.fieldData || {});
+    setFormData(normalizeFieldData(item.fieldData || {}, activeCollection));
     setIsEditing(true);
   };
 
@@ -1760,11 +1782,11 @@ export function AdminDashboard({}: AdminDashboardProps) {
                         {field.type === 'image' && (
                           <div className="space-y-3">
                             {/* Show preview if we have an image */}
-                            {formData[field.key] ? (
+                            {getImageUrl(formData[field.key]) ? (
                               <div className="relative rounded-xl overflow-hidden border border-slate-700/50 bg-slate-900/50">
                                 <div className="bg-slate-800/50 p-4 flex items-center justify-center min-h-[200px]">
                                   <img
-                                    src={formData[field.key]}
+                                    src={getImageUrl(formData[field.key])}
                                     alt="Preview"
                                     className="max-w-full max-h-[300px] object-contain rounded-lg"
                                     onError={(e) => {
@@ -1773,7 +1795,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                                   />
                                 </div>
                                 <div className="p-3 bg-slate-900/80 border-t border-slate-700/50 flex items-center justify-between">
-                                  <span className="text-slate-400 text-xs truncate max-w-[60%]">{formData[field.key].split('/').pop()}</span>
+                                  <span className="text-slate-400 text-xs truncate max-w-[60%]">{getImageUrl(formData[field.key]).split('/').pop()}</span>
                                   <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, [field.key]: '' })}
