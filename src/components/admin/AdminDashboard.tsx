@@ -821,6 +821,16 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setUploadProgress(0);
     setError('');
 
+    // Detailed logging for debugging
+    console.log('=== IMAGE UPLOAD START ===');
+    console.log('File name:', file.name);
+    console.log('File type:', file.type);
+    console.log('File size:', file.size, 'bytes');
+    console.log('Target field:', fieldKey);
+    console.log('Collection:', activeCollection);
+    console.log('API endpoint:', `${API_BASE}/api/admin/upload`);
+    console.log('Token present:', !!getToken());
+
     try {
       // Create form data
       const uploadFormData = new FormData();
@@ -831,6 +841,9 @@ export function AdminDashboard({}: AdminDashboardProps) {
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
+
+      console.log('Sending upload request...');
+      const startTime = Date.now();
 
       const response = await fetch(`${API_BASE}/api/admin/upload`, {
         method: 'POST',
@@ -844,22 +857,40 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
       clearInterval(progressInterval);
 
+      const elapsed = Date.now() - startTime;
+      console.log('Response received in', elapsed, 'ms');
+      console.log('Response status:', response.status);
+      console.log('Response statusText:', response.statusText);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       // Read response as text first to handle non-JSON errors
       const responseText = await response.text();
+      console.log('Response body (first 500 chars):', responseText.substring(0, 500));
+
       let data;
       try {
         data = JSON.parse(responseText);
-      } catch {
+        console.log('Parsed JSON response:', data);
+      } catch (parseErr) {
         // Response is not JSON - likely a CORS or server error
-        console.error('Upload response not JSON:', responseText.substring(0, 200));
+        console.error('=== UPLOAD PARSE ERROR ===');
+        console.error('Failed to parse response as JSON');
+        console.error('Parse error:', parseErr);
+        console.error('Full response text:', responseText);
         throw new Error(response.status === 0
           ? 'Network error - please check your connection'
           : `Server error (${response.status}): ${responseText.substring(0, 100)}`);
       }
 
       if (!response.ok) {
+        console.error('=== UPLOAD FAILED ===');
+        console.error('Response not OK, status:', response.status);
+        console.error('Error data:', data);
         throw new Error(data.error || `Upload failed with status ${response.status}`);
       }
+
+      console.log('=== UPLOAD SUCCESS ===');
+      console.log('Uploaded URL:', data.url);
       setUploadProgress(100);
 
       // Set the URL in form data
@@ -873,6 +904,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
       }, 500);
 
     } catch (err: any) {
+      console.error('=== UPLOAD EXCEPTION ===');
+      console.error('Error type:', err.constructor.name);
+      console.error('Error message:', err.message);
+      console.error('Error stack:', err.stack);
       setError(err.message);
       setUploadingField(null);
       setUploadProgress(0);

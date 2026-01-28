@@ -79,18 +79,39 @@ export const ALL: APIRoute = async ({ request }) => {
 
 // POST - Upload asset to Webflow
 export const POST: APIRoute = async ({ request, locals }) => {
+  console.log('=== UPLOAD REQUEST RECEIVED ===');
+  console.log('Request method:', request.method);
+  console.log('Request URL:', request.url);
+  console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+
+  // Check authorization
+  const authHeader = request.headers.get('Authorization');
+  console.log('Auth header present:', !!authHeader);
+  console.log('Auth header prefix:', authHeader?.substring(0, 20));
+
   if (!verifyToken(request)) {
+    console.log('UPLOAD ERROR: Token verification failed');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
   }
+  console.log('Token verified successfully');
+
+  const runtime = (locals as any)?.runtime;
+  console.log('Runtime exists:', !!runtime);
+  console.log('Runtime env exists:', !!runtime?.env);
+  console.log('Runtime env keys:', runtime?.env ? Object.keys(runtime.env) : []);
 
   const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
   const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
 
+  console.log('WEBFLOW_API_TOKEN present:', !!apiToken);
+  console.log('WEBFLOW_API_TOKEN length:', apiToken?.length || 0);
+  console.log('WEBFLOW_SITE_ID:', siteId || 'NOT SET');
+
   if (!siteId || !apiToken) {
-    const runtime = (locals as any)?.runtime;
+    console.log('UPLOAD ERROR: Missing credentials');
     return withCors(new Response(JSON.stringify({
       error: 'API credentials not configured',
       details: {
@@ -108,11 +129,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     // Get the form data with file
+    console.log('Parsing form data...');
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const folder = formData.get('folder') as string || 'admin-uploads';
 
+    console.log('File received:', file ? 'yes' : 'NO');
+    if (file) {
+      console.log('File name:', file.name);
+      console.log('File type:', file.type);
+      console.log('File size:', file.size, 'bytes');
+    }
+    console.log('Target folder:', folder);
+
     if (!file) {
+      console.log('UPLOAD ERROR: No file in form data');
       return withCors(new Response(JSON.stringify({ error: 'No file provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -122,6 +153,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
+      console.log('UPLOAD ERROR: Invalid file type:', file.type);
       return withCors(new Response(JSON.stringify({
         error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG'
       }), {
@@ -133,6 +165,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Validate file size (max 4MB for images)
     const maxSize = 4 * 1024 * 1024; // 4MB
     if (file.size > maxSize) {
+      console.log('UPLOAD ERROR: File too large:', file.size);
       return withCors(new Response(JSON.stringify({
         error: 'File too large. Maximum size is 4MB'
       }), {
@@ -145,8 +178,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const timestamp = Date.now();
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const fileName = `${timestamp}-${safeName}`;
+    console.log('Generated filename:', fileName);
+
+    // Generate file hash
+    console.log('Generating file hash...');
+    const fileHash = await generateFileHash(file);
+    console.log('File hash:', fileHash.substring(0, 16) + '...');
 
     // Step 1: Request upload URL from Webflow
+    console.log('Step 1: Requesting upload URL from Webflow...');
+    console.log('Webflow API endpoint:', `${BASE_URL}/sites/${siteId}/assets`);
+
+    const uploadRequestBody = {
+      fileName: fileName,
+      fileHash: fileHash,
+      parentFolder: folder
+    };
+    console.log('Request body:', JSON.stringify(uploadRequestBody));
+
     const uploadRequestResponse = await fetch(`${BASE_URL}/sites/${siteId}/assets`, {
       method: 'POST',
       headers: {
@@ -154,28 +203,37 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'accept': 'application/json',
         'content-type': 'application/json'
       },
-      body: JSON.stringify({
-        fileName: fileName,
-        fileHash: await generateFileHash(file),
-        parentFolder: folder
-      })
+      body: JSON.stringify(uploadRequestBody)
     });
 
+    console.log('Webflow response status:', uploadRequestResponse.status);
+    console.log('Webflow response headers:', Object.fromEntries(uploadRequestResponse.headers.entries()));
+
     if (!uploadRequestResponse.ok) {
-      const errorData = await uploadRequestResponse.json();
-      console.error('Webflow upload request error:', errorData);
-      throw new Error(errorData.message || `Failed to get upload URL: ${uploadRequestResponse.status}`);
+      const errorText = await uploadRequestResponse.text();
+      console.log('Webflow error response:', errorText);
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { rawResponse: errorText };
+      }
+      console.error('UPLOAD ERROR: Webflow rejected upload request:', errorData);
+      throw new Error(errorData.message || errorData.error || `Failed to get upload URL: ${uploadRequestResponse.status}`);
     }
 
     const uploadData = await uploadRequestResponse.json();
+    console.log('Webflow upload response:', JSON.stringify(uploadData, null, 2));
 
     // Check if asset already exists (Webflow returns existing URL if hash matches)
-    if (uploadData.url) {
+    if (uploadData.url && !uploadData.uploadUrl) {
+      console.log('Asset already exists, returning cached URL:', uploadData.url);
       return withCors(new Response(JSON.stringify({
         success: true,
         url: uploadData.url,
         id: uploadData.id,
-        fileName: uploadData.displayName || fileName
+        fileName: uploadData.displayName || fileName,
+        cached: true
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
@@ -184,7 +242,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Step 2: Upload file to the provided S3 URL
     if (uploadData.uploadUrl) {
+      console.log('Step 2: Uploading file to S3...');
+      console.log('S3 upload URL:', uploadData.uploadUrl.substring(0, 100) + '...');
+
       const fileBuffer = await file.arrayBuffer();
+      console.log('File buffer size:', fileBuffer.byteLength, 'bytes');
 
       const uploadResponse = await fetch(uploadData.uploadUrl, {
         method: 'PUT',
@@ -195,14 +257,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
         body: fileBuffer
       });
 
+      console.log('S3 upload response status:', uploadResponse.status);
+
       if (!uploadResponse.ok) {
+        const s3ErrorText = await uploadResponse.text();
+        console.error('UPLOAD ERROR: S3 upload failed');
+        console.error('S3 status:', uploadResponse.status);
+        console.error('S3 response:', s3ErrorText.substring(0, 500));
         throw new Error(`Failed to upload file to storage: ${uploadResponse.status}`);
       }
+
+      const finalUrl = uploadData.url || uploadData.hostedUrl;
+      console.log('=== UPLOAD SUCCESS ===');
+      console.log('Final URL:', finalUrl);
 
       // Return the final CDN URL
       return withCors(new Response(JSON.stringify({
         success: true,
-        url: uploadData.url || uploadData.hostedUrl,
+        url: finalUrl,
         id: uploadData.id,
         fileName: uploadData.displayName || fileName
       }), {
@@ -211,11 +283,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }));
     }
 
+    console.error('UPLOAD ERROR: No uploadUrl in Webflow response');
     throw new Error('No upload URL received from Webflow');
 
   } catch (error: any) {
-    console.error('Error uploading asset:', error);
-    return withCors(new Response(JSON.stringify({ error: error.message }), {
+    console.error('=== UPLOAD EXCEPTION ===');
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    return withCors(new Response(JSON.stringify({
+      error: error.message,
+      type: error.constructor.name
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     }));
