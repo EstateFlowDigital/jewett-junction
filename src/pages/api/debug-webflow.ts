@@ -105,7 +105,7 @@ export const GET: APIRoute = async ({ locals }) => {
     results.registeredScriptsError = error.message;
   }
 
-  // Test 5: Actually test the publish endpoint
+  // Test 5: Test publish to subdomain only
   try {
     const publishResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/publish`, {
       method: 'POST',
@@ -119,21 +119,63 @@ export const GET: APIRoute = async ({ locals }) => {
       })
     });
 
-    results.publishStatus = publishResponse.status;
+    results.publishSubdomainStatus = publishResponse.status;
 
     if (!publishResponse.ok) {
       const errorText = await publishResponse.text();
       try {
-        results.publishError = JSON.parse(errorText);
+        results.publishSubdomainError = JSON.parse(errorText);
       } catch {
-        results.publishErrorRaw = errorText;
+        results.publishSubdomainErrorRaw = errorText;
       }
     } else {
-      results.publishSuccess = true;
-      results.publishResponse = await publishResponse.json();
+      results.publishSubdomainSuccess = true;
+      results.publishSubdomainResponse = await publishResponse.json();
     }
   } catch (error: any) {
-    results.publishError = error.message;
+    results.publishSubdomainError = error.message;
+  }
+
+  // Test 6: Test publish WITH custom domains (the real test)
+  try {
+    // Get custom domain IDs
+    const customDomainIds = results.siteCustomDomains?.map((d: any) => d.id) || [];
+
+    const publishBody: any = {
+      publishToWebflowSubdomain: true
+    };
+
+    if (customDomainIds.length > 0) {
+      publishBody.customDomains = customDomainIds;
+    }
+
+    results.publishWithDomainsRequestBody = publishBody;
+
+    const publishResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/publish`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(publishBody)
+    });
+
+    results.publishWithDomainsStatus = publishResponse.status;
+
+    if (!publishResponse.ok) {
+      const errorText = await publishResponse.text();
+      try {
+        results.publishWithDomainsError = JSON.parse(errorText);
+      } catch {
+        results.publishWithDomainsErrorRaw = errorText;
+      }
+    } else {
+      results.publishWithDomainsSuccess = true;
+      results.publishWithDomainsResponse = await publishResponse.json();
+    }
+  } catch (error: any) {
+    results.publishWithDomainsError = error.message;
   }
 
   return new Response(JSON.stringify(results, null, 2), {
