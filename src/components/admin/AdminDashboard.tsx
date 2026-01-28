@@ -376,6 +376,22 @@ export function AdminDashboard({}: AdminDashboardProps) {
     }
   }, [activeCollection, isAuthenticated]);
 
+  // Auto-dismiss success toast after 4 seconds
+  React.useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(''), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  // Auto-dismiss error toast after 6 seconds (longer for errors)
+  React.useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const verifyToken = async (token: string) => {
     try {
       const response = await fetch(`${API_BASE}/api/admin/login`, {
@@ -1777,23 +1793,43 @@ export function AdminDashboard({}: AdminDashboardProps) {
         </div>
       )}
 
-      {/* Messages */}
-      {(success || error) && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-          {success && (
-            <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl backdrop-blur-sm">
-              <Check className="h-5 w-5 text-emerald-400" />
-              <span className="text-emerald-300">{success}</span>
+      {/* Toast Notifications - Fixed position, bottom-right */}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
+        {success && (
+          <div
+            className="flex items-center gap-3 p-4 bg-slate-800/95 border border-emerald-500/40 rounded-xl backdrop-blur-sm shadow-lg shadow-emerald-500/10 animate-in slide-in-from-right-5 duration-300"
+            onClick={() => setSuccess('')}
+          >
+            <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Check className="h-4 w-4 text-emerald-400" />
             </div>
-          )}
-          {error && (
-            <div className="flex items-center gap-3 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-sm">
-              <AlertCircle className="h-5 w-5 text-rose-400" />
-              <span className="text-rose-300">{error}</span>
+            <span className="text-emerald-300 text-sm flex-1">{success}</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); setSuccess(''); }}
+              className="text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+        {error && (
+          <div
+            className="flex items-center gap-3 p-4 bg-slate-800/95 border border-rose-500/40 rounded-xl backdrop-blur-sm shadow-lg shadow-rose-500/10 animate-in slide-in-from-right-5 duration-300"
+            onClick={() => setError('')}
+          >
+            <div className="w-8 h-8 bg-rose-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="h-4 w-4 text-rose-400" />
             </div>
-          )}
-        </div>
-      )}
+            <span className="text-rose-300 text-sm flex-1">{error}</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); setError(''); }}
+              className="text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Mobile Collection Selector */}
