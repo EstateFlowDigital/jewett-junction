@@ -105,38 +105,7 @@ export const GET: APIRoute = async ({ locals }) => {
     results.registeredScriptsError = error.message;
   }
 
-  // Test 5: Test publish to subdomain only
-  try {
-    const publishResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/publish`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'accept': 'application/json',
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        publishToWebflowSubdomain: true
-      })
-    });
-
-    results.publishSubdomainStatus = publishResponse.status;
-
-    if (!publishResponse.ok) {
-      const errorText = await publishResponse.text();
-      try {
-        results.publishSubdomainError = JSON.parse(errorText);
-      } catch {
-        results.publishSubdomainErrorRaw = errorText;
-      }
-    } else {
-      results.publishSubdomainSuccess = true;
-      results.publishSubdomainResponse = await publishResponse.json();
-    }
-  } catch (error: any) {
-    results.publishSubdomainError = error.message;
-  }
-
-  // Test 6: Test publish WITH custom domains (the real test)
+  // Test 5: Test publish with custom domains (skipping subdomain-only to avoid rate limiting)
   try {
     // Get custom domain IDs
     const customDomainIds = results.siteCustomDomains?.map((d: any) => d.id) || [];
@@ -149,7 +118,7 @@ export const GET: APIRoute = async ({ locals }) => {
       publishBody.customDomains = customDomainIds;
     }
 
-    results.publishWithDomainsRequestBody = publishBody;
+    results.publishRequestBody = publishBody;
 
     const publishResponse = await fetch(`https://api.webflow.com/v2/sites/${siteId}/publish`, {
       method: 'POST',
@@ -161,21 +130,21 @@ export const GET: APIRoute = async ({ locals }) => {
       body: JSON.stringify(publishBody)
     });
 
-    results.publishWithDomainsStatus = publishResponse.status;
+    results.publishStatus = publishResponse.status;
 
     if (!publishResponse.ok) {
       const errorText = await publishResponse.text();
       try {
-        results.publishWithDomainsError = JSON.parse(errorText);
+        results.publishError = JSON.parse(errorText);
       } catch {
-        results.publishWithDomainsErrorRaw = errorText;
+        results.publishErrorRaw = errorText;
       }
     } else {
-      results.publishWithDomainsSuccess = true;
-      results.publishWithDomainsResponse = await publishResponse.json();
+      results.publishSuccess = true;
+      results.publishResponse = await publishResponse.json();
     }
   } catch (error: any) {
-    results.publishWithDomainsError = error.message;
+    results.publishError = error.message;
   }
 
   return new Response(JSON.stringify(results, null, 2), {
