@@ -128,22 +128,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   try {
-    // Get the form data with file
-    console.log('Parsing form data...');
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const folder = formData.get('folder') as string || 'admin-uploads';
+    // Parse JSON body with base64 file data
+    console.log('Parsing JSON body...');
+    const body = await request.json();
+    const { fileName, fileType, fileSize, fileData, folder = 'admin-uploads' } = body;
 
-    console.log('File received:', file ? 'yes' : 'NO');
-    if (file) {
-      console.log('File name:', file.name);
-      console.log('File type:', file.type);
-      console.log('File size:', file.size, 'bytes');
-    }
+    console.log('File name:', fileName || 'NOT PROVIDED');
+    console.log('File type:', fileType || 'NOT PROVIDED');
+    console.log('File size:', fileSize || 'NOT PROVIDED', 'bytes');
+    console.log('File data length:', fileData?.length || 0, 'chars');
     console.log('Target folder:', folder);
 
-    if (!file) {
-      console.log('UPLOAD ERROR: No file in form data');
+    if (!fileData || !fileName) {
+      console.log('UPLOAD ERROR: Missing file data or name');
       return withCors(new Response(JSON.stringify({ error: 'No file provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -152,8 +149,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    if (!allowedTypes.includes(file.type)) {
-      console.log('UPLOAD ERROR: Invalid file type:', file.type);
+    if (!allowedTypes.includes(fileType)) {
+      console.log('UPLOAD ERROR: Invalid file type:', fileType);
       return withCors(new Response(JSON.stringify({
         error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG'
       }), {
@@ -164,8 +161,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Validate file size (max 4MB for images)
     const maxSize = 4 * 1024 * 1024; // 4MB
-    if (file.size > maxSize) {
-      console.log('UPLOAD ERROR: File too large:', file.size);
+    if (fileSize > maxSize) {
+      console.log('UPLOAD ERROR: File too large:', fileSize);
       return withCors(new Response(JSON.stringify({
         error: 'File too large. Maximum size is 4MB'
       }), {
@@ -174,15 +171,25 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }));
     }
 
+    // Convert base64 to binary
+    console.log('Decoding base64 data...');
+    const binaryString = atob(fileData);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const fileBuffer = bytes.buffer;
+    console.log('Decoded buffer size:', fileBuffer.byteLength, 'bytes');
+
     // Generate unique filename
     const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const fileName = `${timestamp}-${safeName}`;
-    console.log('Generated filename:', fileName);
+    const safeName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const uniqueFileName = `${timestamp}-${safeName}`;
+    console.log('Generated filename:', uniqueFileName);
 
-    // Generate file hash
+    // Generate file hash from buffer
     console.log('Generating file hash...');
-    const fileHash = await generateFileHash(file);
+    const fileHash = await generateFileHashFromBuffer(fileBuffer);
     console.log('File hash:', fileHash.substring(0, 16) + '...');
 
     // Step 1: Request upload URL from Webflow
@@ -190,7 +197,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('Webflow API endpoint:', `${BASE_URL}/sites/${siteId}/assets`);
 
     const uploadRequestBody = {
-      fileName: fileName,
+      fileName: uniqueFileName,
       fileHash: fileHash,
       parentFolder: folder
     };
@@ -232,7 +239,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         success: true,
         url: uploadData.url,
         id: uploadData.id,
-        fileName: uploadData.displayName || fileName,
+        fileName: uploadData.displayName || uniqueFileName,
         cached: true
       }), {
         status: 200,
@@ -244,15 +251,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (uploadData.uploadUrl) {
       console.log('Step 2: Uploading file to S3...');
       console.log('S3 upload URL:', uploadData.uploadUrl.substring(0, 100) + '...');
-
-      const fileBuffer = await file.arrayBuffer();
       console.log('File buffer size:', fileBuffer.byteLength, 'bytes');
 
       const uploadResponse = await fetch(uploadData.uploadUrl, {
         method: 'PUT',
         headers: {
-          'Content-Type': file.type,
-          'Content-Length': file.size.toString()
+          'Content-Type': fileType,
+          'Content-Length': fileSize.toString()
         },
         body: fileBuffer
       });
@@ -276,7 +281,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         success: true,
         url: finalUrl,
         id: uploadData.id,
-        fileName: uploadData.displayName || fileName
+        fileName: uploadData.displayName || uniqueFileName
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
@@ -301,9 +306,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 };
 
-// Generate a simple hash for the file (for Webflow deduplication)
-async function generateFileHash(file: File): Promise<string> {
-  const buffer = await file.arrayBuffer();
+// Generate a simple hash from ArrayBuffer (for Webflow deduplication)
+async function generateFileHashFromBuffer(buffer: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');

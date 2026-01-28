@@ -832,27 +832,37 @@ export function AdminDashboard({}: AdminDashboardProps) {
     console.log('Token present:', !!getToken());
 
     try {
-      // Create form data
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('folder', activeCollection);
+      // Convert file to base64 to avoid Cloudflare CSRF blocking of FormData
+      console.log('Converting file to base64...');
+      const arrayBuffer = await file.arrayBuffer();
+      const base64 = btoa(
+        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
+      console.log('Base64 length:', base64.length);
 
       // Simulate progress for better UX
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 200);
 
-      console.log('Sending upload request...');
+      console.log('Sending upload request as JSON...');
       const startTime = Date.now();
 
       const response = await fetch(`${API_BASE}/api/admin/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'Accept': 'application/json'
         },
-        body: uploadFormData
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          fileData: base64,
+          folder: activeCollection
+        })
       });
 
       clearInterval(progressInterval);
