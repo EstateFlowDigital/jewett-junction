@@ -58,6 +58,26 @@ export const OPTIONS: APIRoute = async () => {
   });
 };
 
+// ALL - Fallback handler for any method
+export const ALL: APIRoute = async ({ request }) => {
+  // Handle OPTIONS for CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
+  }
+
+  // For any unexpected method
+  return withCors(new Response(JSON.stringify({
+    error: `Method ${request.method} not allowed`,
+    allowedMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS']
+  }), {
+    status: 405,
+    headers: { 'Content-Type': 'application/json' }
+  }));
+};
+
 // GET - List items from a collection
 export const GET: APIRoute = async ({ request, url, locals }) => {
   if (!verifyToken(request)) {
@@ -161,7 +181,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 // PATCH - Update item
 export const PATCH: APIRoute = async ({ request, locals }) => {
+  console.log('=== PATCH ITEM REQUEST ===');
+
   if (!verifyToken(request)) {
+    console.log('PATCH: Unauthorized');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -169,18 +192,27 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   }
 
   const apiToken = getApiToken(locals);
+  console.log('PATCH: API token present:', !!apiToken);
 
   try {
-    const { collection, itemId, fields, isLive = false } = await request.json();
+    const body = await request.json();
+    const { collection, itemId, fields, isLive = false } = body;
+
+    console.log('PATCH: Collection:', collection);
+    console.log('PATCH: Item ID:', itemId);
+    console.log('PATCH: isLive:', isLive);
+    console.log('PATCH: Fields keys:', Object.keys(fields || {}));
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-      return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
+      console.log('PATCH: Invalid collection - not found in COLLECTIONS');
+      return withCors(new Response(JSON.stringify({ error: 'Invalid collection', collection }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       }));
     }
 
     if (!itemId) {
+      console.log('PATCH: Missing item ID');
       return withCors(new Response(JSON.stringify({ error: 'Item ID required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -188,8 +220,12 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
+    console.log('PATCH: Collection ID:', collectionId);
 
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '?live=true' : ''}`, {
+    const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '?live=true' : ''}`;
+    console.log('PATCH: Webflow URL:', url);
+
+    const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
@@ -201,19 +237,37 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
       })
     });
 
+    console.log('PATCH: Webflow response status:', response.status);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Webflow API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('PATCH: Webflow error response:', errorText);
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { rawResponse: errorText };
+      }
+      return withCors(new Response(JSON.stringify({
+        error: errorData.message || `Webflow API error: ${response.status}`,
+        webflowError: errorData,
+        status: response.status
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }));
     }
 
     const data = await response.json();
+    console.log('PATCH: Success!');
     return withCors(new Response(JSON.stringify({ success: true, item: data }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     }));
   } catch (error: any) {
-    console.error('Error updating item:', error);
-    return withCors(new Response(JSON.stringify({ error: error.message }), {
+    console.error('PATCH: Exception:', error.message);
+    console.error('PATCH: Stack:', error.stack);
+    return withCors(new Response(JSON.stringify({ error: error.message, type: error.constructor.name }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     }));
