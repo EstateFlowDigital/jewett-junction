@@ -253,12 +253,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.log('Step 2: Uploading file to S3...');
       console.log('S3 upload URL:', uploadData.uploadUrl.substring(0, 100) + '...');
       console.log('File buffer size:', fileBuffer.byteLength, 'bytes');
+      console.log('Client reported size:', fileSize, 'bytes');
+
+      // Use actual buffer size, not client-reported size
+      const actualSize = fileBuffer.byteLength;
 
       const uploadResponse = await fetch(uploadData.uploadUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': fileType,
-          'Content-Length': fileSize.toString()
+          'Content-Length': actualSize.toString()
         },
         body: fileBuffer
       });
