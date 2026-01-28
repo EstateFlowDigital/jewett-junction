@@ -7,14 +7,62 @@ const BASE_URL = 'https://api.webflow.com/v2';
 
 // Valid Webflow field slugs for each collection
 // Only these fields will be sent to Webflow API
-// Based on actual Webflow collection schemas
+// Based on AdminDashboard form field definitions
+// Note: If a field is missing here, add it to both AdminDashboard and this list
 const VALID_FIELDS: Record<string, string[]> = {
-  announcements: ['name', 'slug', 'content', 'priority', 'published-date', 'author', 'is-pinned'],
-  events: ['name', 'slug', 'description', 'event-date', 'end-date', 'location', 'category', 'registration-link'],
-  employees: ['name', 'slug', 'role', 'department', 'email', 'phone', 'photo', 'bio', 'start-date', 'is-featured'],
-  jobPostings: ['name', 'slug', 'department', 'location', 'description', 'requirements', 'referral-bonus', 'apply-link', 'job-is-active'],
-  cultureStories: ['name', 'slug', 'excerpt', 'content', 'image', 'author', 'published-date', 'category'],
-  resources: ['name', 'slug', 'description', 'category', 'file', 'external-link', 'icon'],
+  announcements: [
+    'name', 'slug', 'content', 'image', 'author', 'category', 'priority',
+    'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date'
+  ],
+  events: [
+    'name', 'slug', 'event-date', 'end-date', 'banner-image', 'location',
+    'virtual-link', 'category', 'description', 'capacity', 'registration-link',
+    'is-mandatory', 'is-virtual'
+  ],
+  jobPostings: [
+    'name', 'slug', 'department', 'location', 'employment-type', 'experience-level',
+    'salary-min', 'salary-max', 'description', 'requirements', 'benefits',
+    'referral-bonus', 'apply-link', 'urgency', 'job-is-active', 'is-remote', 'featured'
+  ],
+  cultureStories: [
+    'name', 'slug', 'type', 'featured-image', 'video-url', 'content', 'excerpt',
+    'person-name', 'person-role', 'person-tenure', 'quote', 'author',
+    'featured', 'published-date', 'category', 'image'
+  ],
+  employees: [
+    'name', 'slug', 'photo', 'role', 'department', 'office-location', 'email',
+    'phone', 'extension', 'linkedin', 'start-date', 'bio', 'skills',
+    'certifications', 'is-featured', 'is-leadership'
+  ],
+  resources: [
+    'name', 'slug', 'thumbnail', 'category', 'description', 'file-type',
+    'external-link', 'file-size', 'last-updated', 'version', 'audience',
+    'is-required', 'is-new', 'file', 'icon'
+  ],
+  hrContent: [
+    'name', 'slug', 'content-type', 'icon', 'description', 'content',
+    'document-link', 'effective-date', 'applies-to', 'priority-order',
+    'featured', 'is-active'
+  ],
+  safetyContent: [
+    'name', 'slug', 'content-type', 'image', 'severity', 'description',
+    'content', 'document-link', 'video-link', 'expiration-date',
+    'required-for', 'priority-order', 'featured', 'is-active'
+  ],
+  itKnowledgeBase: [
+    'name', 'slug', 'article-type', 'icon', 'summary', 'content',
+    'video-link', 'download-link', 'platform', 'difficulty', 'views',
+    'helpful-votes', 'featured', 'is-active'
+  ],
+  marketingAssets: [
+    'name', 'slug', 'asset-type', 'thumbnail', 'preview-image', 'description',
+    'download-link', 'file-format', 'file-size', 'usage-guidelines', 'tags',
+    'version', 'featured', 'is-active'
+  ],
+  submittedIdeas: [
+    'name', 'slug', 'category', 'description', 'submitted-by', 'submitter-email',
+    'department', 'status', 'priority', 'admin-notes', 'votes', 'featured'
+  ],
 };
 
 // Filter fields to only include valid ones for the collection
