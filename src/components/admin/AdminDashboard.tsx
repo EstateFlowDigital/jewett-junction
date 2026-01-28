@@ -49,7 +49,11 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-  Eye
+  Eye,
+  CheckSquare,
+  Square,
+  MoreHorizontal,
+  Copy
 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 
@@ -349,6 +353,14 @@ export function AdminDashboard({}: AdminDashboardProps) {
     { name: '', type: 'PlainText' }
   ]);
 
+  // Bulk edit state
+  const [bulkMode, setBulkMode] = React.useState(false);
+  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
+  const [bulkActionLoading, setBulkActionLoading] = React.useState(false);
+  const [showBulkFieldModal, setShowBulkFieldModal] = React.useState(false);
+  const [bulkFieldKey, setBulkFieldKey] = React.useState('');
+  const [bulkFieldValue, setBulkFieldValue] = React.useState<any>('');
+
   // Check for existing token on mount
   React.useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -528,6 +540,151 @@ export function AdminDashboard({}: AdminDashboardProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Bulk edit functions
+  const toggleBulkMode = () => {
+    setBulkMode(!bulkMode);
+    setSelectedItems([]);
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const selectAllItems = () => {
+    if (selectedItems.length === items.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(items.map(item => item.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.length === 0) return;
+    if (!confirm(`Delete ${selectedItems.length} item(s)? This cannot be undone.`)) return;
+
+    setBulkActionLoading(true);
+    setError('');
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const itemId of selectedItems) {
+      try {
+        const response = await fetch(`${API_BASE}/api/admin/items`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ collection: activeCollection, itemId })
+        });
+        if (response.ok) successCount++;
+        else errorCount++;
+      } catch {
+        errorCount++;
+      }
+    }
+
+    setBulkActionLoading(false);
+    setSelectedItems([]);
+    setSuccess(`Deleted ${successCount} item(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+    loadItems();
+  };
+
+  const handleBulkPublish = async (publishLive: boolean) => {
+    if (selectedItems.length === 0) return;
+    const action = publishLive ? 'publish' : 'save as draft';
+    if (!confirm(`${publishLive ? 'Publish' : 'Save as draft'} ${selectedItems.length} item(s)?`)) return;
+
+    setBulkActionLoading(true);
+    setError('');
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const itemId of selectedItems) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) continue;
+
+      try {
+        const response = await fetch(`${API_BASE}/api/admin/items`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            collection: activeCollection,
+            itemId,
+            fields: item.fieldData || {},
+            isLive: publishLive
+          })
+        });
+        if (response.ok) successCount++;
+        else errorCount++;
+      } catch {
+        errorCount++;
+      }
+    }
+
+    setBulkActionLoading(false);
+    setSelectedItems([]);
+    setSuccess(`${publishLive ? 'Published' : 'Saved as draft'} ${successCount} item(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+    loadItems();
+  };
+
+  const handleBulkSetField = async () => {
+    if (selectedItems.length === 0 || !bulkFieldKey) return;
+
+    setBulkActionLoading(true);
+    setError('');
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const itemId of selectedItems) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) continue;
+
+      const updatedFields = {
+        ...(item.fieldData || {}),
+        [bulkFieldKey]: bulkFieldValue
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/api/admin/items`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            collection: activeCollection,
+            itemId,
+            fields: updatedFields,
+            isLive: false
+          })
+        });
+        if (response.ok) successCount++;
+        else errorCount++;
+      } catch {
+        errorCount++;
+      }
+    }
+
+    setBulkActionLoading(false);
+    setShowBulkFieldModal(false);
+    setBulkFieldKey('');
+    setBulkFieldValue('');
+    setSelectedItems([]);
+    setSuccess(`Updated ${successCount} item(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+    loadItems();
   };
 
   const handleSave = async (publishLive: boolean = false) => {
@@ -2026,9 +2183,23 @@ export function AdminDashboard({}: AdminDashboardProps) {
                         onClick={loadItems}
                         disabled={isLoading}
                         className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors"
+                        title="Refresh"
                       >
                         <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                       </button>
+                      {items.length > 0 && (
+                        <button
+                          onClick={toggleBulkMode}
+                          className={`px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all border ${
+                            bulkMode
+                              ? 'bg-violet-500/20 text-violet-400 border-violet-500/50'
+                              : 'bg-slate-700/50 text-slate-300 border-slate-600/50 hover:bg-slate-700'
+                          }`}
+                        >
+                          <CheckSquare className="h-4 w-4" />
+                          {bulkMode ? 'Exit Bulk' : 'Bulk Edit'}
+                        </button>
+                      )}
                       <button
                         onClick={handleCreate}
                         className={`px-5 py-2.5 bg-gradient-to-r ${config.gradient} text-white rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-lg hover:shadow-xl`}
@@ -2039,6 +2210,69 @@ export function AdminDashboard({}: AdminDashboardProps) {
                     </div>
                   </div>
                 </div>
+
+                {/* Bulk Action Toolbar */}
+                {bulkMode && items.length > 0 && (
+                  <div className="px-5 py-3 border-b border-slate-700/50 bg-violet-500/5 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.length === items.length && items.length > 0}
+                          onChange={selectAllItems}
+                          className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20"
+                        />
+                        <span className="text-sm text-slate-300">
+                          {selectedItems.length === items.length ? 'Deselect All' : 'Select All'}
+                        </span>
+                      </label>
+                      {selectedItems.length > 0 && (
+                        <span className="text-sm text-violet-400 font-medium">
+                          {selectedItems.length} selected
+                        </span>
+                      )}
+                    </div>
+                    {selectedItems.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setShowBulkFieldModal(true)}
+                          disabled={bulkActionLoading}
+                          className="px-3 py-1.5 text-sm bg-slate-700/80 hover:bg-slate-600/80 text-slate-200 rounded-lg flex items-center gap-1.5 transition-colors border border-slate-600/50"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          Set Field
+                        </button>
+                        <button
+                          onClick={() => handleBulkPublish(false)}
+                          disabled={bulkActionLoading}
+                          className="px-3 py-1.5 text-sm bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 rounded-lg flex items-center gap-1.5 transition-colors border border-amber-500/30"
+                        >
+                          <Save className="h-3.5 w-3.5" />
+                          Save Draft
+                        </button>
+                        <button
+                          onClick={() => handleBulkPublish(true)}
+                          disabled={bulkActionLoading}
+                          className="px-3 py-1.5 text-sm bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg flex items-center gap-1.5 transition-colors border border-emerald-500/30"
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                          Publish
+                        </button>
+                        <button
+                          onClick={handleBulkDelete}
+                          disabled={bulkActionLoading}
+                          className="px-3 py-1.5 text-sm bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 rounded-lg flex items-center gap-1.5 transition-colors border border-rose-500/30"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                        {bulkActionLoading && (
+                          <Loader2 className="h-4 w-4 text-violet-400 animate-spin ml-2" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {isLoading && items.length === 0 ? (
                   <div className="p-16 text-center">
@@ -2069,12 +2303,25 @@ export function AdminDashboard({}: AdminDashboardProps) {
                       const subtitle = item.fieldData?.department || item.fieldData?.category || item.fieldData?.type || item.fieldData?.role;
                       const location = item.fieldData?.location || item.fieldData?.['office-location'];
 
+                      const isSelected = selectedItems.includes(item.id);
+
                       return (
                         <div
                           key={item.id}
-                          className="p-5 flex items-center justify-between hover:bg-slate-700/20 transition-colors group"
+                          className={`p-5 flex items-center justify-between hover:bg-slate-700/20 transition-colors group ${
+                            bulkMode && isSelected ? 'bg-violet-500/10' : ''
+                          }`}
                         >
                           <div className="flex items-center gap-4 flex-1 min-w-0">
+                            {/* Bulk mode checkbox */}
+                            {bulkMode && (
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleItemSelection(item.id)}
+                                className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20 cursor-pointer flex-shrink-0"
+                              />
+                            )}
                             {/* Show image thumbnail if available */}
                             {imageUrl ? (
                               <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-slate-700/50">
@@ -2147,6 +2394,119 @@ export function AdminDashboard({}: AdminDashboardProps) {
           </main>
         </div>
       </div>
+
+      {/* Bulk Set Field Modal */}
+      {showBulkFieldModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl max-w-md w-full border border-slate-700/50 shadow-2xl">
+            <div className="p-5 border-b border-slate-700/50">
+              <h3 className="text-lg font-semibold text-white">Set Field for {selectedItems.length} Items</h3>
+              <p className="text-sm text-slate-400 mt-1">Update a field value across all selected items</p>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Select Field</label>
+                <select
+                  value={bulkFieldKey}
+                  onChange={(e) => {
+                    setBulkFieldKey(e.target.value);
+                    setBulkFieldValue('');
+                  }}
+                  className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
+                >
+                  <option value="">Choose a field...</option>
+                  {config.fields.map(field => (
+                    <option key={field.key} value={field.key}>{field.label}</option>
+                  ))}
+                </select>
+              </div>
+              {bulkFieldKey && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">New Value</label>
+                  {(() => {
+                    const field = config.fields.find(f => f.key === bulkFieldKey);
+                    if (!field) return null;
+
+                    if (field.type === 'boolean') {
+                      return (
+                        <select
+                          value={bulkFieldValue ? 'true' : 'false'}
+                          onChange={(e) => setBulkFieldValue(e.target.value === 'true')}
+                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
+                        >
+                          <option value="true">Yes / Enabled</option>
+                          <option value="false">No / Disabled</option>
+                        </select>
+                      );
+                    }
+
+                    if (field.type === 'select' && field.options) {
+                      return (
+                        <select
+                          value={bulkFieldValue || ''}
+                          onChange={(e) => setBulkFieldValue(e.target.value)}
+                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
+                        >
+                          <option value="">Select an option...</option>
+                          {field.options.map((opt: string) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      );
+                    }
+
+                    if (field.type === 'number') {
+                      return (
+                        <input
+                          type="number"
+                          value={bulkFieldValue || ''}
+                          onChange={(e) => setBulkFieldValue(e.target.value ? parseInt(e.target.value) : '')}
+                          placeholder={field.placeholder}
+                          className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
+                        />
+                      );
+                    }
+
+                    return (
+                      <input
+                        type="text"
+                        value={bulkFieldValue || ''}
+                        onChange={(e) => setBulkFieldValue(e.target.value)}
+                        placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
+                        className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
+                      />
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+            <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowBulkFieldModal(false);
+                  setBulkFieldKey('');
+                  setBulkFieldValue('');
+                }}
+                className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkSetField}
+                disabled={!bulkFieldKey || bulkActionLoading}
+                className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+              >
+                {bulkActionLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                Apply to {selectedItems.length} Items
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
