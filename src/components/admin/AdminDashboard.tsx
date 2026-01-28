@@ -48,8 +48,10 @@ import {
   Database,
   CheckCircle2,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  Eye
 } from 'lucide-react';
+import RichTextEditor from './RichTextEditor';
 
 // Base path for API calls - matches the deployment path
 const API_BASE = '/jewett-junction';
@@ -326,6 +328,9 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const [uploadingField, setUploadingField] = React.useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = React.useState<number>(0);
   const [dragOverField, setDragOverField] = React.useState<string | null>(null);
+
+  // Preview state
+  const [showPreview, setShowPreview] = React.useState(false);
 
   // Sync collections state
   const [showSyncModal, setShowSyncModal] = React.useState(false);
@@ -988,6 +993,127 @@ export function AdminDashboard({}: AdminDashboardProps) {
         </div>
       </header>
 
+      {/* Preview Modal */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl">
+            {/* Preview Header */}
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div className="flex items-center gap-3">
+                <Eye className="h-5 w-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Preview: {formData.name || 'Untitled'}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Preview Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-white">
+              {/* Title */}
+              {formData.name && (
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">{formData.name}</h1>
+              )}
+
+              {/* Featured Image */}
+              {(formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail) && (
+                <div className="mb-6 rounded-xl overflow-hidden">
+                  <img
+                    src={formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail}
+                    alt={formData.name || 'Preview'}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Meta info */}
+              <div className="flex flex-wrap gap-3 mb-6 text-sm text-gray-600">
+                {formData.author && (
+                  <span className="flex items-center gap-1">
+                    <Users className="h-4 w-4" /> {formData.author}
+                  </span>
+                )}
+                {formData.category && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    {formData.category}
+                  </span>
+                )}
+                {formData.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" /> {formData.location}
+                  </span>
+                )}
+                {formData['start-date'] && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(formData['start-date']).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                )}
+              </div>
+
+              {/* Main Content (richtext) */}
+              {(formData.content || formData.description) && (
+                <div
+                  className="prose prose-gray max-w-none
+                    [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-3
+                    [&_p]:text-gray-700 [&_p]:my-3 [&_p]:leading-relaxed
+                    [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3
+                    [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3
+                    [&_li]:my-1 [&_li]:text-gray-700
+                    [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800
+                    [&_strong]:font-semibold [&_b]:font-semibold
+                    [&_em]:italic [&_i]:italic"
+                  dangerouslySetInnerHTML={{ __html: formData.content || formData.description || '' }}
+                />
+              )}
+
+              {/* Additional fields preview */}
+              {formData.requirements && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Requirements</h3>
+                  <div
+                    className="prose prose-gray max-w-none text-gray-700"
+                    dangerouslySetInnerHTML={{ __html: formData.requirements }}
+                  />
+                </div>
+              )}
+
+              {formData.benefits && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Benefits</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">{formData.benefits}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Preview Footer */}
+            <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+              <p className="text-sm text-gray-500">
+                This is how your content will appear on the site
+              </p>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sync Collections Modal */}
       {showSyncModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1495,16 +1621,26 @@ export function AdminDashboard({}: AdminDashboardProps) {
                       {editingItem ? `Edit ${config.name.slice(0, -1)}` : `New ${config.name.slice(0, -1)}`}
                     </h2>
                   </div>
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setEditingItem(null);
-                      setFormData({});
-                    }}
-                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowPreview(true)}
+                      className="flex items-center gap-2 px-3 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+                      title="Preview how this will look"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="text-sm">Preview</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setEditingItem(null);
+                        setFormData({});
+                      }}
+                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="p-6 space-y-6">
@@ -1664,12 +1800,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
                         {/* Rich text */}
                         {field.type === 'richtext' && (
-                          <textarea
+                          <RichTextEditor
                             value={formData[field.key] || ''}
-                            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                            rows={6}
-                            placeholder={field.placeholder || "Supports basic HTML formatting"}
-                            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all resize-none font-mono text-sm"
+                            onChange={(html) => setFormData({ ...formData, [field.key]: html })}
+                            placeholder={field.placeholder || "Start typing your content..."}
                           />
                         )}
 
