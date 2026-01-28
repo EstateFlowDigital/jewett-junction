@@ -57,6 +57,38 @@ export const OPTIONS: APIRoute = async () => {
   });
 };
 
+// ALL - Fallback handler for any method
+export const ALL: APIRoute = async ({ request, locals }) => {
+  // Handle OPTIONS for CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
+  }
+
+  // For POST, delegate to the POST handler (should be handled by POST export but just in case)
+  if (request.method === 'POST') {
+    // This shouldn't normally be reached, but provide a fallback
+    return withCors(new Response(JSON.stringify({
+      error: 'Request routed through ALL handler - check deployment',
+      method: request.method
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    }));
+  }
+
+  // For any other unexpected method
+  return withCors(new Response(JSON.stringify({
+    error: `Method ${request.method} not allowed`,
+    allowedMethods: ['POST', 'GET', 'OPTIONS']
+  }), {
+    status: 405,
+    headers: { 'Content-Type': 'application/json' }
+  }));
+};
+
 // POST - Publish site
 export const POST: APIRoute = async ({ request, locals }) => {
   console.log('=== PUBLISH REQUEST ===');

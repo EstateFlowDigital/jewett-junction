@@ -57,6 +57,26 @@ export const OPTIONS: APIRoute = async () => {
   });
 };
 
+// ALL - Fallback handler for any method
+export const ALL: APIRoute = async ({ request }) => {
+  // Handle OPTIONS for CORS preflight
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
+  }
+
+  // For any other unexpected method
+  return withCors(new Response(JSON.stringify({
+    error: `Method ${request.method} not allowed`,
+    allowedMethods: ['POST', 'OPTIONS']
+  }), {
+    status: 405,
+    headers: { 'Content-Type': 'application/json' }
+  }));
+};
+
 // POST - Upload asset to Webflow
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
