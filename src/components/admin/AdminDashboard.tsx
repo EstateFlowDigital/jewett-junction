@@ -810,10 +810,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
       return;
     }
 
-    // Validate file size (max 4MB)
-    const maxSize = 4 * 1024 * 1024;
+    // Validate file size (max 3MB - base64 adds ~33% overhead)
+    const maxSize = 3 * 1024 * 1024;
     if (file.size > maxSize) {
-      setError('File too large. Maximum size is 4MB');
+      setError('File too large. Maximum size is 3MB');
       return;
     }
 
@@ -860,8 +860,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
-          fileData: base64,
-          folder: activeCollection
+          fileData: base64
         })
       });
 

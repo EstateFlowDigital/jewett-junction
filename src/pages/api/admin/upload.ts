@@ -131,13 +131,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Parse JSON body with base64 file data
     console.log('Parsing JSON body...');
     const body = await request.json();
-    const { fileName, fileType, fileSize, fileData, folder = 'admin-uploads' } = body;
+    const { fileName, fileType, fileSize, fileData } = body;
 
     console.log('File name:', fileName || 'NOT PROVIDED');
     console.log('File type:', fileType || 'NOT PROVIDED');
     console.log('File size:', fileSize || 'NOT PROVIDED', 'bytes');
     console.log('File data length:', fileData?.length || 0, 'chars');
-    console.log('Target folder:', folder);
 
     if (!fileData || !fileName) {
       console.log('UPLOAD ERROR: Missing file data or name');
@@ -159,12 +158,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }));
     }
 
-    // Validate file size (max 4MB for images)
-    const maxSize = 4 * 1024 * 1024; // 4MB
+    // Validate file size (max 3MB for images)
+    // Note: Base64 encoding adds ~33% overhead, so 3MB file becomes ~4MB in request
+    const maxSize = 3 * 1024 * 1024; // 3MB
     if (fileSize > maxSize) {
       console.log('UPLOAD ERROR: File too large:', fileSize);
       return withCors(new Response(JSON.stringify({
-        error: 'File too large. Maximum size is 4MB'
+        error: 'File too large. Maximum size is 3MB'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -196,10 +196,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('Step 1: Requesting upload URL from Webflow...');
     console.log('Webflow API endpoint:', `${BASE_URL}/sites/${siteId}/assets`);
 
+    // Note: We don't use parentFolder as Webflow expects a valid folder ObjectId
+    // Assets will be uploaded to the site root
     const uploadRequestBody = {
       fileName: uniqueFileName,
-      fileHash: fileHash,
-      parentFolder: folder
+      fileHash: fileHash
     };
     console.log('Request body:', JSON.stringify(uploadRequestBody));
 
