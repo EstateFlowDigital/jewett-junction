@@ -286,19 +286,19 @@ export interface Resource {
 // ============================================
 
 export const COLLECTIONS = {
-  // Existing collections (update IDs after syncing)
+  // Existing collections
   employees: '69738d872d19741af9e461a1',
   announcements: '69738dd73f2d71626fcc6b0a',
   events: '69738e25a192594f2ba185f3',
   jobPostings: '69738e490bd2a14f9c7f1885',
   cultureStories: '69738e5ef6e68b6b209e404c',
   resources: '69738e7aaef2bb2746f8d943',
-  // New collections (add IDs after syncing via admin panel)
-  hrContent: '', // HR policies, benefits, forms
-  safetyContent: '', // Safety protocols, training, alerts
-  itKnowledgeBase: '', // IT help articles and guides
-  marketingAssets: '', // Brand assets and templates
-  submittedIdeas: '', // Employee suggestions
+  // New collections
+  hrContent: '69766742886e7381c5ab86c1',
+  safetyContent: '69766745cde507f64937f1fc',
+  itKnowledgeBase: '697667485f0556597dac1ce1',
+  marketingAssets: '6976674b9d1917dbf6e1fb4d',
+  submittedIdeas: '6976674fd3adf8bb054da4ce',
 } as const;
 
 // ============================================
