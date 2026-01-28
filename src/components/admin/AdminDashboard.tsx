@@ -445,7 +445,14 @@ export function AdminDashboard({}: AdminDashboardProps) {
         throw new Error('Failed to load items');
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        console.error('Items response not JSON:', responseText.substring(0, 200));
+        throw new Error('Server returned invalid response');
+      }
       setItems(data.items || []);
     } catch (err: any) {
       setError(err.message);
@@ -516,8 +523,18 @@ export function AdminDashboard({}: AdminDashboardProps) {
         body: JSON.stringify(body)
       });
 
+      const responseText = await response.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        console.error('Save response not JSON:', responseText.substring(0, 200));
+        if (!response.ok) {
+          throw new Error(`Server error (${response.status})`);
+        }
+      }
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Failed to save item');
       }
 
@@ -543,10 +560,23 @@ export function AdminDashboard({}: AdminDashboardProps) {
       console.log('Publishing site...');
       const response = await fetch(`${API_BASE}/api/admin/publish`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${getToken()}` }
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json'
+        }
       });
 
-      const data = await response.json().catch(() => ({}));
+      // Read response as text first to handle non-JSON errors
+      const responseText = await response.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        console.error('Publish response not JSON:', responseText.substring(0, 200));
+        throw new Error(response.status === 0
+          ? 'Network error - please check your connection'
+          : `Server error (${response.status}): ${responseText.substring(0, 100)}`);
+      }
       console.log('Publish response:', response.status, data);
 
       if (!response.ok) {
@@ -796,12 +826,22 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
       clearInterval(progressInterval);
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Upload failed');
+      // Read response as text first to handle non-JSON errors
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        // Response is not JSON - likely a CORS or server error
+        console.error('Upload response not JSON:', responseText.substring(0, 200));
+        throw new Error(response.status === 0
+          ? 'Network error - please check your connection'
+          : `Server error (${response.status}): ${responseText.substring(0, 100)}`);
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `Upload failed with status ${response.status}`);
+      }
       setUploadProgress(100);
 
       // Set the URL in form data
