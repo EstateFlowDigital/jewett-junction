@@ -253,19 +253,63 @@ export const POST: APIRoute = async ({ request, locals }) => {
       console.log('Step 2: Uploading file to S3...');
       console.log('S3 upload URL:', uploadData.uploadUrl.substring(0, 100) + '...');
       console.log('File buffer size:', fileBuffer.byteLength, 'bytes');
-      console.log('Client reported size:', fileSize, 'bytes');
+      console.log('Upload details present:', !!uploadData.uploadDetails);
+      if (uploadData.uploadDetails) {
+        console.log('Upload details keys:', Object.keys(uploadData.uploadDetails));
+      }
 
-      // Use actual buffer size, not client-reported size
-      const actualSize = fileBuffer.byteLength;
+      let uploadResponse: Response;
 
-      const uploadResponse = await fetch(uploadData.uploadUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': fileType,
-          'Content-Length': actualSize.toString()
-        },
-        body: fileBuffer
-      });
+      // Check if Webflow provided uploadDetails (for S3 POST with presigned policy)
+      if (uploadData.uploadDetails) {
+        // Use multipart form upload with the provided form fields
+        console.log('Using multipart form upload with uploadDetails...');
+
+        // Build form data manually since FormData isn't available in all runtimes
+        const boundary = '----WebflowUploadBoundary' + Date.now();
+        let formBody = '';
+
+        // Add all uploadDetails fields first
+        for (const [key, value] of Object.entries(uploadData.uploadDetails)) {
+          formBody += `--${boundary}\r\n`;
+          formBody += `Content-Disposition: form-data; name="${key}"\r\n\r\n`;
+          formBody += `${value}\r\n`;
+        }
+
+        // Add the file last (this is required by S3)
+        formBody += `--${boundary}\r\n`;
+        formBody += `Content-Disposition: form-data; name="file"; filename="${uniqueFileName}"\r\n`;
+        formBody += `Content-Type: ${fileType}\r\n\r\n`;
+
+        // Convert form preamble to bytes
+        const encoder = new TextEncoder();
+        const preamble = encoder.encode(formBody);
+        const epilogue = encoder.encode(`\r\n--${boundary}--\r\n`);
+
+        // Combine preamble + file data + epilogue
+        const combinedBody = new Uint8Array(preamble.length + fileBuffer.byteLength + epilogue.length);
+        combinedBody.set(preamble, 0);
+        combinedBody.set(new Uint8Array(fileBuffer), preamble.length);
+        combinedBody.set(epilogue, preamble.length + fileBuffer.byteLength);
+
+        uploadResponse = await fetch(uploadData.uploadUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': `multipart/form-data; boundary=${boundary}`
+          },
+          body: combinedBody
+        });
+      } else {
+        // Fallback to simple PUT (for direct S3 presigned PUT URLs)
+        console.log('Using simple PUT upload...');
+        uploadResponse = await fetch(uploadData.uploadUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': fileType
+          },
+          body: fileBuffer
+        });
+      }
 
       console.log('S3 upload response status:', uploadResponse.status);
 
