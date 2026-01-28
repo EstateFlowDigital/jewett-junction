@@ -158,13 +158,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }));
     }
 
-    // Validate file size (max 3MB for images)
-    // Note: Base64 encoding adds ~33% overhead, so 3MB file becomes ~4MB in request
-    const maxSize = 3 * 1024 * 1024; // 3MB
+    // Validate file size (max 750KB for images)
+    // Note: Base64 encoding adds ~33% overhead, so 750KB becomes ~1MB in request
+    // Webflow Cloud has request body size limits
+    const maxSize = 750 * 1024; // 750KB
     if (fileSize > maxSize) {
       console.log('UPLOAD ERROR: File too large:', fileSize);
       return withCors(new Response(JSON.stringify({
-        error: 'File too large. Maximum size is 3MB'
+        error: 'File too large. Maximum size is 750KB. Please compress your image before uploading.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }

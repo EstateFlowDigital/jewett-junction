@@ -810,10 +810,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
       return;
     }
 
-    // Validate file size (max 3MB - base64 adds ~33% overhead)
-    const maxSize = 3 * 1024 * 1024;
+    // Validate file size (max 750KB - base64 adds ~33% overhead, Webflow Cloud has limits)
+    const maxSize = 750 * 1024;
     if (file.size > maxSize) {
-      setError('File too large. Maximum size is 3MB');
+      setError('File too large. Maximum size is 750KB. Please compress your image before uploading.');
       return;
     }
 
