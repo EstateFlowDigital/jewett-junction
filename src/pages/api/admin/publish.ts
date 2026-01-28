@@ -105,33 +105,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }));
     }
 
-    // Get custom domains first to include in publish request
-    let customDomainIds: string[] = [];
-    try {
-      const domainsResponse = await fetch(`${BASE_URL}/sites/${siteId}/custom_domains`, {
-        headers: {
-          'Authorization': `Bearer ${apiToken}`,
-          'accept': 'application/json'
-        }
-      });
-      if (domainsResponse.ok) {
-        const domainsData = await domainsResponse.json();
-        customDomainIds = domainsData.customDomains?.map((d: any) => d.id) || [];
-        console.log('Publish: Found custom domains:', customDomainIds);
-      }
-    } catch (e) {
-      console.log('Publish: Could not fetch custom domains, publishing to subdomain only');
-    }
-
-    // Build publish request body
-    const publishBody: any = {
+    // Build publish request body - publish to subdomain only
+    // Note: Publishing to custom domains may require additional permissions
+    const publishBody = {
       publishToWebflowSubdomain: true
     };
-
-    // Include custom domains if available
-    if (customDomainIds.length > 0) {
-      publishBody.customDomains = customDomainIds;
-    }
 
     console.log('Publish: Request body:', JSON.stringify(publishBody));
 
@@ -148,6 +126,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     console.log('Publish: Webflow response status:', response.status);
 
+    // response.ok is true for 200-299, including 202 Accepted
     if (!response.ok) {
       const errorText = await response.text();
       let errorData;
