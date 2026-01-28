@@ -1124,11 +1124,11 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
               {/* Featured Image */}
               {(formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail) && (
-                <div className="mb-6 rounded-xl overflow-hidden">
+                <div className="mb-6 rounded-xl overflow-hidden bg-gray-100 p-4 flex items-center justify-center">
                   <img
                     src={formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail}
                     alt={formData.name || 'Preview'}
-                    className="w-full h-64 object-cover"
+                    className="max-w-full max-h-[400px] object-contain rounded-lg"
                   />
                 </div>
               )}
@@ -1762,26 +1762,26 @@ export function AdminDashboard({}: AdminDashboardProps) {
                             {/* Show preview if we have an image */}
                             {formData[field.key] ? (
                               <div className="relative rounded-xl overflow-hidden border border-slate-700/50 bg-slate-900/50">
-                                <img
-                                  src={formData[field.key]}
-                                  alt="Preview"
-                                  className="w-full h-48 object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
-                                  }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity">
-                                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                                    <span className="text-white text-xs truncate max-w-[60%]">{formData[field.key].split('/').pop()}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => setFormData({ ...formData, [field.key]: '' })}
-                                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                      Remove
-                                    </button>
-                                  </div>
+                                <div className="bg-slate-800/50 p-4 flex items-center justify-center min-h-[200px]">
+                                  <img
+                                    src={formData[field.key]}
+                                    alt="Preview"
+                                    className="max-w-full max-h-[300px] object-contain rounded-lg"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
+                                    }}
+                                  />
+                                </div>
+                                <div className="p-3 bg-slate-900/80 border-t border-slate-700/50 flex items-center justify-between">
+                                  <span className="text-slate-400 text-xs truncate max-w-[60%]">{formData[field.key].split('/').pop()}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, [field.key]: '' })}
+                                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                    Remove
+                                  </button>
                                 </div>
                               </div>
                             ) : (
@@ -1834,21 +1834,21 @@ export function AdminDashboard({}: AdminDashboardProps) {
                                       />
                                     </label>
                                     <p className="text-xs text-slate-500 mt-3">
-                                      JPEG, PNG, GIF, WebP, SVG • Max 4MB
+                                      JPEG, PNG, GIF, WebP, SVG • Max 750KB
                                     </p>
                                   </div>
                                 )}
                               </div>
                             )}
 
-                            {/* URL input toggle (collapsed by default) */}
+                            {/* URL input option - good for larger images */}
                             {!formData[field.key] && !uploadingField && (
-                              <details className="group">
-                                <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-400 flex items-center gap-1">
+                              <div className="border-t border-slate-700/50 pt-3">
+                                <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
                                   <Link className="h-3 w-3" />
-                                  Or paste image URL
-                                </summary>
-                                <div className="mt-2 relative">
+                                  Or paste image URL (no size limit)
+                                </p>
+                                <div className="relative">
                                   <input
                                     type="url"
                                     value={formData[field.key] || ''}
@@ -1858,7 +1858,7 @@ export function AdminDashboard({}: AdminDashboardProps) {
                                   />
                                   <Image className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                 </div>
-                              </details>
+                              </div>
                             )}
                           </div>
                         )}
