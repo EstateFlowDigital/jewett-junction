@@ -2063,8 +2063,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
                 ) : (
                   <div className="divide-y divide-slate-700/50">
                     {items.map((item) => {
-                      // Get image from various possible fields
-                      const imageUrl = item.fieldData?.image || item.fieldData?.['banner-image'] || item.fieldData?.['featured-image'] || item.fieldData?.photo || item.fieldData?.thumbnail;
+                      // Get image from various possible fields (use getImageUrl to handle Webflow's object format)
+                      const imageUrl = getImageUrl(item.fieldData?.image) || getImageUrl(item.fieldData?.['banner-image']) || getImageUrl(item.fieldData?.['featured-image']) || getImageUrl(item.fieldData?.photo) || getImageUrl(item.fieldData?.thumbnail);
                       // Get subtitle info based on collection type
                       const subtitle = item.fieldData?.department || item.fieldData?.category || item.fieldData?.type || item.fieldData?.role;
                       const location = item.fieldData?.location || item.fieldData?.['office-location'];
