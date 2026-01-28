@@ -5,6 +5,42 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
+// Valid Webflow field slugs for each collection
+// Only these fields will be sent to Webflow API
+// Based on actual Webflow collection schemas
+const VALID_FIELDS: Record<string, string[]> = {
+  announcements: ['name', 'slug', 'content', 'priority', 'published-date', 'author', 'is-pinned'],
+  events: ['name', 'slug', 'description', 'event-date', 'end-date', 'location', 'category', 'registration-link'],
+  employees: ['name', 'slug', 'role', 'department', 'email', 'phone', 'photo', 'bio', 'start-date', 'is-featured'],
+  jobPostings: ['name', 'slug', 'department', 'location', 'description', 'requirements', 'referral-bonus', 'apply-link', 'job-is-active'],
+  cultureStories: ['name', 'slug', 'excerpt', 'content', 'image', 'author', 'published-date', 'category'],
+  resources: ['name', 'slug', 'description', 'category', 'file', 'external-link', 'icon'],
+};
+
+// Filter fields to only include valid ones for the collection
+function filterValidFields(collection: string, fields: Record<string, any>): Record<string, any> {
+  const validFieldKeys = VALID_FIELDS[collection];
+
+  // If we don't have a schema for this collection, pass through all non-empty fields
+  if (!validFieldKeys) {
+    return Object.fromEntries(
+      Object.entries(fields).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+    );
+  }
+
+  // Filter to only valid fields with non-empty values
+  return Object.fromEntries(
+    Object.entries(fields).filter(([key, value]) => {
+      const isValidField = validFieldKeys.includes(key);
+      const hasValue = value !== undefined && value !== null && value !== '';
+      if (!isValidField && hasValue) {
+        console.log(`Filtering out field '${key}' - not in Webflow schema for ${collection}`);
+      }
+      return isValidField && hasValue;
+    })
+  );
+}
+
 // CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -126,6 +162,8 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
 
 // POST - Create new item
 export const POST: APIRoute = async ({ request, locals }) => {
+  console.log('=== POST ITEM REQUEST ===');
+
   if (!verifyToken(request)) {
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -138,12 +176,19 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const { collection, fields, isLive = false } = await request.json();
 
+    console.log('POST: Collection:', collection);
+    console.log('POST: Original fields keys:', Object.keys(fields || {}));
+
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
       return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       }));
     }
+
+    // Filter to only valid Webflow fields for this collection
+    const filteredFields = filterValidFields(collection, fields || {});
+    console.log('POST: Filtered fields keys:', Object.keys(filteredFields));
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
@@ -156,7 +201,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        fieldData: fields
+        fieldData: filteredFields
       })
     });
 
@@ -201,7 +246,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     console.log('PATCH: Collection:', collection);
     console.log('PATCH: Item ID:', itemId);
     console.log('PATCH: isLive:', isLive);
-    console.log('PATCH: Fields keys:', Object.keys(fields || {}));
+    console.log('PATCH: Original fields keys:', Object.keys(fields || {}));
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
       console.log('PATCH: Invalid collection - not found in COLLECTIONS');
@@ -214,6 +259,18 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     if (!itemId) {
       console.log('PATCH: Missing item ID');
       return withCors(new Response(JSON.stringify({ error: 'Item ID required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      }));
+    }
+
+    // Filter to only valid Webflow fields for this collection
+    const filteredFields = filterValidFields(collection, fields || {});
+    console.log('PATCH: Filtered fields keys:', Object.keys(filteredFields));
+
+    if (Object.keys(filteredFields).length === 0) {
+      console.log('PATCH: No valid fields to update');
+      return withCors(new Response(JSON.stringify({ error: 'No valid fields to update' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       }));
@@ -233,7 +290,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
-        fieldData: fields
+        fieldData: filteredFields
       })
     });
 
