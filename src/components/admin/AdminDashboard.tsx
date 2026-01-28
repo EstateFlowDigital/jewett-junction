@@ -367,7 +367,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
   const verifyToken = async (token: string) => {
     try {
       const response = await fetch(`${API_BASE}/api/admin/login`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
       if (response.ok) {
         setIsAuthenticated(true);
@@ -387,7 +390,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
     try {
       const response = await fetch(`${API_BASE}/api/admin/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
         body: JSON.stringify({ password })
       });
 
@@ -434,7 +440,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
 
     try {
       const response = await fetch(`${API_BASE}/api/admin/items?collection=${activeCollection}`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` }
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (!response.ok) {
@@ -482,7 +491,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({ collection: activeCollection, itemId })
       });
@@ -518,7 +528,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
         method,
         headers: {
           'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify(body)
       });
@@ -562,7 +573,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         }
       });
 
@@ -597,7 +609,10 @@ export function AdminDashboard({}: AdminDashboardProps) {
     setSyncStatus('loading');
     try {
       const response = await fetch(`${API_BASE}/api/admin/collections`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` }
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       });
 
       if (!response.ok) throw new Error('Failed to fetch collections');
@@ -651,7 +666,8 @@ export function AdminDashboard({}: AdminDashboardProps) {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify(requestBody)
       });
@@ -819,7 +835,9 @@ export function AdminDashboard({}: AdminDashboardProps) {
       const response = await fetch(`${API_BASE}/api/admin/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${getToken()}`
+          'Authorization': `Bearer ${getToken()}`,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
         },
         body: uploadFormData
       });
