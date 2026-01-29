@@ -66,6 +66,10 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
     a['article-type'] === 'Software' || a.category === 'Software'
   );
 
+  // If no items have article-type or category set, use all items as fallback
+  const hasTypes = howToArticles.length > 0 || softwareArticles.length > 0;
+  const displayArticles = hasTypes ? [] : articles;
+
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
@@ -160,19 +164,15 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
                     </div>
                   ))}
                 </div>
-              ) : (
-                (howToArticles.length > 0 ? howToArticles.slice(0, 4).map((article) => ({
+              ) : (howToArticles.length > 0 || displayArticles.length > 0) ? (
+                /* Show how-to articles, or all articles if no type is set */
+                (howToArticles.length > 0 ? howToArticles.slice(0, 4) : displayArticles.slice(0, 4)).map((article) => ({
                   title: article.name,
-                  desc: stripHtml(article.description)?.substring(0, 60) || 'Quick fix guide',
-                  link: article['article-link'] || resourcesLink,
+                  desc: stripHtml(article.description || article.summary)?.substring(0, 60) || 'IT Resource',
+                  link: article['article-link'] || article['download-link'] || resourcesLink,
                   icon: getCategoryIcon(article.name),
                   imageUrl: article.icon?.url
-                })) : [
-                  { title: 'Password Reset', desc: 'Reset your network password', link: resourcesLink, icon: Shield, imageUrl: undefined },
-                  { title: 'VPN Connection Issues', desc: 'Troubleshoot remote access', link: resourcesLink, icon: Wifi, imageUrl: undefined },
-                  { title: 'Email Setup', desc: 'Configure email on mobile devices', link: resourcesLink, icon: Mail, imageUrl: undefined },
-                  { title: 'Printer Problems', desc: 'Fix common printing issues', link: resourcesLink, icon: Monitor, imageUrl: undefined },
-                ]).map((item) => (
+                })).map((item) => (
                   <a key={item.title} href={item.link} target={item.link.startsWith('http') ? '_blank' : undefined} rel={item.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt={item.title} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
@@ -188,6 +188,15 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
                     <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                   </a>
                 ))
+              ) : (
+                /* Empty state when no articles */
+                <div className={`text-center py-6 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                  <HelpCircle className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                  <p>No articles available.</p>
+                  <a href="/jewett-junction/admin" className="text-blue-600 hover:underline text-sm mt-1 inline-block">
+                    Add content in the admin panel
+                  </a>
+                </div>
               )}
             </CardContent>
           </Card>

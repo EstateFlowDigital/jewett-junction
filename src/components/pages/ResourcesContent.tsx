@@ -88,22 +88,9 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
-// Sample resources when CMS is not connected
-const sampleResources: CMSResource[] = [
-  { id: '1', name: 'Safety Manual 2026', description: 'Complete company safety guidelines and procedures', category: 'Safety', 'file-type': 'PDF', 'file-size': '2.4 MB', 'last-updated': '2026-01-10', featured: true, 'view-count': 245 },
-  { id: '2', name: 'Employee Handbook', description: 'Policies, benefits, and company culture guide', category: 'HR', 'file-type': 'PDF', 'file-size': '1.8 MB', 'last-updated': '2026-01-08', featured: true, 'view-count': 189 },
-  { id: '3', name: 'Project Budget Template', description: 'Standard budget tracking spreadsheet for all projects', category: 'Project', 'file-type': 'Excel', 'file-size': '156 KB', 'last-updated': '2026-01-05', 'view-count': 134 },
-  { id: '4', name: 'Brand Guidelines', description: 'Logo usage, colors, fonts, and visual standards', category: 'Marketing', 'file-type': 'PDF', 'file-size': '5.2 MB', 'last-updated': '2026-01-03', featured: true, 'view-count': 98 },
-  { id: '5', name: 'IT Security Policy', description: 'Data protection and cybersecurity guidelines', category: 'IT', 'file-type': 'PDF', 'file-size': '890 KB', 'last-updated': '2026-01-02', 'view-count': 156 },
-  { id: '6', name: 'PTO Request Form', description: 'Time off request submission form', category: 'HR', 'file-type': 'PDF', 'file-size': '45 KB', 'last-updated': '2025-12-20', 'view-count': 312 },
-  { id: '7', name: 'OSHA Training Checklist', description: 'Required safety training completion tracker', category: 'Safety', 'file-type': 'Excel', 'file-size': '78 KB', 'last-updated': '2025-12-18', 'view-count': 201 },
-  { id: '8', name: 'Project Status Report Template', description: 'Weekly status report format for project managers', category: 'Project', 'file-type': 'Word', 'file-size': '112 KB', 'last-updated': '2025-12-15', 'view-count': 167 },
-  { id: '9', name: 'Expense Report Form', description: 'Business expense reimbursement submission', category: 'HR', 'file-type': 'PDF', 'file-size': '52 KB', 'last-updated': '2025-12-12', 'view-count': 278 },
-  { id: '10', name: 'VPN Setup Guide', description: 'Step-by-step remote access configuration', category: 'IT', 'file-type': 'PDF', 'file-size': '1.1 MB', 'last-updated': '2025-12-10', 'view-count': 145 },
-];
-
 export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] }: ResourcesContentProps) {
-  const allResources = cmsResources.length > 0 ? cmsResources : sampleResources;
+  // Use CMS resources directly - no hardcoded fallback
+  const allResources = cmsResources;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState<string>('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');

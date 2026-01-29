@@ -139,30 +139,30 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
                     </div>
                   ))}
                 </div>
-              ) : (
-                (recentAssets.length > 0 ? recentAssets.map((asset) => ({
-                  name: asset.name,
-                  date: asset['asset-type'] || 'Asset',
-                  link: asset['file-link']
-                })) : [
-                  { name: 'Q4 2025 Presentation Template', date: 'Jan 12, 2026', link: undefined },
-                  { name: 'Updated Logo Files (SVG)', date: 'Jan 10, 2026', link: undefined },
-                  { name: 'New Project Photo Set - Downtown Tower', date: 'Jan 8, 2026', link: undefined },
-                  { name: 'Safety Signage Templates', date: 'Jan 5, 2026', link: undefined },
-                ]).map((item) => (
-                  <a key={item.name} href={item.link || '#'} target={item.link ? '_blank' : undefined} rel={item.link ? 'noopener' : undefined} className={`flex items-center justify-between p-4 rounded-lg border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'} transition-colors cursor-pointer`}>
+              ) : recentAssets.length > 0 ? (
+                recentAssets.map((asset) => (
+                  <a key={asset.id} href={asset['file-link'] || asset['download-link'] || '#'} target={asset['file-link'] || asset['download-link'] ? '_blank' : undefined} rel={asset['file-link'] || asset['download-link'] ? 'noopener' : undefined} className={`flex items-center justify-between p-4 rounded-lg border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'} transition-colors cursor-pointer`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 ${isDark ? 'bg-rose-900' : 'bg-rose-100'} rounded-lg flex items-center justify-center`}>
                         <FileText className="h-5 w-5 text-rose-600" />
                       </div>
                       <div>
-                        <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{item.name}</div>
-                        <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{item.date}</div>
+                        <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{asset.name}</div>
+                        <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{asset['asset-type'] || 'Asset'}</div>
                       </div>
                     </div>
                     <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                   </a>
                 ))
+              ) : (
+                /* Empty state when no assets */
+                <div className={`text-center py-6 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                  <FileText className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                  <p>No marketing assets available.</p>
+                  <a href="/jewett-junction/admin" className="text-rose-600 hover:underline text-sm mt-1 inline-block">
+                    Add content in the admin panel
+                  </a>
+                </div>
               )}
             </CardContent>
           </Card>

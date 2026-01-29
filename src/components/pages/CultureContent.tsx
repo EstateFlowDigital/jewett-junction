@@ -95,54 +95,6 @@ const coreValues = [
   },
 ];
 
-// Sample stories when CMS is not connected
-const sampleStories: CMSCultureStory[] = [
-  {
-    id: '1',
-    name: 'Employee Spotlight: Jennifer Davis',
-    type: 'Employee Spotlight',
-    'person-name': 'Jennifer Davis',
-    'person-role': 'Project Manager',
-    'person-tenure': '8 years',
-    quote: "What I love most about Jewett is the people. We're not just coworkers—we're a family that supports each other through every challenge.",
-    excerpt: "Jennifer's leadership on the Downtown Office Complex project exemplifies our commitment to excellence. Her dedication to safety and quality has set a new standard for our team.",
-    featured: true,
-  },
-  {
-    id: '2',
-    name: 'Team Win: Plaza Project Completion',
-    type: 'Team Win',
-    excerpt: 'Congratulations to the Downtown Plaza team for completing Phase 2 two weeks ahead of schedule!',
-    author: 'Operations Team',
-    'published-date': new Date().toISOString(),
-  },
-  {
-    id: '3',
-    name: '500 Days Without Incident',
-    type: 'Recognition',
-    excerpt: 'Our safety team has achieved an incredible milestone—500 consecutive days without a recordable incident. Thank you for making safety a priority every single day.',
-    author: 'Safety Department',
-    'published-date': new Date().toISOString(),
-  },
-  {
-    id: '4',
-    name: 'Core Value Champion: Marcus Rodriguez',
-    type: 'Recognition',
-    'person-name': 'Marcus Rodriguez',
-    'person-role': 'Site Superintendent',
-    excerpt: 'Marcus consistently demonstrates our core value of Teamwork, mentoring new hires and fostering collaboration across departments.',
-    'published-date': new Date().toISOString(),
-  },
-  {
-    id: '5',
-    name: 'Community Service Day Success',
-    type: 'Core Value',
-    excerpt: 'Over 100 employees volunteered this weekend, contributing 450+ hours to local charities. Together, we raised $25,000 for Habitat for Humanity.',
-    author: 'HR Team',
-    'published-date': new Date().toISOString(),
-  },
-];
-
 const typeConfig: Record<string, { icon: any; color: string; gradient: string; label: string }> = {
   'employee-spotlight': { icon: Star, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Employee Spotlight' },
   'spotlight': { icon: Star, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Spotlight' },
@@ -162,7 +114,8 @@ function getTypeConfig(type: string | undefined) {
 }
 
 export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: CultureContentProps) {
-  const allStories = cmsStories.length > 0 ? cmsStories : sampleStories;
+  // Use CMS stories directly - no hardcoded fallback
+  const allStories = cmsStories;
   const [activeValueIndex, setActiveValueIndex] = React.useState(0);
   const [spotlightIndex, setSpotlightIndex] = React.useState(0);
 
