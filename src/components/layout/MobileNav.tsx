@@ -19,6 +19,7 @@ import {
   Settings,
   HardHat,
   Lightbulb,
+  HelpCircle,
 } from "lucide-react";
 
 interface NavItem {
@@ -125,6 +126,14 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             >
               <Lightbulb className="h-5 w-5" aria-hidden="true" />
               <span>Submit an Idea</span>
+            </a>
+            <a
+              href="/jewett-junction/help"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <HelpCircle className="h-5 w-5" aria-hidden="true" />
+              <span>Help</span>
             </a>
             <a
               href="/jewett-junction/settings"
