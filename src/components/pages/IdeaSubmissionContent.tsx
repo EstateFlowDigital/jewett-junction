@@ -79,7 +79,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
 
     try {
       // Submit to API endpoint
-      const response = await fetch('/api/submit-idea', {
+      const response = await fetch('/jewett-junction/api/submit-idea', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

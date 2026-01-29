@@ -1,0 +1,26 @@
+---
+import '../../generated/fonts.css';
+import '../../generated/webflow.css';
+import '../site-components/global.css';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'Admin | Jewett Junction' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-slate-950 text-gray-100 min-h-screen">
+    <slot />
+  </body>
+</html>

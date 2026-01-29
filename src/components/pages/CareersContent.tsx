@@ -157,7 +157,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
     }
 
     try {
-      const response = await fetch('/api/apply', {
+      const response = await fetch('/jewett-junction/api/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

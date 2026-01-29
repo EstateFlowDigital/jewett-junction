@@ -1,0 +1,16 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Submitted Ideas | Admin">
+  <AdminLayout client:load currentPage="ideas" title="Submitted Ideas">
+    <CollectionEditor
+      client:load
+      collectionKey="submittedIdeas"
+      config={COLLECTIONS.submittedIdeas}
+    />
+  </AdminLayout>
+</AdminBase>

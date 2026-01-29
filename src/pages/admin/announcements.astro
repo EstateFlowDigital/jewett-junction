@@ -1,0 +1,16 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Announcements | Admin">
+  <AdminLayout client:load currentPage="announcements" title="Announcements">
+    <CollectionEditor
+      client:load
+      collectionKey="announcements"
+      config={COLLECTIONS.announcements}
+    />
+  </AdminLayout>
+</AdminBase>

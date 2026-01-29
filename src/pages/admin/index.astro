@@ -1,21 +1,11 @@
 ---
-import '../../../generated/fonts.css';
-import '../../../generated/webflow.css';
-import '../../site-components/global.css';
-import '../../styles/global.css';
-import { AdminDashboard } from '../../components/admin/AdminDashboard';
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { AdminOverview } from '../../components/admin/AdminOverview';
 ---
 
-<!DOCTYPE html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin Panel | Jewett Junction</title>
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  </head>
-  <body class="bg-slate-950 text-gray-100 min-h-screen">
-    <AdminDashboard client:load />
-  </body>
-</html>
+<AdminBase title="Admin Panel | Jewett Junction">
+  <AdminLayout client:load currentPage="dashboard" title="Dashboard Overview">
+    <AdminOverview client:load />
+  </AdminLayout>
+</AdminBase>
