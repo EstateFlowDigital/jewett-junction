@@ -182,12 +182,14 @@ export function AdminOverview() {
       </div>
 
       {/* Collection Stats Grid */}
-      <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl overflow-hidden">
-        <div className="p-5 border-b border-slate-700/50">
-          <h2 className="text-lg font-semibold text-white">Collections Overview</h2>
-          <p className="text-sm text-slate-400">Click a collection to manage its content</p>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Collections</h2>
+            <p className="text-sm text-slate-400">Manage your content</p>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-slate-700/30" role="list">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -195,18 +197,24 @@ export function AdminOverview() {
                 key={stat.key}
                 href={stat.href}
                 aria-label={`Manage ${stat.name} - ${stat.count} items`}
-                className="bg-slate-800/50 p-5 min-h-[120px] hover:bg-slate-700/50 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+                className="group relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 min-h-[140px] hover:border-slate-600 hover:bg-slate-800/70 hover:shadow-xl hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
                 role="listitem"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-10 h-10 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center`}>
-                    <Icon className="h-5 w-5 text-white" aria-hidden="true" />
+                {/* Gradient glow on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />
+
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                      <Icon className="h-6 w-6 text-white" aria-hidden="true" />
+                    </div>
+                    <span className="px-2.5 py-1 text-xs font-medium bg-slate-700/50 text-slate-300 rounded-full">
+                      {stat.count} {stat.count === 1 ? 'item' : 'items'}
+                    </span>
                   </div>
-                  <ExternalLink className="h-4 w-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                  <h3 className="font-semibold text-white text-lg group-hover:text-blue-400 transition-colors">{stat.name}</h3>
+                  <p className="text-sm text-slate-500 mt-1">Click to manage</p>
                 </div>
-                <h3 className="font-medium text-white mb-1">{stat.name}</h3>
-                <p className="text-2xl font-bold text-slate-300">{stat.count}</p>
-                <p className="text-xs text-slate-500">items</p>
               </a>
             );
           })}

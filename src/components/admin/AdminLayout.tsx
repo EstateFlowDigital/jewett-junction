@@ -65,8 +65,11 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
       const response = await fetch(`${API_BASE}/api/admin/login`, {
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
-        }
+        },
+        credentials: 'same-origin',
+        mode: 'same-origin'
       });
       if (response.ok) {
         setIsAuthenticated(true);
@@ -90,9 +93,12 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password }),
+        credentials: 'same-origin',
+        mode: 'same-origin'
       });
 
       const data = await response.json();
@@ -123,9 +129,23 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('admin_token') || ''}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
-        }
+        },
+        body: JSON.stringify({}),
+        credentials: 'same-origin',
+        mode: 'same-origin'
       });
+
+      // Handle non-JSON responses (like security proxy errors)
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response:', text);
+        setToast({ type: 'error', message: `Server error: ${response.status} - ${text.substring(0, 100)}` });
+        return;
+      }
 
       const data = await response.json();
 

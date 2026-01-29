@@ -769,8 +769,12 @@ export function AdminDashboard({}: AdminDashboardProps) {
         headers: {
           'Authorization': `Bearer ${getToken()}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
-        }
+        },
+        body: JSON.stringify({}),
+        credentials: 'same-origin',
+        mode: 'same-origin'
       });
 
       // Read response as text first to handle non-JSON errors
