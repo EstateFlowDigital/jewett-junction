@@ -113,6 +113,37 @@ export function AdminOverview() {
 
   return (
     <div className="space-y-6">
+      {/* Quick Actions - Moved to top for easy access */}
+      <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+        <nav aria-label="Quick actions" className="flex flex-wrap gap-3">
+          <a
+            href="/jewett-junction/admin/announcements"
+            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            + New Announcement
+          </a>
+          <a
+            href="/jewett-junction/admin/events"
+            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            + New Event
+          </a>
+          <a
+            href="/jewett-junction/admin/jobs"
+            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            + New Job Posting
+          </a>
+          <a
+            href="/jewett-junction/admin/employees"
+            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            + New Employee
+          </a>
+        </nav>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="region" aria-label="Dashboard statistics">
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
@@ -224,36 +255,6 @@ export function AdminOverview() {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
-        <nav aria-label="Quick actions" className="flex flex-wrap gap-3">
-          <a
-            href="/jewett-junction/admin/announcements"
-            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-          >
-            + New Announcement
-          </a>
-          <a
-            href="/jewett-junction/admin/events"
-            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-          >
-            + New Event
-          </a>
-          <a
-            href="/jewett-junction/admin/jobs"
-            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-          >
-            + New Job Posting
-          </a>
-          <a
-            href="/jewett-junction/admin/employees"
-            className="px-4 py-2 min-h-[44px] inline-flex items-center bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-          >
-            + New Employee
-          </a>
-        </nav>
-      </div>
     </div>
   );
 }

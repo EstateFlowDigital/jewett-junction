@@ -77,8 +77,8 @@ export function Header() {
               </span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center text-sm text-primary">
-              View all notifications
+            <DropdownMenuItem asChild className="text-center text-sm text-primary">
+              <a href="/jewett-junction/notifications">View all notifications</a>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -104,14 +104,22 @@ export function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <a href="/jewett-junction/profile" className="flex items-center">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </a>
             </DropdownMenuItem>
-            <DropdownMenuItem>My Badges</DropdownMenuItem>
-            <DropdownMenuItem>Points History</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="/jewett-junction/profile/badges">My Badges</a>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="/jewett-junction/profile/points">Points History</a>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="/jewett-junction/settings">Settings</a>
+            </DropdownMenuItem>
             <DropdownMenuItem>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

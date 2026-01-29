@@ -90,12 +90,12 @@ export function TopNav() {
           </div>
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-900">
+          <a href="/jewett-junction/notifications" className="relative inline-flex items-center justify-center h-9 w-9 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
             <Bell className="h-5 w-5" />
             <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
               3
             </span>
-          </Button>
+          </a>
 
           {/* User Menu */}
           <DropdownMenu>
@@ -119,11 +119,19 @@ export function TopNav() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>My Profile</DropdownMenuItem>
-              <DropdownMenuItem>My Badges</DropdownMenuItem>
-              <DropdownMenuItem>Points History</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/jewett-junction/profile">My Profile</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/jewett-junction/profile/badges">My Badges</a>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/jewett-junction/profile/points">Points History</a>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/jewett-junction/settings">Settings</a>
+              </DropdownMenuItem>
               <DropdownMenuItem>Sign out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

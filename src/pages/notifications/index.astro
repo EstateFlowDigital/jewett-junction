@@ -1,0 +1,8 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { NotificationsContent } from '../../components/notifications/NotificationsContent';
+---
+
+<ThemedPage title="Notifications | Jewett Junction" theme="dark" currentSection="notifications">
+  <NotificationsContent client:load />
+</ThemedPage>

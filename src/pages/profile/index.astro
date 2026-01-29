@@ -1,0 +1,8 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { ProfileContent } from '../../components/profile/ProfileContent';
+---
+
+<ThemedPage title="My Profile | Jewett Junction" theme="dark" currentSection="profile">
+  <ProfileContent client:load />
+</ThemedPage>

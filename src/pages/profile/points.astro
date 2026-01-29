@@ -1,0 +1,8 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { PointsHistoryContent } from '../../components/profile/PointsHistoryContent';
+---
+
+<ThemedPage title="Points History | Jewett Junction" theme="dark" currentSection="profile">
+  <PointsHistoryContent client:load />
+</ThemedPage>

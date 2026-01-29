@@ -25,10 +25,12 @@ import {
   FileText,
   Search,
   ChevronDown,
-  DollarSign
+  DollarSign,
+  X
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { validatePhone, formatPhoneInput, validateFile, validateEmail, formatFileSize } from '../../lib/validation';
 
 interface JobPosting {
   id: string;
@@ -125,9 +127,12 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
     coverLetter: '',
     isVeteran: false,
     resumeFileName: '',
+    resumeFile: null as File | null,
   });
   const [status, setStatus] = React.useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [validationErrors, setValidationErrors] = React.useState<Record<string, string>>({});
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -136,32 +141,118 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+    // Clear validation error when field is edited
+    if (validationErrors[name]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneInput(e.target.value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+    // Clear validation error when field is edited
+    if (validationErrors.phone) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.phone;
+        return newErrors;
+      });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData(prev => ({ ...prev, resumeFileName: file.name }));
+      // Validate file
+      const validation = validateFile(file, 'resume');
+      if (!validation.valid) {
+        setValidationErrors(prev => ({ ...prev, resume: validation.error || 'Invalid file' }));
+        // Reset the file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+      // Clear any previous resume error
+      if (validationErrors.resume) {
+        setValidationErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.resume;
+          return newErrors;
+        });
+      }
+      setFormData(prev => ({ ...prev, resumeFileName: file.name, resumeFile: file }));
     }
+  };
+
+  const clearFile = () => {
+    setFormData(prev => ({ ...prev, resumeFileName: '', resumeFile: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    // Required field validation
+    if (!formData.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+    if (!formData.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+
+    // Email validation
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.valid) {
+      errors.email = emailValidation.error || 'Invalid email';
+    }
+
+    // Phone validation (optional but must be valid if provided)
+    if (formData.phone) {
+      const phoneValidation = validatePhone(formData.phone);
+      if (!phoneValidation.valid) {
+        errors.phone = phoneValidation.error || 'Invalid phone number';
+      }
+    }
+
+    // Position required
+    if (!formData.position) {
+      errors.position = 'Please select a position';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('submitting');
-    setErrorMessage('');
 
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.position) {
+    if (!validateForm()) {
       setStatus('error');
-      setErrorMessage('Please fill in all required fields.');
+      setErrorMessage('Please fix the errors below.');
       return;
     }
 
+    setStatus('submitting');
+    setErrorMessage('');
+
     try {
+      // Format phone before submitting
+      const phoneValidation = validatePhone(formData.phone);
+
       const response = await fetch('/jewett-junction/api/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: phoneValidation.formatted,
+          resumeFile: undefined, // Don't send file object in JSON
           submittedAt: new Date().toISOString(),
         }),
       });
@@ -180,7 +271,9 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
         coverLetter: '',
         isVeteran: false,
         resumeFileName: '',
+        resumeFile: null,
       });
+      setValidationErrors({});
     } catch (error) {
       setStatus('error');
       setErrorMessage('There was an error submitting your application. Please try again.');
@@ -205,85 +298,130 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {/* Name Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
-            <User className="h-4 w-4 inline mr-1" />
+          <label htmlFor="firstName" className="block text-sm font-medium text-slate-300 mb-2">
+            <User className="h-4 w-4 inline mr-1" aria-hidden="true" />
             First Name <span className="text-rose-400">*</span>
           </label>
           <input
             type="text"
+            id="firstName"
             name="firstName"
             value={formData.firstName}
             onChange={handleInputChange}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+            aria-invalid={!!validationErrors.firstName}
+            aria-describedby={validationErrors.firstName ? 'firstName-error' : undefined}
+            className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
+              validationErrors.firstName
+                ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
+            }`}
             placeholder="John"
           />
+          {validationErrors.firstName && (
+            <p id="firstName-error" className="mt-1 text-sm text-rose-400">{validationErrors.firstName}</p>
+          )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
+          <label htmlFor="lastName" className="block text-sm font-medium text-slate-300 mb-2">
             Last Name <span className="text-rose-400">*</span>
           </label>
           <input
             type="text"
+            id="lastName"
             name="lastName"
             value={formData.lastName}
             onChange={handleInputChange}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+            aria-invalid={!!validationErrors.lastName}
+            aria-describedby={validationErrors.lastName ? 'lastName-error' : undefined}
+            className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
+              validationErrors.lastName
+                ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
+            }`}
             placeholder="Smith"
           />
+          {validationErrors.lastName && (
+            <p id="lastName-error" className="mt-1 text-sm text-rose-400">{validationErrors.lastName}</p>
+          )}
         </div>
       </div>
 
       {/* Contact Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
-            <Mail className="h-4 w-4 inline mr-1" />
+          <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+            <Mail className="h-4 w-4 inline mr-1" aria-hidden="true" />
             Email Address <span className="text-rose-400">*</span>
           </label>
           <input
             type="email"
+            id="email"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            required
-            className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+            aria-invalid={!!validationErrors.email}
+            aria-describedby={validationErrors.email ? 'email-error' : undefined}
+            className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
+              validationErrors.email
+                ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
+            }`}
             placeholder="john.smith@email.com"
           />
+          {validationErrors.email && (
+            <p id="email-error" className="mt-1 text-sm text-rose-400">{validationErrors.email}</p>
+          )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
-            <Phone className="h-4 w-4 inline mr-1" />
+          <label htmlFor="phone" className="block text-sm font-medium text-slate-300 mb-2">
+            <Phone className="h-4 w-4 inline mr-1" aria-hidden="true" />
             Phone Number
           </label>
           <input
             type="tel"
+            id="phone"
             name="phone"
             value={formData.phone}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+            onChange={handlePhoneChange}
+            aria-invalid={!!validationErrors.phone}
+            aria-describedby={validationErrors.phone ? 'phone-error' : 'phone-hint'}
+            className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
+              validationErrors.phone
+                ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
+            }`}
             placeholder="(555) 123-4567"
           />
+          {validationErrors.phone ? (
+            <p id="phone-error" className="mt-1 text-sm text-rose-400">{validationErrors.phone}</p>
+          ) : (
+            <p id="phone-hint" className="mt-1 text-xs text-slate-500">Format: (555) 123-4567</p>
+          )}
         </div>
       </div>
 
       {/* Position Selection */}
       <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">
-          <Briefcase className="h-4 w-4 inline mr-1" />
+        <label htmlFor="position" className="block text-sm font-medium text-slate-300 mb-2">
+          <Briefcase className="h-4 w-4 inline mr-1" aria-hidden="true" />
           Position of Interest <span className="text-rose-400">*</span>
         </label>
         <select
+          id="position"
           name="position"
           value={formData.position}
           onChange={handleInputChange}
-          required
-          className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+          aria-invalid={!!validationErrors.position}
+          aria-describedby={validationErrors.position ? 'position-error' : undefined}
+          className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white focus:ring-1 outline-none transition-colors ${
+            validationErrors.position
+              ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
+              : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
+          }`}
         >
           <option value="">Select a position</option>
           <option value="general">General Application</option>
@@ -291,6 +429,9 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
             <option key={job.id} value={job.name}>{job.name} - {job.location || 'Remote'}</option>
           ))}
         </select>
+        {validationErrors.position && (
+          <p id="position-error" className="mt-1 text-sm text-rose-400">{validationErrors.position}</p>
+        )}
       </div>
 
       {/* Experience */}
@@ -334,27 +475,65 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
         </select>
       </div>
 
-      {/* Resume Upload (placeholder - shows filename) */}
+      {/* Resume Upload with validation */}
       <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">
-          <FileText className="h-4 w-4 inline mr-1" />
+        <label htmlFor="resume" className="block text-sm font-medium text-slate-300 mb-2">
+          <FileText className="h-4 w-4 inline mr-1" aria-hidden="true" />
           Resume
         </label>
         <div className="relative">
           <input
+            ref={fileInputRef}
             type="file"
+            id="resume"
             accept=".pdf,.doc,.docx"
             onChange={handleFileChange}
+            aria-invalid={!!validationErrors.resume}
+            aria-describedby={validationErrors.resume ? 'resume-error' : 'resume-hint'}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 border-dashed">
-            <Upload className="h-5 w-5 text-slate-400" />
-            <span className="text-slate-400 text-sm">
-              {formData.resumeFileName || 'Click to upload PDF or Word document'}
-            </span>
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-900/50 border border-dashed transition-colors ${
+            validationErrors.resume
+              ? 'border-rose-500'
+              : formData.resumeFileName
+                ? 'border-emerald-500'
+                : 'border-slate-600'
+          }`}>
+            {formData.resumeFileName ? (
+              <>
+                <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0" aria-hidden="true" />
+                <span className="text-white text-sm flex-1 truncate">
+                  {formData.resumeFileName}
+                  {formData.resumeFile && (
+                    <span className="text-slate-400 ml-2">({formatFileSize(formData.resumeFile.size)})</span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearFile}
+                  className="p-1 hover:bg-slate-700 rounded transition-colors"
+                  aria-label="Remove file"
+                >
+                  <X className="h-4 w-4 text-slate-400 hover:text-white" aria-hidden="true" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Upload className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                <span className="text-slate-400 text-sm">
+                  Click to upload PDF or Word document
+                </span>
+              </>
+            )}
           </div>
         </div>
-        <p className="text-xs text-slate-500 mt-1">Note: File will be attached to your application email</p>
+        {validationErrors.resume ? (
+          <p id="resume-error" className="mt-1 text-sm text-rose-400">{validationErrors.resume}</p>
+        ) : (
+          <p id="resume-hint" className="text-xs text-slate-500 mt-1">
+            Accepted formats: PDF, DOC, DOCX. Maximum size: 5MB
+          </p>
+        )}
       </div>
 
       {/* Cover Letter */}

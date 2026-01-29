@@ -309,10 +309,8 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 overflow-auto pt-16 lg:pt-6" role="main">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-xl lg:text-2xl font-bold text-white mb-6">{title}</h1>
-          {children}
-        </div>
+        <h1 className="text-xl lg:text-2xl font-bold text-white mb-6">{title}</h1>
+        {children}
       </main>
 
       {/* Toast Notification */}

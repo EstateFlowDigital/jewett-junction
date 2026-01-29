@@ -1,0 +1,8 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { BadgesContent } from '../../components/profile/BadgesContent';
+---
+
+<ThemedPage title="My Badges | Jewett Junction" theme="dark" currentSection="profile">
+  <BadgesContent client:load />
+</ThemedPage>

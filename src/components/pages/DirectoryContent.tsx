@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import { useDebounce, fuzzySearch } from '../../lib/search';
 
 interface CMSEmployee {
   id: string;
@@ -106,23 +107,36 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
   const [selectedDept, setSelectedDept] = React.useState('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
 
+  // Debounce search term for better performance
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
   // Get unique departments for filter
   const departments = ['All', ...new Set(allEmployees.map(e => getDeptConfig(e.department).label))];
 
   // Get featured employees
   const featuredEmployees = allEmployees.filter(e => e['is-featured']);
 
-  // Filter employees based on search and department
-  const filteredEmployees = allEmployees.filter(emp => {
-    const matchesSearch = searchTerm === '' ||
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (emp.location?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-    const empDeptLabel = getDeptConfig(emp.department).label;
-    const matchesDept = selectedDept === 'All' || empDeptLabel === selectedDept;
-    return matchesSearch && matchesDept;
-  });
+  // Filter employees based on search and department with fuzzy matching
+  const filteredEmployees = React.useMemo(() => {
+    // First filter by department
+    const deptFiltered = selectedDept === 'All'
+      ? allEmployees
+      : allEmployees.filter(emp => getDeptConfig(emp.department).label === selectedDept);
+
+    // If no search term, return department-filtered results
+    if (!debouncedSearch.trim()) {
+      return deptFiltered;
+    }
+
+    // Use fuzzy search for better matching
+    const searchResults = fuzzySearch(deptFiltered, debouncedSearch, {
+      keys: ['name', 'role', 'department', 'location', 'email'],
+      threshold: 0.3,
+      exactFirst: true,
+    });
+
+    return searchResults.map(result => result.item);
+  }, [allEmployees, debouncedSearch, selectedDept]);
 
   // Get unique locations
   const locations = [...new Set(allEmployees.map(e => e.location || 'Unknown'))];

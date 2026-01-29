@@ -20,34 +20,91 @@ import {
   Copy,
   Users,
   Calendar,
-  Sparkles
+  Sparkles,
+  Megaphone,
+  Briefcase,
+  Heart,
+  FolderOpen,
+  HeartHandshake,
+  HardHat,
+  Monitor,
+  Palette,
+  Lightbulb,
+  FileText,
+  Video,
+  DollarSign,
+  Clock,
+  Tag,
+  Star,
+  Bell,
+  Zap,
+  Building,
+  Award,
+  Mail,
+  Phone,
+  Linkedin,
+  type LucideIcon
 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
+import type { FieldConfig, CollectionConfig } from './collections';
 
 const API_BASE = '/jewett-junction';
 
-// Field configuration type
-export interface FieldConfig {
-  key: string;
-  label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image';
-  required?: boolean;
-  placeholder?: string;
-  helpText?: string;
-  options?: string[];
-  icon?: any;
-}
+// Icon lookup map - maps string identifiers to actual icon components
+const ICON_MAP: Record<string, LucideIcon> = {
+  Megaphone,
+  Calendar,
+  Briefcase,
+  Heart,
+  Users,
+  FolderOpen,
+  HeartHandshake,
+  HardHat,
+  Monitor,
+  Palette,
+  Lightbulb,
+  FileText,
+  Image,
+  Link,
+  Video,
+  DollarSign,
+  Clock,
+  MapPin,
+  Tag,
+  Star,
+  Bell,
+  Zap,
+  Building,
+  Award,
+  Mail,
+  Phone,
+  Linkedin,
+  AlertCircle,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  RefreshCw,
+  Send,
+  Check,
+  Loader2,
+  Upload,
+  ImagePlus,
+  CheckSquare,
+  Eye,
+  Copy,
+  Sparkles,
+};
 
-// Collection configuration type
-export interface CollectionConfig {
-  name: string;
-  icon: any;
-  color: string;
-  gradient: string;
-  description?: string;
-  slug?: string;
-  fields: FieldConfig[];
-}
+// Helper function to get icon component from string identifier
+const getIcon = (iconName: string | undefined): LucideIcon | null => {
+  if (!iconName) return null;
+  return ICON_MAP[iconName] || null;
+};
+
+// Re-export types for backward compatibility
+export type { FieldConfig, CollectionConfig };
 
 interface CollectionEditorProps {
   collectionKey: string;
@@ -80,7 +137,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const [bulkFieldKey, setBulkFieldKey] = React.useState('');
   const [bulkFieldValue, setBulkFieldValue] = React.useState<any>('');
 
-  const Icon = config.icon;
+  const Icon = getIcon(config.icon) || Megaphone;
 
   const getToken = () => localStorage.getItem('admin_token') || '';
 
@@ -494,7 +551,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
 
   // Render field based on type
   const renderField = (field: FieldConfig) => {
-    const FieldIcon = field.icon;
+    const FieldIcon = getIcon(field.icon);
     const fieldId = `field-${field.key}`;
 
     return (

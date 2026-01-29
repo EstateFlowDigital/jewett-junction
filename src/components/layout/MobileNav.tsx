@@ -69,7 +69,7 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[85vw] max-w-[320px] p-0 border-r-0 bg-slate-900 border-slate-800"
+        className="w-[280px] sm:w-[320px] p-0 border-r-0 bg-slate-900 border-slate-800"
       >
         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
         <div className="flex h-full flex-col bg-slate-900">
@@ -88,8 +88,8 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-3">
-            <ul className="space-y-1">
+          <nav className="flex-1 overflow-y-auto px-3 py-2">
+            <ul className="space-y-0.5">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentPath.startsWith(item.href);
@@ -100,14 +100,14 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
-                        "active:scale-[0.98]",
+                        "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-all",
+                        "active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
                         isActive
-                          ? "bg-blue-500/20 text-blue-400"
-                          : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                          : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
                       )}
                     >
-                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      <Icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
                       <span>{item.title}</span>
                     </a>
                   </li>
@@ -117,21 +117,21 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-slate-800 p-3 space-y-1">
+          <div className="border-t border-slate-800 px-3 py-2 space-y-0.5">
             <a
               href="/jewett-junction/submit-idea"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-amber-400 hover:bg-amber-500/10 hover:text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
-              <Lightbulb className="h-5 w-5" />
+              <Lightbulb className="h-5 w-5" aria-hidden="true" />
               <span>Submit an Idea</span>
             </a>
             <a
               href="/jewett-junction/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             >
-              <Settings className="h-5 w-5" />
+              <Settings className="h-5 w-5" aria-hidden="true" />
               <span>Settings</span>
             </a>
           </div>
