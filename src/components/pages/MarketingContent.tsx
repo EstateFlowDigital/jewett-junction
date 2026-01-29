@@ -89,9 +89,9 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
               <h2 className="text-xl font-bold">Jewett Construction Brand Guidelines</h2>
               <p className="text-rose-100">Ensure brand consistency across all materials</p>
             </div>
-            <a href="/jewett-junction/resources" target="_blank" rel="noopener">
+            <a href="/jewett-junction/marketing/brand-guidelines">
               <Button className="bg-white text-rose-700 hover:bg-rose-50">
-                Download Brand Guide
+                View Brand Guide
               </Button>
             </a>
           </div>

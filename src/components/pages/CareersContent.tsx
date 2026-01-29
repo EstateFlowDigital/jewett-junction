@@ -105,16 +105,6 @@ const awards = [
   { year: '2023', title: 'Verified Employer Silver' },
 ];
 
-// Sample jobs for when CMS is not connected
-const sampleJobs: JobPosting[] = [
-  { id: '1', name: 'Project Manager', department: 'Commercial', location: 'Columbus, OH', 'employment-type': 'Full-time' },
-  { id: '2', name: 'Safety Coordinator', department: 'Safety', location: 'Cleveland, OH', 'employment-type': 'Full-time' },
-  { id: '3', name: 'Field Engineer', department: 'Engineering', location: 'Cincinnati, OH', 'employment-type': 'Full-time' },
-  { id: '4', name: 'Construction Superintendent', department: 'Operations', location: 'Columbus, OH', 'employment-type': 'Full-time' },
-  { id: '5', name: 'MEP Coordinator', department: 'Engineering', location: 'Cleveland, OH', 'employment-type': 'Full-time' },
-  { id: '6', name: 'Administrative Assistant', department: 'Admin', location: 'Columbus, OH', 'employment-type': 'Full-time' },
-];
-
 function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   const [formData, setFormData] = React.useState({
     firstName: '',
@@ -599,8 +589,9 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   );
 }
 
-export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
-  const allJobs = jobs && jobs.length > 0 ? jobs : sampleJobs;
+export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProps) {
+  // Use CMS jobs only - no hardcoded fallback
+  const allJobs = jobs;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All Departments');
   const [expandedJob, setExpandedJob] = React.useState<string | null>(null);
@@ -879,19 +870,28 @@ export function CareersContent({ theme = 'dark', jobs }: CareersContentProps) {
           ))}
         </div>
 
-        {displayJobs.length === 0 && (searchTerm || selectedDept !== 'All Departments') && (
+        {displayJobs.length === 0 && (
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="py-12 text-center">
               <Briefcase className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No positions found</h3>
-              <p className="text-slate-400 mb-4">Try adjusting your search or filter criteria</p>
-              <Button
-                variant="outline"
-                onClick={() => { setSearchTerm(''); setSelectedDept('All Departments'); }}
-                className="border-slate-600 text-slate-300"
-              >
-                Clear Filters
-              </Button>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {allJobs.length === 0 ? 'No open positions' : 'No positions found'}
+              </h3>
+              <p className="text-slate-400 mb-4">
+                {allJobs.length === 0
+                  ? 'Check back soon for new opportunities or submit a general application above.'
+                  : 'Try adjusting your search or filter criteria'
+                }
+              </p>
+              {(searchTerm || selectedDept !== 'All Departments') && (
+                <Button
+                  variant="outline"
+                  onClick={() => { setSearchTerm(''); setSelectedDept('All Departments'); }}
+                  className="border-slate-600 text-slate-300"
+                >
+                  Clear Filters
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}

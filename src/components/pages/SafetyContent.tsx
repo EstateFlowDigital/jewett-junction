@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap } from 'lucide-react';
+import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap, Users } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -345,13 +345,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                 <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Director of Safety</p>
               </div>
               <div className="space-y-3">
-                <a href="tel:555-0123" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Phone className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>(555) 012-3456</span>
-                </a>
                 <a href="mailto:safety@jewettconstruction.com" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
                   <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
                   <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>safety@jewettconstruction.com</span>
+                </a>
+                <a href="/jewett-junction/directory" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
+                  <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View Safety Team Directory</span>
                 </a>
               </div>
             </CardContent>
@@ -371,10 +371,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                 <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Poison Control</span>
                 <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>1-800-222-1222</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Safety Hotline (24/7)</span>
-                <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>(555) 999-0000</span>
-              </div>
+              <a href="mailto:safety@jewettconstruction.com" className="flex items-center justify-between hover:opacity-80 transition-opacity">
+                <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Safety Email (24/7)</span>
+                <span className={`font-bold text-xs ${isDark ? 'text-red-200' : 'text-red-900'}`}>safety@jewettconstruction.com</span>
+              </a>
             </CardContent>
           </Card>
 
@@ -390,8 +390,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                   <Newspaper className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <div className={`font-medium text-sm ${isDark ? 'text-white' : ''}`}>January 2026 Issue</div>
-                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Winter Safety Focus</div>
+                  <div className={`font-medium text-sm ${isDark ? 'text-white' : ''}`}>Latest Issue</div>
+                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>View safety resources</div>
                 </div>
               </a>
             </CardContent>

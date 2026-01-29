@@ -117,56 +117,9 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
-// Sample events for when CMS is not connected
-const sampleEvents: CMSEvent[] = [
-  {
-    id: '1',
-    name: 'Q1 2025 All-Hands Meeting',
-    description: 'Join us for our quarterly all-hands to review 2024 wins and discuss 2025 goals. Breakfast will be provided.',
-    'event-date': new Date(Date.now() + 86400000 * 2).toISOString(), // 2 days from now
-    location: 'Main Conference Room',
-    category: 'All-Hands Meeting',
-    'is-mandatory': true,
-  },
-  {
-    id: '2',
-    name: 'Safety Certification Training',
-    description: 'Annual safety certification renewal training. All field staff must complete this training by end of month.',
-    'event-date': new Date(Date.now() + 86400000 * 5).toISOString(),
-    location: 'Training Center',
-    category: 'Training',
-    'is-mandatory': true,
-  },
-  {
-    id: '3',
-    name: 'Team Happy Hour',
-    description: 'Celebrate our successful quarter with the team! Appetizers and drinks provided.',
-    'event-date': new Date(Date.now() + 86400000 * 7).toISOString(),
-    location: 'The Pub Downtown',
-    category: 'Social Event',
-  },
-  {
-    id: '4',
-    name: 'Benefits Q&A Session',
-    description: 'HR will answer your questions about benefits enrollment and explain the new healthcare options.',
-    'event-date': new Date(Date.now() + 86400000 * 10).toISOString(),
-    location: 'Virtual (Teams)',
-    category: 'HR Session',
-    'is-virtual': true,
-    'virtual-link': 'https://teams.microsoft.com/...',
-  },
-  {
-    id: '5',
-    name: 'Project Management Workshop',
-    description: 'Learn best practices for project management from our senior PMs. Open to all departments.',
-    'event-date': new Date(Date.now() + 86400000 * 14).toISOString(),
-    location: 'Room 201',
-    category: 'Workshop',
-  },
-];
-
 export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: EventsContentProps) {
-  const allEvents = cmsEvents.length > 0 ? cmsEvents : sampleEvents;
+  // Use CMS events only - no hardcoded fallback
+  const allEvents = cmsEvents;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('All Events');
   const [viewMode, setViewMode] = React.useState<'list' | 'calendar'>('list');

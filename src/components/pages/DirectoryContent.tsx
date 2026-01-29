@@ -87,22 +87,9 @@ function formatTenure(startDate: string | undefined) {
   return `${years} year${years > 1 ? 's' : ''}`;
 }
 
-// Sample employees when CMS is not connected
-const sampleEmployees: CMSEmployee[] = [
-  { id: '1', name: 'James Mitchell', role: 'Director of Safety', department: 'Safety', location: 'Columbus, OH', email: 'j.mitchell@jewett.com', phone: '(555) 123-4567', 'is-featured': true, 'start-date': '2015-03-15' },
-  { id: '2', name: 'Jennifer Davis', role: 'HR Manager', department: 'Human Resources', location: 'Columbus, OH', email: 'j.davis@jewett.com', phone: '(555) 234-5678', 'is-featured': true, 'start-date': '2017-06-01' },
-  { id: '3', name: 'Mike Thompson', role: 'Project Manager', department: 'Operations', location: 'Cleveland, OH', email: 'm.thompson@jewett.com', phone: '(555) 345-6789', 'start-date': '2018-09-20' },
-  { id: '4', name: 'Sarah Chen', role: 'IT Manager', department: 'Information Technology', location: 'Columbus, OH', email: 's.chen@jewett.com', phone: '(555) 456-7890', 'is-featured': true, 'start-date': '2019-01-15' },
-  { id: '5', name: 'Robert Johnson', role: 'CFO', department: 'Finance', location: 'Columbus, OH', email: 'r.johnson@jewett.com', phone: '(555) 567-8901', 'is-featured': true, 'start-date': '2012-04-10' },
-  { id: '6', name: 'Lisa Wang', role: 'Marketing Director', department: 'Marketing', location: 'Columbus, OH', email: 'l.wang@jewett.com', phone: '(555) 678-9012', 'start-date': '2020-02-28' },
-  { id: '7', name: 'David Martinez', role: 'Site Superintendent', department: 'Operations', location: 'Cincinnati, OH', email: 'd.martinez@jewett.com', phone: '(555) 789-0123', 'start-date': '2016-11-01' },
-  { id: '8', name: 'Amanda Brooks', role: 'Project Engineer', department: 'Engineering', location: 'Cleveland, OH', email: 'a.brooks@jewett.com', 'start-date': '2021-08-15' },
-  { id: '9', name: 'Marcus Rodriguez', role: 'Safety Coordinator', department: 'Safety', location: 'Columbus, OH', email: 'm.rodriguez@jewett.com', phone: '(555) 890-1234', 'start-date': '2019-05-20' },
-  { id: '10', name: 'Emily Watson', role: 'HR Specialist', department: 'Human Resources', location: 'Columbus, OH', email: 'e.watson@jewett.com', 'start-date': '2022-03-01' },
-];
-
 export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] }: DirectoryContentProps) {
-  const allEmployees = cmsEmployees.length > 0 ? cmsEmployees : sampleEmployees;
+  // Use CMS employees only - no hardcoded fallback
+  const allEmployees = cmsEmployees;
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');

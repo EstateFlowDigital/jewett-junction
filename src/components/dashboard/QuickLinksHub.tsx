@@ -29,24 +29,23 @@ const quickLinkCategories: QuickLinkCategory[] = [
   {
     name: "Safety First",
     links: [
-      { title: "Safety Newsletter", href: "/jewett-junction/safety/newsletter", icon: Shield },
-      { title: "Crisis Management", href: "/jewett-junction/safety/crisis", icon: Shield },
-      { title: "Report Incident", href: "/jewett-junction/safety/report", icon: FileText },
+      { title: "Safety Hub", href: "/jewett-junction/safety", icon: Shield },
+      { title: "Report Incident", href: "/jewett-junction/submit-idea", icon: FileText },
     ],
   },
   {
     name: "HR Resources",
     links: [
-      { title: "Employee Handbook", href: "/jewett-junction/hr/handbook", icon: FileText },
-      { title: "Benefits Portal", href: "https://adp.com", icon: Heart, isExternal: true },
-      { title: "Payroll / Timesheets", href: "https://adp.com", icon: Users, isExternal: true },
+      { title: "HR Hub", href: "/jewett-junction/hr", icon: FileText },
+      { title: "Benefits Portal", href: "/jewett-junction/hr/benefits", icon: Heart },
+      { title: "Payroll / Timesheets", href: "/jewett-junction/hr/payroll", icon: Users },
     ],
   },
   {
     name: "IT & Support",
     links: [
       { title: "IT Helpdesk", href: "/jewett-junction/it-helpdesk", icon: Monitor },
-      { title: "Submit Ticket", href: "/jewett-junction/it-helpdesk/tickets", icon: FileText },
+      { title: "Submit Request", href: "/jewett-junction/submit-idea", icon: FileText },
     ],
   },
   {
@@ -59,7 +58,7 @@ const quickLinkCategories: QuickLinkCategory[] = [
   {
     name: "Organization",
     links: [
-      { title: "Org Chart", href: "/jewett-junction/directory/org-chart", icon: Building2 },
+      { title: "Employee Directory", href: "/jewett-junction/directory", icon: Building2 },
       { title: "Team Contacts", href: "/jewett-junction/directory", icon: BookUser },
     ],
   },

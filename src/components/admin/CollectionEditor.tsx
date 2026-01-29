@@ -964,8 +964,8 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
 
       {isEditing ? (
         // Edit/Create Form
-        <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
-          <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/50">
+        <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50">
+          <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/50 rounded-t-2xl">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center`}>
                 <Icon className="h-5 w-5 text-white" />
@@ -1000,7 +1000,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             {config.fields.map(renderField)}
           </div>
 
-          <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50">
+          <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50 rounded-b-2xl">
             <button
               onClick={() => handleSave(false)}
               disabled={isLoading}

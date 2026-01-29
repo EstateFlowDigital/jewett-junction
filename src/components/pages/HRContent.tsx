@@ -163,18 +163,18 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="https://adp.com" target="_blank" rel="noopener">
+        <a href="/jewett-junction/hr/pay-tax-info">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-blue-800 hover:border-blue-600' : 'border-blue-200 bg-blue-50/50 hover:border-blue-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
                 <DollarSign className="h-6 w-6 text-blue-600" />
               </div>
               <div className={`font-semibold ${isDark ? 'text-blue-400' : 'text-blue-900'}`}>Pay & Tax Info</div>
-              <div className={`text-sm ${isDark ? 'text-blue-500' : 'text-blue-700'}`}>View in ADP</div>
+              <div className={`text-sm ${isDark ? 'text-blue-500' : 'text-blue-700'}`}>View details</div>
             </CardContent>
           </Card>
         </a>
-        <a href="https://adp.com" target="_blank" rel="noopener">
+        <a href="/jewett-junction/hr/time-off">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-green-800 hover:border-green-600' : 'border-green-200 bg-green-50/50 hover:border-green-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -185,7 +185,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
             </CardContent>
           </Card>
         </a>
-        <a href="https://bcbs.com" target="_blank" rel="noopener">
+        <a href="/jewett-junction/hr/benefits">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-purple-800 hover:border-purple-600' : 'border-purple-200 bg-purple-50/50 hover:border-purple-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-purple-900' : 'bg-purple-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -293,13 +293,13 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
                 <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>HR Manager</p>
               </div>
               <div className="space-y-3">
-                <a href="tel:555-5000" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Phone className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>(555) 500-0000</span>
-                </a>
                 <a href="mailto:hr@jewettconstruction.com" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
                   <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
                   <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>hr@jewettconstruction.com</span>
+                </a>
+                <a href="/jewett-junction/directory" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
+                  <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
+                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View HR Team Directory</span>
                 </a>
               </div>
             </CardContent>

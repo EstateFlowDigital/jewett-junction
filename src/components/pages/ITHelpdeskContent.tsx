@@ -205,26 +205,15 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
                 <CardTitle className={isDark ? 'text-white' : ''}>My Recent Tickets</CardTitle>
                 <CardDescription className={isDark ? 'text-slate-400' : ''}>Track your support requests</CardDescription>
               </div>
-              <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>View All</Button>
+              <a href="/jewett-junction/submit-idea">
+                <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>Submit Ticket</Button>
+              </a>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className={`p-4 rounded-lg border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`font-medium ${isDark ? 'text-white' : ''}`}>#IT-2024-0142</span>
-                    <Badge className="bg-green-100 text-green-700">Resolved</Badge>
-                  </div>
-                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Email not syncing on mobile device</p>
-                  <p className={`text-xs mt-2 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Resolved Jan 10, 2026</p>
-                </div>
-                <div className={`p-4 rounded-lg border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`font-medium ${isDark ? 'text-white' : ''}`}>#IT-2024-0138</span>
-                    <Badge className="bg-yellow-100 text-yellow-700">In Progress</Badge>
-                  </div>
-                  <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Request new monitor for home office</p>
-                  <p className={`text-xs mt-2 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Updated Jan 12, 2026</p>
-                </div>
+              <div className={`p-6 rounded-lg border text-center ${isDark ? 'bg-slate-700/50 border-slate-600' : 'bg-muted/30'}`}>
+                <Monitor className={`h-10 w-10 mx-auto mb-3 ${isDark ? 'text-slate-500' : 'text-muted-foreground'} opacity-50`} />
+                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>No active tickets</p>
+                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Submit a request to get IT support</p>
               </div>
             </CardContent>
           </Card>

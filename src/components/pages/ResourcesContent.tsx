@@ -243,18 +243,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                       <span className="text-xs text-slate-500">
                         {resource['file-type'] || 'Link'}{resource['file-size'] ? ` • ${resource['file-size']}` : ''}
                       </span>
-                      {(resource.file?.url || resource['external-link']) && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-amber-400 hover:text-amber-300"
-                          asChild
-                        >
-                          <a href={resource.file?.url || resource['external-link']} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-amber-400 hover:text-amber-300"
+                        asChild
+                      >
+                        <a href={`/jewett-junction/resources/${resource.slug || resource.id}`}>
+                          <ChevronRight className="h-4 w-4" />
+                        </a>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -412,18 +410,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                       )}
                     </div>
 
-                    {(resource.file?.url || resource['external-link']) && (
-                      <Button
-                        className="w-full bg-amber-600 hover:bg-amber-700"
-                        size="sm"
-                        asChild
-                      >
-                        <a href={resource.file?.url || resource['external-link']} target="_blank" rel="noopener noreferrer">
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </a>
-                      </Button>
-                    )}
+                    <Button
+                      className="w-full bg-amber-600 hover:bg-amber-700"
+                      size="sm"
+                      asChild
+                    >
+                      <a href={`/jewett-junction/resources/${resource.slug || resource.id}`}>
+                        View Details
+                        <ChevronRight className="h-4 w-4 ml-2" />
+                      </a>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -472,18 +468,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                         <div className="text-sm text-slate-500">
                           {resource['file-type'] || 'Link'}{resource['file-size'] ? ` • ${resource['file-size']}` : ''}
                         </div>
-                        {(resource.file?.url || resource['external-link']) && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-amber-400 hover:text-amber-300"
-                            asChild
-                          >
-                            <a href={resource.file?.url || resource['external-link']} target="_blank" rel="noopener noreferrer">
-                              <Download className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-amber-400 hover:text-amber-300"
+                          asChild
+                        >
+                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`}>
+                            <ChevronRight className="h-4 w-4" />
+                          </a>
+                        </Button>
                       </div>
                     </div>
                   </div>

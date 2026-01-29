@@ -9,7 +9,7 @@ import {
 } from "lucide-react"
 
 const actions = [
-  { label: "Submit Report", icon: FileText, href: "/jewett-junction/safety/report" },
+  { label: "Submit Report", icon: FileText, href: "/jewett-junction/submit-idea" },
   { label: "View Calendar", icon: Calendar, href: "/jewett-junction/events" },
   { label: "Directory", icon: Users, href: "/jewett-junction/directory" },
   { label: "IT Help", icon: HelpCircle, href: "/jewett-junction/it-helpdesk" },
