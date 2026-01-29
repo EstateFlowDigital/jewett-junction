@@ -20,6 +20,8 @@ import {
   HardHat,
   Lightbulb,
   HelpCircle,
+  Bell,
+  User,
 } from "lucide-react";
 
 interface NavItem {
@@ -122,15 +124,51 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             <a
               href="/jewett-junction/submit-idea"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-amber-400 hover:bg-amber-500/10 hover:text-amber-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500",
+                currentPath.startsWith("/jewett-junction/submit-idea")
+                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  : "text-amber-400 hover:bg-amber-500/10 hover:text-amber-300"
+              )}
             >
               <Lightbulb className="h-5 w-5" aria-hidden="true" />
               <span>Submit an Idea</span>
             </a>
             <a
+              href="/jewett-junction/notifications"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                currentPath.startsWith("/jewett-junction/notifications")
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+              )}
+            >
+              <Bell className="h-5 w-5" aria-hidden="true" />
+              <span>Notifications</span>
+            </a>
+            <a
+              href="/jewett-junction/profile"
+              onClick={() => setIsOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                currentPath.startsWith("/jewett-junction/profile")
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+              )}
+            >
+              <User className="h-5 w-5" aria-hidden="true" />
+              <span>My Profile</span>
+            </a>
+            <a
               href="/jewett-junction/help"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                currentPath.startsWith("/jewett-junction/help")
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+              )}
             >
               <HelpCircle className="h-5 w-5" aria-hidden="true" />
               <span>Help</span>
@@ -138,7 +176,12 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             <a
               href="/jewett-junction/settings"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium text-slate-300 hover:bg-slate-800/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+                currentPath.startsWith("/jewett-junction/settings")
+                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
+              )}
             >
               <Settings className="h-5 w-5" aria-hidden="true" />
               <span>Settings</span>
