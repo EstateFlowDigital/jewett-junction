@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap, Loader2 } from 'lucide-react';
+import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -39,7 +40,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
 
     async function fetchSafetyContent() {
       try {
-        const response = await fetch('/api/cms/safety?limit=20');
+        const response = await fetch('/jewett-junction/api/cms/safety?limit=20');
         if (!response.ok) throw new Error('Failed to load content');
         const data = await response.json();
         setSafetyItems(data.items || []);
@@ -167,8 +168,22 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className={`p-4 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/30'}`}>
+                      <div className="flex items-start gap-4">
+                        <Skeleton className="w-10 h-10 rounded-lg shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                            <Skeleton className="h-3 w-20" />
+                          </div>
+                          <Skeleton className="h-5 w-3/4" />
+                          <Skeleton className="h-4 w-full" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : alerts.length > 0 ? (
                 <>

@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, Loader2, AlertCircle } from 'lucide-react';
+import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, AlertCircle } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 
 interface HRItem {
@@ -36,7 +37,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
 
     async function fetchHRContent() {
       try {
-        const response = await fetch('/api/cms/hr?limit=20');
+        const response = await fetch('/jewett-junction/api/cms/hr?limit=20');
         if (!response.ok) throw new Error('Failed to load content');
         const data = await response.json();
         setHrItems(data.items || []);
@@ -75,7 +76,22 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
       </div>
 
       {/* Featured Announcement - CMS or Static Fallback */}
-      {featuredItem ? (
+      {isLoading ? (
+        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
+          <CardContent className="py-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-14 h-14 rounded-xl bg-white/20" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-48 bg-white/20" />
+                  <Skeleton className="h-4 w-72 bg-white/20" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-28 rounded-md bg-white/20" />
+            </div>
+          </CardContent>
+        </Card>
+      ) : featuredItem ? (
         <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
           <CardContent className="py-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

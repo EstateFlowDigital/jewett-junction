@@ -11,21 +11,28 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { GlobalSearch } from "./GlobalSearch"
 
 export function Header() {
+  const [searchOpen, setSearchOpen] = React.useState(false);
+
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
       {/* Search */}
       <div className="flex items-center gap-4 flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Search..."
-            className="h-9 w-full rounded-md border border-input bg-transparent pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"
-          />
-        </div>
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="relative w-full h-9 flex items-center rounded-md border border-input bg-transparent px-3 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+          aria-label="Open search (Cmd+K)"
+        >
+          <Search className="h-4 w-4 mr-2" />
+          <span className="flex-1 text-left">Search...</span>
+          <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+            <span className="text-xs">⌘</span>K
+          </kbd>
+        </button>
       </div>
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* Right side */}
       <div className="flex items-center gap-2">

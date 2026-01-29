@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock, ChevronRight, HelpCircle, Settings, AlertTriangle, Loader2 } from 'lucide-react';
+import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock, ChevronRight, HelpCircle, Settings, AlertTriangle } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
@@ -42,7 +43,7 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
 
     async function fetchITContent() {
       try {
-        const response = await fetch('/api/cms/it?limit=20');
+        const response = await fetch('/jewett-junction/api/cms/it?limit=20');
         if (!response.ok) throw new Error('Failed to load content');
         const data = await response.json();
         setArticles(data.items || []);
@@ -147,8 +148,17 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
             </CardHeader>
             <CardContent className="space-y-3">
               {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className={`flex items-center gap-4 p-4 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/30'}`}>
+                      <Skeleton className="w-10 h-10 rounded-lg shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                      <Skeleton className="h-5 w-5 rounded" />
+                    </div>
+                  ))}
                 </div>
               ) : (
                 (howToArticles.length > 0 ? howToArticles.slice(0, 4).map((article) => ({

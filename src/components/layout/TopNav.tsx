@@ -12,8 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { GlobalSearch } from "./GlobalSearch"
 
 export function TopNav() {
+  const [searchOpen, setSearchOpen] = React.useState(false);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b bg-white">
       <div className="flex h-full items-center justify-between px-6">
@@ -68,14 +71,18 @@ export function TopNav() {
         {/* Right: Search, Notifications, Profile */}
         <div className="flex items-center gap-3">
           {/* Search */}
-          <div className="hidden lg:flex relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="search"
-              placeholder="Search..."
-              className="h-9 w-64 rounded-md border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-gray-300 focus:bg-white focus:ring-1 focus:ring-gray-200"
-            />
-          </div>
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="hidden lg:flex items-center h-9 w-64 rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-400 hover:bg-white hover:border-gray-300 transition-colors"
+            aria-label="Open search (Cmd+K)"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            <span className="flex-1 text-left">Search...</span>
+            <kbd className="inline-flex h-5 items-center gap-1 rounded border bg-white px-1.5 font-mono text-[10px] font-medium text-gray-400">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </button>
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
           {/* Points */}
           <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-[--brand-primary-light] rounded-full">

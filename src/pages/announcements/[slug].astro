@@ -55,8 +55,8 @@ const priorityColors: Record<string, string> = {
 <ThemedPage title={`${announcement.name} | Announcements | Jewett Junction`} theme="dark" currentSection="dashboard">
   <div>
     <!-- Back link -->
-    <a href="/jewett-junction/announcements" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="/jewett-junction/announcements" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors min-h-[44px]" aria-label="Back to Announcements">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
       Back to Announcements
@@ -77,7 +77,7 @@ const priorityColors: Record<string, string> = {
         <div class="flex items-center gap-3 mb-4">
           {announcement['is-pinned'] && (
             <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
               </svg>
               Pinned
@@ -98,7 +98,7 @@ const priorityColors: Record<string, string> = {
             </span>
           )}
           <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             {formatDate(announcement['published-date'])}
@@ -117,10 +117,11 @@ const priorityColors: Record<string, string> = {
             href={announcement['cta-link']}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
+            aria-label={`${announcement['cta-text']} (opens in new tab)`}
           >
             {announcement['cta-text']}
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
@@ -137,10 +138,11 @@ const priorityColors: Record<string, string> = {
           {relatedAnnouncements.map((related) => (
             <a
               href={`/jewett-junction/announcements/${related.slug}`}
-              class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-colors group"
+              class="flex items-center gap-4 p-4 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
+              aria-label={`Read announcement: ${related.name}`}
             >
               <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                 </svg>
               </div>
@@ -152,7 +154,7 @@ const priorityColors: Record<string, string> = {
                   {formatDate(related['published-date'])}
                 </p>
               </div>
-              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>

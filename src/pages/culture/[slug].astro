@@ -47,8 +47,8 @@ const formatDate = (dateStr: string) => {
 <ThemedPage title={`${story.name} | Culture | Jewett Junction`} theme="dark" currentSection="culture">
   <div>
     <!-- Back link -->
-    <a href="/jewett-junction/culture" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="/jewett-junction/culture" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors min-h-[44px]" aria-label="Back to Culture">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
       Back to Culture
@@ -86,7 +86,7 @@ const formatDate = (dateStr: string) => {
               </span>
             )}
             <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               {formatDate(story['published-date'])}
@@ -118,17 +118,18 @@ const formatDate = (dateStr: string) => {
           {relatedStories.map((related) => (
             <a
               href={`/jewett-junction/culture/${related.slug}`}
-              class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-colors group"
+              class="flex items-center gap-4 p-4 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
+              aria-label={`Read story: ${related.name}`}
             >
               {related.image?.url ? (
                 <img
                   src={related.image.url}
-                  alt={related.name}
+                  alt=""
                   class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                 />
               ) : (
-                <div class="w-16 h-16 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                  <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
@@ -141,7 +142,7 @@ const formatDate = (dateStr: string) => {
                   {related.excerpt}
                 </p>
               </div>
-              <svg class="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>

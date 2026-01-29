@@ -45,8 +45,8 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
 <ThemedPage title={`${resource.name} | Resources | Jewett Junction`} theme="dark" currentSection="resources">
   <div>
     <!-- Back link -->
-    <a href="/jewett-junction/resources" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="/jewett-junction/resources" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors min-h-[44px]" aria-label="Back to Resources">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
       Back to Resources
@@ -57,9 +57,9 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
       <div class="flex items-start gap-6 mb-6">
         <div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center flex-shrink-0">
           {resource.icon ? (
-            <img src={resource.icon} alt="" class="w-8 h-8" loading="lazy" />
+            <img src={resource.icon} alt="" class="w-8 h-8" loading="lazy" aria-hidden="true" />
           ) : (
-            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(resource.category)} />
             </svg>
           )}
@@ -86,9 +86,10 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
             href={resource.file.url}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
+            aria-label="Download File (opens in new tab)"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download File
@@ -99,9 +100,10 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
             href={resource['external-link']}
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-xl transition-colors"
+            class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-xl transition-colors"
+            aria-label="Open Link (opens in new tab)"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
             Open Link
@@ -118,10 +120,11 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
           {relatedResources.map((related) => (
             <a
               href={`/jewett-junction/resources/${related.slug}`}
-              class="flex items-center gap-4 p-4 rounded-xl hover:bg-slate-800/50 transition-colors group"
+              class="flex items-center gap-4 p-4 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
+              aria-label={`View resource: ${related.name}`}
             >
               <div class="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(related.category)} />
                 </svg>
               </div>
@@ -131,7 +134,7 @@ const getIcon = (category: string) => categoryIcons[category.toLowerCase()] || c
                 </h3>
                 <p class="text-sm text-slate-400">{related.category}</p>
               </div>
-              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>
