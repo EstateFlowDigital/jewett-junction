@@ -193,13 +193,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                 <>
                   {/* Urgent Alerts */}
                   {urgentAlerts.map((alert) => (
-                    <div key={alert.id} className={`p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
+                    <a key={alert.id} href={`/jewett-junction/safety/${alert.slug || alert.id}`} className={`block p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800 hover:bg-red-900/50' : 'bg-red-50 border border-red-200 hover:bg-red-100'} transition-colors`}>
                       <div className="flex items-start gap-4">
                         {alert.image?.url ? (
-                          <img src={alert.image.url} alt={alert.name} className="w-10 h-10 rounded-lg object-cover shrink-0" loading="lazy" />
+                          <img src={alert.image.url} alt={alert.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
                         ) : (
-                          <div className={`w-10 h-10 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                          <div className={`w-12 h-12 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                            <AlertTriangle className="h-6 w-6 text-red-600" />
                           </div>
                         )}
                         <div className="flex-1">
@@ -210,18 +210,19 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
                           <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
                         </div>
+                        <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
                       </div>
-                    </div>
+                    </a>
                   ))}
                   {/* Regular Alerts */}
                   {regularAlerts.slice(0, 2).map((alert) => (
-                    <div key={alert.id} className={`p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                    <a key={alert.id} href={`/jewett-junction/safety/${alert.slug || alert.id}`} className={`block p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 border border-slate-700' : 'hover:bg-muted/50 border border-muted'}`}>
                       <div className="flex items-start gap-4">
                         {alert.image?.url ? (
-                          <img src={alert.image.url} alt={alert.name} className="w-10 h-10 rounded-lg object-cover shrink-0" loading="lazy" />
+                          <img src={alert.image.url} alt={alert.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
                         ) : (
-                          <div className={`w-10 h-10 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                            <Clock className="h-5 w-5 text-yellow-600" />
+                          <div className={`w-12 h-12 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                            <Clock className="h-6 w-6 text-yellow-600" />
                           </div>
                         )}
                         <div className="flex-1">
@@ -232,35 +233,35 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
                           <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
                         </div>
+                        <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </>
               ) : displayItems.length > 0 ? (
                 /* CMS items without content-type - display as general safety content */
                 <>
                   {displayItems.slice(0, 4).map((item) => (
-                    <div key={item.id} className={`p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 border border-slate-700' : 'hover:bg-muted/50 border border-muted'}`}>
+                    <a key={item.id} href={`/jewett-junction/safety/${item.slug || item.id}`} className={`block p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 border border-slate-700' : 'hover:bg-muted/50 border border-muted'}`}>
                       <div className="flex items-start gap-4">
-                        <div className={`w-10 h-10 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                          <Shield className="h-5 w-5 text-green-600" />
-                        </div>
+                        {item.image?.url ? (
+                          <img src={item.image.url} alt={item.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
+                        ) : (
+                          <div className={`w-12 h-12 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                            <Shield className="h-6 w-6 text-green-600" />
+                          </div>
+                        )}
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">Protocol</Badge>
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">Safety</Badge>
                             {item['expiration-date'] && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Expires: {formatDate(item['expiration-date'])}</span>}
                           </div>
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{item.name}</h3>
                           <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(item.description || item.content)?.substring(0, 200)}</p>
-                          {item['document-link'] && (
-                            <a href={item['document-link']} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-2 text-sm text-green-600 hover:text-green-500">
-                              <Download className="h-4 w-4" />
-                              View Document
-                            </a>
-                          )}
                         </div>
+                        <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </>
               ) : (

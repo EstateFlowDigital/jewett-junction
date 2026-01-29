@@ -141,17 +141,21 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
                 </div>
               ) : recentAssets.length > 0 ? (
                 recentAssets.map((asset) => (
-                  <a key={asset.id} href={asset['file-link'] || asset['download-link'] || '#'} target={asset['file-link'] || asset['download-link'] ? '_blank' : undefined} rel={asset['file-link'] || asset['download-link'] ? 'noopener' : undefined} className={`flex items-center justify-between p-4 rounded-lg border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'} transition-colors cursor-pointer`}>
+                  <a key={asset.id} href={`/jewett-junction/marketing/${asset.slug || asset.id}`} className={`flex items-center justify-between p-4 rounded-lg border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'} transition-colors cursor-pointer`}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 ${isDark ? 'bg-rose-900' : 'bg-rose-100'} rounded-lg flex items-center justify-center`}>
-                        <FileText className="h-5 w-5 text-rose-600" />
-                      </div>
-                      <div>
-                        <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{asset.name}</div>
+                      {(asset['preview-image']?.url || asset.thumbnail?.url) ? (
+                        <img src={asset['preview-image']?.url || asset.thumbnail?.url} alt={asset.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
+                      ) : (
+                        <div className={`w-12 h-12 ${isDark ? 'bg-rose-900' : 'bg-rose-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                          <FileText className="h-6 w-6 text-rose-600" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className={`font-medium truncate ${isDark ? 'text-white' : ''}`}>{asset.name}</div>
                         <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{asset['asset-type'] || 'Asset'}</div>
                       </div>
                     </div>
-                    <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
+                    <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                   </a>
                 ))
               ) : (

@@ -96,56 +96,58 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
           </CardContent>
         </Card>
       ) : featuredItem ? (
-        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                {featuredItem.icon?.url ? (
-                  <img src={featuredItem.icon.url} alt={featuredItem.name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
-                ) : (
-                  <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                    <AlertCircle className="h-7 w-7" />
+        <a href={`/jewett-junction/hr/${featuredItem.slug || featuredItem.id}`} className="block">
+          <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 hover:from-purple-500 hover:to-purple-600 transition-all">
+            <CardContent className="py-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  {featuredItem.icon?.url ? (
+                    <img src={featuredItem.icon.url} alt={featuredItem.name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
+                  ) : (
+                    <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                      <AlertCircle className="h-7 w-7" />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-xl font-bold">{featuredItem.name}</h2>
+                    <p className="text-purple-100">{stripHtml(featuredItem.description || featuredItem.content)?.substring(0, 150)}</p>
                   </div>
-                )}
-                <div>
-                  <h2 className="text-xl font-bold">{featuredItem.name}</h2>
-                  <p className="text-purple-100">{stripHtml(featuredItem.description || featuredItem.content)?.substring(0, 150)}</p>
                 </div>
+                <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
+                  Learn More
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
-              {featuredItem['document-link'] && (
-                <a href={featuredItem['document-link']} target="_blank" rel="noopener">
-                  <Button className="bg-white text-purple-700 hover:bg-purple-50">
-                    Learn More
-                  </Button>
-                </a>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </a>
       ) : displayItems.length > 0 ? (
         /* Show first CMS item as featured when no content-type is set */
-        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                  <Users className="h-7 w-7" />
+        <a href={`/jewett-junction/hr/${displayItems[0].slug || displayItems[0].id}`} className="block">
+          <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 hover:from-purple-500 hover:to-purple-600 transition-all">
+            <CardContent className="py-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  {displayItems[0].icon?.url ? (
+                    <img src={displayItems[0].icon.url} alt={displayItems[0].name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
+                  ) : (
+                    <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Users className="h-7 w-7" />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-xl font-bold">{displayItems[0].name}</h2>
+                    <p className="text-purple-100">{stripHtml(displayItems[0].description || displayItems[0].content)?.substring(0, 150)}</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold">{displayItems[0].name}</h2>
-                  <p className="text-purple-100">{stripHtml(displayItems[0].description || displayItems[0].content)?.substring(0, 150)}</p>
-                </div>
+                <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
+                  Learn More
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
-              {displayItems[0]['document-link'] && (
-                <a href={displayItems[0]['document-link']} target="_blank" rel="noopener">
-                  <Button className="bg-white text-purple-700 hover:bg-purple-50">
-                    Learn More
-                  </Button>
-                </a>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </a>
       ) : (
         /* Empty state when no CMS content */
         <Card className={`border ${isDark ? 'bg-slate-800 border-slate-700' : ''}`}>

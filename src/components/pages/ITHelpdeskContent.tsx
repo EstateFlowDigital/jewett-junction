@@ -165,27 +165,24 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
                   ))}
                 </div>
               ) : (howToArticles.length > 0 || displayArticles.length > 0) ? (
-                /* Show how-to articles, or all articles if no type is set */
-                (howToArticles.length > 0 ? howToArticles.slice(0, 4) : displayArticles.slice(0, 4)).map((article) => ({
-                  title: article.name,
-                  desc: stripHtml(article.description || article.summary)?.substring(0, 60) || 'IT Resource',
-                  link: article['article-link'] || article['download-link'] || resourcesLink,
-                  icon: getCategoryIcon(article.name),
-                  imageUrl: article.icon?.url
-                })).map((item) => (
-                  <a key={item.title} href={item.link} target={item.link.startsWith('http') ? '_blank' : undefined} rel={item.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                    {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.title} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
+                /* Show how-to articles, or all articles if no type is set - link to detail pages */
+                (howToArticles.length > 0 ? howToArticles.slice(0, 4) : displayArticles.slice(0, 4)).map((article) => (
+                  <a key={article.id} href={`/jewett-junction/it-helpdesk/${article.slug || article.id}`} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 border border-slate-700' : 'hover:bg-muted/50 border border-muted'}`}>
+                    {article.icon?.url ? (
+                      <img src={article.icon.url} alt={article.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
                     ) : (
-                      <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center`}>
-                        <item.icon className="h-5 w-5 text-blue-600" />
+                      <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                        {(() => {
+                          const Icon = getCategoryIcon(article.name);
+                          return <Icon className="h-6 w-6 text-blue-600" />;
+                        })()}
                       </div>
                     )}
-                    <div className="flex-1">
-                      <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{item.title}</div>
-                      <div className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{item.desc}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{article.name}</div>
+                      <div className={`text-sm truncate ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(article.description || article.summary)?.substring(0, 80) || 'IT Resource'}</div>
                     </div>
-                    <ChevronRight className={`h-5 w-5 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
+                    <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                   </a>
                 ))
               ) : (
