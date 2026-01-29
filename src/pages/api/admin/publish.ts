@@ -30,23 +30,45 @@ function getEnvVar(locals: any, key: string): string {
   return runtime?.env?.[key] || (import.meta.env as any)[key];
 }
 
-// Verify admin token
-function verifyToken(request: Request): boolean {
+// Verify admin token - returns object with validation details
+function verifyToken(request: Request): { valid: boolean; reason?: string; details?: any } {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.replace('Bearer ', '');
 
-  if (!token || !token.startsWith('admin_')) {
-    return false;
+  if (!authHeader) {
+    return { valid: false, reason: 'No Authorization header' };
+  }
+
+  if (!token) {
+    return { valid: false, reason: 'No token after Bearer prefix' };
+  }
+
+  if (!token.startsWith('admin_')) {
+    return { valid: false, reason: 'Token does not start with admin_', details: { prefix: token.substring(0, 10) } };
   }
 
   const parts = token.split('_');
-  if (parts.length !== 3) return false;
+  if (parts.length !== 3) {
+    return { valid: false, reason: `Token has ${parts.length} parts, expected 3` };
+  }
 
   const timestamp = parseInt(parts[2], 36);
   const now = Date.now();
   const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+  const age = now - timestamp;
 
-  return now - timestamp <= maxAge;
+  if (age > maxAge) {
+    return {
+      valid: false,
+      reason: 'Token expired',
+      details: {
+        tokenAge: `${Math.round(age / 1000 / 60)} minutes`,
+        maxAge: '24 hours'
+      }
+    };
+  }
+
+  return { valid: true };
 }
 
 // OPTIONS - Handle CORS preflight
@@ -101,9 +123,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('Publish: Available env keys =', Object.keys(runtime.env));
   }
 
-  if (!verifyToken(request)) {
-    console.log('Publish: Unauthorized - invalid token');
-    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  const tokenResult = verifyToken(request);
+  if (!tokenResult.valid) {
+    console.log('Publish: Unauthorized -', tokenResult.reason, tokenResult.details);
+    return withCors(new Response(JSON.stringify({
+      error: 'Unauthorized',
+      reason: tokenResult.reason,
+      details: tokenResult.details
+    }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
@@ -231,8 +258,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 // GET - Check publish status / site info
 export const GET: APIRoute = async ({ request, locals }) => {
-  if (!verifyToken(request)) {
-    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  const tokenResult = verifyToken(request);
+  if (!tokenResult.valid) {
+    return withCors(new Response(JSON.stringify({
+      error: 'Unauthorized',
+      reason: tokenResult.reason,
+      details: tokenResult.details
+    }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
