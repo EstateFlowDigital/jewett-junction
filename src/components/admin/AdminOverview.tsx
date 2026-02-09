@@ -14,7 +14,15 @@ import {
   Loader2,
   TrendingUp,
   Clock,
-  ExternalLink
+  ExternalLink,
+  BookOpen,
+  Tag,
+  CircleHelp,
+  Wrench,
+  Building,
+  MapPin,
+  Sparkles,
+  Image
 } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
@@ -41,6 +49,15 @@ const COLLECTION_META: Omit<CollectionStat, 'count'>[] = [
   { key: 'itKnowledgeBase', name: 'IT Knowledge', icon: Monitor, color: 'sky', gradient: 'from-sky-500 to-blue-500', href: '/jewett-junction/admin/it' },
   { key: 'marketingAssets', name: 'Marketing', icon: Palette, color: 'rose', gradient: 'from-fuchsia-500 to-pink-500', href: '/jewett-junction/admin/marketing' },
   { key: 'submittedIdeas', name: 'Ideas', icon: Lightbulb, color: 'yellow', gradient: 'from-yellow-500 to-amber-500', href: '/jewett-junction/admin/ideas' },
+  { key: 'blogPosts', name: 'Blog Posts', icon: BookOpen, color: 'teal', gradient: 'from-teal-500 to-emerald-500', href: '/jewett-junction/admin/blog' },
+  { key: 'blogCategories', name: 'Blog Categories', icon: Tag, color: 'lime', gradient: 'from-lime-500 to-green-500', href: '/jewett-junction/admin/blog-categories' },
+  { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', gradient: 'from-purple-500 to-indigo-500', href: '/jewett-junction/admin/faqs' },
+  { key: 'services', name: 'Services', icon: Wrench, color: 'slate', gradient: 'from-slate-500 to-zinc-500', href: '/jewett-junction/admin/services' },
+  { key: 'industries', name: 'Industries', icon: Building, color: 'stone', gradient: 'from-stone-500 to-neutral-500', href: '/jewett-junction/admin/industries' },
+  { key: 'serviceAreas', name: 'Service Areas', icon: MapPin, color: 'red', gradient: 'from-red-500 to-rose-500', href: '/jewett-junction/admin/service-areas' },
+  { key: 'teamMembers', name: 'Team Members', icon: Users, color: 'blue', gradient: 'from-blue-500 to-indigo-500', href: '/jewett-junction/admin/team-members' },
+  { key: 'ourWork', name: 'Our Work', icon: Sparkles, color: 'amber', gradient: 'from-amber-500 to-yellow-500', href: '/jewett-junction/admin/our-work' },
+  { key: 'imageGalleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', gradient: 'from-fuchsia-500 to-violet-500', href: '/jewett-junction/admin/galleries' },
 ];
 
 export function AdminOverview() {

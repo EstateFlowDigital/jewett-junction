@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -24,6 +24,15 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'it', name: 'IT Knowledge', icon: Monitor, color: 'sky', href: '/jewett-junction/admin/it' },
   { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
   { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
+  { key: 'blog', name: 'Blog Posts', icon: BookOpen, color: 'teal', href: '/jewett-junction/admin/blog' },
+  { key: 'blog-categories', name: 'Blog Categories', icon: Tag, color: 'lime', href: '/jewett-junction/admin/blog-categories' },
+  { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', href: '/jewett-junction/admin/faqs' },
+  { key: 'services', name: 'Services', icon: Wrench, color: 'slate', href: '/jewett-junction/admin/services' },
+  { key: 'industries', name: 'Industries', icon: Building, color: 'stone', href: '/jewett-junction/admin/industries' },
+  { key: 'service-areas', name: 'Service Areas', icon: MapPin, color: 'red', href: '/jewett-junction/admin/service-areas' },
+  { key: 'team-members', name: 'Team Members', icon: Users, color: 'blue', href: '/jewett-junction/admin/team-members' },
+  { key: 'our-work', name: 'Our Work', icon: Sparkles, color: 'amber', href: '/jewett-junction/admin/our-work' },
+  { key: 'galleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', href: '/jewett-junction/admin/galleries' },
 ];
 
 interface AdminLayoutProps {
@@ -283,6 +292,12 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
                 sky: isActive ? 'bg-sky-500/20 text-sky-400 border-sky-500/30' : '',
                 rose: isActive ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : '',
                 yellow: isActive ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : '',
+                teal: isActive ? 'bg-teal-500/20 text-teal-400 border-teal-500/30' : '',
+                lime: isActive ? 'bg-lime-500/20 text-lime-400 border-lime-500/30' : '',
+                purple: isActive ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : '',
+                stone: isActive ? 'bg-stone-500/20 text-stone-400 border-stone-500/30' : '',
+                red: isActive ? 'bg-red-500/20 text-red-400 border-red-500/30' : '',
+                fuchsia: isActive ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30' : '',
               };
               return (
                 <li key={item.key}>

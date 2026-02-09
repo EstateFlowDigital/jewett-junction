@@ -63,6 +63,66 @@ const VALID_FIELDS: Record<string, string[]> = {
     'name', 'slug', 'category', 'description', 'submitted-by', 'submitter-email',
     'department', 'status', 'priority', 'admin-notes', 'votes', 'featured'
   ],
+  blogPosts: [
+    'name', 'slug', 'date', 'main-image', 'main-image-alt-text', 'blog-body-image',
+    'blog-body-image-alt', 'blog-page-heading-h1', 'blog-page-short-description',
+    'blog-card-title-h2', 'blog-card-title-h3', 'blog-card-short-description',
+    'blog-long-description', 'seo-title-tag', 'seo-meta-description',
+    'cdn-image-visibility', 'cdn-image-url', 'additional-content-visibility',
+    'video-visibility', 'video', 'min-image-height', 'object-position-2',
+    'gallery-image-1-visibility', 'gallery-image-1', 'gallery-image-1-alt-text',
+    'gallery-image-2-visibility', 'gallery-image-2', 'gallery-image-2-alt-text'
+  ],
+  blogCategories: [
+    'name', 'slug', 'main-image', 'main-image-alt-text', 'category-name-eyebrow-text',
+    'category-page-heading-h1', 'category-card-title-h2', 'category-card-short-description',
+    'category-long-description', 'seo-title-tag', 'seo-meta-description'
+  ],
+  faqs: [
+    'name', 'slug', 'main-image', 'main-image-alt-text', 'faqs-card-title-h1',
+    'faqs-card-title-h2', 'faqs-card-title-h3', 'faq-short-answer', 'faq-long-answer',
+    'faq-category', 'seo-title-tag', 'seo-meta-description'
+  ],
+  services: [
+    'name', 'slug', 'main-image', 'main-image-alt-text', 'icon-svg-path-1',
+    'is-reversed', 'service-page-heading-h1', 'service-page-short-description',
+    'service-card-title-h2', 'service-card-title-h3', 'service-card-short-description',
+    'service-long-description', 'seo-title-tag-2', 'seo-meta-description-2',
+    'sort-order', 'line-visibility'
+  ],
+  industries: [
+    'name', 'slug', 'main-image', 'main-image-alt-text', 'is-reversed',
+    'industries-page-heading-h1', 'industries-page-short-description',
+    'industries-card-title-h2', 'industries-card-title-h3', 'industries-card-short-description',
+    'industries-long-description', 'seo-title-tag-2', 'seo-meta-description-2',
+    'svg-icon-path-1', 'industry-button'
+  ],
+  serviceAreas: [
+    'name', 'slug', 'main-image', 'main-image-alt-text', 'is-reversed',
+    'service-area-page-heading-h1', 'service-area-page-short-description',
+    'service-area-card-title-h2', 'service-area-card-title-h3',
+    'service-area-card-short-description', 'service-area-long-description',
+    'seo-title-tag-2', 'seo-meta-description-2'
+  ],
+  teamMembers: [
+    'name', 'slug', 'main-image', 'main-image-alt-text',
+    'team-members-page-heading-h1', 'team-members-page-short-description',
+    'team-members-card-title-h2', 'team-members-card-title-h3',
+    'team-members-card-short-description', 'team-members-long-description',
+    'seo-title-tag', 'seo-meta-description', 'department', 'title',
+    'linkedin-url', 'sort-order'
+  ],
+  ourWork: [
+    'name', 'slug', 'main-image', 'main-image-alt-text',
+    'our-work-page-heading-h1', 'our-work-page-short-description',
+    'our-work-card-title-h2', 'our-work-card-title-h3',
+    'our-work-card-short-description', 'our-work-long-description',
+    'seo-title-tag', 'seo-meta-description', 'intro-section-heading-h2',
+    'architect-designer', 'location', 'featured-project', 'video-url'
+  ],
+  imageGalleries: [
+    'name', 'slug', 'main-image-file', 'main-image-alt-text'
+  ],
 };
 
 // Filter fields to only include valid ones for the collection

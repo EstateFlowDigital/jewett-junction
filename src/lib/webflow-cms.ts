@@ -299,6 +299,15 @@ export const COLLECTIONS = {
   itKnowledgeBase: '697667485f0556597dac1ce1',
   marketingAssets: '6976674b9d1917dbf6e1fb4d',
   submittedIdeas: '6976674fd3adf8bb054da4ce',
+  blogPosts: '67a464bc7184fcb8aacb0f3e',
+  blogCategories: '67a464bc7184fcb8aacb0f1c',
+  faqs: '67a464bc7184fcb8aacb0f60',
+  services: '67a464bc7184fcb8aacb0eb6',
+  industries: '67a464bc7184fcb8aacb0eb7',
+  serviceAreas: '67a464bc7184fcb8aacb0eb8',
+  teamMembers: '67a464bc7184fcb8aacb0ed6',
+  ourWork: '67a464bc7184fcb8aacb0ef9',
+  imageGalleries: '67a464bc7184fcb8aacb0f82',
 } as const;
 
 // ============================================

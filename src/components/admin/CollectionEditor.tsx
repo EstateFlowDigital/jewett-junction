@@ -43,6 +43,9 @@ import {
   Mail,
   Phone,
   Linkedin,
+  BookOpen,
+  CircleHelp,
+  Wrench,
   type LucideIcon
 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
@@ -95,6 +98,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Eye,
   Copy,
   Sparkles,
+  BookOpen,
+  CircleHelp,
+  Wrench,
 };
 
 // Helper function to get icon component from string identifier
