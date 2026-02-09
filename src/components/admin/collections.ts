@@ -32,7 +32,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter announcement title', icon: 'FileText' },
       { key: 'content', label: 'Content', type: 'richtext', required: true, placeholder: 'Write your announcement content...', helpText: 'Supports basic HTML formatting' },
-      { key: 'image', label: 'Featured Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Paste image URL (recommended: 1200x630px)', icon: 'Image' },
+      { key: 'image', label: 'Thumbnail Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Square thumbnail (recommended: 1200x630px)', icon: 'Image' },
+      { key: 'blog-body-image', label: 'Blog Body Image', type: 'image', helpText: 'Landscape image (16:9) displayed in the article body. If set, replaces the thumbnail in the detail view.', icon: 'Image' },
       { key: 'author', label: 'Author', type: 'text', placeholder: 'e.g., HR Team, CEO Office', icon: 'Users' },
       { key: 'category', label: 'Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: 'Tag' },
       { key: 'priority', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: 'Bell' },

@@ -64,10 +64,15 @@ const priorityColors: Record<string, string> = {
 
     <!-- Announcement Content -->
     <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
-      <!-- Hero Image -->
-      {announcement.image?.url && (
-        <div class="h-64 w-full overflow-hidden relative">
-          <img src={announcement.image.url} alt={`Image for ${announcement.name}`} class="w-full h-full object-cover" loading="lazy" />
+      <!-- Hero Image: prefer landscape blog-body-image, fall back to thumbnail -->
+      {(announcement['blog-body-image']?.url || announcement.image?.url) && (
+        <div class={`w-full overflow-hidden relative ${announcement['blog-body-image']?.url ? 'aspect-video' : 'h-64'}`}>
+          <img
+            src={announcement['blog-body-image']?.url || announcement.image.url}
+            alt={`Image for ${announcement.name}`}
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
         </div>
       )}

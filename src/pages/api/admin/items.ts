@@ -11,7 +11,7 @@ const BASE_URL = 'https://api.webflow.com/v2';
 // Note: If a field is missing here, add it to both AdminDashboard and this list
 const VALID_FIELDS: Record<string, string[]> = {
   announcements: [
-    'name', 'slug', 'content', 'image', 'author', 'category', 'priority',
+    'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'category', 'priority',
     'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date'
   ],
   events: [
@@ -254,8 +254,25 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Webflow API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('POST: Webflow error response:', errorText);
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { rawResponse: errorText };
+      }
+      // Extract detailed field validation info if available
+      const details = errorData.details || errorData.problems || errorData.err;
+      const detailMsg = details ? ` Details: ${JSON.stringify(details)}` : '';
+      return withCors(new Response(JSON.stringify({
+        error: (errorData.message || `Webflow API error: ${response.status}`) + detailMsg,
+        webflowError: errorData,
+        status: response.status
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }));
     }
 
     const data = await response.json();

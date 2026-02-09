@@ -125,6 +125,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const [uploadingField, setUploadingField] = React.useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = React.useState<number>(0);
   const [dragOverField, setDragOverField] = React.useState<string | null>(null);
+  const [imageFileIds, setImageFileIds] = React.useState<Record<string, string>>({});
 
   // Preview state
   const [showPreview, setShowPreview] = React.useState(false);
@@ -173,11 +174,20 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   // Normalize field data for editing
   const normalizeFieldData = (fieldData: Record<string, any>): Record<string, any> => {
     const normalized = { ...fieldData };
+    const fileIds: Record<string, string> = {};
     config.fields.forEach(field => {
       if (field.type === 'image' && normalized[field.key]) {
-        normalized[field.key] = getImageUrl(normalized[field.key]);
+        const val = normalized[field.key];
+        // Preserve fileId from Webflow's image object
+        if (typeof val === 'object' && val.fileId) {
+          fileIds[field.key] = val.fileId;
+        }
+        normalized[field.key] = getImageUrl(val);
       }
     });
+    if (Object.keys(fileIds).length > 0) {
+      setImageFileIds(prev => ({ ...prev, ...fileIds }));
+    }
     return normalized;
   };
 
@@ -219,6 +229,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const handleCreate = () => {
     setEditingItem(null);
     setFormData({});
+    setImageFileIds({});
     setIsEditing(true);
   };
 
@@ -258,11 +269,32 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     setIsLoading(true);
     setError('');
 
+    // Client-side required field validation
+    const missingFields = config.fields
+      .filter(f => f.required && (!formData[f.key] || formData[f.key].toString().trim() === ''))
+      .map(f => f.label);
+
+    if (missingFields.length > 0) {
+      setError(`Required fields missing: ${missingFields.join(', ')}`);
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      // Process image fields: replace URLs with fileIds for Webflow API
+      const processedFields = { ...formData };
+      config.fields.forEach(field => {
+        if (field.type === 'image' && processedFields[field.key]) {
+          if (imageFileIds[field.key]) {
+            processedFields[field.key] = imageFileIds[field.key];
+          }
+        }
+      });
+
       const method = editingItem ? 'PATCH' : 'POST';
       const body: any = {
         collection: collectionKey,
-        fields: formData,
+        fields: processedFields,
         isLive: publishLive
       };
 
@@ -298,6 +330,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       setIsEditing(false);
       setEditingItem(null);
       setFormData({});
+      setImageFileIds({});
       loadItems();
     } catch (err: any) {
       setError(err.message);
@@ -512,6 +545,9 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
 
       setUploadProgress(100);
       setFormData({ ...formData, [fieldKey]: data.url });
+      if (data.id) {
+        setImageFileIds(prev => ({ ...prev, [fieldKey]: data.id }));
+      }
       setSuccess('Image uploaded successfully!');
 
       setTimeout(() => {
@@ -735,7 +771,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           >
             <option value="">Select {field.label.toLowerCase()}...</option>
             {field.options?.map((opt) => (
-              <option key={opt} value={opt.toLowerCase().replace(/\s+/g, '-')}>{opt}</option>
+              <option key={opt} value={opt}>{opt}</option>
             ))}
           </select>
         )}
