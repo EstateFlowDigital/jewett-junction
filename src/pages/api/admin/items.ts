@@ -160,7 +160,7 @@ function getApiToken(locals: any): string {
   return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
 }
 
-// Verify admin token
+// Verify admin token — checks format and expiry
 function verifyToken(request: Request): boolean {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.replace('Bearer ', '');
@@ -169,10 +169,13 @@ function verifyToken(request: Request): boolean {
     return false;
   }
 
-  const parts = token.split('_');
+  const body = token.slice('admin_'.length);
+  const parts = body.split('.');
   if (parts.length !== 3) return false;
 
-  const timestamp = parseInt(parts[2], 36);
+  const timestamp = parseInt(parts[1], 10);
+  if (isNaN(timestamp)) return false;
+
   const now = Date.now();
   const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 

@@ -32,12 +32,16 @@ function verifyToken(request: Request): { valid: boolean; reason?: string; detai
     return { valid: false, reason: 'Token does not start with admin_', details: { prefix: token.substring(0, 10) } };
   }
 
-  const parts = token.split('_');
+  const body = token.slice('admin_'.length);
+  const parts = body.split('.');
   if (parts.length !== 3) {
-    return { valid: false, reason: `Token has ${parts.length} parts, expected 3` };
+    return { valid: false, reason: `Token body has ${parts.length} parts, expected 3` };
   }
 
-  const timestamp = parseInt(parts[2], 36);
+  const timestamp = parseInt(parts[1], 10);
+  if (isNaN(timestamp)) {
+    return { valid: false, reason: 'Invalid timestamp in token' };
+  }
   const now = Date.now();
   const maxAge = 24 * 60 * 60 * 1000; // 24 hours
   const age = now - timestamp;

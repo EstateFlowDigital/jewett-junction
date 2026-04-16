@@ -1,4 +1,9 @@
 import type { APIRoute } from 'astro';
+import { COLLECTIONS } from '../../lib/webflow-cms';
+
+export const prerender = false;
+
+const BASE_URL = 'https://api.webflow.com/v2';
 
 interface IdeaSubmission {
   name: string;
@@ -10,27 +15,30 @@ interface IdeaSubmission {
   description: string;
   benefits?: string;
   resources?: string;
-  submittedAt: string;
-  notificationEmail?: string;
 }
 
 const categoryLabels: Record<string, string> = {
   process: 'Process Improvement',
-  safety: 'Safety Enhancement',
+  safety: 'Safety',
   cost: 'Cost Savings',
-  culture: 'Team & Culture',
-  innovation: 'New Initiative',
+  culture: 'Culture',
+  innovation: 'Technology',
   other: 'Other',
 };
 
 const impactLabels: Record<string, string> = {
-  low: 'Nice to Have',
-  medium: 'Moderate Impact',
-  high: 'High Impact',
-  critical: 'Game Changer',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  critical: 'High',
 };
 
-export const POST: APIRoute = async ({ request }) => {
+function getApiToken(locals: any): string {
+  const runtime = locals?.runtime;
+  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const data: IdeaSubmission = await request.json();
 
@@ -42,32 +50,77 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Format the email content
-    const emailContent = formatEmailContent(data);
+    const apiToken = getApiToken(locals);
+    if (!apiToken) {
+      console.error('WEBFLOW_API_TOKEN not configured');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // For now, log the submission (in production, this would send an email)
-    console.log('=== NEW IDEA SUBMISSION ===');
-    console.log(`To: ${data.notificationEmail || 'ideas@jewett.com'}`);
-    console.log(`Subject: New Idea Submission: ${data.title}`);
-    console.log('---');
-    console.log(emailContent);
-    console.log('===========================');
+    const collectionId = COLLECTIONS.submittedIdeas;
+    if (!collectionId) {
+      console.error('submittedIdeas collection ID not found');
+      return new Response(
+        JSON.stringify({ error: 'Collection not configured' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
-    // In production with proper email service, you would:
-    // 1. Use a service like SendGrid, Mailgun, or AWS SES
-    // 2. Or use Cloudflare Email Workers
-    // 3. Or integrate with an existing notification system
+    // Build description with benefits and resources appended
+    let fullDescription = data.description;
+    if (data.benefits) {
+      fullDescription += `\n\nExpected Benefits:\n${data.benefits}`;
+    }
+    if (data.resources) {
+      fullDescription += `\n\nResources Needed:\n${data.resources}`;
+    }
 
-    // For Cloudflare Workers, you could use:
-    // - Cloudflare Email Routing
-    // - Integration with external email API via fetch
+    // Map form data to Webflow CMS field slugs
+    const fieldData: Record<string, any> = {
+      name: data.title,
+      slug: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      category: categoryLabels[data.category] || 'Other',
+      description: fullDescription,
+      'submitted-by': data.name,
+      'submitter-email': data.email,
+      status: 'New',
+      priority: impactLabels[data.impact || 'medium'] || 'Medium',
+      votes: 0,
+    };
 
-    // Return success
+    if (data.department) {
+      fieldData.department = data.department;
+    }
+
+    // Create item in Webflow CMS
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items?live=true`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ fieldData }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Webflow API error creating idea:', errorText);
+      return new Response(
+        JSON.stringify({ error: 'Failed to submit idea. Please try again.' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const result = await response.json();
+
     return new Response(
       JSON.stringify({
         success: true,
         message: 'Idea submitted successfully',
-        id: generateSubmissionId(),
+        id: result.id,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
@@ -80,52 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-function formatEmailContent(data: IdeaSubmission): string {
-  const lines = [
-    `New Idea Submission from ${data.name}`,
-    '',
-    '─'.repeat(50),
-    '',
-    `SUBMITTED BY`,
-    `Name: ${data.name}`,
-    `Email: ${data.email}`,
-    data.department ? `Department: ${data.department}` : null,
-    '',
-    '─'.repeat(50),
-    '',
-    `IDEA DETAILS`,
-    `Title: ${data.title}`,
-    `Category: ${categoryLabels[data.category] || data.category}`,
-    data.impact ? `Expected Impact: ${impactLabels[data.impact] || data.impact}` : null,
-    '',
-    `Description:`,
-    data.description,
-    '',
-  ];
-
-  if (data.benefits) {
-    lines.push(`Expected Benefits:`);
-    lines.push(data.benefits);
-    lines.push('');
-  }
-
-  if (data.resources) {
-    lines.push(`Resources Needed:`);
-    lines.push(data.resources);
-    lines.push('');
-  }
-
-  lines.push('─'.repeat(50));
-  lines.push('');
-  lines.push(`Submitted: ${new Date(data.submittedAt).toLocaleString()}`);
-  lines.push('');
-  lines.push('This submission was received through Jewett Junction.');
-
-  return lines.filter(line => line !== null).join('\n');
-}
-
-function generateSubmissionId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  return `IDEA-${timestamp}-${random}`.toUpperCase();
-}
+// CORS preflight is handled by middleware
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, { status: 204 });
+};

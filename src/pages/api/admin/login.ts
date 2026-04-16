@@ -8,37 +8,64 @@ function withCors(response: Response): Response {
   return response;
 }
 
-// Simple token generation - in production, use a proper JWT library
-function generateToken(password: string): string {
+// Generate a cryptographically secure token with HMAC signature
+async function generateToken(secret: string): Promise<string> {
   const timestamp = Date.now();
-  const data = `${password}-${timestamp}`;
-  // Simple hash for demo - in production use crypto
-  let hash = 0;
-  for (let i = 0; i < data.length; i++) {
-    const char = data.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return `admin_${Math.abs(hash).toString(36)}_${timestamp.toString(36)}`;
+  const nonce = crypto.randomUUID();
+  const payload = `${nonce}.${timestamp}`;
+
+  // Sign the payload with HMAC-SHA256 using the admin password as key
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(payload));
+  const sig = btoa(String.fromCharCode(...new Uint8Array(signature))).replace(/[+/=]/g, (c) =>
+    c === '+' ? '-' : c === '/' ? '_' : ''
+  );
+
+  return `admin_${payload}.${sig}`;
 }
 
-// Verify token helper
-function verifyToken(token: string | null): { valid: boolean; reason?: string } {
+// Verify token — checks structure, expiry, and HMAC signature
+async function verifyToken(token: string | null, secret?: string): Promise<{ valid: boolean; reason?: string }> {
   if (!token || !token.startsWith('admin_')) {
     return { valid: false };
   }
 
-  const parts = token.split('_');
+  const body = token.slice('admin_'.length);
+  const parts = body.split('.');
   if (parts.length !== 3) {
     return { valid: false };
   }
 
-  const timestamp = parseInt(parts[2], 36);
+  const [nonce, timestampStr, sig] = parts;
+  const timestamp = parseInt(timestampStr, 10);
+  if (isNaN(timestamp)) {
+    return { valid: false };
+  }
+
   const now = Date.now();
   const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
   if (now - timestamp > maxAge) {
     return { valid: false, reason: 'Token expired' };
+  }
+
+  // If we have the secret, verify the HMAC signature
+  if (secret) {
+    const payload = `${nonce}.${timestampStr}`;
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
+    );
+    // Decode the base64url signature
+    const sigPadded = sig.replace(/-/g, '+').replace(/_/g, '/');
+    const sigBytes = Uint8Array.from(atob(sigPadded), c => c.charCodeAt(0));
+    const valid = await crypto.subtle.verify('HMAC', key, sigBytes, encoder.encode(payload));
+    if (!valid) {
+      return { valid: false, reason: 'Invalid token' };
+    }
   }
 
   return { valid: true };
@@ -50,11 +77,18 @@ export const OPTIONS: APIRoute = async () => {
   return new Response(null, { status: 204 });
 };
 
+// Helper to get admin password from env
+function getAdminPassword(locals: any): string | undefined {
+  const runtime = (locals as any)?.runtime;
+  return runtime?.env?.ADMIN_PASSWORD || import.meta.env.ADMIN_PASSWORD;
+}
+
 // Handle token verification GET request
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   const authHeader = request.headers.get('Authorization');
   const token = authHeader?.replace('Bearer ', '') || null;
-  const result = verifyToken(token);
+  const secret = getAdminPassword(locals);
+  const result = await verifyToken(token, secret);
 
   if (!result.valid) {
     return withCors(new Response(
@@ -91,9 +125,7 @@ async function handlePost(request: Request, locals: any): Promise<Response> {
       ));
     }
 
-    // Access env vars from Cloudflare runtime context, fallback to import.meta.env for local dev
-    const runtime = (locals as any)?.runtime;
-    const adminPassword = runtime?.env?.ADMIN_PASSWORD || import.meta.env.ADMIN_PASSWORD;
+    const adminPassword = getAdminPassword(locals);
 
     if (!adminPassword) {
       console.error('ADMIN_PASSWORD not found in environment variables');
@@ -113,7 +145,7 @@ async function handlePost(request: Request, locals: any): Promise<Response> {
       ));
     }
 
-    const token = generateToken(password);
+    const token = await generateToken(adminPassword);
 
     return withCors(new Response(
       JSON.stringify({
@@ -150,7 +182,8 @@ export const ALL: APIRoute = async ({ request, locals }) => {
   if (method === 'GET') {
     const authHeader = request.headers.get('Authorization');
     const token = authHeader?.replace('Bearer ', '') || null;
-    const result = verifyToken(token);
+    const secret = getAdminPassword(locals);
+    const result = await verifyToken(token, secret);
 
     if (!result.valid) {
       return withCors(new Response(
