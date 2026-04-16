@@ -29,7 +29,7 @@ export function FeaturedCarousel({ announcements }: FeaturedCarouselProps) {
     },
     [
       Autoplay({
-        delay: 3500,
+        delay: 4000,
         stopOnInteraction: false,
         stopOnMouseEnter: true,
         stopOnFocusIn: true,

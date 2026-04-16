@@ -60,42 +60,42 @@ const benefits = [
   {
     icon: Heart,
     title: 'Medical, Dental & Vision',
-    description: 'Comprehensive coverage with multiple plan options and 4-tier coverage for you and your family.',
+    description: 'Comprehensive health coverage with multiple plan options and 4-tier coverage to protect you and your family.',
+  },
+  {
+    icon: PiggyBank,
+    title: '401(k) with Company Match',
+    description: '100% company match on your contributions up to 4%, with no vesting schedule. Your future starts day one.',
   },
   {
     icon: GraduationCap,
     title: 'Tuition Reimbursement',
-    description: 'Up to $3,000 annually for accredited degree programs after one year of service.',
-  },
-  {
-    icon: Users,
-    title: 'Wellness Program',
-    description: 'Community activities including yoga, cooking classes, book clubs, and team outings.',
-  },
-  {
-    icon: Gift,
-    title: 'Referral Program',
-    description: 'Earn bonus incentives for employee referrals that result in successful hires.',
+    description: 'Up to $3,000 annually toward accredited degree programs. We invest in your growth because your development matters.',
   },
   {
     icon: Calendar,
     title: 'Paid Time Off',
-    description: 'Pro-rata accrual throughout the year for vacation, sick time, and personal days.',
-  },
-  {
-    icon: Home,
-    title: 'Flexible Work',
-    description: 'Remote work arrangements available with eligibility standards for qualifying roles.',
-  },
-  {
-    icon: PiggyBank,
-    title: 'Retirement Planning',
-    description: '100% company match on contributions up to 4% with no vesting schedule.',
+    description: 'Generous PTO accrual for vacation, sick time, and personal days — because balance builds better teams.',
   },
   {
     icon: Shield,
-    title: 'Insurance Coverage',
-    description: 'Company-sponsored short & long-term disability plus life insurance protection.',
+    title: 'Insurance & Protection',
+    description: 'Company-sponsored short and long-term disability insurance plus life insurance coverage at no cost to you.',
+  },
+  {
+    icon: Home,
+    title: 'Flexible Work Options',
+    description: 'Remote and hybrid arrangements available for qualifying roles, with the tools and support to work from anywhere.',
+  },
+  {
+    icon: Users,
+    title: 'Wellness & Community',
+    description: 'Team outings, wellness challenges, cooking classes, book clubs, and volunteer events to stay connected.',
+  },
+  {
+    icon: Gift,
+    title: 'Employee Referral Bonuses',
+    description: 'Know someone who belongs on this team? Earn cash bonuses for every successful referral you make.',
   },
 ];
 
@@ -276,9 +276,9 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
         <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="h-8 w-8 text-emerald-400" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">Application Submitted!</h3>
+        <h3 className="text-2xl font-bold text-white mb-3">We've Got Your Application!</h3>
         <p className="text-slate-300 mb-6 max-w-md mx-auto">
-          Thank you for your interest in joining Jewett Construction. We'll review your application and get back to you within 24 hours.
+          Thank you for your interest in joining the Jewett Construction team. Our recruiting team will review your application and follow up within 24 hours.
         </p>
         <Button onClick={() => setStatus('idle')} className="bg-blue-600 hover:bg-blue-700">
           Submit Another Application
@@ -617,26 +617,32 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-2 mb-4">
             <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-              <Briefcase className="h-3 w-3 mr-1" />
-              {displayJobs.length} Open Positions
+              Careers at Jewett Construction
             </Badge>
+            {displayJobs.length > 0 && (
+              <Badge className="bg-emerald-500/30 text-emerald-100 border-emerald-400/30 hover:bg-emerald-500/40">
+                <Briefcase className="h-3 w-3 mr-1" />
+                {displayJobs.length} Open Position{displayJobs.length !== 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Building Careers,<br />Constructing Futures.
+            Build Your Career with<br />a Team That Puts People First.
           </h1>
           <p className="text-lg text-blue-100 mb-6 max-w-2xl">
-            Join a team where people matter more than anything. We value diverse perspectives,
-            continuous innovation, and a culture built on over 50 years of excellence.
+            At Jewett Construction, people matter more than anything. For over 50 years, we've built
+            an award-winning culture rooted in safety, integrity, and opportunity. Whether you're in the
+            field or the office, you'll find a place where your work makes a real impact.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50" asChild>
               <a href="#positions">
-                View Open Positions
+                Explore Open Roles
                 <ChevronRight className="h-4 w-4 ml-1" />
               </a>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <a href="#apply">Apply Now</a>
+              <a href="#apply">Submit Your Application</a>
             </Button>
           </div>
         </div>
@@ -649,10 +655,10 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
         <CardHeader className="border-b border-slate-700">
           <CardTitle className="text-white flex items-center gap-2">
             <Briefcase className="h-5 w-5 text-blue-400" />
-            Start Your Journey
+            Apply to Join Our Team
           </CardTitle>
           <CardDescription className="text-slate-400">
-            Complete the form below and we'll respond within 24 hours. We welcome all talent, including veterans.
+            Fill out the form below to get started. Our recruiting team reviews every application and will follow up within 24 hours. We proudly welcome veterans and military talent.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">
@@ -664,18 +670,23 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Our Story</CardTitle>
+            <CardTitle className="text-white">Why Jewett Construction?</CardTitle>
           </CardHeader>
           <CardContent className="text-slate-300 space-y-4">
             <p>
-              Founded with deep roots in quality craftsmanship, Jewett Construction has grown into an
-              industry leader through continuous innovation and an unwavering commitment to our people.
+              For more than half a century, Jewett Construction has set the standard in commercial
+              construction across Ohio. We've grown from a local builder into a regional leader — not
+              by cutting corners, but by investing in the people who make it all happen.
             </p>
             <p>
-              We believe that <span className="text-white font-medium">people matter more than anything</span>.
-              This isn't just a slogan—it's the foundation of everything we do. From the way we train our
-              teams to how we approach every project, we prioritize the growth, safety, and well-being of
-              our employees.
+              Our culture is built on four values: <span className="text-white font-medium">Safety, Excellence, Teamwork, and Integrity</span>.
+              We live by the principle that <span className="text-white font-medium">people matter more than anything</span> — and
+              that means providing real career growth, industry-leading benefits, and a workplace where
+              every voice is heard.
+            </p>
+            <p>
+              Whether you're an experienced project manager or just starting out in the trades,
+              you'll find a team that has your back and a company that's committed to your success.
             </p>
           </CardContent>
         </Card>
@@ -711,9 +722,10 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
       {/* Benefits Section */}
       <div>
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Benefits Blueprint</h2>
+          <p className="text-sm text-blue-400 uppercase tracking-wider font-semibold mb-2">Total Rewards</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Benefits That Build With You</h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            We invest in our people with a comprehensive benefits package designed to support you and your family.
+            From day one, you're backed by a benefits package designed to support your health, your family, and your future. Because when our people thrive, great things get built.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -738,9 +750,10 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
       <div id="positions" className="scroll-mt-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Open Positions</h2>
+            <p className="text-sm text-blue-400 uppercase tracking-wider font-semibold mb-2">Current Openings</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Find Your Role at Jewett</h2>
             <p className="text-slate-400">
-              Find your next opportunity with us
+              Browse our current openings and find the opportunity that fits your skills and ambitions.
             </p>
           </div>
           <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 self-start md:self-auto">
@@ -875,12 +888,12 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
             <CardContent className="py-12 text-center">
               <Briefcase className="h-12 w-12 text-slate-600 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">
-                {allJobs.length === 0 ? 'No open positions' : 'No positions found'}
+                {allJobs.length === 0 ? 'No open positions right now' : 'No matching positions'}
               </h3>
               <p className="text-slate-400 mb-4">
                 {allJobs.length === 0
-                  ? 'Check back soon for new opportunities or submit a general application above.'
-                  : 'Try adjusting your search or filter criteria'
+                  ? "We're always looking for great people. Submit a general application above and we'll reach out when a role fits."
+                  : 'Try adjusting your search or filter to see more results.'
                 }
               </p>
               {(searchTerm || selectedDept !== 'All Departments') && (
@@ -908,10 +921,10 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  Employee Referral Program
+                  Know Someone Who Belongs Here?
                 </h2>
                 <p className="text-emerald-100">
-                  Know someone who'd be a great fit? Earn bonus incentives for successful referrals!
+                  Our best hires come from our own people. Refer a friend or former colleague and earn a cash bonus when they join the team.
                 </p>
               </div>
             </div>
@@ -931,13 +944,13 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
         <CardContent className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl font-semibold text-white mb-2">Have Questions?</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">Questions About Working at Jewett?</h3>
               <p className="text-slate-400">
-                Our recruiting team is here to help. Reach out and we'll get back to you within 24 hours.
+                Our recruiting team would love to hear from you. Whether you have questions about a specific role, the application process, or what life at Jewett is like — reach out and we'll get back to you within 24 hours.
               </p>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700" asChild>
-              <a href="mailto:careers@jewett.com">Contact Recruiting Team</a>
+            <Button className="bg-blue-600 hover:bg-blue-700 flex-shrink-0" asChild>
+              <a href="mailto:careers@jewett.com">Email Our Recruiting Team</a>
             </Button>
           </div>
         </CardContent>
