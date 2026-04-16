@@ -3,18 +3,9 @@ import type { APIRoute, APIContext } from 'astro';
 // Ensure this route is server-rendered
 export const prerender = false;
 
-// Helper to add CORS headers to any response
+// CORS is handled by middleware — this is a passthrough for compatibility
 function withCors(response: Response): Response {
-  const headers = new Headers(response.headers);
-  headers.set('Access-Control-Allow-Origin', '*');
-  headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
+  return response;
 }
 
 // Simple token generation - in production, use a proper JWT library
@@ -54,15 +45,9 @@ function verifyToken(token: string | null): { valid: boolean; reason?: string } 
 }
 
 // Handle CORS preflight
+// CORS preflight is handled by middleware
 export const OPTIONS: APIRoute = async () => {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept',
-    }
-  });
+  return new Response(null, { status: 204 });
 };
 
 // Handle token verification GET request
@@ -159,14 +144,7 @@ export const ALL: APIRoute = async ({ request, locals }) => {
   const method = request.method.toUpperCase();
 
   if (method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept',
-      }
-    });
+    return new Response(null, { status: 204 });
   }
 
   if (method === 'GET') {

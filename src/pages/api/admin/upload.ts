@@ -4,24 +4,9 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
-// CORS headers
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept',
-};
-
-// Helper to add CORS headers to any response
+// CORS is handled by middleware — this is a passthrough for compatibility
 function withCors(response: Response): Response {
-  const headers = new Headers(response.headers);
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    headers.set(key, value);
-  });
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
+  return response;
 }
 
 // Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
@@ -49,22 +34,15 @@ function verifyToken(request: Request): boolean {
   return now - timestamp <= maxAge;
 }
 
-// OPTIONS - Handle CORS preflight
+// CORS preflight is handled by middleware
 export const OPTIONS: APIRoute = async () => {
-  return new Response(null, {
-    status: 204,
-    headers: corsHeaders
-  });
+  return new Response(null, { status: 204 });
 };
 
 // ALL - Fallback handler for any method
 export const ALL: APIRoute = async ({ request }) => {
-  // Handle OPTIONS for CORS preflight
   if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders
-    });
+    return new Response(null, { status: 204 });
   }
 
   // For any other unexpected method

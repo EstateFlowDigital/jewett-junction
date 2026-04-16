@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { initCMS, getAnnouncements, getEvents, getEmployees, getResources, getJobPostings, getCultureStories, stripHtml } from '../../lib/webflow-cms';
+import { baseUrl } from '../../lib/base-url';
 
 interface SearchResult {
   id: string;
@@ -33,12 +34,12 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     // Fetch from all collections in parallel
     const [announcements, events, employees, resources, jobs, culture] = await Promise.all([
-      getAnnouncements({ limit: 50 }).catch(() => ({ items: [] })),
-      getEvents({ limit: 50 }).catch(() => ({ items: [] })),
-      getEmployees({ limit: 50 }).catch(() => ({ items: [] })),
-      getResources({ limit: 50 }).catch(() => ({ items: [] })),
-      getJobPostings({ limit: 50 }).catch(() => ({ items: [] })),
-      getCultureStories({ limit: 50 }).catch(() => ({ items: [] })),
+      getAnnouncements({ limit: 50 }).catch((err) => { console.error('Search: announcements fetch failed:', err.message); return { items: [] }; }),
+      getEvents({ limit: 50 }).catch((err) => { console.error('Search: events fetch failed:', err.message); return { items: [] }; }),
+      getEmployees({ limit: 50 }).catch((err) => { console.error('Search: employees fetch failed:', err.message); return { items: [] }; }),
+      getResources({ limit: 50 }).catch((err) => { console.error('Search: resources fetch failed:', err.message); return { items: [] }; }),
+      getJobPostings({ limit: 50 }).catch((err) => { console.error('Search: job postings fetch failed:', err.message); return { items: [] }; }),
+      getCultureStories({ limit: 50 }).catch((err) => { console.error('Search: culture stories fetch failed:', err.message); return { items: [] }; }),
     ]);
 
     const results: SearchResult[] = [];
@@ -53,7 +54,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'announcement',
           title: item.name,
           description: stripHtml(item.content)?.substring(0, 150) || '',
-          url: `/jewett-junction/announcements/${item.slug}`,
+          url: `${baseUrl}/announcements/${item.slug}`,
           meta: item.priority === 'high' ? 'High Priority' : undefined
         });
       }
@@ -70,7 +71,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'event',
           title: item.name,
           description: stripHtml(item.description)?.substring(0, 150) || '',
-          url: `/jewett-junction/events/${item.slug}`,
+          url: `${baseUrl}/events/${item.slug}`,
           meta: item['event-date'] ? new Date(item['event-date']).toLocaleDateString() : undefined
         });
       }
@@ -87,7 +88,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'employee',
           title: item.name,
           description: item.role || '',
-          url: `/jewett-junction/directory/${item.slug}`,
+          url: `${baseUrl}/directory/${item.slug}`,
           meta: item.department
         });
       }
@@ -104,7 +105,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'resource',
           title: item.name,
           description: stripHtml(item.description)?.substring(0, 150) || '',
-          url: `/jewett-junction/resources/${item.slug}`,
+          url: `${baseUrl}/resources/${item.slug}`,
           meta: item.category
         });
       }
@@ -122,7 +123,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'job',
           title: item.name,
           description: stripHtml(item.description)?.substring(0, 150) || '',
-          url: `/jewett-junction/careers/${item.slug}`,
+          url: `${baseUrl}/careers/${item.slug}`,
           meta: item.location
         });
       }
@@ -139,7 +140,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'culture',
           title: item.name,
           description: item.excerpt || stripHtml(item.content)?.substring(0, 150) || '',
-          url: `/jewett-junction/culture/${item.slug}`,
+          url: `${baseUrl}/culture/${item.slug}`,
           meta: item.category
         });
       }

@@ -16,6 +16,8 @@ interface SafetyItem {
   priority?: string;
   severity?: string;
   'effective-date'?: string;
+  'expiration-date'?: string;
+  'video-link'?: string;
   featured?: boolean;
   image?: { url: string };
 }

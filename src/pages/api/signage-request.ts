@@ -102,13 +102,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 // Handle OPTIONS for CORS preflight
+// CORS preflight is handled by middleware
 export const OPTIONS: APIRoute = async () => {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+  return new Response(null, { status: 204 });
 };

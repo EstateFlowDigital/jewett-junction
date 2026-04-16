@@ -75,9 +75,13 @@ function getApiToken(): string | undefined {
   return runtimeApiToken || import.meta.env.WEBFLOW_API_TOKEN;
 }
 
-// Get Site ID - checks runtime first, then import.meta.env, then default
+// Get Site ID - checks runtime first, then import.meta.env
 function getSiteId(): string {
-  return runtimeSiteId || import.meta.env.WEBFLOW_SITE_ID || '67a464bc7184fcb8aacb0e8d';
+  const siteId = runtimeSiteId || import.meta.env.WEBFLOW_SITE_ID;
+  if (!siteId) {
+    throw new Error('WEBFLOW_SITE_ID environment variable is not configured');
+  }
+  return siteId;
 }
 
 interface WebflowItem {

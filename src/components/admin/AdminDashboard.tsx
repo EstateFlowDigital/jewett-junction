@@ -63,8 +63,30 @@ import RichTextEditor from './RichTextEditor';
 // Base path for API calls - matches the deployment path
 const API_BASE = '/jewett-junction';
 
+// Field configuration type for collection definitions
+interface CollectionField {
+  key: string;
+  label: string;
+  type: string;
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  icon?: React.ComponentType<any>;
+  options?: string[];
+}
+
+interface CollectionConfig {
+  name: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  gradient: string;
+  slug?: string;
+  description: string;
+  fields: CollectionField[];
+}
+
 // Collection configurations with expanded fields
-const COLLECTIONS = {
+const COLLECTIONS: Record<string, CollectionConfig> = {
   announcements: {
     name: 'Announcements',
     icon: Megaphone,
