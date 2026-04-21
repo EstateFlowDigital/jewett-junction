@@ -417,7 +417,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Member Name', type: 'text', required: true, placeholder: 'Full name', icon: 'Users' },
       { key: 'title', label: 'Job Title', type: 'text', placeholder: 'e.g., Project Manager', icon: 'Briefcase' },
-      { key: 'department', label: 'Department', type: 'select', options: ['Department Name 1'], icon: 'Building' },
+      { key: 'department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: 'Building' },
       { key: 'main-image', label: 'Photo', type: 'image', helpText: 'Team member photo', icon: 'Image' },
       { key: 'main-image-alt-text', label: 'Photo Alt Text', type: 'text', placeholder: 'Describe the photo...', icon: 'FileText' },
       { key: 'team-members-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Member page heading...' },
