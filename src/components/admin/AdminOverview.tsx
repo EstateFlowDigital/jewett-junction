@@ -35,30 +35,61 @@ interface CollectionStat {
   gradient: string;
   count: number;
   href: string;
+  scope: 'intranet' | 'website';
 }
 
-const COLLECTION_META: Omit<CollectionStat, 'count'>[] = [
-  { key: 'announcements', name: 'Announcements', icon: Megaphone, color: 'blue', gradient: 'from-blue-500 to-cyan-500', href: '/jewett-junction/admin/announcements' },
-  { key: 'events', name: 'Events', icon: Calendar, color: 'indigo', gradient: 'from-indigo-500 to-purple-500', href: '/jewett-junction/admin/events' },
-  { key: 'jobPostings', name: 'Job Postings', icon: Briefcase, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', href: '/jewett-junction/admin/jobs' },
-  { key: 'cultureStories', name: 'Culture Stories', icon: Heart, color: 'pink', gradient: 'from-pink-500 to-rose-500', href: '/jewett-junction/admin/culture' },
-  { key: 'employees', name: 'Employees', icon: Users, color: 'cyan', gradient: 'from-cyan-500 to-blue-500', href: '/jewett-junction/admin/employees' },
-  { key: 'resources', name: 'Resources', icon: FolderOpen, color: 'amber', gradient: 'from-amber-500 to-orange-500', href: '/jewett-junction/admin/resources' },
-  { key: 'hrContent', name: 'HR Content', icon: HeartHandshake, color: 'violet', gradient: 'from-violet-500 to-purple-500', href: '/jewett-junction/admin/hr' },
-  { key: 'safetyContent', name: 'Safety Content', icon: HardHat, color: 'orange', gradient: 'from-orange-500 to-red-500', href: '/jewett-junction/admin/safety' },
-  { key: 'itKnowledgeBase', name: 'IT Knowledge', icon: Monitor, color: 'sky', gradient: 'from-sky-500 to-blue-500', href: '/jewett-junction/admin/it' },
-  { key: 'marketingAssets', name: 'Marketing', icon: Palette, color: 'rose', gradient: 'from-fuchsia-500 to-pink-500', href: '/jewett-junction/admin/marketing' },
-  { key: 'submittedIdeas', name: 'Ideas', icon: Lightbulb, color: 'yellow', gradient: 'from-yellow-500 to-amber-500', href: '/jewett-junction/admin/ideas' },
-  { key: 'blogPosts', name: 'Blog Posts', icon: BookOpen, color: 'teal', gradient: 'from-teal-500 to-emerald-500', href: '/jewett-junction/admin/blog' },
-  { key: 'blogCategories', name: 'Blog Categories', icon: Tag, color: 'lime', gradient: 'from-lime-500 to-green-500', href: '/jewett-junction/admin/blog-categories' },
-  { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', gradient: 'from-purple-500 to-indigo-500', href: '/jewett-junction/admin/faqs' },
-  { key: 'services', name: 'Services', icon: Wrench, color: 'slate', gradient: 'from-slate-500 to-zinc-500', href: '/jewett-junction/admin/services' },
-  { key: 'industries', name: 'Industries', icon: Building, color: 'stone', gradient: 'from-stone-500 to-neutral-500', href: '/jewett-junction/admin/industries' },
-  { key: 'serviceAreas', name: 'Service Areas', icon: MapPin, color: 'red', gradient: 'from-red-500 to-rose-500', href: '/jewett-junction/admin/service-areas' },
-  { key: 'teamMembers', name: 'Team Members', icon: Users, color: 'blue', gradient: 'from-blue-500 to-indigo-500', href: '/jewett-junction/admin/team-members' },
-  { key: 'ourWork', name: 'Our Work', icon: Sparkles, color: 'amber', gradient: 'from-amber-500 to-yellow-500', href: '/jewett-junction/admin/our-work' },
-  { key: 'imageGalleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', gradient: 'from-fuchsia-500 to-violet-500', href: '/jewett-junction/admin/galleries' },
+interface CollectionMeta {
+  key: string;
+  name: string;
+  icon: any;
+  color: string;
+  gradient: string;
+  href: string;
+}
+
+interface CollectionGroup {
+  label: string;
+  scope: 'intranet' | 'website';
+  items: CollectionMeta[];
+}
+
+const COLLECTION_GROUPS: CollectionGroup[] = [
+  {
+    label: 'Intranet',
+    scope: 'intranet',
+    items: [
+      { key: 'announcements', name: 'Announcements', icon: Megaphone, color: 'blue', gradient: 'from-blue-500 to-cyan-500', href: '/jewett-junction/admin/announcements' },
+      { key: 'banner', name: 'Banner Messages', icon: Sparkles, color: 'purple', gradient: 'from-purple-500 to-pink-500', href: '/jewett-junction/admin/banner' },
+      { key: 'events', name: 'Events', icon: Calendar, color: 'indigo', gradient: 'from-indigo-500 to-purple-500', href: '/jewett-junction/admin/events' },
+      { key: 'jobPostings', name: 'Job Postings', icon: Briefcase, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', href: '/jewett-junction/admin/jobs' },
+      { key: 'cultureStories', name: 'Culture Stories', icon: Heart, color: 'pink', gradient: 'from-pink-500 to-rose-500', href: '/jewett-junction/admin/culture' },
+      { key: 'employees', name: 'Employees', icon: Users, color: 'cyan', gradient: 'from-cyan-500 to-blue-500', href: '/jewett-junction/admin/employees' },
+      { key: 'resources', name: 'Resources', icon: FolderOpen, color: 'amber', gradient: 'from-amber-500 to-orange-500', href: '/jewett-junction/admin/resources' },
+      { key: 'hrContent', name: 'HR Content', icon: HeartHandshake, color: 'violet', gradient: 'from-violet-500 to-purple-500', href: '/jewett-junction/admin/hr' },
+      { key: 'safetyContent', name: 'Safety Content', icon: HardHat, color: 'orange', gradient: 'from-orange-500 to-red-500', href: '/jewett-junction/admin/safety' },
+      { key: 'itKnowledgeBase', name: 'IT Knowledge', icon: Monitor, color: 'sky', gradient: 'from-sky-500 to-blue-500', href: '/jewett-junction/admin/it' },
+      { key: 'marketingAssets', name: 'Marketing', icon: Palette, color: 'rose', gradient: 'from-fuchsia-500 to-pink-500', href: '/jewett-junction/admin/marketing' },
+      { key: 'submittedIdeas', name: 'Ideas', icon: Lightbulb, color: 'yellow', gradient: 'from-yellow-500 to-amber-500', href: '/jewett-junction/admin/ideas' },
+    ],
+  },
+  {
+    label: 'Website',
+    scope: 'website',
+    items: [
+      { key: 'blogPosts', name: 'Blog Posts', icon: BookOpen, color: 'teal', gradient: 'from-teal-500 to-emerald-500', href: '/jewett-junction/admin/blog' },
+      { key: 'blogCategories', name: 'Blog Categories', icon: Tag, color: 'lime', gradient: 'from-lime-500 to-green-500', href: '/jewett-junction/admin/blog-categories' },
+      { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', gradient: 'from-purple-500 to-indigo-500', href: '/jewett-junction/admin/faqs' },
+      { key: 'services', name: 'Services', icon: Wrench, color: 'slate', gradient: 'from-slate-500 to-zinc-500', href: '/jewett-junction/admin/services' },
+      { key: 'industries', name: 'Industries', icon: Building, color: 'stone', gradient: 'from-stone-500 to-neutral-500', href: '/jewett-junction/admin/industries' },
+      { key: 'serviceAreas', name: 'Service Areas', icon: MapPin, color: 'red', gradient: 'from-red-500 to-rose-500', href: '/jewett-junction/admin/service-areas' },
+      { key: 'teamMembers', name: 'Team Members', icon: Users, color: 'blue', gradient: 'from-blue-500 to-indigo-500', href: '/jewett-junction/admin/team-members' },
+      { key: 'ourWork', name: 'Our Work', icon: Sparkles, color: 'amber', gradient: 'from-amber-500 to-yellow-500', href: '/jewett-junction/admin/our-work' },
+      { key: 'imageGalleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', gradient: 'from-fuchsia-500 to-violet-500', href: '/jewett-junction/admin/galleries' },
+    ],
+  },
 ];
+
+const ALL_COLLECTIONS = COLLECTION_GROUPS.flatMap((g) => g.items.map((item) => ({ ...item, scope: g.scope })));
 
 export function AdminOverview() {
   const [stats, setStats] = React.useState<CollectionStat[]>([]);
@@ -76,7 +107,7 @@ export function AdminOverview() {
     const statsData: CollectionStat[] = [];
     const recent: any[] = [];
 
-    for (const meta of COLLECTION_META) {
+    for (const meta of ALL_COLLECTIONS) {
       try {
         const response = await fetch(`${API_BASE}/api/admin/items?collection=${meta.key}`, {
           headers: {
@@ -206,36 +237,49 @@ export function AdminOverview() {
             <p className="text-sm text-slate-400">Manage your content</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <a
-                key={stat.key}
-                href={stat.href}
-                aria-label={`Manage ${stat.name} - ${stat.count} items`}
-                className="group relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 min-h-[140px] hover:border-slate-600 hover:bg-slate-800/70 hover:shadow-xl hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-                role="listitem"
-              >
-                {/* Gradient glow on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />
-
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
-                      <Icon className="h-6 w-6 text-white" aria-hidden="true" />
-                    </div>
-                    <span className="px-2.5 py-1 text-xs font-medium bg-slate-700/50 text-slate-300 rounded-full">
-                      {stat.count} {stat.count === 1 ? 'item' : 'items'}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-white text-lg group-hover:text-blue-400 transition-colors">{stat.name}</h3>
-                  <p className="text-sm text-slate-500 mt-1">Click to manage</p>
-                </div>
-              </a>
-            );
-          })}
-        </div>
+        {COLLECTION_GROUPS.map((group) => {
+          const groupStats = stats.filter((s) => s.scope === group.scope);
+          const pillClass = group.scope === 'intranet'
+            ? 'bg-blue-500/10 text-blue-300 border-blue-500/30'
+            : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30';
+          const dotClass = group.scope === 'intranet' ? 'bg-blue-400' : 'bg-emerald-400';
+          return (
+            <div key={group.scope} className="mb-8">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 mb-3 text-xs font-bold uppercase tracking-wider rounded-full border ${pillClass}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
+                {group.label}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
+                {groupStats.map((stat) => {
+                  const Icon = stat.icon;
+                  return (
+                    <a
+                      key={stat.key}
+                      href={stat.href}
+                      aria-label={`Manage ${stat.name} - ${stat.count} items`}
+                      className="group relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 min-h-[140px] hover:border-slate-600 hover:bg-slate-800/70 hover:shadow-xl hover:shadow-slate-900/50 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                      role="listitem"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />
+                      <div className="relative">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                            <Icon className="h-6 w-6 text-white" aria-hidden="true" />
+                          </div>
+                          <span className="px-2.5 py-1 text-xs font-medium bg-slate-700/50 text-slate-300 rounded-full">
+                            {stat.count} {stat.count === 1 ? 'item' : 'items'}
+                          </span>
+                        </div>
+                        <h3 className="font-semibold text-white text-lg group-hover:text-blue-400 transition-colors">{stat.name}</h3>
+                        <p className="text-sm text-slate-500 mt-1">Click to manage</p>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Recent Items */}

@@ -11,28 +11,50 @@ interface NavItem {
   href: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { key: 'dashboard', name: 'Overview', icon: LayoutDashboard, color: 'slate', href: '/jewett-junction/admin' },
-  { key: 'announcements', name: 'Announcements', icon: Megaphone, color: 'blue', href: '/jewett-junction/admin/announcements' },
-  { key: 'events', name: 'Events', icon: Calendar, color: 'indigo', href: '/jewett-junction/admin/events' },
-  { key: 'jobs', name: 'Job Postings', icon: Briefcase, color: 'emerald', href: '/jewett-junction/admin/jobs' },
-  { key: 'culture', name: 'Culture Stories', icon: Heart, color: 'pink', href: '/jewett-junction/admin/culture' },
-  { key: 'employees', name: 'Employees', icon: Users, color: 'cyan', href: '/jewett-junction/admin/employees' },
-  { key: 'resources', name: 'Resources', icon: FolderOpen, color: 'amber', href: '/jewett-junction/admin/resources' },
-  { key: 'hr', name: 'HR Content', icon: HeartHandshake, color: 'violet', href: '/jewett-junction/admin/hr' },
-  { key: 'safety', name: 'Safety Content', icon: HardHat, color: 'orange', href: '/jewett-junction/admin/safety' },
-  { key: 'it', name: 'IT Knowledge', icon: Monitor, color: 'sky', href: '/jewett-junction/admin/it' },
-  { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
-  { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
-  { key: 'blog', name: 'Blog Posts', icon: BookOpen, color: 'teal', href: '/jewett-junction/admin/blog' },
-  { key: 'blog-categories', name: 'Blog Categories', icon: Tag, color: 'lime', href: '/jewett-junction/admin/blog-categories' },
-  { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', href: '/jewett-junction/admin/faqs' },
-  { key: 'services', name: 'Services', icon: Wrench, color: 'slate', href: '/jewett-junction/admin/services' },
-  { key: 'industries', name: 'Industries', icon: Building, color: 'stone', href: '/jewett-junction/admin/industries' },
-  { key: 'service-areas', name: 'Service Areas', icon: MapPin, color: 'red', href: '/jewett-junction/admin/service-areas' },
-  { key: 'team-members', name: 'Team Members', icon: Users, color: 'blue', href: '/jewett-junction/admin/team-members' },
-  { key: 'our-work', name: 'Our Work', icon: Sparkles, color: 'amber', href: '/jewett-junction/admin/our-work' },
-  { key: 'galleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', href: '/jewett-junction/admin/galleries' },
+interface NavGroup {
+  label: string;
+  scope: 'intranet' | 'website';
+  items: NavItem[];
+}
+
+const OVERVIEW_ITEM: NavItem = {
+  key: 'dashboard', name: 'Overview', icon: LayoutDashboard, color: 'slate', href: '/jewett-junction/admin',
+};
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Intranet',
+    scope: 'intranet',
+    items: [
+      { key: 'announcements', name: 'Announcements', icon: Megaphone, color: 'blue', href: '/jewett-junction/admin/announcements' },
+      { key: 'banner', name: 'Banner Messages', icon: Sparkles, color: 'purple', href: '/jewett-junction/admin/banner' },
+      { key: 'events', name: 'Events', icon: Calendar, color: 'indigo', href: '/jewett-junction/admin/events' },
+      { key: 'jobs', name: 'Job Postings', icon: Briefcase, color: 'emerald', href: '/jewett-junction/admin/jobs' },
+      { key: 'culture', name: 'Culture Stories', icon: Heart, color: 'pink', href: '/jewett-junction/admin/culture' },
+      { key: 'employees', name: 'Employees', icon: Users, color: 'cyan', href: '/jewett-junction/admin/employees' },
+      { key: 'resources', name: 'Resources', icon: FolderOpen, color: 'amber', href: '/jewett-junction/admin/resources' },
+      { key: 'hr', name: 'HR Content', icon: HeartHandshake, color: 'violet', href: '/jewett-junction/admin/hr' },
+      { key: 'safety', name: 'Safety Content', icon: HardHat, color: 'orange', href: '/jewett-junction/admin/safety' },
+      { key: 'it', name: 'IT Knowledge', icon: Monitor, color: 'sky', href: '/jewett-junction/admin/it' },
+      { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
+      { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
+    ],
+  },
+  {
+    label: 'Website',
+    scope: 'website',
+    items: [
+      { key: 'blog', name: 'Blog Posts', icon: BookOpen, color: 'teal', href: '/jewett-junction/admin/blog' },
+      { key: 'blog-categories', name: 'Blog Categories', icon: Tag, color: 'lime', href: '/jewett-junction/admin/blog-categories' },
+      { key: 'faqs', name: 'FAQs', icon: CircleHelp, color: 'purple', href: '/jewett-junction/admin/faqs' },
+      { key: 'services', name: 'Services', icon: Wrench, color: 'slate', href: '/jewett-junction/admin/services' },
+      { key: 'industries', name: 'Industries', icon: Building, color: 'stone', href: '/jewett-junction/admin/industries' },
+      { key: 'service-areas', name: 'Service Areas', icon: MapPin, color: 'red', href: '/jewett-junction/admin/service-areas' },
+      { key: 'team-members', name: 'Team Members', icon: Users, color: 'blue', href: '/jewett-junction/admin/team-members' },
+      { key: 'our-work', name: 'Our Work', icon: Sparkles, color: 'amber', href: '/jewett-junction/admin/our-work' },
+      { key: 'galleries', name: 'Image Galleries', icon: Image, color: 'fuchsia', href: '/jewett-junction/admin/galleries' },
+    ],
+  },
 ];
 
 interface AdminLayoutProps {
@@ -170,6 +192,45 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
     }
   };
 
+  const renderItem = (item: NavItem, isActive: boolean) => {
+    const Icon = item.icon;
+    const colorClasses: Record<string, string> = {
+      slate: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+      blue: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      indigo: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+      emerald: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      pink: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+      cyan: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+      amber: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      violet: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+      orange: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+      sky: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+      rose: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+      yellow: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      teal: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+      lime: 'bg-lime-500/20 text-lime-400 border-lime-500/30',
+      purple: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      stone: 'bg-stone-500/20 text-stone-400 border-stone-500/30',
+      red: 'bg-red-500/20 text-red-400 border-red-500/30',
+      fuchsia: 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30',
+    };
+    return (
+      <li key={item.key}>
+        <a
+          href={item.href}
+          onClick={() => setIsSidebarOpen(false)}
+          aria-current={isActive ? 'page' : undefined}
+          className={`flex items-center gap-3 px-3 min-h-[44px] rounded-lg transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+            isActive ? `${colorClasses[item.color]} border` : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+          <span>{item.name}</span>
+        </a>
+      </li>
+    );
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -275,49 +336,26 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
 
         {/* Navigation */}
         <nav className="flex-1 p-3 overflow-y-auto" aria-label="Admin sections">
-          <ul className="space-y-1" role="list">
-            {NAV_ITEMS.map((item) => {
-              const isActive = currentPage === item.key;
-              const Icon = item.icon;
-              const colorClasses = {
-                slate: isActive ? 'bg-slate-500/20 text-slate-300 border-slate-500/30' : '',
-                blue: isActive ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : '',
-                indigo: isActive ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30' : '',
-                emerald: isActive ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : '',
-                pink: isActive ? 'bg-pink-500/20 text-pink-400 border-pink-500/30' : '',
-                cyan: isActive ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : '',
-                amber: isActive ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : '',
-                violet: isActive ? 'bg-violet-500/20 text-violet-400 border-violet-500/30' : '',
-                orange: isActive ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' : '',
-                sky: isActive ? 'bg-sky-500/20 text-sky-400 border-sky-500/30' : '',
-                rose: isActive ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : '',
-                yellow: isActive ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : '',
-                teal: isActive ? 'bg-teal-500/20 text-teal-400 border-teal-500/30' : '',
-                lime: isActive ? 'bg-lime-500/20 text-lime-400 border-lime-500/30' : '',
-                purple: isActive ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : '',
-                stone: isActive ? 'bg-stone-500/20 text-stone-400 border-stone-500/30' : '',
-                red: isActive ? 'bg-red-500/20 text-red-400 border-red-500/30' : '',
-                fuchsia: isActive ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30' : '',
-              };
-              return (
-                <li key={item.key}>
-                  <a
-                    href={item.href}
-                    onClick={() => setIsSidebarOpen(false)}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`flex items-center gap-3 px-3 min-h-[44px] rounded-lg transition-all text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                      isActive
-                        ? `${colorClasses[item.color as keyof typeof colorClasses]} border`
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                    <span>{item.name}</span>
-                  </a>
-                </li>
-              );
-            })}
+          <ul className="space-y-1 mb-2" role="list">
+            {renderItem(OVERVIEW_ITEM, currentPage === OVERVIEW_ITEM.key)}
           </ul>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.scope} className="mt-4">
+              <div
+                className={`px-3 py-1.5 mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider rounded-md ${
+                  group.scope === 'intranet'
+                    ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20'
+                    : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${group.scope === 'intranet' ? 'bg-blue-400' : 'bg-emerald-400'}`} />
+                {group.label}
+              </div>
+              <ul className="space-y-1" role="list">
+                {group.items.map((item) => renderItem(item, currentPage === item.key))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
         {/* Footer Actions */}
