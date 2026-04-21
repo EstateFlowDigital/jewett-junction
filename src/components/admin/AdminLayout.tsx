@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -38,6 +38,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'it', name: 'IT Knowledge', icon: Monitor, color: 'sky', href: '/jewett-junction/admin/it' },
       { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
       { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
+      { key: 'bulk-upload', name: 'Bulk Upload', icon: Upload, color: 'teal', href: '/jewett-junction/admin/bulk-upload' },
     ],
   },
   {

@@ -1,0 +1,11 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { BulkUploader } from '../../components/admin/BulkUploader';
+---
+
+<AdminBase title="Bulk Upload | Admin">
+  <AdminLayout client:load currentPage="bulk-upload" title="Bulk Upload">
+    <BulkUploader client:load />
+  </AdminLayout>
+</AdminBase>
