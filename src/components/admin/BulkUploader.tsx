@@ -90,8 +90,8 @@ export function BulkUploader() {
     <div className="space-y-4">
       <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-5 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Target Collection</label>
-          <select value={collection} onChange={(e) => { setCollection(e.target.value); setParsed(null); setResult(null); }}
+          <label htmlFor="collection-select" className="block text-sm font-medium text-slate-300 mb-1">Target Collection</label>
+          <select id="collection-select" value={collection} onChange={(e) => { setCollection(e.target.value); setParsed(null); setResult(null); setIsImporting(false); }}
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
             {BULK_COLLECTIONS.map((k) => (
               <option key={k} value={k}>{(COLLECTION_CONFIGS as any)[k]?.name || k}</option>
@@ -100,8 +100,8 @@ export function BulkUploader() {
           <p className="text-xs text-slate-500 mt-1">CSV headers must match field slugs: {Array.from(validKeys).join(', ')}</p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">CSV File</label>
-          <input type="file" accept=".csv,text/csv" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          <label htmlFor="csv-file" className="block text-sm font-medium text-slate-300 mb-1">CSV File</label>
+          <input id="csv-file" type="file" accept=".csv,text/csv" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
                  className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-500 file:text-white hover:file:bg-blue-600" />
         </div>
       </div>
