@@ -128,25 +128,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+      'application/pdf',
+    ];
     if (!allowedTypes.includes(fileType)) {
       console.log('UPLOAD ERROR: Invalid file type:', fileType);
       return withCors(new Response(JSON.stringify({
-        error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG'
+        error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG, PDF'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       }));
     }
 
-    // Validate file size (max 750KB for images)
-    // Note: Base64 encoding adds ~33% overhead, so 750KB becomes ~1MB in request
-    // Webflow Cloud has request body size limits
-    const maxSize = 750 * 1024; // 750KB
+    // Validate file size — type-aware limits
+    // Note: Base64 encoding adds ~33% overhead; Webflow Cloud has request body size limits
+    const imageMax = 750 * 1024;        // 750 KB
+    const pdfMax = 5 * 1024 * 1024;     // 5 MB
+    const maxSize = fileType === 'application/pdf' ? pdfMax : imageMax;
     if (fileSize > maxSize) {
       console.log('UPLOAD ERROR: File too large:', fileSize);
+      const kb = Math.round(maxSize / 1024);
       return withCors(new Response(JSON.stringify({
-        error: 'File too large. Maximum size is 750KB. Please compress your image before uploading.'
+        error: `File too large. Maximum size is ${kb} KB for ${fileType === 'application/pdf' ? 'PDFs' : 'images'}.`
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }

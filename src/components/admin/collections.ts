@@ -4,7 +4,7 @@
 export interface FieldConfig {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image';
+  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image' | 'file';
   required?: boolean;
   placeholder?: string;
   helpText?: string;
@@ -146,7 +146,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: 'Tag' },
       { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content' },
       { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: 'FileText' },
-      { key: 'external-link', label: 'Resource Link', type: 'url', placeholder: 'https://...', helpText: 'Link to document or external resource', icon: 'Link' },
+      { key: 'file', label: 'Document File (PDF)', type: 'file', helpText: 'Upload a PDF — employees can preview in-browser and download', icon: 'FileText' },
+      { key: 'external-link', label: 'External Link', type: 'url', placeholder: 'https://...', helpText: 'Use instead of file upload for third-party resources', icon: 'Link' },
       { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText' },
       { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock' },
       { key: 'version', label: 'Version', type: 'text', placeholder: 'e.g., v2.1', icon: 'Tag' },

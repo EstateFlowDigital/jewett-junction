@@ -101,9 +101,9 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     const normalized = { ...fieldData };
     const fileIds: Record<string, string> = {};
     config.fields.forEach(field => {
-      if (field.type === 'image' && normalized[field.key]) {
+      if ((field.type === 'image' || field.type === 'file') && normalized[field.key]) {
         const val = normalized[field.key];
-        // Preserve fileId from Webflow's image object
+        // Preserve fileId from Webflow's asset object
         if (typeof val === 'object' && val.fileId) {
           fileIds[field.key] = val.fileId;
         }
@@ -206,10 +206,10 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     }
 
     try {
-      // Process image fields: replace URLs with fileIds for Webflow API
+      // Process asset fields: replace URLs with fileIds for Webflow API
       const processedFields = { ...formData };
       config.fields.forEach(field => {
-        if (field.type === 'image' && processedFields[field.key]) {
+        if ((field.type === 'image' || field.type === 'file') && processedFields[field.key]) {
           if (imageFileIds[field.key]) {
             processedFields[field.key] = imageFileIds[field.key];
           }
@@ -408,17 +408,20 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     loadItems();
   };
 
-  // Handle file upload
+  // Handle file upload (images + PDFs)
   const handleFileUpload = async (file: File, fieldKey: string) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = [...imageTypes, 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      setError('Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG');
+      setError('Invalid file type. Allowed: JPEG, PNG, GIF, WebP, SVG, PDF');
       return;
     }
 
-    const maxSize = 750 * 1024;
+    const isPdf = file.type === 'application/pdf';
+    const maxSize = isPdf ? 5 * 1024 * 1024 : 750 * 1024; // 5MB PDF, 750KB images
     if (file.size > maxSize) {
-      setError('File too large. Maximum size is 750KB. Please compress your image before uploading.');
+      const kb = Math.round(maxSize / 1024);
+      setError(`File too large. Maximum size is ${kb} KB for ${isPdf ? 'PDFs' : 'images'}.`);
       return;
     }
 
@@ -473,7 +476,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       if (data.id) {
         setImageFileIds(prev => ({ ...prev, [fieldKey]: data.id }));
       }
-      setSuccess('Image uploaded successfully!');
+      setSuccess(`${isPdf ? 'PDF' : 'Image'} uploaded successfully!`);
 
       setTimeout(() => {
         setUploadProgress(0);
@@ -624,6 +627,102 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             )}
           </div>
         )}
+
+        {/* File (PDF) field */}
+        {field.type === 'file' && (() => {
+          const fileUrl = getImageUrl(formData[field.key]);
+          return (
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="application/pdf"
+                id={`file-${field.key}`}
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleFileUpload(f, field.key);
+                  e.target.value = '';
+                }}
+              />
+              {fileUrl ? (
+                <div className="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-900/50">
+                  <iframe
+                    src={fileUrl}
+                    title={field.label}
+                    className="w-full h-64 bg-slate-950"
+                  />
+                  <div className="p-3 bg-slate-900/80 border-t border-slate-700/50 flex items-center gap-2 flex-wrap">
+                    <a
+                      href={fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-lg text-xs font-medium transition-all shadow-lg shadow-blue-500/20"
+                    >
+                      Download
+                    </a>
+                    <label
+                      htmlFor={`file-${field.key}`}
+                      className="px-3 py-2 border border-slate-600/50 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg text-xs font-medium text-slate-300 cursor-pointer transition-colors"
+                    >
+                      Replace
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, [field.key]: '' });
+                        setImageFileIds((prev) => {
+                          const next = { ...prev };
+                          delete next[field.key];
+                          return next;
+                        });
+                      }}
+                      className="px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onDrop={(e) => handleDrop(e, field.key)}
+                  onDragOver={(e) => handleDragOver(e, field.key)}
+                  onDragLeave={handleDragLeave}
+                  className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
+                    dragOverField === field.key
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-slate-600/50 hover:border-slate-500 bg-slate-900/30'
+                  } ${uploadingField === field.key ? 'pointer-events-none' : ''}`}
+                >
+                  {uploadingField === field.key ? (
+                    <div className="text-center">
+                      <Loader2 className="h-10 w-10 text-blue-400 animate-spin mx-auto mb-3" />
+                      <p className="text-sm text-white font-medium mb-2">Uploading...</p>
+                      <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-2">{uploadProgress}%</p>
+                    </div>
+                  ) : (
+                    <label
+                      htmlFor={`file-${field.key}`}
+                      className="flex flex-col items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mb-1 border border-slate-700">
+                        <Upload className="h-7 w-7 text-slate-400" />
+                      </div>
+                      <p className="text-sm text-white font-medium">Upload PDF</p>
+                      <p className="text-xs text-slate-500">Drag & drop or click to browse (max 5 MB)</p>
+                    </label>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Text, email, tel, url fields */}
         {(field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'url') && (
