@@ -1,17 +1,36 @@
 import { defineMiddleware } from 'astro:middleware';
+import { parseAllowlist, isAllowedIp } from './lib/ip-allowlist';
 
-// Build CORS headers based on request origin
+const GATED_PREFIXES = [
+  '/dashboard',
+  '/jewett-junction',
+  '/admin',
+  '/announcements',
+  '/culture',
+  '/directory',
+  '/events',
+  '/help',
+  '/hr',
+  '/it-helpdesk',
+  '/marketing',
+  '/notifications',
+  '/profile',
+  '/resources',
+  '/safety',
+  '/settings',
+  '/submit-idea',
+  '/api/admin',
+  '/jewett-junction/api/admin',
+];
+
 function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const allowedOrigins = import.meta.env.ALLOWED_ORIGINS
     ? import.meta.env.ALLOWED_ORIGINS.split(',').map((o: string) => o.trim())
     : [];
-
-  // Allow same-origin requests and any configured origins
   const requestUrl = new URL(request.url);
   const sameOrigin = origin === requestUrl.origin;
   const isAllowed = sameOrigin || allowedOrigins.includes(origin);
-
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : requestUrl.origin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -20,38 +39,64 @@ function getCorsHeaders(request: Request): Record<string, string> {
   };
 }
 
+function isGatedPath(pathname: string): boolean {
+  return GATED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
+
+function getClientIp(request: Request): string | null {
+  return (
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    null
+  );
+}
+
+function getAllowedIpsEnv(locals: any): string | undefined {
+  const runtime = (locals as any)?.runtime;
+  return runtime?.env?.ALLOWED_IPS || import.meta.env.ALLOWED_IPS;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const { request } = context;
 
-  // Handle CORS preflight for API routes
   if (pathname.startsWith('/api/') || pathname.startsWith('/jewett-junction/api/')) {
     if (request.method === 'OPTIONS') {
-      return new Response(null, {
-        status: 204,
-        headers: getCorsHeaders(request)
-      });
+      return new Response(null, { status: 204, headers: getCorsHeaders(request) });
     }
   }
 
-  // Handle root path - rewrite to /dashboard internally
+  if (isGatedPath(pathname)) {
+    const rawAllowlist = getAllowedIpsEnv(context.locals);
+    const allowlist = parseAllowlist(rawAllowlist);
+    if (allowlist.length > 0) {
+      const ip = getClientIp(request);
+      if (!isAllowedIp(ip, allowlist)) {
+        if (pathname.includes('/api/')) {
+          return new Response(JSON.stringify({ error: 'Access denied' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        return context.rewrite('/access-denied');
+      }
+    }
+  }
+
   if (pathname === '/jewett-junction' || pathname === '/jewett-junction/') {
     return context.rewrite('/dashboard');
   }
 
   const response = await next();
 
-  // Add CORS headers to API responses
   if (pathname.startsWith('/api/') || pathname.startsWith('/jewett-junction/api/')) {
     const corsHeaders = getCorsHeaders(request);
     const newHeaders = new Headers(response.headers);
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      newHeaders.set(key, value);
-    });
+    Object.entries(corsHeaders).forEach(([key, value]) => newHeaders.set(key, value));
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers: newHeaders
+      headers: newHeaders,
     });
   }
 

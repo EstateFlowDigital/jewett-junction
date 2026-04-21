@@ -142,3 +142,11 @@ Navigate to `/jewett-junction/admin` and enter the admin password to access the 
 ## Deployment
 
 Configured for Cloudflare Pages with the `@astrojs/cloudflare` adapter. Push to main branch to trigger automatic deployment.
+
+## IP Allowlist (Intranet + Admin)
+
+Set `ALLOWED_IPS` to a comma-separated list of CIDR ranges to restrict intranet and admin access:
+
+ALLOWED_IPS=203.0.113.0/24,198.51.100.42/32
+
+When unset or empty, the gate is disabled. Entries must be IPv4. The gate reads `CF-Connecting-IP` (Cloudflare) with `X-Forwarded-For` as fallback. Configure in Webflow Cloud environment settings for production; in `.dev.vars` for local Wrangler dev.
