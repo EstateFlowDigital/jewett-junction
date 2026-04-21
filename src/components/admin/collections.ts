@@ -471,6 +471,21 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
     ]
   },
+  banner: {
+    name: 'Banner Messages',
+    icon: 'Sparkles',
+    color: 'purple',
+    gradient: 'from-purple-500 to-pink-500',
+    description: 'Rotating announcement banner at top of the dashboard',
+    fields: [
+      { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'e.g., Construction Safety Week', helpText: 'Used only in admin — not shown to employees', icon: 'FileText' },
+      { key: 'message', label: 'Banner Text', type: 'text', required: true, placeholder: 'e.g., Safety First - 4EverSafe', helpText: 'Text shown in the scrolling banner', icon: 'Megaphone' },
+      { key: 'display-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
+      { key: 'icon-color', label: 'Icon Color', type: 'select', options: ['amber', 'emerald', 'pink', 'cyan', 'blue', 'purple'], helpText: 'Color of the leading icon', icon: 'Palette' },
+      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional — auto-hide after this time', icon: 'Clock' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
+    ],
+  },
 };
 
 export type CollectionKey = keyof typeof COLLECTIONS;

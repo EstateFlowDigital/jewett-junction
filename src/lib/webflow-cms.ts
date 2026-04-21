@@ -312,6 +312,11 @@ export const COLLECTIONS = {
   teamMembers: '67a464bc7184fcb8aacb0ed6',
   ourWork: '67a464bc7184fcb8aacb0ef9',
   imageGalleries: '67a464bc7184fcb8aacb0f82',
+  // TODO: Paste the Webflow collection ID for "Banner Messages" here after creating the collection.
+  // Required fields: name (plain text, required), message (plain text, required), display-order (number),
+  // icon-color (option: amber/emerald/pink/cyan/blue/purple), expiration-date (datetime, optional),
+  // is-active (switch, default true).
+  banner: '',
 } as const;
 
 // ============================================
@@ -339,6 +344,21 @@ export async function getAnnouncements(options?: { limit?: number; pinned?: bool
     return new Date(b['published-date']).getTime() - new Date(a['published-date']).getTime();
   });
   return { ...result, items: sorted };
+}
+
+export async function getBannerMessages(options?: { limit?: number }) {
+  if (!COLLECTIONS.banner) return { items: [], total: 0 };
+  const now = new Date();
+  const result = await getCollection<any>(COLLECTIONS.banner, options);
+  const items = result.items
+    .filter((m) => m['is-active'] !== false)
+    .filter((m) => {
+      if (!m['expiration-date']) return true;
+      const exp = new Date(m['expiration-date']);
+      return isNaN(exp.getTime()) || exp > now;
+    })
+    .sort((a, b) => (a['display-order'] ?? 999) - (b['display-order'] ?? 999));
+  return { ...result, items };
 }
 
 export async function getEvents(options?: { limit?: number; upcoming?: boolean }) {

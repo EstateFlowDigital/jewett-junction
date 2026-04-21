@@ -123,6 +123,9 @@ const VALID_FIELDS: Record<string, string[]> = {
   imageGalleries: [
     'name', 'slug', 'main-image-file', 'main-image-alt-text'
   ],
+  banner: [
+    'name', 'slug', 'message', 'display-order', 'icon-color', 'expiration-date', 'is-active',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection

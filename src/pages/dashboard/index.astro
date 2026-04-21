@@ -5,7 +5,7 @@ import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -19,9 +19,10 @@ let hrContent: any[] = [];
 let safetyContent: any[] = [];
 let itArticles: any[] = [];
 let marketingAssets: any[] = [];
+let bannerMessages: any[] = [];
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
@@ -30,6 +31,7 @@ try {
     getSafetyContent({ limit: 3, featured: true }),
     getITKnowledgeBase({ limit: 3, featured: true }),
     getMarketingAssets({ limit: 6, featured: true }),
+    getBannerMessages({ limit: 20 }),
   ]);
   announcements = announcementsRes.items;
   events = eventsRes.items;
@@ -39,6 +41,7 @@ try {
   safetyContent = safetyRes.items;
   itArticles = itRes.items;
   marketingAssets = marketingRes.items;
+  bannerMessages = bannerRes.items;
 } catch (error) {
   console.error('Error fetching CMS data:', error);
 }
@@ -125,6 +128,20 @@ const carouselData = pinnedAnnouncements.map(a => ({
   priority: a.priority || '',
   category: a.category || '',
 }));
+
+// Banner messages — CMS-driven with fallback to static company values
+const BANNER_FALLBACK = [
+  { message: 'Building Excellence. Delivering Results. Creating Futures.', 'icon-color': 'amber' },
+  { message: 'Safety First - 4EverSafe', 'icon-color': 'emerald' },
+  { message: 'People. Integrity. Excellence. Teamwork.', 'icon-color': 'pink' },
+  { message: 'Building New England Since 1972', 'icon-color': 'cyan' },
+];
+const bannerDisplay = bannerMessages.length > 0 ? bannerMessages : BANNER_FALLBACK;
+const bannerColorClass: Record<string, string> = {
+  amber: 'text-amber-300', emerald: 'text-emerald-300', pink: 'text-pink-300',
+  cyan: 'text-cyan-300', blue: 'text-blue-300', purple: 'text-purple-300',
+};
+const bannerLoop = [...bannerDisplay, ...bannerDisplay];
 ---
 
 <html lang="en" class="dark">
@@ -212,43 +229,16 @@ const carouselData = pinnedAnnouncements.map(a => ({
 
     <!-- Main -->
     <main class="md:pl-20 min-h-screen">
-      <!-- Mission Statement Banner -->
-      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 overflow-hidden relative" role="marquee" aria-label="Company values and mission">
+      <!-- Rotating Banner Messages -->
+      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 overflow-hidden relative" role="marquee" aria-label="Company messages">
         <div class="py-3 overflow-hidden whitespace-nowrap">
           <div class="animate-marquee inline-flex">
-            <span class="mx-8 text-white font-medium flex items-center gap-2">
-              <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-              Building Excellence. Delivering Results. Creating Futures.
-            </span>
-            <span class="mx-8 text-white/80 flex items-center gap-2">
-              <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Safety First - 4EverSafe
-            </span>
-            <span class="mx-8 text-white font-medium flex items-center gap-2">
-              <svg class="w-5 h-5 text-pink-300" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-              People. Integrity. Excellence. Teamwork.
-            </span>
-            <span class="mx-8 text-white/80 flex items-center gap-2">
-              <svg class="w-5 h-5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-              Building New England Since 1972
-            </span>
-            <!-- Duplicate for seamless loop -->
-            <span class="mx-8 text-white font-medium flex items-center gap-2">
-              <svg class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-              Building Excellence. Delivering Results. Creating Futures.
-            </span>
-            <span class="mx-8 text-white/80 flex items-center gap-2">
-              <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Safety First - 4EverSafe
-            </span>
-            <span class="mx-8 text-white font-medium flex items-center gap-2">
-              <svg class="w-5 h-5 text-pink-300" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-              People. Integrity. Excellence. Teamwork.
-            </span>
-            <span class="mx-8 text-white/80 flex items-center gap-2">
-              <svg class="w-5 h-5 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-              Building New England Since 1972
-            </span>
+            {bannerLoop.map((m) => (
+              <span class="mx-8 text-white font-medium flex items-center gap-2">
+                <svg class={`w-5 h-5 ${bannerColorClass[m['icon-color']] || 'text-amber-300'}`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                {m.message}
+              </span>
+            ))}
           </div>
         </div>
       </div>
