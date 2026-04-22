@@ -145,7 +145,6 @@ function filterValidFields(collection: string, fields: Record<string, any>): Rec
       const isValidField = validFieldKeys.includes(key);
       const hasValue = value !== undefined && value !== null && value !== '';
       if (!isValidField && hasValue) {
-        console.log(`Filtering out field '${key}' - not in Webflow schema for ${collection}`);
       }
       return isValidField && hasValue;
     })
@@ -227,7 +226,6 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
 
 // POST - Create new item
 export const POST: APIRoute = async ({ request, locals }) => {
-  console.log('=== POST ITEM REQUEST ===');
 
   if (!(await verifyAdminRequest(request, locals))) {
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -241,8 +239,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const { collection, fields, isLive = false } = await request.json();
 
-    console.log('POST: Collection:', collection);
-    console.log('POST: Original fields keys:', Object.keys(fields || {}));
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
       return withCors(new Response(JSON.stringify({ error: 'Invalid collection' }), {
@@ -253,7 +249,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Filter to only valid Webflow fields for this collection
     const filteredFields = filterValidFields(collection, fields || {});
-    console.log('POST: Filtered fields keys:', Object.keys(filteredFields));
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
@@ -334,10 +329,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 // PATCH - Update item
 export const PATCH: APIRoute = async ({ request, locals }) => {
-  console.log('=== PATCH ITEM REQUEST ===');
 
   if (!(await verifyAdminRequest(request, locals))) {
-    console.log('PATCH: Unauthorized');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -345,19 +338,13 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   }
 
   const apiToken = getWebflowApiToken(locals);
-  console.log('PATCH: API token present:', !!apiToken);
 
   try {
     const body = await request.json();
     const { collection, itemId, fields, isLive = false } = body;
 
-    console.log('PATCH: Collection:', collection);
-    console.log('PATCH: Item ID:', itemId);
-    console.log('PATCH: isLive:', isLive);
-    console.log('PATCH: Original fields keys:', Object.keys(fields || {}));
 
     if (!collection || !COLLECTIONS[collection as keyof typeof COLLECTIONS]) {
-      console.log('PATCH: Invalid collection - not found in COLLECTIONS');
       return withCors(new Response(JSON.stringify({ error: 'Invalid collection', collection }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -365,7 +352,6 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     if (!itemId) {
-      console.log('PATCH: Missing item ID');
       return withCors(new Response(JSON.stringify({ error: 'Item ID required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -374,10 +360,8 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
 
     // Filter to only valid Webflow fields for this collection
     const filteredFields = filterValidFields(collection, fields || {});
-    console.log('PATCH: Filtered fields keys:', Object.keys(filteredFields));
 
     if (Object.keys(filteredFields).length === 0) {
-      console.log('PATCH: No valid fields to update');
       return withCors(new Response(JSON.stringify({ error: 'No valid fields to update' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -385,11 +369,9 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
-    console.log('PATCH: Collection ID:', collectionId);
 
     // Update staged item (works regardless of site publish state)
     const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}`;
-    console.log('PATCH: Webflow URL:', url);
 
     const response = await fetch(url, {
       method: 'PATCH',
@@ -405,7 +387,6 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
       })
     });
 
-    console.log('PATCH: Webflow response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -427,7 +408,6 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
-    console.log('PATCH: Success!');
 
     // If requested live, publish the updated item
     if (isLive) {

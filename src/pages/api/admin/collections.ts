@@ -1243,7 +1243,6 @@ async function getCollectionFields(collectionId: string, apiToken: string): Prom
     });
 
     if (!response.ok) {
-      console.log(`Failed to fetch collection schema: ${response.status}`);
       return new Map();
     }
 
@@ -1260,7 +1259,6 @@ async function getCollectionFields(collectionId: string, apiToken: string): Prom
       }
     }
 
-    console.log(`Collection ${collectionId} has fields:`, Array.from(fieldMap.keys()));
     return fieldMap;
   } catch (err) {
     console.error('Error fetching collection fields:', err);
@@ -1281,7 +1279,6 @@ function filterFieldData(fieldData: Record<string, any>, existingFields: Map<str
 
     // Only include if the field exists in the collection
     if (!existingFields.has(key)) {
-      console.log(`  Skipping field '${key}' - not in collection schema`);
       continue;
     }
 
@@ -1291,7 +1288,6 @@ function filterFieldData(fieldData: Record<string, any>, existingFields: Map<str
     if (fieldInfo?.type === 'Option' && fieldInfo?.validations?.options) {
       const allowedOptions = fieldInfo.validations.options.map((opt: any) => opt.name);
       if (!allowedOptions.includes(value)) {
-        console.log(`  Skipping field '${key}' - value '${value}' not in allowed options: [${allowedOptions.join(', ')}]`);
         continue;
       }
     }
@@ -1339,9 +1335,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const body = await request.json();
     const { collections: collectionsToSync = [], customCollections = [], addSampleItems = true } = body;
 
-    console.log('=== SYNC REQUEST ===');
-    console.log('Collections to sync:', collectionsToSync);
-    console.log('addSampleItems:', addSampleItems);
 
     // Get existing collections first
     const existingResponse = await fetch(`${BASE_URL}/sites/${siteId}/collections`, {
@@ -1359,50 +1352,36 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const existingCollections = existingData.collections || [];
     const existingSlugs = new Set(existingCollections.map((c: any) => c.slug));
 
-    console.log('Existing collections from Webflow:', existingCollections.map((c: any) => ({ slug: c.slug, id: c.id, displayName: c.displayName })));
-    console.log('Existing slugs:', Array.from(existingSlugs));
 
     const results: any[] = [];
 
     // Process each collection to sync
     for (const collectionKey of collectionsToSync) {
-      console.log(`\n--- Processing collection: ${collectionKey} ---`);
       const definition = COLLECTION_DEFINITIONS[collectionKey as keyof typeof COLLECTION_DEFINITIONS];
       if (!definition) {
-        console.log(`Unknown collection key: ${collectionKey}`);
         results.push({ slug: collectionKey, status: 'error', message: 'Unknown collection' });
         continue;
       }
-      console.log(`Definition found: slug=${definition.slug}, displayName=${definition.displayName}`);
 
       // Check if collection already exists
       const collectionExistsInWebflow = existingSlugs.has(definition.slug);
-      console.log(`Collection exists in Webflow: ${collectionExistsInWebflow}`);
 
       if (collectionExistsInWebflow) {
         // Find the existing collection to get its ID
         const existing = existingCollections.find((c: any) => c.slug === definition.slug);
-        console.log(`Found existing collection: id=${existing?.id}`);
 
         // If addSampleItems is true, add sample items to existing collection
-        console.log(`Checking addSampleItems (${addSampleItems}) && existing?.id (${existing?.id})`);
         if (addSampleItems && existing?.id) {
           const sampleItems = SAMPLE_DATA[definition.slug] || [];
-          console.log(`SAMPLE_DATA key used: '${definition.slug}', found ${sampleItems.length} sample items`);
-          console.log(`Available SAMPLE_DATA keys:`, Object.keys(SAMPLE_DATA));
           if (sampleItems.length === 0) {
-            console.log(`WARNING: No sample data found for '${definition.slug}'`);
           }
 
           // Fetch the collection's actual field schema
-          console.log(`Fetching field schema for collection ${existing.id}...`);
           const existingFields = await getCollectionFields(existing.id, apiToken);
 
           if (existingFields.size === 0) {
-            console.log(`WARNING: Could not fetch fields for collection. Will try with all fields.`);
           }
 
-          console.log(`Adding ${sampleItems.length} sample items to existing collection ${definition.slug} (${existing.id})`);
           let itemsCreated = 0;
           let itemErrors: string[] = [];
 
@@ -1416,7 +1395,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 ? filterFieldData(rawFieldData, existingFields)
                 : rawFieldData;
 
-              console.log(`Creating item: ${sampleItem.name}`, JSON.stringify(fieldData).slice(0, 200));
 
               const itemResponse = await fetch(`${BASE_URL}/collections/${existing.id}/items`, {
                 method: 'POST',
@@ -1433,10 +1411,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
               });
 
               const itemData = await consumeResponse(itemResponse);
-              console.log(`Item response for ${sampleItem.name}: ${itemResponse.status}`, JSON.stringify(itemData).slice(0, 300));
               if (itemResponse.ok) {
                 itemsCreated++;
-                console.log(`Successfully created item: ${sampleItem.name}`);
               } else {
                 const errorMsg = `${sampleItem.name || _slug}: ${itemData.message || itemData.msg || JSON.stringify(itemData)}`;
                 console.error(`Failed to create item: ${errorMsg}`);
@@ -1462,7 +1438,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             itemErrors: itemErrors.length > 0 ? itemErrors : undefined
           });
         } else {
-          console.log(`SKIPPING sample items: addSampleItems=${addSampleItems}, existing?.id=${existing?.id}`);
           results.push({
             slug: definition.slug,
             status: 'exists',
