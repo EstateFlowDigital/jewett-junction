@@ -312,11 +312,7 @@ export const COLLECTIONS = {
   teamMembers: '67a464bc7184fcb8aacb0ed6',
   ourWork: '67a464bc7184fcb8aacb0ef9',
   imageGalleries: '67a464bc7184fcb8aacb0f82',
-  // TODO: Paste the Webflow collection ID for "Banner Messages" here after creating the collection.
-  // Required fields: name (plain text, required), message (plain text, required), display-order (number),
-  // icon-color (option: amber/emerald/pink/cyan/blue/purple), expiration-date (datetime, optional),
-  // is-active (switch, default true).
-  banner: '',
+  banner: '69e83787ba03eb7aaf73abf0',
 } as const;
 
 // ============================================
