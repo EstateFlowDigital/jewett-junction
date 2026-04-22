@@ -2,11 +2,13 @@
 import AdminBase from '../../layouts/admin-base.astro';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { FormSubmissionsBackfill } from '../../components/admin/FormSubmissionsBackfill';
 import { COLLECTIONS } from '../../components/admin/collections';
 ---
 
 <AdminBase title="Form Submissions | Admin">
   <AdminLayout client:load currentPage="form-submissions" title="Form Submissions">
+    <FormSubmissionsBackfill client:load />
     <CollectionEditor client:load collectionKey="formSubmissions" config={COLLECTIONS.formSubmissions} />
   </AdminLayout>
 </AdminBase>
