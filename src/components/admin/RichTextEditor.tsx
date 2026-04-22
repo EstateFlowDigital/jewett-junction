@@ -123,9 +123,12 @@ HeadingDropdown.displayName = 'HeadingDropdown';
 export default function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const isUserTyping = useRef(false);
-  const lastValue = useRef(value);
+  // Sentinel ensures the very first effect run always pushes `value` into innerHTML,
+  // even when the item already has content. If this were seeded with `value`, the
+  // condition below would short-circuit on mount and existing content would never render.
+  const lastValue = useRef<string | undefined>(undefined);
 
-  // Only sync from parent when value actually changes externally
+  // Sync from parent when value differs from what's in the editor.
   useEffect(() => {
     if (editorRef.current && value !== lastValue.current && !isUserTyping.current) {
       editorRef.current.innerHTML = value || '';
