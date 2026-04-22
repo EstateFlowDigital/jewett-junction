@@ -284,7 +284,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
-    // Create as staged item first (works regardless of site publish state)
+    // Create item. isDraft false when publishing (required so Webflow will actually publish it),
+    // true when user chose Save as Draft.
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
       method: 'POST',
       headers: {
@@ -293,6 +294,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
+        isArchived: false,
+        isDraft: !isLive,
         fieldData: filteredFields
       })
     });
@@ -423,6 +426,8 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
         'content-type': 'application/json'
       },
       body: JSON.stringify({
+        isArchived: false,
+        isDraft: !isLive,
         fieldData: filteredFields
       })
     });

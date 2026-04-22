@@ -251,7 +251,11 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
         throw new Error(data.error || 'Failed to save item');
       }
 
-      setSuccess(editingItem ? 'Item updated!' : 'Item created!');
+      if (data.publishWarning) {
+        setError(data.publishWarning);
+      } else {
+        setSuccess(editingItem ? (publishLive ? 'Item updated & published!' : 'Item updated!') : (publishLive ? 'Item created & published!' : 'Item saved as draft'));
+      }
       setIsEditing(false);
       setEditingItem(null);
       setFormData({});
