@@ -10,12 +10,15 @@ interface HRItem {
   slug?: string;
   'content-type'?: string;
   description?: string;
+  'full-content'?: string;
   content?: string;
   'document-link'?: string;
   'effective-date'?: string;
   featured?: boolean;
   icon?: { url: string };
 }
+
+const getContent = (item: { 'full-content'?: string; content?: string }) => item['full-content'] || item.content;
 
 interface HRContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
@@ -108,7 +111,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
                   )}
                   <div>
                     <h2 className="text-xl font-bold">{featuredItem.name}</h2>
-                    <p className="text-purple-100">{stripHtml(featuredItem.description || featuredItem.content)?.substring(0, 150)}</p>
+                    <p className="text-purple-100">{stripHtml(featuredItem.description || getContent(featuredItem))?.substring(0, 150)}</p>
                   </div>
                 </div>
                 <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
@@ -135,7 +138,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
                   )}
                   <div>
                     <h2 className="text-xl font-bold">{displayItems[0].name}</h2>
-                    <p className="text-purple-100">{stripHtml(displayItems[0].description || displayItems[0].content)?.substring(0, 150)}</p>
+                    <p className="text-purple-100">{stripHtml(displayItems[0].description || getContent(displayItems[0]))?.substring(0, 150)}</p>
                   </div>
                 </div>
                 <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
@@ -221,7 +224,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
                 {/* Show benefits from CMS, or display items without content-type, or empty state */}
                 {(benefits.length > 0 ? benefits.slice(0, 2) : displayItems.slice(0, 2)).map((benefit, i) => ({
                   name: benefit.name,
-                  desc: stripHtml(benefit.description || benefit.content)?.substring(0, 100),
+                  desc: stripHtml(benefit.description || getContent(benefit))?.substring(0, 100),
                   icon: i === 0 ? Heart : DollarSign,
                   color: i === 0 ? 'red' : 'green'
                 })).map((benefit, index) => (

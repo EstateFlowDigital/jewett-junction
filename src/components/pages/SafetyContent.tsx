@@ -11,6 +11,7 @@ interface SafetyItem {
   slug?: string;
   'content-type'?: string;
   description?: string;
+  'full-content'?: string;
   content?: string;
   'document-link'?: string;
   priority?: string;
@@ -21,6 +22,8 @@ interface SafetyItem {
   featured?: boolean;
   image?: { url: string };
 }
+
+const getContent = (item: { 'full-content'?: string; content?: string }) => item['full-content'] || item.content;
 
 interface SafetyContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
@@ -208,7 +211,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                             {alert['effective-date'] && formatDate(alert['effective-date']) && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{formatDate(alert['effective-date'])}</span>}
                           </div>
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
-                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || getContent(alert))?.substring(0, 200)}</p>
                         </div>
                         <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
                       </div>
@@ -231,7 +234,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                             {alert['effective-date'] && formatDate(alert['effective-date']) && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{formatDate(alert['effective-date'])}</span>}
                           </div>
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{alert.name}</h3>
-                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || alert.content)?.substring(0, 200)}</p>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(alert.description || getContent(alert))?.substring(0, 200)}</p>
                         </div>
                         <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                       </div>
@@ -257,7 +260,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                             {item['expiration-date'] && <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Expires: {formatDate(item['expiration-date'])}</span>}
                           </div>
                           <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{item.name}</h3>
-                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(item.description || item.content)?.substring(0, 200)}</p>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(item.description || getContent(item))?.substring(0, 200)}</p>
                         </div>
                         <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                       </div>
@@ -296,7 +299,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                 {/* Show training items if they have content-type, otherwise show items with video-link as training */}
                 {(training.length > 0 ? training.slice(0, 2) : safetyItems.filter(item => item['video-link']).slice(0, 2)).map((item, i) => ({
                   name: item.name,
-                  desc: stripHtml(item.description || item.content)?.substring(0, 80),
+                  desc: stripHtml(item.description || getContent(item))?.substring(0, 80),
                   link: item['document-link'] || item['video-link'],
                   color: i === 0 ? 'green' : 'blue',
                   icon: i === 0 ? Shield : HardHat

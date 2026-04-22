@@ -420,6 +420,7 @@ export interface HRContent {
   'content-type'?: string;
   icon?: { url: string };
   description?: string;
+  'full-content'?: string;
   content?: string;
   'document-link'?: string;
   'effective-date'?: string;
@@ -436,6 +437,7 @@ export interface SafetyContent {
   image?: { url: string };
   severity?: string;
   description?: string;
+  'full-content'?: string;
   content?: string;
   'document-link'?: string;
   'video-link'?: string;
@@ -452,7 +454,9 @@ export interface ITArticle {
   'article-type'?: string;
   icon?: { url: string };
   summary?: string;
+  'full-content'?: string;
   content?: string;
+  'video-tutorial'?: string;
   'video-link'?: string;
   'download-link'?: string;
   platform?: string;
@@ -486,7 +490,7 @@ export interface SubmittedIdea {
   category?: string;
   description?: string;
   'submitted-by'?: string;
-  'submitter-email'?: string;
+  email?: string;
   department?: string;
   status?: string;
   priority?: string;

@@ -139,17 +139,17 @@ const difficultyColors: Record<string, string> = {
       )}
 
       <!-- Full Content -->
-      {item.content && (
+      {(item['full-content'] || item.content) && (
         <div class="mb-8 prose prose-invert max-w-none">
-          <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(item.content)} />
+          <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(item['full-content'] || item.content)} />
         </div>
       )}
 
       <!-- Actions -->
       <div class="flex flex-wrap gap-4">
-        {item['video-link'] && (
+        {(item['video-tutorial'] || item['video-link']) && (
           <a
-            href={item['video-link']}
+            href={item['video-tutorial'] || item['video-link']}
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-xl transition-colors"

@@ -84,7 +84,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       category: categoryLabels[data.category] || 'Other',
       description: fullDescription,
       'submitted-by': data.name,
-      'submitter-email': data.email,
+      'email': data.email,
       status: 'New',
       priority: impactLabels[data.impact || 'medium'] || 'Medium',
       votes: 0,

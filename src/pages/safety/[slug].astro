@@ -114,9 +114,9 @@ const typeStyle = typeColors[item['content-type'] || ''] || typeColors.default;
       )}
 
       <!-- Full Content -->
-      {item.content && (
+      {(item['full-content'] || item.content) && (
         <div class="mb-8 prose prose-invert max-w-none border-t border-slate-700/50 pt-6">
-          <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(item.content)} />
+          <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(item['full-content'] || item.content)} />
         </div>
       )}
 

@@ -11,13 +11,13 @@ const BASE_URL = 'https://api.webflow.com/v2';
 // Keep in sync with field lists in src/components/admin/collections.ts.
 const VALID_FIELDS: Record<string, string[]> = {
   announcements: [
-    'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'category', 'priority',
+    'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'news-category', 'priority',
     'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date'
   ],
   events: [
     'name', 'slug', 'event-date', 'end-date', 'banner-image', 'location',
-    'virtual-link', 'category', 'description', 'capacity', 'registration-link',
-    'is-mandatory', 'is-virtual'
+    'virtual-meeting-link', 'category', 'description', 'max-capacity', 'registration-link',
+    'mandatory-attendance', 'virtual-event'
   ],
   jobPostings: [
     'name', 'slug', 'department', 'location', 'employment-type', 'experience-level',
@@ -25,14 +25,14 @@ const VALID_FIELDS: Record<string, string[]> = {
     'referral-bonus', 'apply-link', 'urgency', 'job-is-active', 'is-remote', 'featured'
   ],
   cultureStories: [
-    'name', 'slug', 'type', 'featured-image', 'video-url', 'content', 'excerpt',
+    'name', 'slug', 'story-type', 'featured-image', 'video-url', 'content', 'excerpt',
     'person-name', 'person-role', 'person-tenure', 'quote', 'author',
     'featured', 'published-date', 'category', 'image'
   ],
   employees: [
     'name', 'slug', 'photo', 'role', 'department', 'office-location', 'email',
-    'phone', 'extension', 'linkedin', 'start-date', 'bio', 'skills',
-    'certifications', 'is-featured', 'is-leadership'
+    'phone', 'extension', 'linkedin-url', 'start-date', 'bio', 'skills',
+    'certifications', 'is-featured', 'leadership-team'
   ],
   resources: [
     'name', 'slug', 'thumbnail', 'category', 'description', 'file-type',
@@ -40,18 +40,18 @@ const VALID_FIELDS: Record<string, string[]> = {
     'is-required', 'is-new', 'file', 'icon'
   ],
   hrContent: [
-    'name', 'slug', 'content-type', 'icon', 'description', 'content',
+    'name', 'slug', 'content-type', 'icon', 'description', 'full-content',
     'document-link', 'effective-date', 'applies-to', 'priority-order',
     'featured', 'is-active'
   ],
   safetyContent: [
     'name', 'slug', 'content-type', 'image', 'severity', 'description',
-    'content', 'document-link', 'video-link', 'expiration-date',
+    'full-content', 'document-link', 'video-link', 'expiration-date',
     'required-for', 'priority-order', 'featured', 'is-active'
   ],
   itKnowledgeBase: [
-    'name', 'slug', 'article-type', 'icon', 'summary', 'content',
-    'video-link', 'download-link', 'platform', 'difficulty', 'views',
+    'name', 'slug', 'article-type', 'icon', 'summary', 'full-content',
+    'video-tutorial', 'download-link', 'platform', 'difficulty', 'views',
     'helpful-votes', 'featured', 'is-active'
   ],
   marketingAssets: [
@@ -60,7 +60,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'version', 'featured', 'is-active'
   ],
   submittedIdeas: [
-    'name', 'slug', 'category', 'description', 'submitted-by', 'submitter-email',
+    'name', 'slug', 'category', 'description', 'submitted-by', 'email',
     'department', 'status', 'priority', 'admin-notes', 'votes', 'featured'
   ],
   blogPosts: [
@@ -112,7 +112,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'team-members-page-heading-h1', 'team-members-page-short-description',
     'team-members-card-title-h2', 'team-members-card-title-h3',
     'team-members-card-short-description', 'team-members-long-description',
-    'seo-title-tag', 'seo-meta-description', 'department', 'title',
+    'seo-title-tag', 'seo-meta-description', 'title',
     'linkedin-url', 'sort-order'
   ],
   ourWork: [

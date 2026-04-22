@@ -1,0 +1,6 @@
+Name,Slug,Collection ID,Locale ID,Item ID,Archived,Draft,Created On,Updated On,Published On,Message,Display Order,Icon Color,Expiration Date,Is Active?
+Test,test,69e83787ba03eb7aaf73abf0,67a464bc7184fcb8aacb0e90,69e83b514b241814bb1ffe9f,false,false,Wed Apr 22 2026 03:06:57 GMT+0000 (Coordinated Universal Time),Wed Apr 22 2026 03:33:54 GMT+0000 (Coordinated Universal Time),Wed Apr 22 2026 03:35:05 GMT+0000 (Coordinated Universal Time),Test,5,emerald,,true
+Mission - Excellence,mission-excellence,69e83787ba03eb7aaf73abf0,67a464bc7184fcb8aacb0e90,,false,false,,,,Building Excellence. Delivering Results. Creating Futures.,1,amber,,true
+Mission - Safety,mission-safety,69e83787ba03eb7aaf73abf0,67a464bc7184fcb8aacb0e90,,false,false,,,,Safety First - 4EverSafe,2,emerald,,true
+Mission - Values,mission-values,69e83787ba03eb7aaf73abf0,67a464bc7184fcb8aacb0e90,,false,false,,,,People. Integrity. Excellence. Teamwork.,3,pink,,true
+Mission - Heritage,mission-heritage,69e83787ba03eb7aaf73abf0,67a464bc7184fcb8aacb0e90,,false,false,,,,Building New England Since 1972,4,cyan,,true

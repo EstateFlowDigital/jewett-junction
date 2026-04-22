@@ -13,8 +13,10 @@ interface ITArticle {
   'article-type'?: string;
   description?: string;
   summary?: string;
+  'full-content'?: string;
   content?: string;
   'article-link'?: string;
+  'video-tutorial'?: string;
   'video-link'?: string;
   'download-link'?: string;
   platform?: string;
