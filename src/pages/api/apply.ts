@@ -1,4 +1,10 @@
 import type { APIRoute } from 'astro';
+import { COLLECTIONS } from '../../lib/webflow-cms';
+import { getWebflowApiToken } from '../../lib/admin-auth';
+
+export const prerender = false;
+
+const BASE_URL = 'https://api.webflow.com/v2';
 
 interface ApplicationSubmission {
   firstName: string;
@@ -31,107 +37,81 @@ const referralLabels: Record<string, string> = {
   other: 'Other',
 };
 
-export const POST: APIRoute = async ({ request }) => {
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  let data: ApplicationSubmission;
   try {
-    const data: ApplicationSubmission = await request.json();
+    data = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-    // Validate required fields
-    if (!data.firstName || !data.lastName || !data.email || !data.position) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+  if (!data.firstName || !data.lastName || !data.email || !data.position) {
+    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const apiToken = getWebflowApiToken(locals);
+  const collectionId = COLLECTIONS.jobApplications;
+  if (!apiToken || !collectionId) {
+    console.error('apply: WEBFLOW_API_TOKEN or jobApplications collection id missing');
+    return new Response(JSON.stringify({ error: 'Server not configured' }), {
+      status: 500, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const displayName = `${data.firstName} ${data.lastName} \u2014 ${data.position}`;
+  const timestamp = data.submittedAt || new Date().toISOString();
+  const uniqueSlug = `${slugify(`${data.firstName}-${data.lastName}-${data.position}`)}-${Date.now().toString(36)}`;
+
+  const fieldData: Record<string, any> = {
+    name: displayName.slice(0, 256),
+    slug: uniqueSlug,
+    'first-name': data.firstName,
+    'last-name': data.lastName,
+    email: data.email,
+    position: data.position,
+    status: 'New',
+    'submitted-at': timestamp,
+  };
+  if (data.phone) fieldData.phone = data.phone;
+  if (data.coverLetter) fieldData['cover-letter'] = data.coverLetter;
+  if (data.resumeFileName) fieldData['resume-file-name'] = data.resumeFileName;
+  if (typeof data.isVeteran === 'boolean') fieldData['is-veteran'] = data.isVeteran;
+  if (data.experience) fieldData.experience = experienceLabels[data.experience] || data.experience;
+  if (data.referralSource) fieldData['referral-source'] = referralLabels[data.referralSource] || data.referralSource;
+
+  try {
+    const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+      },
+      body: JSON.stringify({ isArchived: false, isDraft: false, fieldData }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('apply: Webflow create failed', res.status, err.substring(0, 500));
+      return new Response(JSON.stringify({ error: 'Unable to record application right now' }), {
+        status: 502, headers: { 'Content-Type': 'application/json' },
+      });
     }
-
-    // Format the email content
-    const emailContent = formatEmailContent(data);
-
-    // Get notification email from environment
-    const notificationEmail = import.meta.env.CAREERS_NOTIFICATION_EMAIL || 'careers@jewett.com';
-
-    // Log the application (in production, this would send an email)
-    console.log('=== NEW JOB APPLICATION ===');
-    console.log(`To: ${notificationEmail}`);
-    console.log(`Subject: New Application: ${data.position} - ${data.firstName} ${data.lastName}`);
-    console.log('---');
-    console.log(emailContent);
-    console.log('===========================');
-
-    // In production with proper email service, you would:
-    // 1. Use a service like SendGrid, Mailgun, or AWS SES
-    // 2. Or use Cloudflare Email Workers
-    // 3. Or integrate with an existing ATS (Applicant Tracking System)
-
-    // Return success
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: 'Application submitted successfully',
-        id: generateApplicationId(),
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  } catch (error) {
-    console.error('Error processing application:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    const created = await res.json();
+    return new Response(JSON.stringify({ success: true, id: created.id }), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (e: any) {
+    console.error('apply: exception', e?.message);
+    return new Response(JSON.stringify({ error: 'Unable to record application right now' }), {
+      status: 502, headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
-
-function formatEmailContent(data: ApplicationSubmission): string {
-  const lines = [
-    `New Job Application`,
-    '',
-    '═'.repeat(50),
-    '',
-    `APPLICANT INFORMATION`,
-    `Name: ${data.firstName} ${data.lastName}`,
-    `Email: ${data.email}`,
-    data.phone ? `Phone: ${data.phone}` : null,
-    data.isVeteran ? `Veteran Status: Yes - Military Veteran` : null,
-    '',
-    '─'.repeat(50),
-    '',
-    `POSITION DETAILS`,
-    `Position Applied For: ${data.position}`,
-    data.experience ? `Experience: ${experienceLabels[data.experience] || data.experience}` : null,
-    data.referralSource ? `How They Heard About Us: ${referralLabels[data.referralSource] || data.referralSource}` : null,
-    '',
-  ];
-
-  if (data.resumeFileName) {
-    lines.push('─'.repeat(50));
-    lines.push('');
-    lines.push(`RESUME`);
-    lines.push(`Filename: ${data.resumeFileName}`);
-    lines.push(`Note: Resume file was selected but requires separate handling for attachment.`);
-    lines.push('');
-  }
-
-  if (data.coverLetter) {
-    lines.push('─'.repeat(50));
-    lines.push('');
-    lines.push(`COVER LETTER / ADDITIONAL INFORMATION`);
-    lines.push(data.coverLetter);
-    lines.push('');
-  }
-
-  lines.push('═'.repeat(50));
-  lines.push('');
-  lines.push(`Submitted: ${new Date(data.submittedAt).toLocaleString()}`);
-  lines.push('');
-  lines.push('This application was received through Jewett Junction.');
-  lines.push('');
-  lines.push('─'.repeat(50));
-  lines.push('ACTION REQUIRED: Please respond to the applicant within 24 hours.');
-
-  return lines.filter(line => line !== null).join('\n');
-}
-
-function generateApplicationId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 8);
-  return `APP-${timestamp}-${random}`.toUpperCase();
-}

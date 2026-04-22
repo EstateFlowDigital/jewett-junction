@@ -38,6 +38,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'it', name: 'IT Knowledge', icon: Monitor, color: 'sky', href: '/jewett-junction/admin/it' },
       { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
       { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
+      { key: 'applications', name: 'Job Applications', icon: Briefcase, color: 'emerald', href: '/jewett-junction/admin/applications' },
       { key: 'bulk-upload', name: 'Bulk Upload', icon: Upload, color: 'teal', href: '/jewett-junction/admin/bulk-upload' },
     ],
   },

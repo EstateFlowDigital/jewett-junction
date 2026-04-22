@@ -294,6 +294,9 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'video-visibility', label: 'Show Video', type: 'boolean', helpText: 'Toggle video section visibility' },
       { key: 'video', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video' },
       { key: 'additional-content-visibility', label: 'Show Additional Content', type: 'boolean', helpText: 'Toggle additional content section' },
+      { key: 'blog-category', label: 'Blog Category (ID)', type: 'text', helpText: 'Webflow item ID from the Blog Categories collection', icon: 'Tag' },
+      { key: 'blog-related-to-industry', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link' },
+      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set by the Airtable integration', icon: 'Tag' },
     ]
   },
   blogCategories: {
@@ -314,6 +317,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'category-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full category description...' },
       { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
       { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set by the Airtable integration', icon: 'Tag' },
     ]
   },
   faqs: {
@@ -333,6 +337,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'faq-short-answer', label: 'Short Answer', type: 'richtext', placeholder: 'Brief answer to the question...' },
       { key: 'faq-long-answer', label: 'Long Answer', type: 'richtext', placeholder: 'Detailed answer with full explanation...' },
       { key: 'faq-category', label: 'Category', type: 'select', options: ['General Construction Process', 'Regulatory Compliance & Site Preparation', 'Budget, Cost & Financing', 'Sustainability & Innovation', 'Construction Methodologies & Specialized Builds', 'Project Execution & Risk Management', 'Post-Construction & Maintenance'], icon: 'Tag' },
+      { key: 'faq-related-to-service', label: 'Related Service (ID)', type: 'text', helpText: 'Webflow item ID from the Services collection', icon: 'Link' },
+      { key: 'faq-related-to-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
       { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
       { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
     ]
@@ -455,6 +461,13 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'location', label: 'Location', type: 'text', placeholder: 'Project location', icon: 'MapPin' },
       { key: 'video-url', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video' },
       { key: 'featured-project', label: 'Featured Project', type: 'boolean', helpText: 'Highlight this project' },
+      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
+      { key: 'industries', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link' },
+      { key: 'related-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
+      { key: 'state-2', label: 'State Reference (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
+      { key: 'gallery', label: 'Gallery (managed in Webflow)', type: 'text', helpText: 'Multi-image gallery \u2014 edit directly in Webflow CMS until the admin supports it' },
+      { key: 'gallery-2', label: 'Gallery 2 (managed in Webflow)', type: 'text', helpText: 'Multi-image gallery \u2014 edit directly in Webflow CMS until the admin supports it' },
+      { key: 'old-page-url', label: 'Old Page URL', type: 'text', placeholder: 'https://\u2026', icon: 'Link' },
       { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
       { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
     ]
@@ -485,6 +498,30 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'icon-color', label: 'Icon Color', type: 'select', options: ['amber', 'emerald', 'pink', 'cyan', 'blue', 'purple'], helpText: 'Color of the leading icon', icon: 'Palette' },
       { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional — auto-hide after this time', icon: 'Clock' },
       { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
+    ],
+  },
+  jobApplications: {
+    name: 'Job Applications',
+    icon: 'Briefcase',
+    color: 'emerald',
+    gradient: 'from-emerald-500 to-green-500',
+    slug: 'job-applications',
+    description: 'Inbound applications from the careers page',
+    fields: [
+      { key: 'name', label: 'Display Name', type: 'text', required: true, placeholder: 'First Last \u2014 Position', helpText: 'Auto-populated on submit; edit to re-identify', icon: 'FileText' },
+      { key: 'first-name', label: 'First Name', type: 'text', required: true, icon: 'Users' },
+      { key: 'last-name', label: 'Last Name', type: 'text', required: true, icon: 'Users' },
+      { key: 'email', label: 'Email', type: 'email', required: true, icon: 'Mail' },
+      { key: 'phone', label: 'Phone', type: 'tel', icon: 'Phone' },
+      { key: 'position', label: 'Position Applied For', type: 'text', required: true, icon: 'Briefcase' },
+      { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'], icon: 'Clock' },
+      { key: 'referral-source', label: 'Referral Source', type: 'select', options: ['Employee Referral', 'LinkedIn', 'Indeed', 'Company Website', 'Career Fair', 'Other'], icon: 'Tag' },
+      { key: 'cover-letter', label: 'Cover Letter', type: 'richtext', placeholder: 'Applicant\u2019s message\u2026' },
+      { key: 'resume-file-name', label: 'Resume File Name', type: 'text', helpText: 'Filename only \u2014 file storage not yet wired', icon: 'FileText' },
+      { key: 'is-veteran', label: 'Military Veteran', type: 'boolean' },
+      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Contacted', 'Interviewing', 'Rejected', 'Hired'], icon: 'Zap' },
+      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', placeholder: 'Private reviewer notes\u2026', helpText: 'Not visible to applicant' },
+      { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock' },
     ],
   },
 };

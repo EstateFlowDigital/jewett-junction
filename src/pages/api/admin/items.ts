@@ -71,17 +71,20 @@ const VALID_FIELDS: Record<string, string[]> = {
     'cdn-image-visibility', 'cdn-image-url', 'additional-content-visibility',
     'video-visibility', 'video', 'min-image-height', 'object-position-2',
     'gallery-image-1-visibility', 'gallery-image-1', 'gallery-image-1-alt-text',
-    'gallery-image-2-visibility', 'gallery-image-2', 'gallery-image-2-alt-text'
+    'gallery-image-2-visibility', 'gallery-image-2', 'gallery-image-2-alt-text',
+    'blog-related-to-industry', 'blog-category', 'airtable-id'
   ],
   blogCategories: [
     'name', 'slug', 'main-image', 'main-image-alt-text', 'category-name-eyebrow-text',
     'category-page-heading-h1', 'category-card-title-h2', 'category-card-short-description',
-    'category-long-description', 'seo-title-tag', 'seo-meta-description'
+    'category-long-description', 'seo-title-tag', 'seo-meta-description',
+    'airtable-id'
   ],
   faqs: [
     'name', 'slug', 'main-image', 'main-image-alt-text', 'faqs-card-title-h1',
     'faqs-card-title-h2', 'faqs-card-title-h3', 'faq-short-answer', 'faq-long-answer',
-    'faq-category', 'seo-title-tag', 'seo-meta-description'
+    'faq-category', 'seo-title-tag', 'seo-meta-description',
+    'faq-related-to-service', 'faq-related-to-service-area'
   ],
   services: [
     'name', 'slug', 'main-image', 'main-image-alt-text', 'icon-svg-path-1',
@@ -118,13 +121,20 @@ const VALID_FIELDS: Record<string, string[]> = {
     'our-work-card-title-h2', 'our-work-card-title-h3',
     'our-work-card-short-description', 'our-work-long-description',
     'seo-title-tag', 'seo-meta-description', 'intro-section-heading-h2',
-    'architect-designer', 'location', 'featured-project', 'video-url'
+    'architect-designer', 'location', 'featured-project', 'video-url',
+    'gallery', 'gallery-2', 'industries', 'related-service-area',
+    'old-page-url', 'state-2', 'sort-order'
   ],
   imageGalleries: [
     'name', 'slug', 'main-image-file', 'main-image-alt-text'
   ],
   banner: [
     'name', 'slug', 'message', 'display-order', 'icon-color', 'expiration-date', 'is-active',
+  ],
+  jobApplications: [
+    'name', 'slug', 'first-name', 'last-name', 'email', 'phone', 'position',
+    'experience', 'referral-source', 'cover-letter', 'resume-file-name',
+    'is-veteran', 'status', 'admin-notes', 'submitted-at',
   ],
 };
 
