@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -39,6 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'marketing', name: 'Marketing', icon: Palette, color: 'rose', href: '/jewett-junction/admin/marketing' },
       { key: 'ideas', name: 'Submitted Ideas', icon: Lightbulb, color: 'yellow', href: '/jewett-junction/admin/ideas' },
       { key: 'applications', name: 'Job Applications', icon: Briefcase, color: 'emerald', href: '/jewett-junction/admin/applications' },
+      { key: 'form-submissions', name: 'Form Submissions', icon: Mail, color: 'cyan', href: '/jewett-junction/admin/form-submissions' },
       { key: 'bulk-upload', name: 'Bulk Upload', icon: Upload, color: 'teal', href: '/jewett-junction/admin/bulk-upload' },
     ],
   },

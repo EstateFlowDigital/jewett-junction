@@ -136,6 +136,11 @@ const VALID_FIELDS: Record<string, string[]> = {
     'experience', 'referral-source', 'cover-letter', 'resume-file-name',
     'is-veteran', 'status', 'admin-notes', 'submitted-at',
   ],
+  formSubmissions: [
+    'name', 'slug', 'form-name', 'webflow-form-id', 'submission-id',
+    'submitted-at', 'submitter-name', 'submitter-email', 'submitter-phone',
+    'published-path', 'full-response', 'admin-notes', 'status',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection

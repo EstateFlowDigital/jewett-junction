@@ -523,6 +523,28 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock' },
     ],
   },
+  formSubmissions: {
+    name: 'Form Submissions',
+    icon: 'Mail',
+    color: 'cyan',
+    gradient: 'from-cyan-500 to-sky-500',
+    slug: 'form-submissions',
+    description: 'Inbound messages from native Webflow forms',
+    fields: [
+      { key: 'name', label: 'Display Name', type: 'text', required: true, helpText: 'Auto-generated on webhook ingest; safe to edit', icon: 'FileText' },
+      { key: 'form-name', label: 'Form Name', type: 'text', helpText: 'Which Webflow form was submitted', icon: 'Tag' },
+      { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock' },
+      { key: 'submitter-name', label: 'Submitter Name', type: 'text', icon: 'Users' },
+      { key: 'submitter-email', label: 'Submitter Email', type: 'email', icon: 'Mail' },
+      { key: 'submitter-phone', label: 'Submitter Phone', type: 'tel', icon: 'Phone' },
+      { key: 'published-path', label: 'Submitted From (Page)', type: 'text', icon: 'Link' },
+      { key: 'full-response', label: 'Full Response', type: 'richtext', helpText: 'All submitted form fields' },
+      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Reviewed', 'Contacted', 'Qualified', 'Rejected', 'Archived'], icon: 'Zap' },
+      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', helpText: 'Not visible to submitter' },
+      { key: 'webflow-form-id', label: 'Webflow Form ID', type: 'text', helpText: 'Populated automatically', icon: 'Tag' },
+      { key: 'submission-id', label: 'Submission ID', type: 'text', helpText: 'Unique dedup key from Webflow', icon: 'Tag' },
+    ],
+  },
 };
 
 export type CollectionKey = keyof typeof COLLECTIONS;
