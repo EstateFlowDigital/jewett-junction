@@ -79,6 +79,7 @@ const HeadingDropdown = memo(({ onSelect }: { onSelect: (tag: string) => void })
 
   const headings = [
     { tag: '<p>', label: 'Paragraph', className: 'text-sm' },
+    { tag: '<h1>', label: 'Heading 1', className: 'text-xl font-bold' },
     { tag: '<h2>', label: 'Heading 2', className: 'text-lg font-bold' },
     { tag: '<h3>', label: 'Heading 3', className: 'text-base font-bold' },
     { tag: '<h4>', label: 'Heading 4', className: 'text-sm font-bold' },
