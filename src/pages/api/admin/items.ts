@@ -284,8 +284,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
-    // Create item in Webflow — v2 uses /items/live path for published creates
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items${isLive ? '/live' : ''}`, {
+    // Create as staged item first (works regardless of site publish state)
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
@@ -306,7 +306,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       } catch {
         errorData = { rawResponse: errorText };
       }
-      // Extract detailed field validation info if available
       const details = errorData.details || errorData.problems || errorData.err;
       const detailMsg = details ? ` Details: ${JSON.stringify(details)}` : '';
       return withCors(new Response(JSON.stringify({
@@ -320,6 +319,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const data = await response.json();
+
+    // If requested live, publish the newly-created item
+    if (isLive && data.id) {
+      const publishRes = await fetch(`${BASE_URL}/collections/${collectionId}/items/publish`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'accept': 'application/json',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ itemIds: [data.id] })
+      });
+      if (!publishRes.ok) {
+        const pubErr = await publishRes.text();
+        console.error('POST: publish step failed:', pubErr);
+        // Item was created successfully; surface publish failure as non-fatal warning
+        return withCors(new Response(JSON.stringify({
+          success: true,
+          item: data,
+          publishWarning: `Item saved but publish failed: ${pubErr.substring(0, 200)}`
+        }), { status: 201, headers: { 'Content-Type': 'application/json' } }));
+      }
+    }
+
     return withCors(new Response(JSON.stringify({ success: true, item: data }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
@@ -388,7 +411,8 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
     console.log('PATCH: Collection ID:', collectionId);
 
-    const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '/live' : ''}`;
+    // Update staged item (works regardless of site publish state)
+    const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}`;
     console.log('PATCH: Webflow URL:', url);
 
     const response = await fetch(url, {
@@ -426,6 +450,29 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
 
     const data = await response.json();
     console.log('PATCH: Success!');
+
+    // If requested live, publish the updated item
+    if (isLive) {
+      const publishRes = await fetch(`${BASE_URL}/collections/${collectionId}/items/publish`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'accept': 'application/json',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ itemIds: [itemId] })
+      });
+      if (!publishRes.ok) {
+        const pubErr = await publishRes.text();
+        console.error('PATCH: publish step failed:', pubErr);
+        return withCors(new Response(JSON.stringify({
+          success: true,
+          item: data,
+          publishWarning: `Item saved but publish failed: ${pubErr.substring(0, 200)}`
+        }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      }
+    }
+
     return withCors(new Response(JSON.stringify({ success: true, item: data }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
