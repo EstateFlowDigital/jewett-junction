@@ -1,10 +1,59 @@
-# CORS headers for API routes
-/api/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
+# Public API routes get permissive CORS (search, public form submissions, CMS reads).
+# Admin routes (/api/admin/*, /jewett-junction/api/admin/*) intentionally omitted —
+# src/middleware.ts sets origin-specific CORS for them based on same-origin + ALLOWED_ORIGINS.
 
-/jewett-junction/api/*
+/api/search
   Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/api/apply
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/api/submit-idea
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/api/signage-request
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/api/cms/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/jewett-junction/api/search
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/jewett-junction/api/apply
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/jewett-junction/api/submit-idea
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/jewett-junction/api/signage-request
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+/jewett-junction/api/cms/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
+
+# Security headers for all HTML responses
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
+import { COLLECTIONS as COLLECTION_CONFIGS } from '../../../components/admin/collections';
 
 export const prerender = false;
 
@@ -21,6 +22,20 @@ function getApiToken(locals: any): string {
   return runtime?.env?.WEBFLOW_API_TOKEN || (import.meta.env as any).WEBFLOW_API_TOKEN;
 }
 
+function filterRowToValidFields(collection: string, row: Record<string, any>): Record<string, any> {
+  const config = (COLLECTION_CONFIGS as any)[collection];
+  if (!config) return row;
+  const validKeys = new Set<string>(config.fields.map((f: any) => f.key));
+  validKeys.add('slug');
+  const filtered: Record<string, any> = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (validKeys.has(k) && v !== '' && v !== null && v !== undefined) {
+      filtered[k] = v;
+    }
+  }
+  return filtered;
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
   if (!verifyToken(request)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
@@ -39,9 +54,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const apiToken = getApiToken(locals);
   const results: Array<{ ok: boolean; row: number; error?: string; id?: string }> = [];
+  const createdIds: string[] = [];
 
   for (let i = 0; i < rows.length; i++) {
-    const fieldData = rows[i];
+    const fieldData = filterRowToValidFields(collection, rows[i]);
+    if (Object.keys(fieldData).length === 0) {
+      results.push({ ok: false, row: i, error: 'No valid fields in row (check CSV headers match collection field slugs)' });
+      continue;
+    }
     try {
       const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
         method: 'POST',
@@ -58,14 +78,42 @@ export const POST: APIRoute = async ({ request, locals }) => {
       } else {
         const data = await res.json();
         results.push({ ok: true, row: i, id: data.id });
+        if (data.id) createdIds.push(data.id);
       }
     } catch (e: any) {
       results.push({ ok: false, row: i, error: e?.message || 'Unknown error' });
     }
   }
 
+  // Batch-publish all successfully-created items
+  let publishWarning: string | undefined;
+  if (createdIds.length > 0) {
+    try {
+      const pubRes = await fetch(`${BASE_URL}/collections/${collectionId}/items/publish`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+        },
+        body: JSON.stringify({ itemIds: createdIds }),
+      });
+      if (!pubRes.ok) {
+        const err = await pubRes.text();
+        publishWarning = `Items created but publish step failed: ${err.substring(0, 200)}`;
+      }
+    } catch (e: any) {
+      publishWarning = `Items created but publish step threw: ${e?.message}`;
+    }
+  }
+
   const succeeded = results.filter((r) => r.ok).length;
-  return new Response(JSON.stringify({ succeeded, failed: results.length - succeeded, results }), {
+  return new Response(JSON.stringify({
+    succeeded,
+    failed: results.length - succeeded,
+    results,
+    ...(publishWarning ? { publishWarning } : {}),
+  }), {
     status: 200, headers: { 'Content-Type': 'application/json' },
   });
 };

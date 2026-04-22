@@ -35,7 +35,6 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
   // CMS state - use initialItems if provided (server-side fetched)
   const [articles, setArticles] = React.useState<ITArticle[]>(initialItems);
   const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
-  const [error, setError] = React.useState<string | null>(null);
 
   // Only fetch client-side if no initial items provided
   React.useEffect(() => {
@@ -49,7 +48,6 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
         setArticles(data.items || []);
       } catch (err: any) {
         console.error('Error fetching IT content:', err);
-        setError(err.message);
       } finally {
         setIsLoading(false);
       }

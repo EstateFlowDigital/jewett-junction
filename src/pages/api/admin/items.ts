@@ -5,10 +5,9 @@ export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
-// Valid Webflow field slugs for each collection
-// Only these fields will be sent to Webflow API
-// Based on AdminDashboard form field definitions
-// Note: If a field is missing here, add it to both AdminDashboard and this list
+// Valid Webflow field slugs for each collection.
+// Only these fields are sent to Webflow API; unknown fields are dropped.
+// Keep in sync with field lists in src/components/admin/collections.ts.
 const VALID_FIELDS: Record<string, string[]> = {
   announcements: [
     'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'category', 'priority',

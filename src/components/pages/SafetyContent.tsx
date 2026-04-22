@@ -34,7 +34,6 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
   // CMS state - use initialItems if provided (server-side fetched)
   const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>(initialItems);
   const [isLoading, setIsLoading] = React.useState(initialItems.length === 0);
-  const [error, setError] = React.useState<string | null>(null);
 
   // Only fetch client-side if no initial items provided
   React.useEffect(() => {
@@ -48,7 +47,6 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
         setSafetyItems(data.items || []);
       } catch (err: any) {
         console.error('Error fetching Safety content:', err);
-        setError(err.message);
       } finally {
         setIsLoading(false);
       }
