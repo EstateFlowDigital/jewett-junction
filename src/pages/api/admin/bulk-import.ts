@@ -1,26 +1,11 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 import { COLLECTIONS as COLLECTION_CONFIGS } from '../../../components/admin/collections';
+import { verifyAdminRequest, getWebflowApiToken } from '../../../lib/admin-auth';
 
 export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
-
-function verifyToken(request: Request): boolean {
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '');
-  if (!token || !token.startsWith('admin_')) return false;
-  const parts = token.slice('admin_'.length).split('.');
-  if (parts.length !== 3) return false;
-  const timestamp = parseInt(parts[1], 10);
-  if (isNaN(timestamp)) return false;
-  return Date.now() - timestamp <= 24 * 60 * 60 * 1000;
-}
-
-function getApiToken(locals: any): string {
-  const runtime = (locals as any)?.runtime;
-  return runtime?.env?.WEBFLOW_API_TOKEN || (import.meta.env as any).WEBFLOW_API_TOKEN;
-}
 
 function filterRowToValidFields(collection: string, row: Record<string, any>): Record<string, any> {
   const config = (COLLECTION_CONFIGS as any)[collection];
@@ -37,7 +22,7 @@ function filterRowToValidFields(collection: string, row: Record<string, any>): R
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
   }
   const { collection, rows } = await request.json();
@@ -52,7 +37,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ error: 'Maximum 100 rows per import' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const apiToken = getApiToken(locals);
+  const apiToken = getWebflowApiToken(locals);
   const results: Array<{ ok: boolean; row: number; error?: string; id?: string }> = [];
   const createdIds: string[] = [];
 

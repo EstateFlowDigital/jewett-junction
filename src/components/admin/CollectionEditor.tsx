@@ -50,7 +50,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const [uploadingField, setUploadingField] = React.useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = React.useState<number>(0);
   const [dragOverField, setDragOverField] = React.useState<string | null>(null);
-  const [imageFileIds, setImageFileIds] = React.useState<Record<string, string>>({});
+  const [assetFileIds, setAssetFileIds] = React.useState<Record<string, string>>({});
 
   // Preview state
   const [showPreview, setShowPreview] = React.useState(false);
@@ -111,7 +111,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       }
     });
     if (Object.keys(fileIds).length > 0) {
-      setImageFileIds(prev => ({ ...prev, ...fileIds }));
+      setAssetFileIds(prev => ({ ...prev, ...fileIds }));
     }
     return normalized;
   };
@@ -154,7 +154,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const handleCreate = () => {
     setEditingItem(null);
     setFormData({});
-    setImageFileIds({});
+    setAssetFileIds({});
     setIsEditing(true);
   };
 
@@ -210,8 +210,8 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       const processedFields = { ...formData };
       config.fields.forEach(field => {
         if ((field.type === 'image' || field.type === 'file') && processedFields[field.key]) {
-          if (imageFileIds[field.key]) {
-            processedFields[field.key] = imageFileIds[field.key];
+          if (assetFileIds[field.key]) {
+            processedFields[field.key] = assetFileIds[field.key];
           }
         }
       });
@@ -259,7 +259,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       setIsEditing(false);
       setEditingItem(null);
       setFormData({});
-      setImageFileIds({});
+      setAssetFileIds({});
       loadItems();
     } catch (err: any) {
       setError(err.message);
@@ -478,7 +478,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       setUploadProgress(100);
       setFormData({ ...formData, [fieldKey]: data.url });
       if (data.id) {
-        setImageFileIds(prev => ({ ...prev, [fieldKey]: data.id }));
+        setAssetFileIds(prev => ({ ...prev, [fieldKey]: data.id }));
       }
       setSuccess(`${isPdf ? 'PDF' : 'Image'} uploaded successfully!`);
 
@@ -549,7 +549,14 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   <span className="text-slate-400 text-xs truncate max-w-[60%]">{getImageUrl(formData[field.key]).split('/').pop()}</span>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, [field.key]: '' })}
+                    onClick={() => {
+                      setFormData({ ...formData, [field.key]: '' });
+                      setAssetFileIds((prev) => {
+                        const next = { ...prev };
+                        delete next[field.key];
+                        return next;
+                      });
+                    }}
                     className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -674,7 +681,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                       type="button"
                       onClick={() => {
                         setFormData({ ...formData, [field.key]: '' });
-                        setImageFileIds((prev) => {
+                        setAssetFileIds((prev) => {
                           const next = { ...prev };
                           delete next[field.key];
                           return next;

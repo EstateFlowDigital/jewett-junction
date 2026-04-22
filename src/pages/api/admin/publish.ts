@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { verifyAdminRequest, getWebflowApiToken, getWebflowSiteId } from '../../../lib/admin-auth';
 
 export const prerender = false;
 
@@ -7,57 +8,6 @@ const BASE_URL = 'https://api.webflow.com/v2';
 // CORS is handled by middleware — this is a passthrough for compatibility
 function withCors(response: Response): Response {
   return response;
-}
-
-// Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
-function getEnvVar(locals: any, key: string): string {
-  const runtime = (locals as any)?.runtime;
-  return runtime?.env?.[key] || (import.meta.env as any)[key];
-}
-
-// Verify admin token - returns object with validation details
-function verifyToken(request: Request): { valid: boolean; reason?: string; details?: any } {
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '');
-
-  if (!authHeader) {
-    return { valid: false, reason: 'No Authorization header' };
-  }
-
-  if (!token) {
-    return { valid: false, reason: 'No token after Bearer prefix' };
-  }
-
-  if (!token.startsWith('admin_')) {
-    return { valid: false, reason: 'Token does not start with admin_', details: { prefix: token.substring(0, 10) } };
-  }
-
-  const body = token.slice('admin_'.length);
-  const parts = body.split('.');
-  if (parts.length !== 3) {
-    return { valid: false, reason: `Token body has ${parts.length} parts, expected 3` };
-  }
-
-  const timestamp = parseInt(parts[1], 10);
-  if (isNaN(timestamp)) {
-    return { valid: false, reason: 'Invalid timestamp in token' };
-  }
-  const now = Date.now();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-  const age = now - timestamp;
-
-  if (age > maxAge) {
-    return {
-      valid: false,
-      reason: 'Token expired',
-      details: {
-        tokenAge: `${Math.round(age / 1000 / 60)} minutes`,
-        maxAge: '24 hours'
-      }
-    };
-  }
-
-  return { valid: true };
 }
 
 // CORS preflight is handled by middleware
@@ -105,21 +55,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
     console.log('Publish: Available env keys =', Object.keys(runtime.env));
   }
 
-  const tokenResult = verifyToken(request);
-  if (!tokenResult.valid) {
-    console.log('Publish: Unauthorized -', tokenResult.reason, tokenResult.details);
-    return withCors(new Response(JSON.stringify({
-      error: 'Unauthorized',
-      reason: tokenResult.reason,
-      details: tokenResult.details
-    }), {
+  if (!(await verifyAdminRequest(request, locals))) {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
   }
 
-  const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
-  const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
+  const apiToken = getWebflowApiToken(locals);
+  const siteId = getWebflowSiteId(locals);
 
   console.log('Publish: siteId =', siteId ? 'present' : 'MISSING');
   console.log('Publish: apiToken =', apiToken ? `present (length: ${apiToken.length})` : 'MISSING');
@@ -239,20 +183,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 // GET - Check publish status / site info
 export const GET: APIRoute = async ({ request, locals }) => {
-  const tokenResult = verifyToken(request);
-  if (!tokenResult.valid) {
-    return withCors(new Response(JSON.stringify({
-      error: 'Unauthorized',
-      reason: tokenResult.reason,
-      details: tokenResult.details
-    }), {
+  if (!(await verifyAdminRequest(request, locals))) {
+    return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
   }
 
-  const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
-  const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
+  const apiToken = getWebflowApiToken(locals);
+  const siteId = getWebflowSiteId(locals);
 
   try {
     const response = await fetch(`${BASE_URL}/sites/${siteId}`, {

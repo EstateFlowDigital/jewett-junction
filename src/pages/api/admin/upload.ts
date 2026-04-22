@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { verifyAdminRequest, getWebflowApiToken, getWebflowSiteId } from '../../../lib/admin-auth';
 
 export const prerender = false;
 
@@ -7,34 +8,6 @@ const BASE_URL = 'https://api.webflow.com/v2';
 // CORS is handled by middleware — this is a passthrough for compatibility
 function withCors(response: Response): Response {
   return response;
-}
-
-// Get env vars from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
-function getEnvVar(locals: any, key: string): string {
-  const runtime = (locals as any)?.runtime;
-  return runtime?.env?.[key] || (import.meta.env as any)[key];
-}
-
-// Verify admin token — checks format and expiry
-function verifyToken(request: Request): boolean {
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '');
-
-  if (!token || !token.startsWith('admin_')) {
-    return false;
-  }
-
-  const body = token.slice('admin_'.length);
-  const parts = body.split('.');
-  if (parts.length !== 3) return false;
-
-  const timestamp = parseInt(parts[1], 10);
-  if (isNaN(timestamp)) return false;
-
-  const now = Date.now();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-
-  return now - timestamp <= maxAge;
 }
 
 // CORS preflight is handled by middleware
@@ -70,7 +43,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   console.log('Auth header present:', !!authHeader);
   console.log('Auth header prefix:', authHeader?.substring(0, 20));
 
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     console.log('UPLOAD ERROR: Token verification failed');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -84,8 +57,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   console.log('Runtime env exists:', !!runtime?.env);
   console.log('Runtime env keys:', runtime?.env ? Object.keys(runtime.env) : []);
 
-  const apiToken = getEnvVar(locals, 'WEBFLOW_API_TOKEN');
-  const siteId = getEnvVar(locals, 'WEBFLOW_SITE_ID');
+  const apiToken = getWebflowApiToken(locals);
+  const siteId = getWebflowSiteId(locals);
 
   console.log('WEBFLOW_API_TOKEN present:', !!apiToken);
   console.log('WEBFLOW_API_TOKEN length:', apiToken?.length || 0);

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
+import { verifyAdminRequest, getWebflowApiToken } from '../../../lib/admin-auth';
 
 export const prerender = false;
 
@@ -156,33 +157,6 @@ function withCors(response: Response): Response {
   return response;
 }
 
-// Get API token from runtime context (Cloudflare) or fallback to import.meta.env (local dev)
-function getApiToken(locals: any): string {
-  const runtime = locals?.runtime;
-  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
-}
-
-// Verify admin token — checks format and expiry
-function verifyToken(request: Request): boolean {
-  const authHeader = request.headers.get('Authorization');
-  const token = authHeader?.replace('Bearer ', '');
-
-  if (!token || !token.startsWith('admin_')) {
-    return false;
-  }
-
-  const body = token.slice('admin_'.length);
-  const parts = body.split('.');
-  if (parts.length !== 3) return false;
-
-  const timestamp = parseInt(parts[1], 10);
-  if (isNaN(timestamp)) return false;
-
-  const now = Date.now();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-
-  return now - timestamp <= maxAge;
-}
 
 // CORS preflight is handled by middleware
 export const OPTIONS: APIRoute = async () => {
@@ -207,7 +181,7 @@ export const ALL: APIRoute = async ({ request }) => {
 
 // GET - List items from a collection
 export const GET: APIRoute = async ({ request, url, locals }) => {
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -223,7 +197,7 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
   }
 
   const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
-  const apiToken = getApiToken(locals);
+  const apiToken = getWebflowApiToken(locals);
 
   try {
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
@@ -255,14 +229,14 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
   console.log('=== POST ITEM REQUEST ===');
 
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
   }
 
-  const apiToken = getApiToken(locals);
+  const apiToken = getWebflowApiToken(locals);
 
   try {
     const { collection, fields, isLive = false } = await request.json();
@@ -362,7 +336,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 export const PATCH: APIRoute = async ({ request, locals }) => {
   console.log('=== PATCH ITEM REQUEST ===');
 
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     console.log('PATCH: Unauthorized');
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
@@ -370,7 +344,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }));
   }
 
-  const apiToken = getApiToken(locals);
+  const apiToken = getWebflowApiToken(locals);
   console.log('PATCH: API token present:', !!apiToken);
 
   try {
@@ -493,14 +467,14 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
 
 // DELETE - Delete item
 export const DELETE: APIRoute = async ({ request, locals }) => {
-  if (!verifyToken(request)) {
+  if (!(await verifyAdminRequest(request, locals))) {
     return withCors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
     }));
   }
 
-  const apiToken = getApiToken(locals);
+  const apiToken = getWebflowApiToken(locals);
 
   try {
     const { collection, itemId } = await request.json();
