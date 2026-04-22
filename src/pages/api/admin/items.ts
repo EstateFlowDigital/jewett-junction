@@ -284,8 +284,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
-    // Create item in Webflow
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items${isLive ? '?live=true' : ''}`, {
+    // Create item in Webflow — v2 uses /items/live path for published creates
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items${isLive ? '/live' : ''}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
@@ -388,7 +388,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
     console.log('PATCH: Collection ID:', collectionId);
 
-    const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '?live=true' : ''}`;
+    const url = `${BASE_URL}/collections/${collectionId}/items/${itemId}${isLive ? '/live' : ''}`;
     console.log('PATCH: Webflow URL:', url);
 
     const response = await fetch(url, {
