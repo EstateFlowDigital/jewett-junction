@@ -11,16 +11,16 @@ const BASE_URL = 'https://api.webflow.com/v2';
 // Keep in sync with field lists in src/components/admin/collections.ts.
 const VALID_FIELDS: Record<string, string[]> = {
   announcements: [
-    'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'news-category', 'priority',
+    'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'news-category', 'priority-level',
     'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date'
   ],
   events: [
     'name', 'slug', 'event-date', 'end-date', 'banner-image', 'location',
-    'virtual-meeting-link', 'category', 'description', 'max-capacity', 'registration-link',
+    'virtual-meeting-link', 'event-category', 'description', 'max-capacity', 'registration-link',
     'mandatory-attendance', 'virtual-event'
   ],
   jobPostings: [
-    'name', 'slug', 'department', 'location', 'employment-type', 'experience-level',
+    'name', 'slug', 'job-department', 'location', 'employment-type', 'experience-level',
     'salary-min', 'salary-max', 'description', 'requirements', 'benefits',
     'referral-bonus', 'apply-link', 'urgency', 'job-is-active', 'is-remote', 'featured'
   ],
@@ -30,12 +30,12 @@ const VALID_FIELDS: Record<string, string[]> = {
     'featured', 'published-date', 'category', 'image'
   ],
   employees: [
-    'name', 'slug', 'photo', 'role', 'department', 'office-location', 'email',
+    'name', 'slug', 'photo', 'role', 'team-department', 'office-location', 'email',
     'phone', 'extension', 'linkedin-url', 'start-date', 'bio', 'skills',
     'certifications', 'is-featured', 'leadership-team'
   ],
   resources: [
-    'name', 'slug', 'thumbnail', 'category', 'description', 'file-type',
+    'name', 'slug', 'thumbnail', 'resource-category', 'description', 'file-type',
     'external-link', 'file-size', 'last-updated', 'version', 'audience',
     'is-required', 'is-new', 'file', 'icon'
   ],

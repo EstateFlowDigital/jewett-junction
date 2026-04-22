@@ -104,6 +104,25 @@ interface WebflowCollectionResponse {
   };
 }
 
+// When Webflow's placeholder Option fields couldn't be updated via API we created
+// new Option fields with different slugs. Display code still references the old keys,
+// so aliasCollectionItem mirrors the new-slug values back onto the old keys.
+const COLLECTION_FIELD_ALIASES: Record<string, Record<string, string>> = {
+  // Maps oldKey → newKey per collection. Populated lazily because COLLECTIONS is defined below.
+};
+
+function applyFieldAliases(collectionId: string, fieldData: Record<string, unknown>): Record<string, unknown> {
+  const aliases = COLLECTION_FIELD_ALIASES[collectionId];
+  if (!aliases) return fieldData;
+  const out = { ...fieldData };
+  for (const [oldKey, newKey] of Object.entries(aliases)) {
+    if (out[newKey] !== undefined && out[newKey] !== null && out[newKey] !== '' && (out[oldKey] === undefined || out[oldKey] === null || out[oldKey] === '')) {
+      out[oldKey] = out[newKey];
+    }
+  }
+  return out;
+}
+
 /**
  * Fetch items from a Webflow CMS collection
  */
@@ -142,7 +161,7 @@ export async function getCollection<T = Record<string, unknown>>(
       .filter(item => !item.isArchived && !item.isDraft)
       .map(item => ({
         id: item.id,
-        ...item.fieldData,
+        ...applyFieldAliases(collectionId, item.fieldData),
       })) as (T & { id: string })[],
     total: data.pagination.total,
   };
@@ -315,6 +334,25 @@ export const COLLECTIONS = {
   banner: '69e83787ba03eb7aaf73abf0',
   jobApplications: '69e92188c048862f1a049a8d',
 } as const;
+
+// Webflow placeholder Option fields we couldn't update via API got replaced by
+// new fields with distinct slugs. This map lets fetched items expose BOTH keys
+// so downstream display code can keep reading the older human-friendly name.
+Object.assign(COLLECTION_FIELD_ALIASES, {
+  [COLLECTIONS.employees]: { department: 'team-department' },
+  [COLLECTIONS.announcements]: { priority: 'priority-level' },
+  [COLLECTIONS.events]: { category: 'event-category' },
+  [COLLECTIONS.jobPostings]: { department: 'job-department' },
+  [COLLECTIONS.resources]: { category: 'resource-category' },
+  // HR/Safety/IT: Webflow uses `full-content`; old display code reads `content`
+  [COLLECTIONS.hrContent]: { content: 'full-content' },
+  [COLLECTIONS.safetyContent]: { content: 'full-content' },
+  [COLLECTIONS.itKnowledgeBase]: { content: 'full-content', 'video-link': 'video-tutorial' },
+  // Culture Stories: renamed slug
+  [COLLECTIONS.cultureStories]: { type: 'story-type' },
+  // Submitted Ideas: placeholder renamed
+  [COLLECTIONS.submittedIdeas]: { 'submitter-email': 'email' },
+});
 
 // ============================================
 // Helper functions for specific collections
