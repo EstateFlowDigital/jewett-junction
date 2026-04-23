@@ -30,6 +30,20 @@ export function FormSubmissionsBackfill() {
           'X-Requested-With': 'XMLHttpRequest',
         },
       });
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await res.text();
+        const preview = text.trim().substring(0, 200).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const hint = res.status === 404
+          ? 'Endpoint not found — the Webflow Cloud redeploy may not be complete yet.'
+          : res.status === 401
+            ? 'Admin session expired. Log in again and retry.'
+            : res.status === 403
+              ? 'Access denied. If ALLOWED_IPS is set, your IP is not in the list.'
+              : `Unexpected response (HTTP ${res.status}).`;
+        setResult({ scanned: 0, created: 0, skipped: 0, failed: 0, error: `${hint}${preview ? ` Response: ${preview.substring(0, 120)}` : ''}` });
+        return;
+      }
       const data = await res.json();
       setResult(data);
     } catch (err: any) {
