@@ -104,11 +104,18 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     config.fields.forEach(field => {
       if ((field.type === 'image' || field.type === 'file') && normalized[field.key]) {
         const val = normalized[field.key];
-        // Preserve fileId from Webflow's asset object
         if (typeof val === 'object' && val.fileId) {
           fileIds[field.key] = val.fileId;
         }
         normalized[field.key] = getImageUrl(val);
+      }
+      if (field.type === 'multi-image' && Array.isArray(normalized[field.key])) {
+        // Normalize to array of { fileId, url } so the editor can render thumbnails
+        // and sends fileIds back to Webflow on save.
+        normalized[field.key] = normalized[field.key].map((item: any) => {
+          if (typeof item === 'string') return { url: item };
+          return { fileId: item?.fileId, url: item?.url };
+        });
       }
     });
     if (Object.keys(fileIds).length > 0) {
@@ -214,6 +221,12 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           if (assetFileIds[field.key]) {
             processedFields[field.key] = assetFileIds[field.key];
           }
+        }
+        if (field.type === 'multi-image' && Array.isArray(processedFields[field.key])) {
+          // Webflow MultiImage accepts an array of fileIds (strings) for writes
+          processedFields[field.key] = processedFields[field.key]
+            .map((item: any) => (typeof item === 'string' ? item : item?.fileId))
+            .filter(Boolean);
         }
       });
 
@@ -423,7 +436,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     }
 
     const isPdf = file.type === 'application/pdf';
-    const maxSize = isPdf ? 5 * 1024 * 1024 : 750 * 1024; // 5MB PDF, 750KB images
+    const maxSize = isPdf ? 5 * 1024 * 1024 : 4 * 1024 * 1024; // 5MB PDF, 4MB images
     if (file.size > maxSize) {
       const kb = Math.round(maxSize / 1024);
       setError(`File too large. Maximum size is ${kb} KB for ${isPdf ? 'PDFs' : 'images'}.`);
@@ -504,6 +517,83 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     if (files.length > 0) {
       handleFileUpload(files[0], fieldKey);
     }
+  };
+
+  // Multi-image: upload many files, append to the existing array for the field.
+  const MULTI_IMAGE_MAX = 25;
+  const handleMultiImageUpload = async (files: FileList | File[], fieldKey: string) => {
+    const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const maxSize = 4 * 1024 * 1024;
+    const current: any[] = Array.isArray(formData[fieldKey]) ? formData[fieldKey] : [];
+    const remaining = MULTI_IMAGE_MAX - current.length;
+    if (remaining <= 0) {
+      setError(`Already at ${MULTI_IMAGE_MAX}-image limit for ${fieldKey}. Remove some before adding more.`);
+      return;
+    }
+    const incoming = Array.from(files).slice(0, remaining);
+    const rejected: string[] = [];
+    const accepted: File[] = [];
+    for (const f of incoming) {
+      if (!imageTypes.includes(f.type)) {
+        rejected.push(`${f.name} (unsupported type)`);
+        continue;
+      }
+      if (f.size > maxSize) {
+        rejected.push(`${f.name} (over 4 MB)`);
+        continue;
+      }
+      accepted.push(f);
+    }
+    if (rejected.length > 0) {
+      setError(`Skipped: ${rejected.slice(0, 3).join(', ')}${rejected.length > 3 ? `, +${rejected.length - 3} more` : ''}`);
+    }
+    if (accepted.length === 0) return;
+
+    setUploadingField(fieldKey);
+    setUploadProgress(0);
+    const uploaded: Array<{ fileId: string; url: string }> = [];
+    for (let i = 0; i < accepted.length; i++) {
+      const file = accepted[i];
+      try {
+        const buf = await file.arrayBuffer();
+        const base64 = btoa(new Uint8Array(buf).reduce((s, b) => s + String.fromCharCode(b), ''));
+        const res = await fetch(`${API_BASE}/api/admin/upload`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify({ fileName: file.name, fileType: file.type, fileSize: file.size, fileData: base64 }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        if (data.url && data.id) uploaded.push({ fileId: data.id, url: data.url });
+      } catch (err: any) {
+        setError(`Upload failed for ${file.name}: ${err?.message || 'Unknown error'}`);
+      }
+      setUploadProgress(Math.round(((i + 1) / accepted.length) * 100));
+    }
+    const next = [...current, ...uploaded];
+    setFormData({ ...formData, [fieldKey]: next });
+    setUploadingField(null);
+    setUploadProgress(0);
+    if (uploaded.length > 0) setSuccess(`Added ${uploaded.length} image${uploaded.length === 1 ? '' : 's'}.`);
+  };
+
+  const removeMultiImageAt = (fieldKey: string, index: number) => {
+    const current: any[] = Array.isArray(formData[fieldKey]) ? formData[fieldKey] : [];
+    const next = current.filter((_, i) => i !== index);
+    setFormData({ ...formData, [fieldKey]: next });
+  };
+
+  const reorderMultiImage = (fieldKey: string, from: number, to: number) => {
+    const current: any[] = Array.isArray(formData[fieldKey]) ? formData[fieldKey] : [];
+    if (from === to || to < 0 || to >= current.length) return;
+    const next = [...current];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setFormData({ ...formData, [fieldKey]: next });
   };
 
   const handleDragOver = (e: React.DragEvent, fieldKey: string) => {
@@ -639,6 +729,114 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             )}
           </div>
         )}
+
+        {/* Multi-image gallery field */}
+        {field.type === 'multi-image' && (() => {
+          const items: any[] = Array.isArray(formData[field.key]) ? formData[field.key] : [];
+          const inputId = `multi-${field.key}`;
+          const isUploading = uploadingField === field.key;
+          return (
+            <div className="space-y-3">
+              <input
+                id={inputId}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    handleMultiImageUpload(e.target.files, field.key);
+                    e.target.value = '';
+                  }
+                }}
+              />
+              <div
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOverField(null);
+                  if (e.dataTransfer.files.length > 0) handleMultiImageUpload(e.dataTransfer.files, field.key);
+                }}
+                onDragOver={(e) => { e.preventDefault(); setDragOverField(field.key); }}
+                onDragLeave={() => setDragOverField(null)}
+                className={`relative border-2 border-dashed rounded-xl p-5 transition-all ${
+                  dragOverField === field.key ? 'border-blue-500 bg-blue-500/10' : 'border-slate-600/50 hover:border-slate-500 bg-slate-900/30'
+                } ${isUploading ? 'pointer-events-none' : ''}`}
+              >
+                {isUploading ? (
+                  <div className="text-center">
+                    <Loader2 className="h-10 w-10 text-blue-400 animate-spin mx-auto mb-3" />
+                    <p className="text-sm text-white font-medium mb-2">Uploading… {uploadProgress}%</p>
+                    <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 transition-all" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <ImagePlus className="h-10 w-10 text-slate-400 mx-auto mb-3" />
+                    <p className="text-sm text-white font-medium mb-1">
+                      Drag &amp; drop images here, or{' '}
+                      <label htmlFor={inputId} className="text-blue-400 hover:text-blue-300 underline cursor-pointer">browse</label>
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {items.length}/{MULTI_IMAGE_MAX} images • Max 4&nbsp;MB each • JPEG, PNG, GIF, WebP, SVG
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {items.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {items.map((item: any, i: number) => {
+                    const url = typeof item === 'string' ? item : item?.url;
+                    return (
+                      <div key={`${url}-${i}`} className="group relative aspect-square rounded-xl overflow-hidden border border-slate-700/50 bg-slate-800">
+                        {url ? (
+                          <img src={url} alt={`${field.label} ${i + 1}`} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">No preview</div>
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-end justify-between p-1.5 opacity-0 group-hover:opacity-100">
+                          <div className="flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() => reorderMultiImage(field.key, i, i - 1)}
+                              disabled={i === 0}
+                              aria-label="Move left"
+                              className="w-7 h-7 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
+                            >
+                              ‹
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => reorderMultiImage(field.key, i, i + 1)}
+                              disabled={i === items.length - 1}
+                              aria-label="Move right"
+                              className="w-7 h-7 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
+                            >
+                              ›
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeMultiImageAt(field.key, i)}
+                            aria-label="Remove image"
+                            className="w-7 h-7 bg-rose-600 hover:bg-rose-500 text-white rounded-md flex items-center justify-center"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        <div className="absolute top-1 left-1 bg-slate-900/80 text-white text-[10px] font-medium rounded px-1.5 py-0.5">
+                          {i + 1}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {field.helpText && <p className="text-xs text-slate-500">{field.helpText}</p>}
+            </div>
+          );
+        })()}
 
         {/* File (PDF) field */}
         {field.type === 'file' && (() => {
@@ -875,41 +1073,63 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           aria-modal="true"
           aria-labelledby="preview-modal-title"
         >
-          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="bg-slate-900 rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl border border-slate-700/50">
+            <div className="p-4 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/50">
               <div className="flex items-center gap-3">
-                <Eye className="h-5 w-5 text-gray-600" aria-hidden="true" />
-                <h2 id="preview-modal-title" className="text-lg font-semibold text-gray-900">
+                <Eye className="h-5 w-5 text-slate-300" aria-hidden="true" />
+                <h2 id="preview-modal-title" className="text-lg font-semibold text-white">
                   Preview: {formData.name || 'Untitled'}
                 </h2>
               </div>
               <button
                 onClick={() => setShowPreview(false)}
                 aria-label="Close preview"
-                className="min-h-[44px] min-w-[44px] p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-white space-y-5">
+            <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-slate-900 space-y-5">
               {formData.name && (
-                <h1 className="text-2xl font-bold text-gray-900 border-b border-gray-200 pb-3">{formData.name}</h1>
+                <h1 className="text-2xl font-bold text-white border-b border-slate-700/50 pb-3">{formData.name}</h1>
               )}
               {config.fields.filter((f) => f.key !== 'name').map((field) => {
                 const raw = formData[field.key];
-                const value = typeof raw === 'object' && raw !== null && 'url' in raw ? (raw as any).url : raw;
+                // Normalize: Webflow asset objects → .url; arrays of assets → array of urls
+                let value: any = raw;
+                if (Array.isArray(raw)) {
+                  value = raw.map((v: any) => (typeof v === 'object' && v?.url ? v.url : v));
+                } else if (typeof raw === 'object' && raw !== null && 'url' in raw) {
+                  value = (raw as any).url;
+                }
                 const isEmpty = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
                 if (isEmpty) return null;
 
-                const label = <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">{field.label}</div>;
+                const label = <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">{field.label}</div>;
 
                 if (field.type === 'image') {
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200 p-3">
+                      <div className="rounded-xl overflow-hidden bg-slate-800/50 border border-slate-700/50 p-3">
                         <img src={String(value)} alt={field.label} className="max-w-full max-h-[400px] object-contain mx-auto rounded-lg" />
                       </div>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'multi-image' && Array.isArray(value)) {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        {value.map((url: string, i: number) => (
+                          <div key={i} className="aspect-square rounded-lg overflow-hidden bg-slate-800/50 border border-slate-700/50">
+                            <img src={url} alt={`${field.label} ${i + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">{value.length} image{value.length === 1 ? '' : 's'}</div>
                     </div>
                   );
                 }
@@ -918,10 +1138,10 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
-                        <iframe src={String(value)} title={field.label} className="w-full h-80 bg-white" />
-                        <div className="p-3 border-t border-gray-200">
-                          <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
+                      <div className="rounded-xl overflow-hidden bg-slate-800/50 border border-slate-700/50">
+                        <iframe src={String(value)} title={field.label} className="w-full h-80 bg-slate-950" />
+                        <div className="p-3 border-t border-slate-700/50">
+                          <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium text-sm">
                             <Link className="h-4 w-4" /> Open in new tab
                           </a>
                         </div>
@@ -934,7 +1154,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="prose prose-gray max-w-none border border-gray-200 rounded-xl p-4 bg-gray-50" dangerouslySetInnerHTML={{ __html: String(value) }} />
+                      <div className="prose prose-invert max-w-none border border-slate-700/50 rounded-xl p-4 bg-slate-800/30 [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_p]:text-slate-200 [&_a]:text-blue-400 [&_ul]:text-slate-200 [&_ol]:text-slate-200" dangerouslySetInnerHTML={{ __html: String(value) }} />
                     </div>
                   );
                 }
@@ -943,7 +1163,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 underline break-all">
+                      <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 underline break-all">
                         <Link className="h-3.5 w-3.5 flex-shrink-0" /> {String(value)}
                       </a>
                     </div>
@@ -954,7 +1174,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <a href={`mailto:${value}`} className="text-blue-600 hover:text-blue-700 underline">{String(value)}</a>
+                      <a href={`mailto:${value}`} className="text-blue-400 hover:text-blue-300 underline">{String(value)}</a>
                     </div>
                   );
                 }
@@ -963,7 +1183,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <a href={`tel:${value}`} className="text-blue-600 hover:text-blue-700 underline">{String(value)}</a>
+                      <a href={`tel:${value}`} className="text-blue-400 hover:text-blue-300 underline">{String(value)}</a>
                     </div>
                   );
                 }
@@ -974,7 +1194,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="text-gray-800">{display}</div>
+                      <div className="text-slate-200">{display}</div>
                     </div>
                   );
                 }
@@ -983,7 +1203,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${value ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${value ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'}`}>
                         {value ? <CheckCircle2 className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
                         {value ? 'Yes' : 'No'}
                       </span>
@@ -995,7 +1215,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <span className="inline-block px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{String(value)}</span>
+                      <span className="inline-block px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-medium">{String(value)}</span>
                     </div>
                   );
                 }
@@ -1004,7 +1224,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="text-gray-800 whitespace-pre-wrap">{String(value)}</div>
+                      <div className="text-slate-200 whitespace-pre-wrap">{String(value)}</div>
                     </div>
                   );
                 }
@@ -1012,7 +1232,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 return (
                   <div key={field.key}>
                     {label}
-                    <div className="text-gray-800 break-words">{String(value)}</div>
+                    <div className="text-slate-200 break-words">{String(value)}</div>
                   </div>
                 );
               })}

@@ -4,7 +4,7 @@
 export interface FieldConfig {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image' | 'file';
+  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image' | 'file' | 'multi-image';
   required?: boolean;
   placeholder?: string;
   helpText?: string;
@@ -464,8 +464,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'industries', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link' },
       { key: 'related-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
       { key: 'state-2', label: 'State Reference (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
-      { key: 'gallery', label: 'Gallery (managed in Webflow)', type: 'text', helpText: 'Multi-image gallery \u2014 edit directly in Webflow CMS until the admin supports it' },
-      { key: 'gallery-2', label: 'Gallery 2 (managed in Webflow)', type: 'text', helpText: 'Multi-image gallery \u2014 edit directly in Webflow CMS until the admin supports it' },
+      { key: 'gallery', label: 'Gallery', type: 'multi-image', helpText: 'Drag and drop up to 25 images (max 4 MB each)', icon: 'Image' },
+      { key: 'gallery-2', label: 'Gallery 2', type: 'multi-image', helpText: 'Drag and drop up to 25 images (max 4 MB each)', icon: 'Image' },
       { key: 'old-page-url', label: 'Old Page URL', type: 'text', placeholder: 'https://\u2026', icon: 'Link' },
       { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
       { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },

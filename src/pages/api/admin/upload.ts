@@ -80,7 +80,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Validate file size — type-aware limits
     // Note: Base64 encoding adds ~33% overhead; Webflow Cloud has request body size limits
-    const imageMax = 750 * 1024;        // 750 KB
+    const imageMax = 4 * 1024 * 1024;   // 4 MB
     const pdfMax = 5 * 1024 * 1024;     // 5 MB
     const maxSize = fileType === 'application/pdf' ? pdfMax : imageMax;
     if (fileSize > maxSize) {
