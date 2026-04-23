@@ -1600,8 +1600,20 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                         {item.isDraft ? 'Draft' : 'Published'}
                       </span>
                       <button
+                        onClick={() => {
+                          setFormData(normalizeFieldData(item.fieldData || {}));
+                          setShowPreview(true);
+                        }}
+                        aria-label={`Preview ${item.fieldData?.name || item.fieldData?.title || 'item'}`}
+                        title="Preview"
+                        className="min-h-[44px] min-w-[44px] p-2.5 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                      >
+                        <Eye className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                      <button
                         onClick={() => handleEdit(item)}
                         aria-label={`Edit ${item.fieldData?.name || item.fieldData?.title || 'item'}`}
+                        title="Edit"
                         className="min-h-[44px] min-w-[44px] p-2.5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                       >
                         <Edit className="h-4 w-4" aria-hidden="true" />
