@@ -301,6 +301,7 @@ export default function RichTextEditor({ value, onChange, placeholder, className
         data-placeholder={placeholder || 'Start typing...'}
         className="min-h-[200px] max-h-[400px] overflow-y-auto p-4 text-white focus:outline-none
           [&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:text-slate-500 [&:empty]:before:pointer-events-none
+          [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-white [&_h1]:mt-4 [&_h1]:mb-3 [&_h1]:leading-tight
           [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-4 [&_h2]:mb-2
           [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mt-3 [&_h3]:mb-2
           [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-white [&_h4]:mt-3 [&_h4]:mb-1
