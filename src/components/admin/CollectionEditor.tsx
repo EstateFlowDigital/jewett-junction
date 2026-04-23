@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Send,
   Check,
+  CheckCircle2,
   AlertCircle,
   Loader2,
   Upload,
@@ -890,42 +891,131 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-white">
+            <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-white space-y-5">
               {formData.name && (
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">{formData.name}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 border-b border-gray-200 pb-3">{formData.name}</h1>
               )}
-              {(formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail) && (
-                <div className="mb-6 rounded-xl overflow-hidden bg-gray-100 p-4 flex items-center justify-center">
-                  <img
-                    src={formData.image || formData['banner-image'] || formData['featured-image'] || formData.thumbnail}
-                    alt={formData.name || 'Preview'}
-                    className="max-w-full max-h-[400px] object-contain rounded-lg"
-                  />
-                </div>
-              )}
-              <div className="flex flex-wrap gap-3 mb-6 text-sm text-gray-600">
-                {formData.author && (
-                  <span className="flex items-center gap-1">
-                    <Users className="h-4 w-4" /> {formData.author}
-                  </span>
-                )}
-                {formData.category && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
-                    {formData.category}
-                  </span>
-                )}
-                {formData.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" /> {formData.location}
-                  </span>
-                )}
-              </div>
-              {(formData.content || formData.description) && (
-                <div
-                  className="prose prose-gray max-w-none"
-                  dangerouslySetInnerHTML={{ __html: formData.content || formData.description || '' }}
-                />
-              )}
+              {config.fields.filter((f) => f.key !== 'name').map((field) => {
+                const raw = formData[field.key];
+                const value = typeof raw === 'object' && raw !== null && 'url' in raw ? (raw as any).url : raw;
+                const isEmpty = value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
+                if (isEmpty) return null;
+
+                const label = <div className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">{field.label}</div>;
+
+                if (field.type === 'image') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200 p-3">
+                        <img src={String(value)} alt={field.label} className="max-w-full max-h-[400px] object-contain mx-auto rounded-lg" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'file') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="rounded-xl overflow-hidden bg-gray-50 border border-gray-200">
+                        <iframe src={String(value)} title={field.label} className="w-full h-80 bg-white" />
+                        <div className="p-3 border-t border-gray-200">
+                          <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm">
+                            <Link className="h-4 w-4" /> Open in new tab
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'richtext') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="prose prose-gray max-w-none border border-gray-200 rounded-xl p-4 bg-gray-50" dangerouslySetInnerHTML={{ __html: String(value) }} />
+                    </div>
+                  );
+                }
+
+                if (field.type === 'url') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <a href={String(value)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 underline break-all">
+                        <Link className="h-3.5 w-3.5 flex-shrink-0" /> {String(value)}
+                      </a>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'email') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <a href={`mailto:${value}`} className="text-blue-600 hover:text-blue-700 underline">{String(value)}</a>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'tel') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <a href={`tel:${value}`} className="text-blue-600 hover:text-blue-700 underline">{String(value)}</a>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'datetime') {
+                  const d = new Date(String(value));
+                  const display = isNaN(d.getTime()) ? String(value) : d.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="text-gray-800">{display}</div>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'boolean') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${value ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {value ? <CheckCircle2 className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+                        {value ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'select') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <span className="inline-block px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{String(value)}</span>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'textarea') {
+                  return (
+                    <div key={field.key}>
+                      {label}
+                      <div className="text-gray-800 whitespace-pre-wrap">{String(value)}</div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={field.key}>
+                    {label}
+                    <div className="text-gray-800 break-words">{String(value)}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
