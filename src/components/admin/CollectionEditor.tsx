@@ -992,6 +992,41 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           />
         )}
 
+        {/* Color picker — stores hex string (#RRGGBB) */}
+        {field.type === 'color' && (() => {
+          const raw = (formData[field.key] || '').toString();
+          const hex = /^#[0-9a-fA-F]{6}$/.test(raw) ? raw : '#3b82f6';
+          return (
+            <div className="flex items-center gap-3">
+              <input
+                id={fieldId}
+                type="color"
+                value={hex}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                aria-label={field.label}
+                className="h-12 w-16 rounded-lg border border-slate-600/50 bg-slate-900/50 cursor-pointer p-1"
+              />
+              <input
+                type="text"
+                value={raw}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                placeholder="#3b82f6"
+                pattern="^#[0-9a-fA-F]{6}$"
+                className="flex-1 px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white placeholder:text-slate-500 font-mono focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus-visible:outline-none transition-all"
+              />
+              {raw && (
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, [field.key]: '' })}
+                  className="px-3 py-2 text-xs text-slate-400 hover:text-white"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          );
+        })()}
+
         {/* Select dropdown */}
         {field.type === 'select' && (
           <select

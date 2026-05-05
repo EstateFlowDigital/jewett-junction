@@ -4,7 +4,7 @@
 export interface FieldConfig {
   key: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image' | 'file' | 'multi-image';
+  type: 'text' | 'email' | 'tel' | 'url' | 'number' | 'textarea' | 'richtext' | 'datetime' | 'select' | 'boolean' | 'image' | 'file' | 'multi-image' | 'color';
   required?: boolean;
   placeholder?: string;
   helpText?: string;
@@ -166,7 +166,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., PTO Policy', icon: 'FileText' },
       { key: 'content-type', label: 'Content Type', type: 'select', options: ['Policy', 'Benefit', 'Form', 'FAQ', 'Announcement', 'Training', 'Procedure'], icon: 'Tag' },
-      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Small icon for display', icon: 'Image' },
+      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Upload an SVG, PNG, or WebP. For dashboard tiles, prefer a single-color SVG and pair it with the Icon Color field below.', icon: 'Image' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
       { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...', helpText: 'Shows in card preview' },
       { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full policy or content text...' },
       { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', helpText: 'Link to PDF or external document', icon: 'Link' },

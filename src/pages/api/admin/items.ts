@@ -40,7 +40,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'is-required', 'is-new', 'file', 'icon'
   ],
   hrContent: [
-    'name', 'slug', 'content-type', 'icon', 'description', 'full-content',
+    'name', 'slug', 'content-type', 'icon', 'icon-color', 'description', 'full-content',
     'document-link', 'effective-date', 'applies-to', 'priority-order',
     'featured', 'is-active'
   ],
