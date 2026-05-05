@@ -2,16 +2,23 @@ import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 import { COLLECTIONS as COLLECTION_CONFIGS } from '../../../components/admin/collections';
 import { verifyAdminRequest, getWebflowApiToken } from '../../../lib/admin-auth';
+import { getValidSlugs } from './schema';
 
 export const prerender = false;
 
 const BASE_URL = 'https://api.webflow.com/v2';
 
-function filterRowToValidFields(collection: string, row: Record<string, any>): Record<string, any> {
+function filterRowToValidFields(
+  collection: string,
+  row: Record<string, any>,
+  liveSlugs: string[] | null,
+): Record<string, any> {
   const config = (COLLECTION_CONFIGS as any)[collection];
-  if (!config) return row;
-  const validKeys = new Set<string>(config.fields.map((f: any) => f.key));
+  // Allow anything in the live Webflow schema OR the hardcoded admin config.
+  const validKeys = new Set<string>([...(liveSlugs || [])]);
+  if (config) for (const f of config.fields) validKeys.add(f.key);
   validKeys.add('slug');
+  if (validKeys.size === 1) return row; // only 'slug' fallback — pass through
   const filtered: Record<string, any> = {};
   for (const [k, v] of Object.entries(row)) {
     if (validKeys.has(k) && v !== '' && v !== null && v !== undefined) {
@@ -41,8 +48,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const results: Array<{ ok: boolean; row: number; error?: string; id?: string }> = [];
   const createdIds: string[] = [];
 
+  // Pull live schema slugs once for the whole batch — saves N round trips.
+  const liveSlugs = apiToken ? await getValidSlugs(collectionId, apiToken) : null;
+
   for (let i = 0; i < rows.length; i++) {
-    const fieldData = filterRowToValidFields(collection, rows[i]);
+    const fieldData = filterRowToValidFields(collection, rows[i], liveSlugs);
     if (Object.keys(fieldData).length === 0) {
       results.push({ ok: false, row: i, error: 'No valid fields in row (check CSV headers match collection field slugs)' });
       continue;

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 import { verifyAdminRequest, getWebflowApiToken } from '../../../lib/admin-auth';
+import { getValidSlugs } from './schema';
 
 export const prerender = false;
 
@@ -143,26 +144,37 @@ const VALID_FIELDS: Record<string, string[]> = {
   ],
 };
 
-// Filter fields to only include valid ones for the collection
-function filterValidFields(collection: string, fields: Record<string, any>): Record<string, any> {
-  const validFieldKeys = VALID_FIELDS[collection];
+// Filter fields to only include valid ones for the collection.
+// Two-source allowlist: live Webflow schema (preferred — picks up newly added
+// fields automatically) PLUS the hardcoded VALID_FIELDS map (fallback when
+// the schema fetch fails so existing behaviour never regresses).
+async function filterValidFields(
+  collection: string,
+  fields: Record<string, any>,
+  apiToken: string,
+): Promise<Record<string, any>> {
+  const collectionId = (COLLECTIONS as Record<string, string>)[collection];
+  let liveSlugs: string[] | null = null;
+  if (collectionId && apiToken) {
+    liveSlugs = await getValidSlugs(collectionId, apiToken);
+  }
 
-  // If we don't have a schema for this collection, pass through all non-empty fields
-  if (!validFieldKeys) {
+  const hardcoded = VALID_FIELDS[collection];
+  // Union the two lists — anything in either source is allowed. If both are
+  // missing, fall back to "pass through any non-empty value" (legacy behaviour).
+  const merged = new Set<string>([...(liveSlugs || []), ...(hardcoded || [])]);
+
+  if (merged.size === 0) {
     return Object.fromEntries(
-      Object.entries(fields).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+      Object.entries(fields).filter(([_, value]) => value !== undefined && value !== null && value !== ''),
     );
   }
 
-  // Filter to only valid fields with non-empty values
   return Object.fromEntries(
     Object.entries(fields).filter(([key, value]) => {
-      const isValidField = validFieldKeys.includes(key);
       const hasValue = value !== undefined && value !== null && value !== '';
-      if (!isValidField && hasValue) {
-      }
-      return isValidField && hasValue;
-    })
+      return merged.has(key) && hasValue;
+    }),
   );
 }
 
@@ -309,7 +321,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Filter to only valid Webflow fields for this collection
-    const filteredFields = filterValidFields(collection, fields || {});
+    const filteredFields = await filterValidFields(collection, fields || {}, apiToken || '');
 
     const collectionId = COLLECTIONS[collection as keyof typeof COLLECTIONS];
 
@@ -420,7 +432,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
     }
 
     // Filter to only valid Webflow fields for this collection
-    const filteredFields = filterValidFields(collection, fields || {});
+    const filteredFields = await filterValidFields(collection, fields || {}, apiToken || '');
 
     if (Object.keys(filteredFields).length === 0) {
       return withCors(new Response(JSON.stringify({ error: 'No valid fields to update' }), {

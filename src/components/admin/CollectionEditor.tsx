@@ -64,13 +64,27 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
   const [bulkFieldKey, setBulkFieldKey] = React.useState('');
   const [bulkFieldValue, setBulkFieldValue] = React.useState<any>('');
 
+  // Live Webflow schema — populated on mount, refreshed alongside the item list.
+  // Drives dropdown options + auto-renders fields the hardcoded config doesn't know about.
+  const [schema, setSchema] = React.useState<{
+    fieldOptions?: Record<string, string[]>;
+    fieldTypes?: Record<string, string>;
+    fieldDisplayNames?: Record<string, string>;
+    validSlugs?: string[];
+  }>({});
+
   const Icon = getIcon(config.icon) || Megaphone;
 
   const getToken = () => localStorage.getItem('admin_token') || '';
 
-  // Load items on mount
+  // Load schema + items on mount, then poll items every 60s so edits made
+  // in Webflow Designer (or by other admins in another tab) show up here
+  // without a manual refresh.
   React.useEffect(() => {
+    loadSchema();
     loadItems();
+    const interval = setInterval(loadItems, 60_000);
+    return () => clearInterval(interval);
   }, [collectionKey]);
 
   // Auto-dismiss success toast after 4 seconds
@@ -122,6 +136,24 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       setAssetFileIds(prev => ({ ...prev, ...fileIds }));
     }
     return normalized;
+  };
+
+  // Pulls the live Webflow schema for this collection. Used to:
+  //   1. Populate dropdown options without a code change when an editor adds
+  //      a new option in Webflow Designer.
+  //   2. Auto-render fields the hardcoded config doesn't know about.
+  // On failure we silently fall back to the hardcoded config — never a regression.
+  const loadSchema = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/schema?collection=${collectionKey}`, {
+        headers: { 'Authorization': `Bearer ${getToken()}`, 'X-Requested-With': 'XMLHttpRequest' },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setSchema(data || {});
+    } catch {
+      // ignore — UI keeps working with hardcoded config
+    }
   };
 
   const loadItems = async () => {
@@ -632,6 +664,52 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     setDragOverField(null);
   };
 
+  // Build the effective field list = hardcoded config ∪ Webflow schema.
+  // Fields the editor already declares win on label/icon/help text. Any field
+  // present in the live Webflow schema that's NOT in the hardcoded config
+  // gets auto-appended with a sensible derived type, so editors who add new
+  // fields in Webflow Designer can edit them in our admin without a code push.
+  const WEBFLOW_TO_FIELD_TYPE: Record<string, FieldConfig['type']> = {
+    PlainText: 'text',
+    RichText: 'richtext',
+    Email: 'email',
+    Phone: 'tel',
+    Link: 'url',
+    Number: 'number',
+    DateTime: 'datetime',
+    Switch: 'boolean',
+    Image: 'image',
+    File: 'file',
+    MultiImage: 'multi-image',
+    Option: 'select',
+    Color: 'color',
+  };
+  const titleCaseSlug = (slug: string) =>
+    slug.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const effectiveFields: FieldConfig[] = React.useMemo(() => {
+    const known = new Set(config.fields.map((f) => f.key));
+    const extras: FieldConfig[] = [];
+    if (schema.fieldTypes) {
+      for (const [slug, wfType] of Object.entries(schema.fieldTypes)) {
+        if (known.has(slug)) continue;
+        // Skip required Webflow internals — the form already drives these via `name`.
+        if (slug === 'name' || slug === 'slug') continue;
+        const mapped = WEBFLOW_TO_FIELD_TYPE[wfType] || 'text';
+        extras.push({
+          key: slug,
+          label: schema.fieldDisplayNames?.[slug] || titleCaseSlug(slug),
+          type: mapped,
+          // Reference / MultiReference / VideoLink land here as plain text inputs
+          // (storing the referenced item ID or URL). Good enough for v1; richer
+          // pickers can be added per type as needed.
+          helpText: mapped === 'text' && wfType !== 'PlainText' ? `(${wfType} — paste value or ID)` : undefined,
+        });
+      }
+    }
+    return [...config.fields, ...extras];
+  }, [config.fields, schema.fieldTypes, schema.fieldDisplayNames]);
+
   // Render field based on type
   const renderField = (field: FieldConfig) => {
     const FieldIcon = getIcon(field.icon);
@@ -1035,21 +1113,28 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           );
         })()}
 
-        {/* Select dropdown */}
-        {field.type === 'select' && (
-          <select
-            id={fieldId}
-            value={formData[field.key] || ''}
-            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-            aria-required={field.required}
-            className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus-visible:outline-none transition-all appearance-none cursor-pointer"
-          >
-            <option value="">Select {field.label.toLowerCase()}...</option>
-            {field.options?.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </select>
-        )}
+        {/* Select dropdown — prefer live Webflow options so adding a new
+            option in Webflow Designer shows up here within the schema cache TTL,
+            without any code change. Falls back to hardcoded config when the
+            schema fetch hasn't completed or the field isn't in the schema. */}
+        {field.type === 'select' && (() => {
+          const liveOptions = schema.fieldOptions?.[field.key];
+          const opts = (liveOptions && liveOptions.length > 0) ? liveOptions : (field.options || []);
+          return (
+            <select
+              id={fieldId}
+              value={formData[field.key] || ''}
+              onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+              aria-required={field.required}
+              className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus-visible:outline-none transition-all appearance-none cursor-pointer"
+            >
+              <option value="">Select {field.label.toLowerCase()}...</option>
+              {opts.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          );
+        })()}
 
         {/* Boolean toggle */}
         {field.type === 'boolean' && (
@@ -1308,7 +1393,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   className="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 outline-none"
                 >
                   <option value="">Choose a field...</option>
-                  {config.fields.map(field => (
+                  {effectiveFields.map(field => (
                     <option key={field.key} value={field.key}>{field.label}</option>
                   ))}
                 </select>
@@ -1317,7 +1402,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">New Value</label>
                   {(() => {
-                    const field = config.fields.find(f => f.key === bulkFieldKey);
+                    const field = effectiveFields.find(f => f.key === bulkFieldKey);
                     if (!field) return null;
 
                     if (field.type === 'boolean') {
@@ -1419,7 +1504,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           </div>
 
           <div className="p-6 space-y-6">
-            {config.fields.map(renderField)}
+            {effectiveFields.map(renderField)}
           </div>
 
           <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50 rounded-b-2xl">
