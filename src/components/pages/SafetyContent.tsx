@@ -119,7 +119,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/jewett-junction/submit-idea">
+        <a href="/jewett-junction/safety-incident">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-red-800 hover:border-red-600' : 'border-red-200 bg-red-50/50 hover:border-red-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -130,7 +130,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
             </CardContent>
           </Card>
         </a>
-        <a href="/jewett-junction/submit-idea">
+        <a href="/jewett-junction/safety-incident">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-yellow-800 hover:border-yellow-600' : 'border-yellow-200 bg-yellow-50/50 hover:border-yellow-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>

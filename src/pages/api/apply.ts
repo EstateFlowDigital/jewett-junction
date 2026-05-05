@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
 import { getWebflowApiToken } from '../../lib/admin-auth';
+import { sendNotification } from '../../lib/notify';
 
 export const prerender = false;
 
@@ -142,6 +143,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
     const created = await res.json();
+
+    await sendNotification(locals, {
+      inbox: 'hr',
+      subject: `[Job Application] ${data.firstName} ${data.lastName} — ${data.position}`,
+      replyTo: data.email,
+      fields: [
+        { label: 'Name', value: `${data.firstName} ${data.lastName}` },
+        { label: 'Email', value: data.email },
+        { label: 'Phone', value: data.phone },
+        { label: 'Position', value: data.position },
+        { label: 'Experience', value: experienceLabels[data.experience || ''] || data.experience },
+        { label: 'Referral Source', value: referralLabels[data.referralSource || ''] || data.referralSource },
+        { label: 'Veteran', value: data.isVeteran ? 'Yes' : undefined },
+        { label: 'Resume Filename', value: data.resumeFileName },
+        { label: 'Cover Letter', value: data.coverLetter },
+      ],
+    });
+
     return new Response(JSON.stringify({ success: true, id: created.id }), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });

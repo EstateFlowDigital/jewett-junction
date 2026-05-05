@@ -96,7 +96,7 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/jewett-junction/submit-idea">
+        <a href="/jewett-junction/it-ticket">
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-blue-800 hover:border-blue-600' : 'border-blue-200 bg-blue-50/50 hover:border-blue-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -205,7 +205,7 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
                 <CardTitle className={isDark ? 'text-white' : ''}>My Recent Tickets</CardTitle>
                 <CardDescription className={isDark ? 'text-slate-400' : ''}>Track your support requests</CardDescription>
               </div>
-              <a href="/jewett-junction/submit-idea">
+              <a href="/jewett-junction/it-ticket">
                 <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>Submit Ticket</Button>
               </a>
             </CardHeader>

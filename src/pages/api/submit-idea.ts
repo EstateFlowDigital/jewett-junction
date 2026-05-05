@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
+import { sendNotification } from '../../lib/notify';
 
 export const prerender = false;
 
@@ -149,6 +150,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const result = await response.json();
+
+    await sendNotification(locals, {
+      inbox: 'ideas',
+      subject: `[Idea] ${data.title}`,
+      replyTo: data.email,
+      fields: [
+        { label: 'Submitter', value: data.name },
+        { label: 'Email', value: data.email },
+        { label: 'Department', value: data.department },
+        { label: 'Category', value: categoryLabels[data.category] || data.category },
+        { label: 'Impact', value: impactLabels[data.impact || ''] || data.impact },
+        { label: 'Description', value: data.description },
+        { label: 'Expected Benefits', value: data.benefits },
+        { label: 'Resources Needed', value: data.resources },
+      ],
+    });
 
     return new Response(
       JSON.stringify({

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
+import { sendNotification } from '../../lib/notify';
 
 export const prerender = false;
 
@@ -131,6 +132,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const result = await response.json();
+
+    await sendNotification(locals, {
+      inbox: 'signage',
+      subject: `[Signage Request] ${data.signageType} — ${data.projectName}`,
+      fields: [
+        { label: 'Requester', value: data.requesterName },
+        { label: 'Department', value: data.department },
+        { label: 'Signage Type', value: data.signageType },
+        { label: 'Project', value: data.projectName },
+        { label: 'Quantity', value: String(data.quantity) },
+        { label: 'Needed By', value: data.neededByDate },
+        { label: 'Delivery Address', value: data.deliveryAddress },
+        { label: 'Special Instructions', value: data.specialInstructions },
+      ],
+    });
 
     return new Response(
       JSON.stringify({
