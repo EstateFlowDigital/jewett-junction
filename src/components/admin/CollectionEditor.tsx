@@ -1210,7 +1210,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
               <button
                 onClick={() => setShowPreview(false)}
                 aria-label="Close preview"
-                className="min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="min-h-[44px] min-w-[44px] p-2 inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -1496,7 +1496,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   setFormData({});
                 }}
                 aria-label="Close editor"
-                className="min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="min-h-[44px] min-w-[44px] p-2 inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>

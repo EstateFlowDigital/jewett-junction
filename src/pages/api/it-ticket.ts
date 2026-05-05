@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
+import { getWebflowApiToken } from '../../lib/admin-auth';
 import { sendNotification } from '../../lib/notify';
+import { mapSubmissionToFieldData } from '../../lib/form-submission-mapper';
 
 export const prerender = false;
 
@@ -15,11 +17,6 @@ interface ITTicket {
   device?: string;
   title: string;         // short description
   description: string;
-}
-
-function getApiToken(locals: any): string {
-  const runtime = locals?.runtime;
-  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -37,31 +34,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ error: 'Field too long' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const apiToken = getApiToken(locals);
-  const collectionId = COLLECTIONS.submittedIdeas;
+  const apiToken = getWebflowApiToken(locals);
+  const collectionId = COLLECTIONS.formSubmissions;
   if (!apiToken || !collectionId) {
     return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const baseSlug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
-  const fieldData: Record<string, any> = {
-    name: `IT Ticket: ${data.title}`.slice(0, 256),
-    slug: `it-${baseSlug}-${Date.now().toString(36)}`,
-    category: 'Technology',
-    description: [
-      `Type: ${data.category || 'Other'}`,
-      data.device ? `Device: ${data.device}` : '',
-      data.urgency ? `Urgency: ${data.urgency}` : '',
-      '',
-      data.description,
-    ].filter(Boolean).join('\n'),
-    'submitted-by': data.name,
-    email: data.email,
-    status: 'New',
-    priority: data.urgency === 'Urgent' || data.urgency === 'High' ? 'High' : 'Medium',
-    votes: 0,
-  };
-  if (data.department) fieldData.department = data.department;
+  // Mirror IT tickets into the Form Submissions collection so they triage
+  // alongside other inbound messages, with Form Name = "IT Ticket".
+  const submissionId = `it-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const fieldData = mapSubmissionToFieldData({
+    id: submissionId,
+    formId: 'it-ticket',
+    displayName: 'IT Ticket',
+    formResponse: {
+      'Title': data.title,
+      'Description': data.description,
+      'Type': data.category || 'Other',
+      'Urgency': data.urgency || '',
+      'Device': data.device || '',
+      'Department': data.department || '',
+      'Submitted By': data.name,
+      'Email': data.email,
+    },
+    dateSubmitted: new Date().toISOString(),
+    publishedPath: '/it-helpdesk',
+  });
 
   try {
     const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {

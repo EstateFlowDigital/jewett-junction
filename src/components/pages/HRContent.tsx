@@ -66,6 +66,23 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
+  // The four quick-action cards (Pay, Time Off, Benefits, Help) used to link to
+  // hardcoded slugs like '/hr/pay-tax-info' that don't exist in the CMS, so the
+  // [slug] page redirected back to /hr — making the cards appear unclickable.
+  // Find the first HR item whose name OR slug contains any of the keywords.
+  // Falls back to the HR listing so the click always goes somewhere visible.
+  const findHRLink = (keywords: string[]): string => {
+    const needle = (s?: string) => (s || '').toLowerCase();
+    const match = hrItems.find((item) => {
+      const haystack = `${needle(item.name)} ${needle(item.slug)} ${needle(item['content-type'])}`;
+      return keywords.some((k) => haystack.includes(k.toLowerCase()));
+    });
+    return match ? `/jewett-junction/hr/${match.slug || match.id}` : '/jewett-junction/hr';
+  };
+  const payLink = findHRLink(['pay', 'tax', 'salary', 'payroll']);
+  const timeOffLink = findHRLink(['time off', 'pto', 'vacation', 'holiday', 'leave']);
+  const benefitsLink = findHRLink(['benefit', 'health', 'insurance', '401k']);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -164,7 +181,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/jewett-junction/hr/pay-tax-info">
+        <a href={payLink}>
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-blue-800 hover:border-blue-600' : 'border-blue-200 bg-blue-50/50 hover:border-blue-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -175,7 +192,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
             </CardContent>
           </Card>
         </a>
-        <a href="/jewett-junction/hr/time-off">
+        <a href={timeOffLink}>
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-green-800 hover:border-green-600' : 'border-green-200 bg-green-50/50 hover:border-green-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -186,7 +203,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
             </CardContent>
           </Card>
         </a>
-        <a href="/jewett-junction/hr/benefits">
+        <a href={benefitsLink}>
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-purple-800 hover:border-purple-600' : 'border-purple-200 bg-purple-50/50 hover:border-purple-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-purple-900' : 'bg-purple-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
