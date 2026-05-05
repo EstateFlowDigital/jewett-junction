@@ -6,16 +6,12 @@ import {
   MapPin,
   Briefcase,
   Calendar,
-  Award,
-  Star,
   ChevronRight,
-  Edit,
   Camera,
   Shield,
-  Trophy,
-  Zap
+  Zap,
+  Edit,
 } from 'lucide-react';
-import { BadgeStrip } from '../gamification/BadgeCollection';
 
 // Identity is keyed off a localStorage email — set in /settings.
 // We look that email up in the Employees CMS collection and render the real
@@ -37,13 +33,6 @@ interface EmployeeRecord {
   'start-date'?: string;
   photo?: { url: string };
 }
-
-const defaultGamification = {
-  points: 0,
-  level: 1,
-  earnedBadges: [] as string[],
-  streak: 0,
-};
 
 export function ProfileContent() {
   const [profile, setProfile] = React.useState<EmployeeRecord | null>(null);
@@ -110,12 +99,10 @@ export function ProfileContent() {
     skills: (profile.skills || '').split(',').map((s) => s.trim()).filter(Boolean),
     certifications: (profile.certifications || '').split(',').map((s) => s.trim()).filter(Boolean),
     photo: profile.photo?.url || '',
-    ...defaultGamification,
   };
   const yearsAtCompany = user.startDate
     ? Math.floor((new Date().getTime() - new Date(user.startDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
     : 0;
-  const mockUser = user; // keep downstream JSX referencing `mockUser` working
 
   return (
     <div>
@@ -148,7 +135,7 @@ export function ProfileContent() {
                 <div className="relative">
                   <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center">
                     <span className="text-3xl font-bold text-white">
-                      {mockUser.name.split(' ').map(n => n[0]).join('')}
+                      {user.name.split(' ').map(n => n[0]).join('')}
                     </span>
                   </div>
                   <button
@@ -162,8 +149,8 @@ export function ProfileContent() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h2 className="text-xl font-bold text-white">{mockUser.name}</h2>
-                      <p className="text-slate-400">{mockUser.role} - {mockUser.department}</p>
+                      <h2 className="text-xl font-bold text-white">{user.name}</h2>
+                      <p className="text-slate-400">{user.role} - {user.department}</p>
                     </div>
                     <button className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors">
                       <Edit className="w-5 h-5" aria-hidden="true" />
@@ -172,7 +159,7 @@ export function ProfileContent() {
                   <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <MapPin className="w-4 h-4" aria-hidden="true" />
-                      {mockUser.location}
+                      {user.location}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Calendar className="w-4 h-4" aria-hidden="true" />
@@ -188,28 +175,28 @@ export function ProfileContent() {
                   <Mail className="w-5 h-5 text-blue-400" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-slate-500">Email</p>
-                    <p className="text-sm text-white">{mockUser.email}</p>
+                    <p className="text-sm text-white">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl">
                   <Phone className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-slate-500">Phone</p>
-                    <p className="text-sm text-white">{mockUser.phone}</p>
+                    <p className="text-sm text-white">{user.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl">
                   <Briefcase className="w-5 h-5 text-purple-400" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-slate-500">Department</p>
-                    <p className="text-sm text-white">{mockUser.department}</p>
+                    <p className="text-sm text-white">{user.department}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl">
                   <Calendar className="w-5 h-5 text-amber-400" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-slate-500">Start Date</p>
-                    <p className="text-sm text-white">{new Date(mockUser.startDate).toLocaleDateString()}</p>
+                    <p className="text-sm text-white">{new Date(user.startDate).toLocaleDateString()}</p>
                   </div>
                 </div>
               </div>
@@ -222,7 +209,7 @@ export function ProfileContent() {
               <h3 className="font-semibold text-white">About</h3>
             </div>
             <div className="p-5">
-              <p className="text-slate-300">{mockUser.bio}</p>
+              <p className="text-slate-300">{user.bio}</p>
             </div>
           </div>
 
@@ -237,7 +224,7 @@ export function ProfileContent() {
               </div>
               <div className="p-5">
                 <div className="flex flex-wrap gap-2">
-                  {mockUser.skills.map((skill) => (
+                  {user.skills.map((skill) => (
                     <span
                       key={skill}
                       className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-sm"
@@ -257,7 +244,7 @@ export function ProfileContent() {
               </div>
               <div className="p-5">
                 <div className="flex flex-wrap gap-2">
-                  {mockUser.certifications.map((cert) => (
+                  {user.certifications.map((cert) => (
                     <span
                       key={cert}
                       className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-full text-sm"
@@ -273,62 +260,6 @@ export function ProfileContent() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Points Overview */}
-          <div className="glass rounded-2xl border border-slate-800/50 overflow-hidden">
-            <div className="p-5 border-b border-slate-700/50">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
-                Points & Level
-              </h3>
-            </div>
-            <div className="p-5">
-              <div className="text-center mb-4">
-                <div className="text-4xl font-bold text-white mb-1">{mockUser.points.toLocaleString()}</div>
-                <div className="text-sm text-slate-400">Total XP</div>
-              </div>
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <span className="text-lg font-bold text-white">{mockUser.level}</span>
-                  </div>
-                  <div className="text-xs text-slate-400">Level</div>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-1">
-                    <Zap className="w-6 h-6 text-white" aria-hidden="true" />
-                  </div>
-                  <div className="text-xs text-slate-400">{mockUser.streak} day streak</div>
-                </div>
-              </div>
-              <a
-                href="/jewett-junction/profile/points"
-                className="block w-full text-center px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-xl text-sm transition-colors"
-              >
-                View Points History
-              </a>
-            </div>
-          </div>
-
-          {/* Badges Preview */}
-          <div className="glass rounded-2xl border border-slate-800/50 overflow-hidden">
-            <div className="p-5 border-b border-slate-700/50 flex items-center justify-between">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                My Badges
-              </h3>
-              <span className="text-sm text-slate-400">{mockUser.earnedBadges.length} earned</span>
-            </div>
-            <div className="p-5">
-              <BadgeStrip earnedBadgeIds={mockUser.earnedBadges} maxDisplay={5} className="justify-center mb-4" />
-              <a
-                href="/jewett-junction/profile/badges"
-                className="block w-full text-center px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-xl text-sm transition-colors"
-              >
-                View All Badges
-              </a>
-            </div>
-          </div>
-
           {/* Quick Links */}
           <div className="glass rounded-2xl border border-slate-800/50 overflow-hidden">
             <div className="p-5 border-b border-slate-700/50">

@@ -59,6 +59,19 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
+  // Resolve the "Brand Guidelines" hero link dynamically — the previous hardcoded
+  // /marketing/brand-guidelines slug had no matching CMS item, so the [slug]
+  // page redirected back to /marketing and the click appeared to do nothing.
+  const findAssetLink = (keywords: string[]): string => {
+    const needle = (s?: string) => (s || '').toLowerCase();
+    const match = assets.find((a) => {
+      const haystack = `${needle(a.name)} ${needle(a.slug)} ${needle(a['asset-type'])}`;
+      return keywords.some((k) => haystack.includes(k.toLowerCase()));
+    });
+    return match ? `/jewett-junction/marketing/${match.slug || match.id}` : '/jewett-junction/marketing/brand-assets';
+  };
+  const brandGuidelinesLink = findAssetLink(['brand guideline', 'brand guide', 'guidelines', 'brand standard']);
+
   const resources = [
     { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/jewett-junction/marketing/brand-assets`, color: 'blue' },
     { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/jewett-junction/marketing/letterhead`, color: 'green' },
@@ -87,7 +100,7 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
               <h2 className="text-xl font-bold">Jewett Construction Brand Guidelines</h2>
               <p className="text-rose-100">Ensure brand consistency across all materials</p>
             </div>
-            <a href="/jewett-junction/marketing/brand-guidelines">
+            <a href={brandGuidelinesLink}>
               <Button className="bg-white text-rose-700 hover:bg-rose-50">
                 View Brand Guide
               </Button>
