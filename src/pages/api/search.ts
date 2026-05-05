@@ -28,18 +28,27 @@ export const GET: APIRoute = async ({ request, locals }) => {
     );
   }
 
+  if (query.length > 200) {
+    return new Response(
+      JSON.stringify({ success: false, error: 'Search query too long' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     // Initialize CMS with Cloudflare runtime context
     initCMS(locals);
 
-    // Fetch from all collections in parallel
+    // Fetch from all collections in parallel. No limit so the auto-paginating
+    // getCollection returns every item — otherwise items at position 51+ in any
+    // collection would be invisible to search.
     const [announcements, events, employees, resources, jobs, culture] = await Promise.all([
-      getAnnouncements({ limit: 50 }).catch((err) => { console.error('Search: announcements fetch failed:', err.message); return { items: [] }; }),
-      getEvents({ limit: 50 }).catch((err) => { console.error('Search: events fetch failed:', err.message); return { items: [] }; }),
-      getEmployees({ limit: 50 }).catch((err) => { console.error('Search: employees fetch failed:', err.message); return { items: [] }; }),
-      getResources({ limit: 50 }).catch((err) => { console.error('Search: resources fetch failed:', err.message); return { items: [] }; }),
-      getJobPostings({ limit: 50 }).catch((err) => { console.error('Search: job postings fetch failed:', err.message); return { items: [] }; }),
-      getCultureStories({ limit: 50 }).catch((err) => { console.error('Search: culture stories fetch failed:', err.message); return { items: [] }; }),
+      getAnnouncements().catch((err) => { console.error('Search: announcements fetch failed:', err.message); return { items: [] }; }),
+      getEvents().catch((err) => { console.error('Search: events fetch failed:', err.message); return { items: [] }; }),
+      getEmployees().catch((err) => { console.error('Search: employees fetch failed:', err.message); return { items: [] }; }),
+      getResources().catch((err) => { console.error('Search: resources fetch failed:', err.message); return { items: [] }; }),
+      getJobPostings().catch((err) => { console.error('Search: job postings fetch failed:', err.message); return { items: [] }; }),
+      getCultureStories().catch((err) => { console.error('Search: culture stories fetch failed:', err.message); return { items: [] }; }),
     ]);
 
     const results: SearchResult[] = [];

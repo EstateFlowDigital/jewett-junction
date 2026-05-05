@@ -58,7 +58,8 @@ export function CultureCorner({ stories = [] }: CultureCornerProps) {
             const title = story.name || story.title || 'Untitled'
             const excerpt = story.excerpt || story.summary || story.description || ''
             const tag = story.tag || story.category || 'Team'
-            const imageUrl = story.image?.url || story['preview-image']?.url
+            const s = story as any;
+            const imageUrl = s['featured-image']?.url || s.image?.url || s['preview-image']?.url
 
             return (
               <a

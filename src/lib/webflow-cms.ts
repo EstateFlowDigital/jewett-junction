@@ -111,10 +111,61 @@ const COLLECTION_FIELD_ALIASES: Record<string, Record<string, string>> = {
   // Maps oldKey → newKey per collection. Populated lazily because COLLECTIONS is defined below.
 };
 
-function applyFieldAliases(collectionId: string, fieldData: Record<string, unknown>): Record<string, unknown> {
-  const aliases = COLLECTION_FIELD_ALIASES[collectionId];
-  if (!aliases) return fieldData;
+// Webflow returns Option-typed fields as the option's id (a 32-char hex string),
+// not the human-readable name. We cache each collection's schema and translate
+// option ids back to names so display code sees "Operations" instead of
+// "6b86e1a59533bb60654993fc6bbf1bec". This also makes the admin select widget
+// match the dropdown options on edit (otherwise selected value is the raw id
+// which doesn't match any <option>, so the dropdown appears blank).
+type SchemaField = { slug: string; type: string; validations?: { options?: Array<{ id: string; name: string }> } };
+const COLLECTION_SCHEMAS = new Map<string, SchemaField[]>();
+const COLLECTION_OPTION_MAPS = new Map<string, Map<string, Map<string, string>>>();
+
+async function getCollectionSchema(collectionId: string, apiToken: string): Promise<SchemaField[]> {
+  const cached = COLLECTION_SCHEMAS.get(collectionId);
+  if (cached) return cached;
+  try {
+    const res = await fetch(`https://api.webflow.com/v2/collections/${collectionId}`, {
+      headers: { Authorization: `Bearer ${apiToken}`, accept: 'application/json' },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const fields: SchemaField[] = data.fields || [];
+    COLLECTION_SCHEMAS.set(collectionId, fields);
+    // Pre-build the option-id-to-name lookup once per collection
+    const fieldOptionMap = new Map<string, Map<string, string>>();
+    for (const field of fields) {
+      if (field.type === 'Option' && field.validations?.options) {
+        const map = new Map<string, string>();
+        for (const opt of field.validations.options) map.set(opt.id, opt.name);
+        fieldOptionMap.set(field.slug, map);
+      }
+    }
+    COLLECTION_OPTION_MAPS.set(collectionId, fieldOptionMap);
+    return fields;
+  } catch {
+    return [];
+  }
+}
+
+function resolveOptionIds(collectionId: string, fieldData: Record<string, unknown>): Record<string, unknown> {
+  const optionMaps = COLLECTION_OPTION_MAPS.get(collectionId);
+  if (!optionMaps || optionMaps.size === 0) return fieldData;
   const out = { ...fieldData };
+  for (const [slug, idToName] of optionMaps) {
+    const value = out[slug];
+    if (typeof value === 'string' && idToName.has(value)) {
+      out[slug] = idToName.get(value);
+    }
+  }
+  return out;
+}
+
+function applyFieldAliases(collectionId: string, fieldData: Record<string, unknown>): Record<string, unknown> {
+  const resolved = resolveOptionIds(collectionId, fieldData);
+  const aliases = COLLECTION_FIELD_ALIASES[collectionId];
+  if (!aliases) return resolved;
+  const out = { ...resolved };
   for (const [oldKey, newKey] of Object.entries(aliases)) {
     if (out[newKey] !== undefined && out[newKey] !== null && out[newKey] !== '' && (out[oldKey] === undefined || out[oldKey] === null || out[oldKey] === '')) {
       out[oldKey] = out[newKey];
@@ -124,11 +175,15 @@ function applyFieldAliases(collectionId: string, fieldData: Record<string, unkno
 }
 
 /**
- * Fetch items from a Webflow CMS collection
+ * Fetch items from a Webflow CMS collection.
+ *
+ * When no `limit` is provided, auto-paginates through Webflow's 100-item page cap
+ * so callers like `getBySlug` helpers and listing pages see every item — not just
+ * the first 100. When a `limit` is provided, honors it and makes a single request.
  */
 export async function getCollection<T = Record<string, unknown>>(
   collectionId: string,
-  options: { limit?: number; offset?: number } = {}
+  options: { limit?: number; offset?: number; slug?: string } = {}
 ): Promise<{ items: (T & { id: string })[]; total: number }> {
   const apiToken = getApiToken();
   if (!apiToken) {
@@ -136,34 +191,69 @@ export async function getCollection<T = Record<string, unknown>>(
     return { items: [], total: 0 };
   }
 
-  const params = new URLSearchParams();
-  if (options.limit) params.set('limit', options.limit.toString());
-  if (options.offset) params.set('offset', options.offset.toString());
+  const WEBFLOW_MAX_PAGE = 100;
+  const HARD_CAP = 2000;
+  // Preload schema so applyFieldAliases can resolve option IDs to names.
+  await getCollectionSchema(collectionId, apiToken);
+  const mapItem = (item: WebflowItem) => ({
+    id: item.id,
+    ...applyFieldAliases(collectionId, item.fieldData),
+  });
 
-  const response = await fetch(
-    `https://api.webflow.com/v2/collections/${collectionId}/items?${params}`,
-    {
-      headers: {
-        Authorization: `Bearer ${apiToken}`,
-        'accept-version': '2.0.0',
-      },
+  async function fetchPage(limit: number, offset: number, slug?: string): Promise<WebflowCollectionResponse> {
+    const params = new URLSearchParams();
+    params.set('limit', limit.toString());
+    if (offset) params.set('offset', offset.toString());
+    if (slug) params.set('slug', slug);
+    const response = await fetch(
+      `https://api.webflow.com/v2/collections/${collectionId}/items?${params}`,
+      { headers: { Authorization: `Bearer ${apiToken}`, 'accept-version': '2.0.0' } }
+    );
+    if (!response.ok) {
+      throw new Error(`Webflow API error: ${response.status} ${response.statusText}`);
     }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Webflow API error: ${response.status} ${response.statusText}`);
+    return response.json();
   }
 
-  const data: WebflowCollectionResponse = await response.json();
+  // Slug lookup: ask Webflow to filter server-side instead of fetching every item
+  if (options.slug) {
+    const data = await fetchPage(options.limit ?? 1, options.offset ?? 0, options.slug);
+    return {
+      items: data.items
+        .filter(item => !item.isArchived && !item.isDraft)
+        .map(mapItem) as (T & { id: string })[],
+      total: data.pagination.total,
+    };
+  }
+
+  // Single-page path when caller passed an explicit limit
+  if (options.limit) {
+    const data = await fetchPage(options.limit, options.offset ?? 0);
+    return {
+      items: data.items
+        .filter(item => !item.isArchived && !item.isDraft)
+        .map(mapItem) as (T & { id: string })[],
+      total: data.pagination.total,
+    };
+  }
+
+  // Auto-paginate to fetch all items
+  const allRaw: WebflowItem[] = [];
+  let offset = options.offset ?? 0;
+  let total = 0;
+  while (allRaw.length < HARD_CAP) {
+    const page = await fetchPage(WEBFLOW_MAX_PAGE, offset);
+    allRaw.push(...page.items);
+    total = page.pagination.total;
+    if (page.items.length < WEBFLOW_MAX_PAGE || allRaw.length >= total) break;
+    offset += WEBFLOW_MAX_PAGE;
+  }
 
   return {
-    items: data.items
+    items: allRaw
       .filter(item => !item.isArchived && !item.isDraft)
-      .map(item => ({
-        id: item.id,
-        ...applyFieldAliases(collectionId, item.fieldData),
-      })) as (T & { id: string })[],
-    total: data.pagination.total,
+      .map(mapItem) as (T & { id: string })[],
+    total,
   };
 }
 
@@ -620,66 +710,66 @@ export async function getSubmittedIdeas(options?: { limit?: number; status?: str
 
 export async function getEventBySlug(slug: string): Promise<(Event & { id: string }) | null> {
   if (!COLLECTIONS.events) return null;
-  const result = await getCollection<Event>(COLLECTIONS.events);
+  const result = await getCollection<Event>(COLLECTIONS.events, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getAnnouncementBySlug(slug: string): Promise<(Announcement & { id: string }) | null> {
   if (!COLLECTIONS.announcements) return null;
-  const result = await getCollection<Announcement>(COLLECTIONS.announcements);
+  const result = await getCollection<Announcement>(COLLECTIONS.announcements, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getJobPostingBySlug(slug: string): Promise<(JobPosting & { id: string }) | null> {
   if (!COLLECTIONS.jobPostings) return null;
-  const result = await getCollection<JobPosting>(COLLECTIONS.jobPostings);
+  const result = await getCollection<JobPosting>(COLLECTIONS.jobPostings, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getEmployeeBySlug(slug: string): Promise<(Employee & { id: string }) | null> {
   if (!COLLECTIONS.employees) return null;
-  const result = await getCollection<Employee>(COLLECTIONS.employees);
+  const result = await getCollection<Employee>(COLLECTIONS.employees, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getCultureStoryBySlug(slug: string): Promise<(CultureStory & { id: string }) | null> {
   if (!COLLECTIONS.cultureStories) return null;
-  const result = await getCollection<CultureStory>(COLLECTIONS.cultureStories);
+  const result = await getCollection<CultureStory>(COLLECTIONS.cultureStories, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getResourceBySlug(slug: string): Promise<(Resource & { id: string }) | null> {
   if (!COLLECTIONS.resources) return null;
-  const result = await getCollection<Resource>(COLLECTIONS.resources);
+  const result = await getCollection<Resource>(COLLECTIONS.resources, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getHRContentBySlug(slug: string): Promise<(HRContent & { id: string }) | null> {
   if (!COLLECTIONS.hrContent) return null;
-  const result = await getCollection<HRContent>(COLLECTIONS.hrContent);
+  const result = await getCollection<HRContent>(COLLECTIONS.hrContent, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getSafetyContentBySlug(slug: string): Promise<(SafetyContent & { id: string }) | null> {
   if (!COLLECTIONS.safetyContent) return null;
-  const result = await getCollection<SafetyContent>(COLLECTIONS.safetyContent);
+  const result = await getCollection<SafetyContent>(COLLECTIONS.safetyContent, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getITArticleBySlug(slug: string): Promise<(ITArticle & { id: string }) | null> {
   if (!COLLECTIONS.itKnowledgeBase) return null;
-  const result = await getCollection<ITArticle>(COLLECTIONS.itKnowledgeBase);
+  const result = await getCollection<ITArticle>(COLLECTIONS.itKnowledgeBase, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getMarketingAssetBySlug(slug: string): Promise<(MarketingAsset & { id: string }) | null> {
   if (!COLLECTIONS.marketingAssets) return null;
-  const result = await getCollection<MarketingAsset>(COLLECTIONS.marketingAssets);
+  const result = await getCollection<MarketingAsset>(COLLECTIONS.marketingAssets, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }
 
 export async function getSubmittedIdeaBySlug(slug: string): Promise<(SubmittedIdea & { id: string }) | null> {
   if (!COLLECTIONS.submittedIdeas) return null;
-  const result = await getCollection<SubmittedIdea>(COLLECTIONS.submittedIdeas);
+  const result = await getCollection<SubmittedIdea>(COLLECTIONS.submittedIdeas, { slug });
   return result.items.find(item => item.slug === slug) || null;
 }

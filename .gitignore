@@ -37,3 +37,10 @@ lerna-debug.log*
 
 # Test coverage
 coverage/
+
+# Claude Code per-project state
+.claude/
+.claude-cache/
+
+# Script run logs (manifest is committed for reference; logs are not)
+scripts/*.log

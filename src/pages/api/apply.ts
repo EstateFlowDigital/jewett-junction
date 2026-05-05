@@ -57,6 +57,41 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   }
 
+  // Validate email shape (basic syntactic check)
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(String(data.email).trim())) {
+    return new Response(JSON.stringify({ error: 'Invalid email address' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Enforce reasonable caps on free-text fields to prevent abuse and
+  // avoid Webflow validation errors (name field is PlainText max 256).
+  const NAME_MAX = 80;
+  const POSITION_MAX = 200;
+  const COVER_LETTER_MAX = 5000;
+  const PHONE_MAX = 40;
+  if (data.firstName.length > NAME_MAX || data.lastName.length > NAME_MAX) {
+    return new Response(JSON.stringify({ error: 'Name too long' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (data.position.length > POSITION_MAX) {
+    return new Response(JSON.stringify({ error: 'Position too long' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (data.coverLetter && data.coverLetter.length > COVER_LETTER_MAX) {
+    return new Response(JSON.stringify({ error: 'Cover letter too long (max 5000 characters)' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (data.phone && data.phone.length > PHONE_MAX) {
+    return new Response(JSON.stringify({ error: 'Phone number too long' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const apiToken = getWebflowApiToken(locals);
   const collectionId = COLLECTIONS.jobApplications;
   if (!apiToken || !collectionId) {
@@ -95,7 +130,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'Content-Type': 'application/json',
         'accept': 'application/json',
       },
-      body: JSON.stringify({ isArchived: false, isDraft: false, fieldData }),
+      // Always create as draft — these are private internal records, not public pages.
+      // The admin UI lists drafts, so this doesn't hide them from the team.
+      body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
     });
     if (!res.ok) {
       const err = await res.text();

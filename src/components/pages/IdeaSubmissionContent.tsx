@@ -92,7 +92,10 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit idea');
+        // Surface specific backend validation errors (invalid email, too long, etc.)
+        // instead of a generic message so the user knows how to fix the submission.
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to submit idea');
       }
 
       setStatus('success');
@@ -108,9 +111,9 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
         benefits: '',
         resources: '',
       });
-    } catch (error) {
+    } catch (error: any) {
       setStatus('error');
-      setErrorMessage('There was an error submitting your idea. Please try again.');
+      setErrorMessage(error?.message || 'There was an error submitting your idea. Please try again.');
     }
   };
 
@@ -224,6 +227,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
                   value={formData.name}
                   onChange={handleInputChange}
                   required
+                  maxLength={160}
                   className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors"
                   placeholder="John Smith"
                 />
@@ -277,6 +281,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
                 value={formData.title}
                 onChange={handleInputChange}
                 required
+                maxLength={200}
                 className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors"
                 placeholder="Give your idea a short, descriptive title"
               />
@@ -343,6 +348,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
                 onChange={handleInputChange}
                 required
                 rows={4}
+                maxLength={10000}
                 className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors resize-none"
                 placeholder="Explain your idea in detail. What problem does it solve? How would it work?"
               />
@@ -358,6 +364,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
                 value={formData.benefits}
                 onChange={handleInputChange}
                 rows={3}
+                maxLength={5000}
                 className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors resize-none"
                 placeholder="What benefits would this bring? Cost savings, time savings, improved safety, etc."
               />
@@ -373,6 +380,7 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
                 value={formData.resources}
                 onChange={handleInputChange}
                 rows={2}
+                maxLength={5000}
                 className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors resize-none"
                 placeholder="What would be needed to implement this idea? (optional)"
               />

@@ -188,16 +188,29 @@ export default function RichTextEditor({ value, onChange, placeholder, className
   const insertLink = useCallback(() => {
     const selection = window.getSelection();
     const selectedText = selection?.toString() || '';
-    const url = prompt('Enter URL:', 'https://');
+    const raw = prompt('Enter URL:', 'https://');
+    if (!raw || raw === 'https://') return;
 
-    if (url && url !== 'https://') {
-      if (selectedText) {
-        execCommand('createLink', url);
-      } else {
-        // Insert link with URL as text if no selection
-        const linkHtml = `<a href="${url}" target="_blank">${url}</a>`;
-        execCommand('insertHTML', linkHtml);
-      }
+    // Reject dangerous schemes. Allow http(s), mailto, tel, and protocol-relative/
+    // relative URLs. Anything else (javascript:, data:, file:, vbscript:, etc.)
+    // would let an admin inject executable links.
+    const url = raw.trim();
+    const schemeMatch = url.match(/^([a-z][a-z0-9+.-]*):/i);
+    if (schemeMatch && !/^(https?|mailto|tel)$/i.test(schemeMatch[1])) {
+      alert(`Blocked URL scheme: ${schemeMatch[1]}:`);
+      return;
+    }
+
+    const escape = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    if (selectedText) {
+      execCommand('createLink', url);
+    } else {
+      // Insert link with URL as text if no selection. Escape both slots so the
+      // URL can't break out of the attribute or the text node.
+      const linkHtml = `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(url)}</a>`;
+      execCommand('insertHTML', linkHtml);
     }
   }, [execCommand]);
 

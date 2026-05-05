@@ -57,11 +57,11 @@ const formatDate = (dateStr: string) => {
     <!-- Story Content -->
     <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
       <!-- Hero Image -->
-      {story.image?.url && (
+      {(story['featured-image']?.url || story.image?.url) && (
         <div class="aspect-video relative">
           <img
-            src={story.image.url}
-            alt={story.image.alt || story.name}
+            src={story['featured-image']?.url || story.image.url}
+            alt={story['featured-image']?.alt || story.image?.alt || story.name}
             class="w-full h-full object-cover"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
@@ -121,9 +121,9 @@ const formatDate = (dateStr: string) => {
               class="flex items-center gap-4 p-4 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
               aria-label={`Read story: ${related.name}`}
             >
-              {related.image?.url ? (
+              {(related['featured-image']?.url || related.image?.url) ? (
                 <img
-                  src={related.image.url}
+                  src={related['featured-image']?.url || related.image.url}
                   alt=""
                   class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                 />

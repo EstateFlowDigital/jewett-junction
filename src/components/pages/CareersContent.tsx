@@ -247,7 +247,11 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit application');
+      if (!response.ok) {
+        // Surface specific backend validation errors (invalid email, too long, etc.)
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to submit application');
+      }
 
       setStatus('success');
       setFormData({
@@ -264,9 +268,9 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
         resumeFile: null,
       });
       setValidationErrors({});
-    } catch (error) {
+    } catch (error: any) {
       setStatus('error');
-      setErrorMessage('There was an error submitting your application. Please try again.');
+      setErrorMessage(error?.message || 'There was an error submitting your application. Please try again.');
     }
   };
 
@@ -302,6 +306,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
             name="firstName"
             value={formData.firstName}
             onChange={handleInputChange}
+            maxLength={80}
             aria-invalid={!!validationErrors.firstName}
             aria-describedby={validationErrors.firstName ? 'firstName-error' : undefined}
             className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
@@ -325,6 +330,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
             name="lastName"
             value={formData.lastName}
             onChange={handleInputChange}
+            maxLength={80}
             aria-invalid={!!validationErrors.lastName}
             aria-describedby={validationErrors.lastName ? 'lastName-error' : undefined}
             className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
@@ -377,6 +383,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
             name="phone"
             value={formData.phone}
             onChange={handlePhoneChange}
+            maxLength={40}
             aria-invalid={!!validationErrors.phone}
             aria-describedby={validationErrors.phone ? 'phone-error' : 'phone-hint'}
             className={`w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border text-white placeholder-slate-500 focus:ring-1 outline-none transition-colors ${
@@ -536,6 +543,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
           value={formData.coverLetter}
           onChange={handleInputChange}
           rows={4}
+          maxLength={5000}
           className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none"
           placeholder="Tell us about yourself, your experience, and why you're interested in joining Jewett Construction..."
         />

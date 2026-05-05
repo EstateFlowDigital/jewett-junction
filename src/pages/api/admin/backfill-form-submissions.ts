@@ -90,7 +90,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           'Content-Type': 'application/json',
           accept: 'application/json',
         },
-        body: JSON.stringify({ isArchived: false, isDraft: false, fieldData }),
+        body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
       });
       if (!createRes.ok) {
         const errText = await createRes.text();

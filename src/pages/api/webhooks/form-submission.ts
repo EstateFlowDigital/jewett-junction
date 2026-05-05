@@ -66,6 +66,8 @@ export const POST: APIRoute = async ({ request, url, locals }) => {
 
   const fieldData = mapSubmissionToFieldData(submission);
 
+  // Mirror incoming form submissions as drafts — these are internal records for
+  // the intranet Form Submissions page, not public CMS pages. Admin list shows drafts.
   const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
     method: 'POST',
     headers: {
@@ -73,7 +75,7 @@ export const POST: APIRoute = async ({ request, url, locals }) => {
       'Content-Type': 'application/json',
       accept: 'application/json',
     },
-    body: JSON.stringify({ isArchived: false, isDraft: false, fieldData }),
+    body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
   });
   if (!res.ok) {
     const err = await res.text();

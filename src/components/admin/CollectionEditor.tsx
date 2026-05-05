@@ -110,11 +110,11 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
         normalized[field.key] = getImageUrl(val);
       }
       if (field.type === 'multi-image' && Array.isArray(normalized[field.key])) {
-        // Normalize to array of { fileId, url } so the editor can render thumbnails
-        // and sends fileIds back to Webflow on save.
+        // Normalize to array of { fileId, url, alt } so the editor can render thumbnails
+        // and preserves accessibility alt text through save (was previously dropped).
         normalized[field.key] = normalized[field.key].map((item: any) => {
           if (typeof item === 'string') return { url: item };
-          return { fileId: item?.fileId, url: item?.url };
+          return { fileId: item?.fileId, url: item?.url, alt: item?.alt ?? null };
         });
       }
     });
@@ -214,21 +214,37 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     }
 
     try {
-      // Process asset fields: replace URLs with fileIds for Webflow API
+      // Process asset fields: replace URLs with fileIds for Webflow API.
+      // Webflow Image/File fields require a fileId (returned from the upload
+      // endpoint), not a CDN URL — sending a URL silently drops the field
+      // ("logo disappears after save"). Detect that mismatch and surface it.
       const processedFields = { ...formData };
+      const orphanedImageFields: string[] = [];
       config.fields.forEach(field => {
         if ((field.type === 'image' || field.type === 'file') && processedFields[field.key]) {
           if (assetFileIds[field.key]) {
             processedFields[field.key] = assetFileIds[field.key];
+          } else if (typeof processedFields[field.key] === 'string' && /^https?:\/\//.test(processedFields[field.key])) {
+            orphanedImageFields.push(field.label);
           }
         }
         if (field.type === 'multi-image' && Array.isArray(processedFields[field.key])) {
-          // Webflow MultiImage accepts an array of fileIds (strings) for writes
+          // Send full { fileId, url, alt } objects so Webflow preserves the alt text
+          // for each image. Passing bare fileId strings wipes alt on every save.
           processedFields[field.key] = processedFields[field.key]
-            .map((item: any) => (typeof item === 'string' ? item : item?.fileId))
+            .map((item: any) => {
+              if (typeof item === 'string') return { fileId: item };
+              if (!item?.fileId) return null;
+              return { fileId: item.fileId, url: item.url, alt: item.alt ?? null };
+            })
             .filter(Boolean);
         }
       });
+      if (orphanedImageFields.length > 0) {
+        setError(`These image fields need to be re-uploaded (URL pasted instead of an upload won't save): ${orphanedImageFields.join(', ')}`);
+        setIsLoading(false);
+        return;
+      }
 
       const method = editingItem ? 'PATCH' : 'POST';
       const body: any = {
@@ -551,7 +567,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
 
     setUploadingField(fieldKey);
     setUploadProgress(0);
-    const uploaded: Array<{ fileId: string; url: string }> = [];
+    const uploaded: Array<{ fileId: string; url: string; alt: string | null }> = [];
     for (let i = 0; i < accepted.length; i++) {
       const file = accepted[i];
       try {
@@ -568,7 +584,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Upload failed');
-        if (data.url && data.id) uploaded.push({ fileId: data.id, url: data.url });
+        if (data.url && data.id) uploaded.push({ fileId: data.id, url: data.url, alt: null });
       } catch (err: any) {
         setError(`Upload failed for ${file.name}: ${err?.message || 'Unknown error'}`);
       }
@@ -702,31 +718,13 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                       />
                     </label>
                     <p className="text-xs text-slate-500 mt-3">
-                      JPEG, PNG, GIF, WebP, SVG - Max 750KB
+                      JPEG, PNG, GIF, WebP, SVG - Max 4 MB
                     </p>
                   </div>
                 )}
               </div>
             )}
 
-            {!formData[field.key] && !uploadingField && (
-              <div className="border-t border-slate-700/50 pt-3">
-                <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
-                  <Link className="h-3 w-3" />
-                  Or paste image URL (no size limit)
-                </p>
-                <div className="relative">
-                  <input
-                    type="url"
-                    value={formData[field.key] || ''}
-                    onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2.5 pr-10 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white text-sm placeholder:text-slate-500 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                  />
-                  <Image className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -1535,7 +1533,17 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           ) : (
             <div className="divide-y divide-slate-700/50">
               {items.map((item) => {
-                const imageUrl = getImageUrl(item.fieldData?.image) || getImageUrl(item.fieldData?.['banner-image']) || getImageUrl(item.fieldData?.['featured-image']) || getImageUrl(item.fieldData?.photo) || getImageUrl(item.fieldData?.thumbnail);
+                const f = item.fieldData || {};
+                const imageUrl = getImageUrl(f.image)
+                  || getImageUrl(f['blog-body-image'])
+                  || getImageUrl(f['main-image'])
+                  || getImageUrl(f['main-image-file'])
+                  || getImageUrl(f['banner-image'])
+                  || getImageUrl(f['featured-image'])
+                  || getImageUrl(f.photo)
+                  || getImageUrl(f.thumbnail)
+                  || getImageUrl(f['preview-image'])
+                  || getImageUrl(f.icon);
                 const subtitle = item.fieldData?.department || item.fieldData?.category || item.fieldData?.type || item.fieldData?.role;
                 const location = item.fieldData?.location || item.fieldData?.['office-location'];
                 const isSelected = selectedItems.includes(item.id);
@@ -1593,11 +1601,13 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                     </div>
                     <div className="flex items-center gap-3 ml-4">
                       <span className={`px-3 py-1.5 text-xs font-medium rounded-full ${
-                        item.isDraft
-                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                        item.isArchived
+                          ? 'bg-slate-500/10 text-slate-400 border border-slate-500/30'
+                          : item.isDraft
+                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                       }`}>
-                        {item.isDraft ? 'Draft' : 'Published'}
+                        {item.isArchived ? 'Archived' : item.isDraft ? 'Draft' : 'Published'}
                       </span>
                       <button
                         onClick={() => {

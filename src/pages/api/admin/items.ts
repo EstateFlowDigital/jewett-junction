@@ -214,19 +214,65 @@ export const GET: APIRoute = async ({ request, url, locals }) => {
   const apiToken = getWebflowApiToken(locals);
 
   try {
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'accept': 'application/json'
-      }
+    // Fetch the collection schema once so we can translate Option-typed field
+    // values (which Webflow returns as 32-char hex IDs) back into human-readable
+    // names. Without this, the admin select widget can't match the saved value
+    // to its <option>s and the dropdown looks blank.
+    const schemaRes = await fetch(`${BASE_URL}/collections/${collectionId}`, {
+      headers: { 'Authorization': `Bearer ${apiToken}`, 'accept': 'application/json' }
     });
+    const schema = schemaRes.ok ? await schemaRes.json() : { fields: [] };
+    const optionMaps = new Map<string, Map<string, string>>();
+    for (const f of (schema.fields || [])) {
+      if (f.type === 'Option' && f.validations?.options) {
+        const m = new Map<string, string>();
+        for (const o of f.validations.options) m.set(o.id, o.name);
+        optionMaps.set(f.slug, m);
+      }
+    }
+    const resolveOptions = (fieldData: Record<string, any>) => {
+      const out = { ...fieldData };
+      for (const [slug, idToName] of optionMaps) {
+        const v = out[slug];
+        if (typeof v === 'string' && idToName.has(v)) out[slug] = idToName.get(v);
+      }
+      return out;
+    };
 
-    if (!response.ok) {
-      throw new Error(`Webflow API error: ${response.status}`);
+    // Webflow's list endpoint caps at 100 items/page — paginate to fetch them all
+    // so collections that exceed 100 (e.g. Blog Posts) don't silently truncate in the admin.
+    const PAGE_SIZE = 100;
+    const HARD_CAP = 2000; // safety: stop after 20 pages to avoid runaway loops
+    const allItems: any[] = [];
+    let offset = 0;
+    let total = 0;
+
+    while (offset < HARD_CAP) {
+      const url = `${BASE_URL}/collections/${collectionId}/items?limit=${PAGE_SIZE}&offset=${offset}`;
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webflow API error: ${response.status}`);
+      }
+
+      const page = await response.json();
+      const pageItems = Array.isArray(page.items) ? page.items : [];
+      for (const item of pageItems) {
+        if (item && item.fieldData) item.fieldData = resolveOptions(item.fieldData);
+      }
+      allItems.push(...pageItems);
+      total = page.pagination?.total ?? allItems.length;
+
+      if (pageItems.length < PAGE_SIZE || allItems.length >= total) break;
+      offset += PAGE_SIZE;
     }
 
-    const data = await response.json();
-    return withCors(new Response(JSON.stringify(data), {
+    return withCors(new Response(JSON.stringify({ items: allItems, pagination: { total } }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     }));

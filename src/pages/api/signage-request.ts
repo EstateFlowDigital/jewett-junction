@@ -36,11 +36,30 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    if (typeof data.quantity !== 'number' || data.quantity < 1) {
+    if (typeof data.quantity !== 'number' || data.quantity < 1 || data.quantity > 10000) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Quantity must be a positive number' }),
+        JSON.stringify({ success: false, error: 'Quantity must be a positive number up to 10000' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Length caps on free-text fields — consistent with apply.ts / submit-idea.ts
+    const caps: Array<[keyof SignageRequest, number]> = [
+      ['requesterName', 160],
+      ['department', 100],
+      ['signageType', 100],
+      ['projectName', 200],
+      ['deliveryAddress', 500],
+      ['specialInstructions', 5000],
+    ];
+    for (const [key, max] of caps) {
+      const value = data[key];
+      if (typeof value === 'string' && value.length > max) {
+        return new Response(
+          JSON.stringify({ success: false, error: `${key} too long (max ${max} characters)` }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     const apiToken = getApiToken(locals);
@@ -74,7 +93,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       data.specialInstructions ? `\nSpecial Instructions:\n${data.specialInstructions}` : '',
     ].filter(Boolean).join('\n');
 
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 100);
+    // Append a short unique suffix so repeated requests for the same signage/project
+    // don't collide on the Webflow slug (409).
+    const slugBase = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 80);
+    const slug = `${slugBase}-${Date.now().toString(36)}`;
 
     const fieldData: Record<string, any> = {
       name: title,
@@ -88,14 +110,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       votes: 0,
     };
 
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items?live=true`, {
+    // Create as draft — signage requests are internal records, not public pages.
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json',
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ fieldData }),
+      body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
     });
 
     if (!response.ok) {

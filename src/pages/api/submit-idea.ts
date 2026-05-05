@@ -50,6 +50,35 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
+    // Validate email shape
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(String(data.email).trim())) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Reasonable length caps to prevent abuse and avoid Webflow validation errors
+    if (data.title.length > 200) {
+      return new Response(
+        JSON.stringify({ error: 'Title too long (max 200 characters)' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    if (data.name.length > 160) {
+      return new Response(
+        JSON.stringify({ error: 'Name too long' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    if (data.description.length > 10000 || (data.benefits && data.benefits.length > 5000) || (data.resources && data.resources.length > 5000)) {
+      return new Response(
+        JSON.stringify({ error: 'Free-text field too long' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const apiToken = getApiToken(locals);
     if (!apiToken) {
       console.error('WEBFLOW_API_TOKEN not configured');
@@ -78,9 +107,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Map form data to Webflow CMS field slugs
+    // Append a short random suffix to the slug so two submissions with the same title
+    // don't collide (Webflow rejects duplicate slugs with a 409).
+    const baseSlug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+    const uniqueSlug = `${baseSlug}-${Date.now().toString(36)}`;
     const fieldData: Record<string, any> = {
       name: data.title,
-      slug: data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      slug: uniqueSlug,
       category: categoryLabels[data.category] || 'Other',
       description: fullDescription,
       'submitted-by': data.name,
@@ -94,15 +127,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
       fieldData.department = data.department;
     }
 
-    // Create item in Webflow CMS
-    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items?live=true`, {
+    // Create as draft — submitted ideas are internal records, not public pages.
+    // The admin UI shows drafts, so staff visibility is unaffected.
+    const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
         'accept': 'application/json',
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ fieldData }),
+      body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
     });
 
     if (!response.ok) {

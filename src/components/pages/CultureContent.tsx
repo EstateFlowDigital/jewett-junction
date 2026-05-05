@@ -273,10 +273,10 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
               <div className="grid grid-cols-1 lg:grid-cols-3">
                 {/* Photo/Avatar Column */}
                 <div className="bg-gradient-to-br from-amber-500 to-orange-500 p-8 flex flex-col items-center justify-center text-center">
-                  {currentSpotlight.image?.url || currentSpotlight['featured-image']?.url ? (
+                  {currentSpotlight['featured-image']?.url || currentSpotlight.image?.url ? (
                     <img
-                      src={currentSpotlight.image?.url || currentSpotlight['featured-image']?.url}
-                      alt={currentSpotlight.image?.alt || currentSpotlight.name}
+                      src={currentSpotlight['featured-image']?.url || currentSpotlight.image?.url}
+                      alt={currentSpotlight['featured-image']?.alt || currentSpotlight.image?.alt || currentSpotlight.name}
                       className="w-32 h-32 rounded-full object-cover border-4 border-white/30 shadow-xl mb-4"
                       loading="lazy"
                     />
