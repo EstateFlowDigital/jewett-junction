@@ -19,6 +19,9 @@
 interface RuntimeEnv {
   RESEND_API_KEY?: string;
   NOTIFY_FROM_EMAIL?: string;
+  // Comma-separated list of addresses CC'd on every notification — used
+  // during rollout so marketing/leadership can audit all submissions.
+  NOTIFY_CC_EMAIL?: string;
   IT_INBOX_EMAIL?: string;
   SAFETY_INBOX_EMAIL?: string;
   HR_INBOX_EMAIL?: string;
@@ -61,6 +64,9 @@ export interface NotifyParams {
   fields: Array<{ label: string; value: string | undefined | null }>;
   // Optional reply-to so the team can reply directly to the submitter.
   replyTo?: string;
+  // Optional extra CC addresses for this specific notification, on top of
+  // the global NOTIFY_CC_EMAIL list.
+  cc?: string[];
 }
 
 export interface NotifyResult {
@@ -91,6 +97,15 @@ ${rows}
 <p style="margin:24px 0 0;color:#888;font-size:12px">Sent automatically by Jewett Junction.</p>
 </body></html>`;
 
+  // CC list: from env (comma-separated) plus any per-call extras.
+  // Strip duplicates and the primary `to` so nobody gets emailed twice.
+  const ccFromEnv = (env.NOTIFY_CC_EMAIL || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const cc = Array.from(new Set([...ccFromEnv, ...(params.cc || [])]))
+    .filter((addr) => addr.toLowerCase() !== to.toLowerCase());
+
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -103,6 +118,7 @@ ${rows}
         to,
         subject: params.subject,
         html,
+        ...(cc.length > 0 ? { cc } : {}),
         ...(params.replyTo ? { reply_to: params.replyTo } : {}),
       }),
     });
