@@ -45,12 +45,12 @@ const VALID_FIELDS: Record<string, string[]> = {
     'featured', 'is-active'
   ],
   safetyContent: [
-    'name', 'slug', 'content-type', 'image', 'severity', 'description',
+    'name', 'slug', 'content-type', 'icon-color', 'image', 'severity', 'description',
     'full-content', 'document-link', 'video-link', 'expiration-date',
     'required-for', 'priority-order', 'featured', 'is-active'
   ],
   itKnowledgeBase: [
-    'name', 'slug', 'article-type', 'icon', 'summary', 'full-content',
+    'name', 'slug', 'article-type', 'icon', 'icon-color', 'summary', 'full-content',
     'video-tutorial', 'download-link', 'platform', 'difficulty', 'views',
     'helpful-votes', 'featured', 'is-active'
   ],

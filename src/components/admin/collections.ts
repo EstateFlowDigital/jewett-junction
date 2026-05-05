@@ -188,6 +188,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Fall Protection Protocol', icon: 'FileText' },
       { key: 'content-type', label: 'Content Type', type: 'select', options: ['Alert', 'Training', 'Protocol', 'Certification', 'Incident Report', 'Best Practice', 'Equipment'], icon: 'Tag' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
       { key: 'image', label: 'Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Safety-related image', icon: 'Image' },
       { key: 'severity', label: 'Severity Level', type: 'select', options: ['Info', 'Warning', 'Critical', 'Emergency'], icon: 'AlertCircle' },
       { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...' },
@@ -211,7 +212,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Article Title', type: 'text', required: true, placeholder: 'e.g., How to Reset Your Password', icon: 'FileText' },
       { key: 'article-type', label: 'Article Type', type: 'select', options: ['FAQ', 'How-To Guide', 'Troubleshooting', 'Software', 'Hardware', 'Security', 'Policy'], icon: 'Tag' },
-      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', icon: 'Image' },
+      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Upload an SVG, PNG, or WebP. Pair with the Icon Color field for tinted dashboard tiles.', icon: 'Image' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
       { key: 'summary', label: 'Summary', type: 'textarea', placeholder: 'Brief description of this article...' },
       { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Step-by-step instructions...' },
       { key: 'video-tutorial', label: 'Video Tutorial', type: 'url', placeholder: 'YouTube or Loom link', icon: 'Video' },
