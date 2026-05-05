@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
+import { getWebflowApiToken } from '../../lib/admin-auth';
 import { sendNotification } from '../../lib/notify';
+import { mapSubmissionToFieldData } from '../../lib/form-submission-mapper';
 
 export const prerender = false;
 
@@ -17,10 +19,6 @@ interface SignageRequest {
   specialInstructions?: string;
 }
 
-function getApiToken(locals: any): string {
-  const runtime = locals?.runtime;
-  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
-}
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -63,7 +61,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     }
 
-    const apiToken = getApiToken(locals);
+    const apiToken = getWebflowApiToken(locals);
     if (!apiToken) {
       console.error('WEBFLOW_API_TOKEN not configured');
       return new Response(
@@ -72,8 +70,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // Store signage requests in submittedIdeas collection with clear categorization
-    const collectionId = COLLECTIONS.submittedIdeas;
+    // Mirror signage requests into Form Submissions for unified intake triage.
+    const collectionId = COLLECTIONS.formSubmissions;
     if (!collectionId) {
       console.error('submittedIdeas collection ID not found');
       return new Response(
@@ -82,34 +80,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const title = `Signage Request: ${data.signageType} - ${data.projectName}`;
-
-    // Format details into the description field
-    const description = [
-      `Signage Type: ${data.signageType}`,
-      `Project: ${data.projectName}`,
-      `Quantity: ${data.quantity}`,
-      `Needed By: ${data.neededByDate}`,
-      `Delivery Address: ${data.deliveryAddress}`,
-      data.specialInstructions ? `\nSpecial Instructions:\n${data.specialInstructions}` : '',
-    ].filter(Boolean).join('\n');
-
-    // Append a short unique suffix so repeated requests for the same signage/project
-    // don't collide on the Webflow slug (409).
-    const slugBase = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 80);
-    const slug = `${slugBase}-${Date.now().toString(36)}`;
-
-    const fieldData: Record<string, any> = {
-      name: title,
-      slug,
-      category: 'Other',
-      description,
-      'submitted-by': data.requesterName,
-      department: data.department,
-      status: 'New',
-      priority: 'Medium',
-      votes: 0,
-    };
+    const submissionId = `signage-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const fieldData = mapSubmissionToFieldData({
+      id: submissionId,
+      formId: 'signage-request',
+      displayName: 'Signage Request',
+      formResponse: {
+        'Project': data.projectName,
+        'Signage Type': data.signageType,
+        'Quantity': String(data.quantity),
+        'Needed By': data.neededByDate,
+        'Delivery Address': data.deliveryAddress,
+        'Department': data.department,
+        'Requested By': data.requesterName,
+        'Special Instructions': data.specialInstructions || '',
+      },
+      dateSubmitted: new Date().toISOString(),
+      publishedPath: '/marketing/signage',
+    });
 
     // Create as draft — signage requests are internal records, not public pages.
     const response = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {

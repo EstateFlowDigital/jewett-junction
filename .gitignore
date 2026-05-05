@@ -44,3 +44,5 @@ coverage/
 
 # Script run logs (manifest is committed for reference; logs are not)
 scripts/*.log
+
+Website-Upload-Final/

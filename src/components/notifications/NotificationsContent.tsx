@@ -101,7 +101,7 @@ async function fetchNotifications(): Promise<Notification[]> {
     if (safRes && safRes.ok) {
       const data = await safRes.json();
       for (const s of data.items || []) {
-        if (s.severity !== 'Critical' && s.severity !== 'Emergency' && s.priority !== 'Urgent') continue;
+        if (s.severity !== 'Critical' && s.severity !== 'Emergency') continue;
         const id = `saf-${s.id}`;
         const slug = s.slug || s.id;
         out.push({

@@ -22,11 +22,6 @@ interface SafetyIncident {
   immediateActions?: string;
 }
 
-function getApiToken(locals: any): string {
-  const runtime = locals?.runtime;
-  return runtime?.env?.WEBFLOW_API_TOKEN || import.meta.env.WEBFLOW_API_TOKEN;
-}
-
 export const POST: APIRoute = async ({ request, locals }) => {
   let data: SafetyIncident;
   try { data = await request.json(); }
@@ -42,34 +37,34 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(JSON.stringify({ error: 'Field too long' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const apiToken = getApiToken(locals);
-  const collectionId = COLLECTIONS.submittedIdeas;
+  const apiToken = getWebflowApiToken(locals);
+  const collectionId = COLLECTIONS.formSubmissions;
   if (!apiToken || !collectionId) {
     return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const baseSlug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
-  const fieldData: Record<string, any> = {
-    name: `Safety Incident: ${data.title}`.slice(0, 256),
-    slug: `safety-${baseSlug}-${Date.now().toString(36)}`,
-    category: 'Safety',
-    description: [
-      `Incident Type: ${data.incidentType}`,
-      data.severity ? `Severity: ${data.severity}` : '',
-      data.jobSite ? `Job Site: ${data.jobSite}` : '',
-      data.occurredAt ? `Occurred At: ${data.occurredAt}` : '',
-      data.phone ? `Phone: ${data.phone}` : '',
-      '',
-      data.description,
-      data.immediateActions ? `\nImmediate Actions Taken:\n${data.immediateActions}` : '',
-    ].filter(Boolean).join('\n'),
-    'submitted-by': data.name,
-    email: data.email,
-    status: 'New',
-    priority: data.severity === 'Critical' || data.severity === 'High' ? 'High' : 'Medium',
-    votes: 0,
-  };
-  if (data.department) fieldData.department = data.department;
+  // Mirror safety incidents into Form Submissions with Form Name = "Safety Incident".
+  const submissionId = `safety-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const fieldData = mapSubmissionToFieldData({
+    id: submissionId,
+    formId: 'safety-incident',
+    displayName: 'Safety Incident',
+    formResponse: {
+      'Title': data.title,
+      'Incident Type': data.incidentType,
+      'Severity': data.severity || '',
+      'Job Site': data.jobSite || '',
+      'Occurred At': data.occurredAt || '',
+      'Description': data.description,
+      'Immediate Actions Taken': data.immediateActions || '',
+      'Department': data.department || '',
+      'Reporter': data.name,
+      'Email': data.email,
+      'Phone': data.phone || '',
+    },
+    dateSubmitted: new Date().toISOString(),
+    publishedPath: '/safety',
+  });
 
   try {
     const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
