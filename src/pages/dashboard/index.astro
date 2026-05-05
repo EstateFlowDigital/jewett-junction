@@ -48,7 +48,7 @@ try {
 
 // Get featured items from new collections
 const featuredHR = hrContent[0];
-const featuredSafety = safetyContent.find(s => s.priority === 'Urgent') || safetyContent[0];
+const featuredSafety = safetyContent.find(s => s.severity === 'Critical' || s.severity === 'Emergency') || safetyContent[0];
 const featuredIT = itArticles[0];
 
 // Format date helper - safely handles invalid dates
@@ -347,7 +347,7 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
               {featuredSafety ? (
                 <>
                   <div class="text-lg font-bold text-white truncate">{featuredSafety.name}</div>
-                  <div class="text-sm text-emerald-400 mt-1">{featuredSafety.priority === 'Urgent' ? '⚠️ Alert' : 'View Resources →'}</div>
+                  <div class="text-sm text-emerald-400 mt-1">{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Alert' : 'View Resources →'}</div>
                 </>
               ) : (
                 <>
@@ -423,7 +423,7 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
                 </a>
               )}
               {featuredSafety && (
-                <a href="/jewett-junction/safety" class={`glass rounded-2xl overflow-hidden border transition-all group ${featuredSafety.priority === 'Urgent' ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/70' : 'border-emerald-500/30 hover:border-emerald-500/50'}`}>
+                <a href="/jewett-junction/safety" class={`glass rounded-2xl overflow-hidden border transition-all group ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/70' : 'border-emerald-500/30 hover:border-emerald-500/50'}`}>
                   {featuredSafety.image?.url && (
                     <div class="h-32 w-full overflow-hidden">
                       <img src={featuredSafety.image.url} alt={featuredSafety.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
@@ -435,19 +435,19 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
                         class="w-8 h-8 rounded-lg flex items-center justify-center"
                         style={featuredSafety['icon-color']
                           ? `background-color: ${featuredSafety['icon-color']}33`
-                          : `background-color: ${featuredSafety.priority === 'Urgent' ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`}
+                          : `background-color: ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`}
                       >
                         <svg
                           class="w-4 h-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
-                          style={`color: ${featuredSafety['icon-color'] || (featuredSafety.priority === 'Urgent' ? '#f87171' : '#34d399')}`}
+                          style={`color: ${featuredSafety['icon-color'] || ((featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '#f87171' : '#34d399')}`}
                         ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                       </div>
-                      <span class={`text-xs font-medium uppercase ${featuredSafety.priority === 'Urgent' ? 'text-red-400' : 'text-emerald-400'}`}>{featuredSafety.priority === 'Urgent' ? '⚠️ Safety Alert' : 'Safety Update'}</span>
+                      <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Safety Alert' : 'Safety Update'}</span>
                     </div>
-                    <h3 class={`font-medium transition-colors truncate ${featuredSafety.priority === 'Urgent' ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
+                    <h3 class={`font-medium transition-colors truncate ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
                     <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredSafety.description || featuredSafety.content)?.substring(0, 80)}...</p>
                   </div>
                 </a>
@@ -491,11 +491,11 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
           <div class="mb-10">
             <div class="flex items-center justify-between mb-4">
               <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">Photo Gallery</h2>
-              <a href="/jewett-junction/resources" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
+              <a href="/jewett-junction/marketing" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {marketingAssets.filter(asset => asset['preview-image']?.url || asset.image?.url).slice(0, 6).map((asset) => (
-                <a href="/jewett-junction/resources" class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all">
+                <a href="/jewett-junction/marketing" class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all">
                   <img
                     src={asset['preview-image']?.url || asset.image?.url}
                     alt={asset.name || 'Company photo'}

@@ -223,7 +223,15 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       config.fields.forEach(field => {
         if ((field.type === 'image' || field.type === 'file') && processedFields[field.key]) {
           if (assetFileIds[field.key]) {
-            processedFields[field.key] = assetFileIds[field.key];
+            // Send full { fileId, url } object — bare fileId strings get
+            // silently dropped by Webflow's per-item PATCH on Image fields,
+            // which is what was causing the 'logo disappears after save' bug.
+            const url = typeof processedFields[field.key] === 'string'
+              ? processedFields[field.key]
+              : processedFields[field.key]?.url;
+            processedFields[field.key] = url
+              ? { fileId: assetFileIds[field.key], url, alt: null }
+              : { fileId: assetFileIds[field.key] };
           } else if (typeof processedFields[field.key] === 'string' && /^https?:\/\//.test(processedFields[field.key])) {
             orphanedImageFields.push(field.label);
           }
@@ -1651,7 +1659,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                         }}
                         aria-label={`Preview ${item.fieldData?.name || item.fieldData?.title || 'item'}`}
                         title="Preview"
-                        className="min-h-[44px] min-w-[44px] p-2.5 text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                        className="min-h-[44px] min-w-[44px] p-2.5 inline-flex items-center justify-center text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                       >
                         <Eye className="h-4 w-4" aria-hidden="true" />
                       </button>
@@ -1659,14 +1667,14 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                         onClick={() => handleEdit(item)}
                         aria-label={`Edit ${item.fieldData?.name || item.fieldData?.title || 'item'}`}
                         title="Edit"
-                        className="min-h-[44px] min-w-[44px] p-2.5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        className="min-h-[44px] min-w-[44px] p-2.5 inline-flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                       >
                         <Edit className="h-4 w-4" aria-hidden="true" />
                       </button>
                       <button
                         onClick={() => handleDelete(item.id)}
                         aria-label={`Delete ${item.fieldData?.name || item.fieldData?.title || 'item'}`}
-                        className="min-h-[44px] min-w-[44px] p-2.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                        className="min-h-[44px] min-w-[44px] p-2.5 inline-flex items-center justify-center text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
