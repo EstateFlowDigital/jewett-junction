@@ -39,31 +39,45 @@ import ThemedPage from '../../layouts/themed-page.astro';
             <p class="text-sm text-slate-400 mt-1">Manage your personal information</p>
           </div>
           <div class="p-5 space-y-4">
-            <div class="flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
-              <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                  <span class="text-xl font-bold text-white">JC</span>
-                </div>
-                <div>
-                  <div class="font-medium text-white">Jewett Construction</div>
-                  <div class="text-sm text-slate-400">admin@jewettconstruction.com</div>
-                </div>
+            <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
+              <label for="profile-email-input" class="text-sm font-medium text-slate-300">Your Work Email</label>
+              <p class="text-xs text-slate-500 mt-1 mb-3">
+                Used to look up your record from the company directory. Powers Profile, Notifications,
+                and personalization across the intranet. Stored locally in this browser only.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="profile-email-input" type="email" placeholder="firstname.lastname@jewettconstruction.com" class="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
+                <button id="profile-email-save" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg">Save</button>
+                <button id="profile-email-clear" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg">Clear</button>
               </div>
-              <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="text-sm font-medium text-slate-300">Display Name</label>
-                <input type="text" value="Jewett Construction" class="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
-              </div>
-              <div>
-                <label class="text-sm font-medium text-slate-300">Department</label>
-                <input type="text" value="Administration" class="w-full mt-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
-              </div>
+              <p id="profile-email-status" class="text-xs mt-2 text-slate-500"></p>
             </div>
           </div>
+
+          <script is:inline>
+            (function () {
+              const KEY = 'jewett_profile_email';
+              const input = document.getElementById('profile-email-input');
+              const saveBtn = document.getElementById('profile-email-save');
+              const clearBtn = document.getElementById('profile-email-clear');
+              const status = document.getElementById('profile-email-status');
+              const stored = localStorage.getItem(KEY) || '';
+              if (stored) { input.value = stored; status.textContent = 'Connected as ' + stored; }
+              saveBtn?.addEventListener('click', () => {
+                const val = (input.value || '').trim();
+                if (!/^\S+@\S+\.\S+$/.test(val)) { status.textContent = 'Enter a valid email address'; status.className = 'text-xs mt-2 text-rose-400'; return; }
+                localStorage.setItem(KEY, val);
+                status.textContent = 'Saved. Open Profile to see your record.';
+                status.className = 'text-xs mt-2 text-emerald-400';
+              });
+              clearBtn?.addEventListener('click', () => {
+                localStorage.removeItem(KEY);
+                input.value = '';
+                status.textContent = 'Cleared. Profile and Notifications will show empty states.';
+                status.className = 'text-xs mt-2 text-slate-500';
+              });
+            })();
+          </script>
         </div>
 
         <!-- Notification Settings -->
@@ -254,7 +268,7 @@ import ThemedPage from '../../layouts/themed-page.astro';
             </div>
             <div class="flex justify-between">
               <span class="text-slate-400">Last Updated</span>
-              <span class="font-medium text-white">Jan 26, 2026</span>
+              <span class="font-medium text-white">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-400">Environment</span>

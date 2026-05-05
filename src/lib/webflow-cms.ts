@@ -327,27 +327,48 @@ export async function listCollections(): Promise<{ id: string; displayName: stri
 // Type definitions for Jewett Junction CMS
 // ============================================
 
+// NOTE: Many of these interfaces declare both the legacy slug and the
+// current Webflow slug because COLLECTION_FIELD_ALIASES mirrors the new
+// slug values onto the old keys at fetch time. Either name is safe to
+// read; saves should always go to the new slug (admin handles this).
+
 export interface Employee {
   name: string;
   slug: string;
   role: string;
+  /** legacy alias of `team-department` (placeholder Option, single value) */
   department: string;
+  /** real Webflow slug, full options */
+  'team-department'?: string;
   email?: string;
   phone?: string;
   photo?: { url: string; alt?: string };
   bio?: string;
   'start-date'?: string;
   'is-featured'?: boolean;
+  'leadership-team'?: boolean;
+  'office-location'?: string;
+  extension?: string;
+  'linkedin-url'?: string;
+  skills?: string;
+  certifications?: string;
 }
 
 export interface Announcement {
   name: string;
   slug: string;
   content: string;
+  /** legacy alias of `priority-level` (placeholder Option) */
   priority: 'high' | 'normal' | 'low';
+  /** real Webflow slug; values: Normal | High | Urgent */
+  'priority-level'?: 'Normal' | 'High' | 'Urgent';
   'published-date': string;
   author?: string;
   'is-pinned'?: boolean;
+  'news-category'?: string;
+  'expiration-date'?: string;
+  'cta-text'?: string;
+  'cta-link'?: string;
 }
 
 export interface Event {
@@ -357,17 +378,35 @@ export interface Event {
   'event-date': string;
   'end-date'?: string;
   location?: string;
-  category?: string; // Reference field returns ID, handle in component
+  /** legacy alias of `event-category` (placeholder Option) */
+  category?: string;
+  'event-category'?: string;
+  'banner-image'?: { url: string };
+  'virtual-meeting-link'?: string;
+  'max-capacity'?: number;
+  'mandatory-attendance'?: boolean;
+  'virtual-event'?: boolean;
   'registration-link'?: string;
 }
 
 export interface JobPosting {
   name: string;
   slug: string;
+  /** legacy alias of `job-department` (placeholder Option) */
   department: string;
+  /** real Webflow slug, full options */
+  'job-department'?: string;
   location: string;
   description: string;
   requirements?: string;
+  benefits?: string;
+  'salary-min'?: number;
+  'salary-max'?: number;
+  'employment-type'?: string;
+  'experience-level'?: string;
+  urgency?: string;
+  'is-remote'?: boolean;
+  featured?: boolean;
   'referral-bonus'?: number;
   'apply-link'?: string;
   'job-is-active'?: boolean;
@@ -379,19 +418,40 @@ export interface CultureStory {
   excerpt: string;
   content: string;
   image?: { url: string; alt?: string };
+  'featured-image'?: { url: string; alt?: string };
+  'video-url'?: string;
+  'person-name'?: string;
+  'person-role'?: string;
+  'person-tenure'?: string;
+  quote?: string;
+  featured?: boolean;
   author?: string;
   'published-date': string;
-  category?: string; // Reference field returns ID, handle in component
+  /** legacy placeholder; `story-type` is the real classifier */
+  category?: string;
+  /** legacy alias preserved for back-compat */
+  type?: string;
+  'story-type'?: string;
 }
 
 export interface Resource {
   name: string;
   slug: string;
   description?: string;
+  /** legacy alias of `resource-category` (placeholder Option) */
   category: string;
+  'resource-category'?: string;
   file?: { url: string };
   'external-link'?: string;
   icon?: string;
+  thumbnail?: { url: string };
+  'file-type'?: string;
+  'file-size'?: string;
+  'last-updated'?: string;
+  version?: string;
+  audience?: string;
+  'is-required'?: boolean;
+  'is-new'?: boolean;
 }
 
 // ============================================

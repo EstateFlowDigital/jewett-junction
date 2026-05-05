@@ -57,10 +57,12 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
     fetchITContent();
   }, [initialItems.length]);
 
-  // Filter articles by category/article-type
+  // article-type is the real Webflow slug. Webflow option names are
+  // "How-To Guide", "Troubleshooting", "Software", "Hardware", "Security",
+  // "Policy", "FAQ". Older items may still use legacy `category` values.
   const howToArticles = articles.filter(a =>
-    a['article-type'] === 'How-To' || a['article-type'] === 'Troubleshooting' ||
-    a.category === 'How-To' || a.category === 'Troubleshooting'
+    a['article-type'] === 'How-To Guide' || a['article-type'] === 'Troubleshooting' ||
+    a.category === 'How-To Guide' || a.category === 'Troubleshooting' || a.category === 'How-To'
   );
   const softwareArticles = articles.filter(a =>
     a['article-type'] === 'Software' || a.category === 'Software'

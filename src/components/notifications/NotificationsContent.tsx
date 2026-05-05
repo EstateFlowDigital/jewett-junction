@@ -26,81 +26,101 @@ interface Notification {
   link?: string;
 }
 
-// Mock notifications - in production this would come from API
-const initialNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'announcement',
-    title: 'New Safety Policy Update',
-    message: 'Updated PPE requirements for all job sites effective immediately.',
-    date: '2024-01-28T10:30:00',
-    read: false,
-    link: '/jewett-junction/safety'
-  },
-  {
-    id: '2',
-    type: 'event',
-    title: 'Company BBQ Tomorrow',
-    message: 'Don\'t forget the company BBQ at 12:00 PM in the main parking lot.',
-    date: '2024-01-27T15:00:00',
-    read: false,
-    link: '/jewett-junction/events'
-  },
-  {
-    id: '3',
-    type: 'badge',
-    title: 'New Badge Earned!',
-    message: 'Congratulations! You earned the "Team Player" badge.',
-    date: '2024-01-26T09:15:00',
-    read: false,
-    link: '/jewett-junction/profile/badges'
-  },
-  {
-    id: '4',
-    type: 'safety',
-    title: 'Safety Training Reminder',
-    message: 'Your annual safety certification expires in 30 days.',
-    date: '2024-01-25T08:00:00',
-    read: true,
-    link: '/jewett-junction/safety'
-  },
-  {
-    id: '5',
-    type: 'announcement',
-    title: 'Q1 All-Hands Meeting',
-    message: 'Join us for the quarterly all-hands meeting this Friday at 2 PM.',
-    date: '2024-01-24T14:00:00',
-    read: true,
-    link: '/jewett-junction/events'
-  },
-  {
-    id: '6',
-    type: 'system',
-    title: 'Profile Update Required',
-    message: 'Please update your emergency contact information.',
-    date: '2024-01-23T11:00:00',
-    read: true,
-    link: '/jewett-junction/settings'
-  },
-  {
-    id: '7',
-    type: 'event',
-    title: 'Training Session Scheduled',
-    message: 'New OSHA training session scheduled for next Monday.',
-    date: '2024-01-22T16:30:00',
-    read: true,
-    link: '/jewett-junction/events'
-  },
-  {
-    id: '8',
-    type: 'badge',
-    title: 'Badge Progress Update',
-    message: 'You\'re 2 events away from earning the "Event Enthusiast" badge!',
-    date: '2024-01-21T12:00:00',
-    read: true,
-    link: '/jewett-junction/profile/badges'
+// Notifications are derived from real CMS data: announcements, events, and
+// urgent safety items. Read state is persisted in localStorage by id.
+const READ_STORAGE_KEY = 'jewett_notifications_read';
+const stripHtml = (html?: string) => (html || '').replace(/<[^>]*>/g, '').trim();
+const truncate = (s: string, n: number) => (s.length <= n ? s : s.slice(0, n - 1).trimEnd() + '…');
+
+function loadReadIds(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const raw = window.localStorage.getItem(READ_STORAGE_KEY);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    return new Set();
   }
-];
+}
+
+function saveReadIds(ids: Set<string>) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(READ_STORAGE_KEY, JSON.stringify([...ids]));
+  } catch {
+    /* ignore */
+  }
+}
+
+async function fetchNotifications(): Promise<Notification[]> {
+  const read = loadReadIds();
+  const out: Notification[] = [];
+  try {
+    const [annRes, evtRes, safRes] = await Promise.all([
+      fetch('/jewett-junction/api/cms/announcements?limit=20').catch(() => null),
+      fetch('/jewett-junction/api/cms/events?limit=20').catch(() => null),
+      fetch('/jewett-junction/api/cms/safety?limit=10').catch(() => null),
+    ]);
+    if (annRes && annRes.ok) {
+      const data = await annRes.json();
+      for (const a of data.items || []) {
+        const id = `ann-${a.id}`;
+        const slug = a.slug || a.id;
+        out.push({
+          id,
+          type: 'announcement',
+          title: a.name || 'Announcement',
+          message: truncate(stripHtml(a.content || ''), 140),
+          date: a['published-date'] || a.lastUpdated || new Date().toISOString(),
+          read: read.has(id),
+          link: `/jewett-junction/announcements/${slug}`,
+        });
+      }
+    }
+    if (evtRes && evtRes.ok) {
+      const data = await evtRes.json();
+      const now = Date.now();
+      for (const e of data.items || []) {
+        const dateStr = e['event-date'];
+        if (!dateStr) continue;
+        const eventTs = new Date(dateStr).getTime();
+        if (isNaN(eventTs) || eventTs < now - 86400000) continue; // past events skipped
+        const id = `evt-${e.id}`;
+        const slug = e.slug || e.id;
+        out.push({
+          id,
+          type: 'event',
+          title: e.name || 'Upcoming Event',
+          message: truncate(stripHtml(e.description || e.location || ''), 140) || 'See event details.',
+          date: dateStr,
+          read: read.has(id),
+          link: `/jewett-junction/events/${slug}`,
+        });
+      }
+    }
+    if (safRes && safRes.ok) {
+      const data = await safRes.json();
+      for (const s of data.items || []) {
+        if (s.severity !== 'Critical' && s.severity !== 'Emergency' && s.priority !== 'Urgent') continue;
+        const id = `saf-${s.id}`;
+        const slug = s.slug || s.id;
+        out.push({
+          id,
+          type: 'safety',
+          title: s.name || 'Safety Alert',
+          message: truncate(stripHtml(s.description || s['full-content'] || s.content || ''), 140) || 'Critical safety alert.',
+          date: s['effective-date'] || new Date().toISOString(),
+          read: read.has(id),
+          link: `/jewett-junction/safety/${slug}`,
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Notifications fetch error:', err);
+  }
+  out.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return out;
+}
 
 const typeIcons: Record<Notification['type'], React.ElementType> = {
   announcement: Megaphone,
@@ -119,9 +139,17 @@ const typeColors: Record<Notification['type'], string> = {
 };
 
 export function NotificationsContent() {
-  const [notifications, setNotifications] = React.useState<Notification[]>(initialNotifications);
+  const [notifications, setNotifications] = React.useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [filter, setFilter] = React.useState<'all' | 'unread'>('all');
   const [typeFilter, setTypeFilter] = React.useState<string>('all');
+
+  React.useEffect(() => {
+    fetchNotifications().then((items) => {
+      setNotifications(items);
+      setIsLoading(false);
+    });
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -132,21 +160,26 @@ export function NotificationsContent() {
   });
 
   const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    const ids = loadReadIds();
+    ids.add(id);
+    saveReadIds(ids);
   };
 
   const markAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    const ids = loadReadIds();
+    notifications.forEach((n) => ids.add(n.id));
+    saveReadIds(ids);
   };
 
   const deleteNotification = (id: string) => {
+    // Hide locally; CMS-sourced items will reappear on refresh by design.
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const clearAll = () => {
-    if (confirm('Are you sure you want to clear all notifications?')) {
+    if (confirm('Hide all notifications from this view? CMS-driven entries will reappear on refresh.')) {
       setNotifications([]);
     }
   };
@@ -264,7 +297,12 @@ export function NotificationsContent() {
       </div>
 
       {/* Notifications List */}
-      {filteredNotifications.length > 0 ? (
+      {isLoading ? (
+        <div className="glass rounded-2xl border border-slate-800/50 p-12 text-center">
+          <Bell className="w-12 h-12 text-slate-600 mx-auto mb-4 animate-pulse" aria-hidden="true" />
+          <p className="text-slate-400">Loading notifications…</p>
+        </div>
+      ) : filteredNotifications.length > 0 ? (
         <div className="glass rounded-2xl border border-slate-800/50 overflow-hidden divide-y divide-slate-700/50">
           {filteredNotifications.map((notification) => {
             const Icon = typeIcons[notification.type];

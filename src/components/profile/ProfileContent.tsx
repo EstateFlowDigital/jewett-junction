@@ -17,28 +17,105 @@ import {
 } from 'lucide-react';
 import { BadgeStrip } from '../gamification/BadgeCollection';
 
-// Mock user data - in production this would come from auth/API
-const mockUser = {
-  name: 'Jewett Employee',
-  email: 'employee@jewett.com',
-  phone: '(555) 123-4567',
-  department: 'Administration',
-  role: 'Team Member',
-  location: 'Columbus, OH',
-  startDate: '2022-03-15',
-  bio: 'Dedicated team member passionate about construction excellence and workplace safety.',
-  skills: ['Project Management', 'Safety Compliance', 'Team Leadership'],
-  certifications: ['OSHA 30', 'First Aid/CPR'],
-  points: 1250,
-  level: 5,
-  earnedBadges: ['safety_champion', 'team_player', 'event_enthusiast'],
-  streak: 12
+// Identity is keyed off a localStorage email — set in /settings.
+// We look that email up in the Employees CMS collection and render the real
+// record. If nothing is set, render a clear empty state pointing at /settings.
+const PROFILE_EMAIL_KEY = 'jewett_profile_email';
+
+interface EmployeeRecord {
+  id: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+  department?: string;
+  'team-department'?: string;
+  'office-location'?: string;
+  bio?: string;
+  skills?: string;
+  certifications?: string;
+  'start-date'?: string;
+  photo?: { url: string };
+}
+
+const defaultGamification = {
+  points: 0,
+  level: 1,
+  earnedBadges: [] as string[],
+  streak: 0,
 };
 
 export function ProfileContent() {
-  const yearsAtCompany = Math.floor(
-    (new Date().getTime() - new Date(mockUser.startDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
-  );
+  const [profile, setProfile] = React.useState<EmployeeRecord | null>(null);
+  const [profileEmail, setProfileEmail] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const email = (typeof window !== 'undefined' && window.localStorage.getItem(PROFILE_EMAIL_KEY)) || '';
+    setProfileEmail(email);
+    if (!email) {
+      setIsLoading(false);
+      return;
+    }
+    fetch('/jewett-junction/api/cms/employees?limit=200')
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((data) => {
+        const match = (data.items || []).find(
+          (e: EmployeeRecord) => (e.email || '').toLowerCase() === email.toLowerCase(),
+        );
+        setProfile(match || null);
+      })
+      .catch(() => setProfile(null))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="glass rounded-2xl border border-slate-800/50 p-12 text-center">
+        <User className="w-12 h-12 text-slate-600 mx-auto mb-4 animate-pulse" aria-hidden="true" />
+        <p className="text-slate-400">Loading profile…</p>
+      </div>
+    );
+  }
+
+  if (!profileEmail || !profile) {
+    return (
+      <div className="glass rounded-2xl border border-slate-800/50 p-10 text-center max-w-xl mx-auto">
+        <User className="w-12 h-12 text-slate-500 mx-auto mb-4" aria-hidden="true" />
+        <h2 className="text-xl font-bold text-white mb-2">Profile not connected</h2>
+        <p className="text-slate-400 mb-5">
+          {profileEmail
+            ? `No employee record matches "${profileEmail}". Update your work email in Settings or ask HR to add you to the directory.`
+            : 'Set your work email in Settings to load your profile from the company directory.'}
+        </p>
+        <a
+          href="/jewett-junction/settings"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
+        >
+          <ChevronRight className="w-4 h-4" /> Open Settings
+        </a>
+      </div>
+    );
+  }
+
+  const user = {
+    name: profile.name || 'Employee',
+    email: profile.email || profileEmail,
+    phone: profile.phone || '',
+    department: profile['team-department'] || profile.department || '',
+    role: profile.role || '',
+    location: profile['office-location'] || '',
+    startDate: profile['start-date'] || '',
+    bio: profile.bio || '',
+    skills: (profile.skills || '').split(',').map((s) => s.trim()).filter(Boolean),
+    certifications: (profile.certifications || '').split(',').map((s) => s.trim()).filter(Boolean),
+    photo: profile.photo?.url || '',
+    ...defaultGamification,
+  };
+  const yearsAtCompany = user.startDate
+    ? Math.floor((new Date().getTime() - new Date(user.startDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+    : 0;
+  const mockUser = user; // keep downstream JSX referencing `mockUser` working
 
   return (
     <div>

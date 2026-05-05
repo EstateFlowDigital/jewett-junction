@@ -61,8 +61,11 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
   const alerts = safetyItems.filter(item => item['content-type'] === 'Alert');
   const protocols = safetyItems.filter(item => item['content-type'] === 'Protocol');
   const training = safetyItems.filter(item => item['content-type'] === 'Training');
-  const urgentAlerts = alerts.filter(item => item.priority === 'Urgent');
-  const regularAlerts = alerts.filter(item => item.priority !== 'Urgent');
+  // Severity is the real Webflow field; old `priority` kept as fallback for legacy items.
+  const isUrgent = (item: SafetyItem) =>
+    item.severity === 'Critical' || item.severity === 'Emergency' || item.priority === 'Urgent';
+  const urgentAlerts = alerts.filter(isUrgent);
+  const regularAlerts = alerts.filter((item) => !isUrgent(item));
 
   // If no items have content-type set, treat all items as protocols/general safety content
   const hasContentTypes = alerts.length > 0 || protocols.length > 0 || training.length > 0;
