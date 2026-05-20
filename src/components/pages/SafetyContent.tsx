@@ -80,6 +80,24 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
   const alerts = safetyItems.filter(item => item['content-type'] === 'Alert');
   const protocols = safetyItems.filter(item => item['content-type'] === 'Protocol');
   const training = safetyItems.filter(item => item['content-type'] === 'Training');
+
+  // Latest safety newsletter — match by content-type OR by 'newsletter' in the
+  // item name so the client can use whatever convention they prefer. Returns
+  // undefined when none exist, in which case the card is hidden.
+  const latestNewsletter = (() => {
+    const matches = safetyItems.filter((item: SafetyItem) => {
+      const ct = (item['content-type'] || '').toLowerCase();
+      const name = (item.name || '').toLowerCase();
+      return ct === 'newsletter' || name.includes('newsletter');
+    });
+    if (matches.length === 0) return undefined;
+    // Most recently effective/created — fall back to first match if no dates.
+    return matches.slice().sort((a: any, b: any) => {
+      const da = new Date(a['effective-date'] || a['last-updated'] || 0).getTime();
+      const db = new Date(b['effective-date'] || b['last-updated'] || 0).getTime();
+      return db - da;
+    })[0];
+  })();
   // Severity is the real Webflow field; old `priority` kept as fallback for legacy items.
   const isUrgent = (item: SafetyItem) =>
     item.severity === 'Critical' || item.severity === 'Emergency' || item.priority === 'Urgent';
@@ -383,24 +401,28 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             </CardContent>
           </Card>
 
-          {/* Safety Newsletter */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Safety Newsletter</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Stay updated with the latest safety news and tips.</p>
-              <a href={resourcesLink} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                  <Newspaper className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <div className={`font-medium text-sm ${isDark ? 'text-white' : ''}`}>Latest Issue</div>
-                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>View safety resources</div>
-                </div>
-              </a>
-            </CardContent>
-          </Card>
+          {/* Safety Newsletter — hidden when no newsletter exists in CMS */}
+          {latestNewsletter && (
+            <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+              <CardHeader>
+                <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Safety Newsletter</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Stay updated with the latest safety news and tips.</p>
+                <a href={`/jewett-junction/safety/${latestNewsletter.slug || latestNewsletter.id}`} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                  <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                    <Newspaper className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className={`font-medium text-sm truncate ${isDark ? 'text-white' : ''}`}>{latestNewsletter.name}</div>
+                    <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>
+                      {formatDate(latestNewsletter['effective-date']) || stripHtml(latestNewsletter.description || getContent(latestNewsletter))?.substring(0, 60) || 'Read the latest issue'}
+                    </div>
+                  </div>
+                </a>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
