@@ -40,6 +40,7 @@ interface CollectionEditorProps {
 
 export function CollectionEditor({ collectionKey, config }: CollectionEditorProps) {
   const [items, setItems] = React.useState<any[]>([]);
+  const [listSearch, setListSearch] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const [success, setSuccess] = React.useState('');
@@ -1690,6 +1691,31 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             </div>
           )}
 
+          {/* Search bar — only when there are enough items to make scanning hard */}
+          {items.length >= 6 && (
+            <div className="px-5 py-3 border-b border-slate-700/50 bg-slate-900/30">
+              <div className="relative max-w-md">
+                <input
+                  type="search"
+                  value={listSearch}
+                  onChange={(e) => setListSearch(e.target.value)}
+                  placeholder={`Search ${config.name.toLowerCase()}...`}
+                  aria-label={`Search ${config.name}`}
+                  className="w-full px-4 py-2 pr-9 rounded-lg bg-slate-800/60 border border-slate-700 text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                />
+                {listSearch && (
+                  <button
+                    onClick={() => setListSearch('')}
+                    aria-label="Clear search"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Items list */}
           {isLoading && items.length === 0 ? (
             <div className="p-16 text-center">
@@ -1713,9 +1739,39 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 Create the first one
               </button>
             </div>
-          ) : (
+          ) : (() => {
+            // Filter items by the list search term — matches against name,
+            // title, department, category, location, and the slug. Case-insensitive.
+            const q = listSearch.trim().toLowerCase();
+            const filteredItems = q
+              ? items.filter((it) => {
+                  const fd = it.fieldData || {};
+                  const haystack = [
+                    fd.name, fd.title, fd.department, fd.category, fd['content-type'],
+                    fd.location, fd.role, fd['job-department'], fd.slug, fd['submitted-by'],
+                    fd['submitter-name'], fd.email, fd['submitter-email'],
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                  return haystack.includes(q);
+                })
+              : items;
+
+            if (filteredItems.length === 0) {
+              return (
+                <div className="p-12 text-center text-slate-400">
+                  <p className="mb-2">No matches for &ldquo;{listSearch}&rdquo;</p>
+                  <button onClick={() => setListSearch('')} className="text-sm text-blue-400 hover:text-blue-300 underline">
+                    Clear search
+                  </button>
+                </div>
+              );
+            }
+
+            return (
             <div className="divide-y divide-slate-700/50">
-              {items.map((item) => {
+              {filteredItems.map((item) => {
                 const f = item.fieldData || {};
                 const imageUrl = getImageUrl(f.image)
                   || getImageUrl(f['blog-body-image'])
@@ -1823,7 +1879,8 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 );
               })}
             </div>
-          )}
+            );
+          })()}
         </div>
       )}
     </div>
