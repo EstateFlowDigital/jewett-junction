@@ -2,7 +2,7 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CareersContent } from '../../components/pages/CareersContent';
-import { initCMS, getJobPostings, getSiteSettings, getEmployeeBenefits, getCompanyAwards } from '../../lib/webflow-cms';
+import { initCMS, getJobPostings, getSiteSettings, getEmployeeBenefits, getCompanyAwards, getPageCopy } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -11,22 +11,25 @@ let jobs: any[] = [];
 let settings: any = {};
 let benefits: any[] = [];
 let awards: any[] = [];
+let pageCopy: any = null;
 try {
-  const [jobsResult, siteSettings, benefitsResult, awardsResult] = await Promise.all([
+  const [jobsResult, siteSettings, benefitsResult, awardsResult, copy] = await Promise.all([
     getJobPostings(),
     getSiteSettings(),
     getEmployeeBenefits(),
     getCompanyAwards(),
+    getPageCopy('careers'),
   ]);
   jobs = jobsResult.items;
   settings = siteSettings;
   benefits = benefitsResult.items;
   awards = awardsResult.items;
+  pageCopy = copy;
 } catch (error) {
   console.error('Error fetching careers data:', error);
 }
 ---
 
 <ThemedPage title="Careers | Jewett Junction" theme="dark" currentSection="careers">
-  <CareersContent client:load theme="dark" jobs={jobs} settings={settings} benefits={benefits} awards={awards} />
+  <CareersContent client:load theme="dark" jobs={jobs} settings={settings} benefits={benefits} awards={awards} pageCopy={pageCopy} />
 </ThemedPage>

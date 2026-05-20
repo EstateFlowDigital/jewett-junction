@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award, FileText } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -41,6 +41,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'applications', name: 'Job Applications', icon: Briefcase, color: 'emerald', href: '/jewett-junction/admin/applications' },
       { key: 'form-submissions', name: 'Form Submissions', icon: Mail, color: 'cyan', href: '/jewett-junction/admin/form-submissions' },
       { key: 'site-settings', name: 'Site Settings', icon: Settings, color: 'slate', href: '/jewett-junction/admin/site-settings' },
+      { key: 'page-copy', name: 'Page Copy', icon: FileText, color: 'sky', href: '/jewett-junction/admin/page-copy' },
       { key: 'core-values', name: 'Core Values', icon: Heart, color: 'pink', href: '/jewett-junction/admin/core-values' },
       { key: 'employee-benefits', name: 'Employee Benefits', icon: Heart, color: 'emerald', href: '/jewett-junction/admin/employee-benefits' },
       { key: 'company-awards', name: 'Company Awards', icon: Award, color: 'amber', href: '/jewett-junction/admin/company-awards' },

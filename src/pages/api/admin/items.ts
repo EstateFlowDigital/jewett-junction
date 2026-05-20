@@ -161,6 +161,12 @@ const VALID_FIELDS: Record<string, string[]> = {
     'brand-color-2-name', 'brand-color-2-hex',
     'brand-color-3-name', 'brand-color-3-hex',
   ],
+  pageCopy: [
+    'name', 'slug',
+    'hero-headline', 'hero-subtitle',
+    'section-headline', 'section-body',
+    'application-description',
+  ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',
   ],

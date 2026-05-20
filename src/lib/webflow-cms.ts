@@ -489,6 +489,7 @@ export const COLLECTIONS = {
   jobApplications: '69e92188c048862f1a049a8d',
   formSubmissions: '69e95d7506997240e17e09bd',
   settings: '69fcc0eda58c76d3e2a92ad3',
+  pageCopy: '6a0d59046808b5093596722b',
   coreValues: '69fcc5395999a5288927fdea',
   employeeBenefits: '69fcc53b891ff14c73b15107',
   companyAwards: '69fcc53c891ff14c73b151de',
@@ -516,6 +517,43 @@ Object.assign(COLLECTION_FIELD_ALIASES, {
 // ============================================
 // Helper functions for specific collections
 // ============================================
+
+/**
+ * Page Copy — one record per page (slug = 'careers', 'hr', 'safety', etc.).
+ * Lets the client rewrite hero/section copy from the admin without code edits.
+ */
+export interface PageCopy {
+  id?: string;
+  name?: string;
+  slug?: string;
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+  'section-headline'?: string;
+  'section-body'?: string;
+  'application-description'?: string;
+}
+
+/**
+ * Fetch the Page Copy record for a given page slug. Returns null when nothing
+ * is set so callers can fall back to their hardcoded defaults.
+ */
+let _pageCopyCache: Map<string, { data: PageCopy | null; ts: number }> | null = null;
+const PAGE_COPY_CACHE_MS = 60 * 1000;
+export async function getPageCopy(pageSlug: string): Promise<PageCopy | null> {
+  if (!COLLECTIONS.pageCopy) return null;
+  if (!_pageCopyCache) _pageCopyCache = new Map();
+  const cached = _pageCopyCache.get(pageSlug);
+  const now = Date.now();
+  if (cached && now - cached.ts < PAGE_COPY_CACHE_MS) return cached.data;
+  try {
+    const result = await getCollection<PageCopy>(COLLECTIONS.pageCopy, { slug: pageSlug });
+    const data = result.items.find((p) => p.slug === pageSlug) || null;
+    _pageCopyCache.set(pageSlug, { data, ts: now });
+    return data;
+  } catch {
+    return null;
+  }
+}
 
 export interface SiteSettings {
   name?: string;

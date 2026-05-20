@@ -579,6 +579,23 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'brand-color-3-hex', label: 'Brand: Color 3 Hex', type: 'color' },
     ],
   },
+  pageCopy: {
+    name: 'Page Copy',
+    icon: 'FileText',
+    color: 'sky',
+    gradient: 'from-sky-500 to-cyan-500',
+    slug: 'page-copy',
+    description: 'Editable hero and section copy for fixed pages (Careers, HR, Safety, etc.). One record per page slug.',
+    fields: [
+      { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'e.g., Careers Page Copy', helpText: 'Identifier — not shown publicly', icon: 'FileText' },
+      { key: 'slug', label: 'Page Slug', type: 'text', required: true, placeholder: 'careers', helpText: 'Matches the URL — use lowercase, no slashes. e.g. "careers", "hr", "safety", "it-helpdesk", "marketing".', icon: 'Link' },
+      { key: 'hero-headline', label: 'Hero Headline', type: 'text', placeholder: 'Build Your Career with a Team That Puts People First', helpText: 'Big bold headline at the top of the page', icon: 'Type' },
+      { key: 'hero-subtitle', label: 'Hero Subtitle', type: 'richtext', placeholder: 'Supporting paragraph under the hero headline...', helpText: 'Body copy that introduces the page' },
+      { key: 'section-headline', label: 'Section Headline', type: 'text', placeholder: 'Why Jewett Construction?', helpText: 'Optional second headline lower on the page', icon: 'Type' },
+      { key: 'section-body', label: 'Section Body', type: 'richtext', placeholder: 'Body copy for the secondary section...', helpText: 'Rich-text body for the second content block' },
+      { key: 'application-description', label: 'Form / Application Description', type: 'textarea', placeholder: 'Fill out the form below to get started...', helpText: 'Optional callout shown above forms on pages like Careers or Signage' },
+    ],
+  },
   coreValues: {
     name: 'Core Values',
     icon: 'Heart',

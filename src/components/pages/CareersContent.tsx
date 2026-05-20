@@ -72,12 +72,22 @@ interface CMSCompanyAward {
   'sort-order'?: number;
 }
 
+interface CareersPageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+  'section-headline'?: string;
+  'section-body'?: string;
+  'application-description'?: string;
+}
+
 interface CareersContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   jobs?: JobPosting[];
   settings?: CareersSettings;
   benefits?: CMSEmployeeBenefit[];
   awards?: CMSCompanyAward[];
+  /** Optional editable copy from the Page Copy CMS (slug='careers'). */
+  pageCopy?: CareersPageCopy | null;
 }
 
 // Maps lucide icon-name strings (from CMS) to actual components.
@@ -598,7 +608,21 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   );
 }
 
-export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [] }: CareersContentProps) {
+// Default hero/section copy when the Page Copy CMS record isn't set.
+const DEFAULT_HERO_HEADLINE = 'Build Your Career with a Team That Puts People First.';
+const DEFAULT_HERO_SUBTITLE = `<p>At Jewett Construction, people matter more than anything. For over 50 years, we've built an award-winning culture rooted in safety, integrity, and opportunity. Whether you're in the field or the office, you'll find a place where your work makes a real impact.</p>`;
+const DEFAULT_SECTION_HEADLINE = 'Why Jewett Construction?';
+const DEFAULT_SECTION_BODY = `<p>For more than half a century, Jewett Construction has set the standard in commercial construction across Ohio. We've grown from a local builder into a regional leader — not by cutting corners, but by investing in the people who make it all happen.</p><p>Our culture is built on four values: <strong>Safety, Excellence, Teamwork, and Integrity</strong>. We live by the principle that <strong>people matter more than anything</strong> — and that means providing real career growth, industry-leading benefits, and a workplace where every voice is heard.</p><p>Whether you're an experienced project manager or just starting out in the trades, you'll find a team that has your back and a company that's committed to your success.</p>`;
+const DEFAULT_APPLICATION_DESCRIPTION = 'Fill out the form below to get started. Our recruiting team reviews every application and will follow up within 24 hours. We proudly welcome veterans and military talent.';
+
+export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [], pageCopy = null }: CareersContentProps) {
+  // Editable hero/section copy — falls back to baked-in defaults when the
+  // Page Copy CMS record (slug='careers') is empty or any field is blank.
+  const heroHeadline = pageCopy?.['hero-headline'] || DEFAULT_HERO_HEADLINE;
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || DEFAULT_HERO_SUBTITLE;
+  const sectionHeadline = pageCopy?.['section-headline'] || DEFAULT_SECTION_HEADLINE;
+  const sectionBody = pageCopy?.['section-body'] || DEFAULT_SECTION_BODY;
+  const applicationDescription = pageCopy?.['application-description'] || DEFAULT_APPLICATION_DESCRIPTION;
   const careersEmail = settings['careers-email'] || 'careers@jewett.com';
   const benefits: BenefitDisplay[] = cmsBenefits.length > 0
     ? cmsBenefits.map((b) => ({
@@ -647,13 +671,12 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
             )}
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Build Your Career with<br />a Team That Puts People First.
+            {heroHeadline}
           </h1>
-          <p className="text-lg text-blue-100 mb-6 max-w-2xl">
-            At Jewett Construction, people matter more than anything. For over 50 years, we've built
-            an award-winning culture rooted in safety, integrity, and opportunity. Whether you're in the
-            field or the office, you'll find a place where your work makes a real impact.
-          </p>
+          <div
+            className="text-lg text-blue-100 mb-6 max-w-2xl prose prose-invert prose-p:my-0 prose-p:text-blue-100"
+            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+          />
           <div className="flex flex-wrap gap-3">
             <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50" asChild>
               <a href="#positions">
@@ -678,7 +701,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
             Apply to Join Our Team
           </CardTitle>
           <CardDescription className="text-slate-400">
-            Fill out the form below to get started. Our recruiting team reviews every application and will follow up within 24 hours. We proudly welcome veterans and military talent.
+            {applicationDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">
@@ -690,24 +713,13 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Why Jewett Construction?</CardTitle>
+            <CardTitle className="text-white">{sectionHeadline}</CardTitle>
           </CardHeader>
-          <CardContent className="text-slate-300 space-y-4">
-            <p>
-              For more than half a century, Jewett Construction has set the standard in commercial
-              construction across Ohio. We've grown from a local builder into a regional leader — not
-              by cutting corners, but by investing in the people who make it all happen.
-            </p>
-            <p>
-              Our culture is built on four values: <span className="text-white font-medium">Safety, Excellence, Teamwork, and Integrity</span>.
-              We live by the principle that <span className="text-white font-medium">people matter more than anything</span> — and
-              that means providing real career growth, industry-leading benefits, and a workplace where
-              every voice is heard.
-            </p>
-            <p>
-              Whether you're an experienced project manager or just starting out in the trades,
-              you'll find a team that has your back and a company that's committed to your success.
-            </p>
+          <CardContent>
+            <div
+              className="text-slate-300 prose prose-invert max-w-none prose-p:text-slate-300 prose-strong:text-white"
+              dangerouslySetInnerHTML={{ __html: sectionBody }}
+            />
           </CardContent>
         </Card>
 
