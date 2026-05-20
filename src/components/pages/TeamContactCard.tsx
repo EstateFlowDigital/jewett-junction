@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Mail, Phone, Users } from 'lucide-react';
+import { Mail, Phone, Users, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 interface Employee {
@@ -8,13 +8,19 @@ interface Employee {
   role?: string;
   email?: string;
   phone?: string;
-  department?: string;
-  'team-department'?: string;
+  /** Canonical department field — Webflow Option, 8 fixed values */
   dept?: string;
+  /** Legacy alias kept for items not yet re-saved on the new schema */
+  department?: string;
   photo?: { url?: string };
   'is-featured'?: boolean;
   'leadership-team'?: boolean;
   'page-contact-for'?: string;
+  /** When set, the contact card shows this portal link in place of the email
+   *  row — used for outsourced vendor contacts (e.g. managed IT). */
+  'portal-url'?: string;
+  /** Optional instruction shown above the portal link. */
+  'portal-message'?: string;
 }
 
 interface TeamContactCardProps {
@@ -81,7 +87,7 @@ export function TeamContactCard({
         // 2. Fall back to substring match on any department-ish field.
         const needle = department.toLowerCase();
         const inDept = items.filter((e) => {
-          const dept = (e.dept || e['team-department'] || e.department || '').toLowerCase();
+          const dept = (e.dept || e.department || '').toLowerCase();
           return dept.includes(needle);
         });
         const lead =
@@ -96,6 +102,9 @@ export function TeamContactCard({
   }, [department, tag]);
 
   const email = contact?.email || fallbackEmail;
+  const portalUrl = contact?.['portal-url']?.trim() || '';
+  const portalMessage = contact?.['portal-message']?.trim() || 'For support, please log in to the portal:';
+  const hasPortal = portalUrl.length > 0;
   const accentBg = isDark ? `bg-${accent}-900/40` : `bg-${accent}-100`;
   const accentText = `text-${accent}-600`;
   const directoryHref = `/jewett-junction/directory?department=${encodeURIComponent(department)}`;
@@ -135,15 +144,35 @@ export function TeamContactCard({
           </div>
         )}
         <div className="space-y-3">
-          <a
-            href={`mailto:${email}`}
-            className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-              isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'
-            }`}
-          >
-            <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-            <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>{email}</span>
-          </a>
+          {hasPortal ? (
+            // Portal link replaces the email row when the contact employee has
+            // a `portal-url` set (e.g. an outsourced IT vendor like SymQuest).
+            <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-muted/50'}`}>
+              <p className={`text-xs leading-snug mb-2 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                {portalMessage}
+              </p>
+              <a
+                href={portalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 text-sm font-medium break-all underline-offset-2 hover:underline ${isDark ? `text-${accent}-300 hover:text-${accent}-200` : `text-${accent}-600 hover:text-${accent}-700`}`}
+                aria-label="Open support portal in a new tab"
+              >
+                <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{portalUrl.replace(/^https?:\/\//, '')}</span>
+              </a>
+            </div>
+          ) : (
+            <a
+              href={`mailto:${email}`}
+              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'
+              }`}
+            >
+              <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
+              <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>{email}</span>
+            </a>
+          )}
           {contact?.phone && (
             <a
               href={`tel:${contact.phone}`}

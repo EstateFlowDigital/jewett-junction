@@ -14,6 +14,42 @@ import {
   getResources,
 } from '../../../lib/webflow-cms';
 
+// Fields that MUST NOT be exposed through the unauthenticated public CMS API.
+// These are internal triage/PII fields used by the admin UI; pages that need
+// them (admin lists, triage panels) hit the admin items.ts endpoint instead.
+const INTERNAL_FIELDS = [
+  'admin-notes',          // staff annotations
+  'submitter-email',      // PII on form/idea submissions
+  'submitter-phone',      // PII
+  'submitter-name',       // PII
+  'email',                // PII on submittedIdeas / employees PII unless explicitly part of directory display
+  'phone',                // PII
+  'full-response',        // raw form payload — may include PII / free-text
+  'webflow-form-id',
+  'submission-id',
+  'published-path',
+  'webflow-record-id',
+];
+
+// Collections where the fields above are part of the intended public display
+// (e.g., the Employee Directory shows email/phone by design). For these the
+// stripping is bypassed.
+const PUBLIC_FULL_DETAIL_COLLECTIONS = new Set(['employees']);
+
+function stripInternalFields(items: any[], collection: string | undefined): any[] {
+  if (!Array.isArray(items)) return items;
+  if (collection && PUBLIC_FULL_DETAIL_COLLECTIONS.has(collection)) return items;
+  return items.map((it) => {
+    if (!it || typeof it !== 'object') return it;
+    const next: Record<string, any> = {};
+    for (const [k, v] of Object.entries(it)) {
+      if (INTERNAL_FIELDS.includes(k)) continue;
+      next[k] = v;
+    }
+    return next;
+  });
+}
+
 // Public API for fetching CMS content (no auth required)
 export const GET: APIRoute = async ({ params, url, locals }) => {
   // Initialize CMS with Cloudflare runtime context
@@ -87,7 +123,13 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
         });
     }
 
-    return new Response(JSON.stringify(result), {
+    // Strip internal/PII fields before serving over the public endpoint.
+    const sanitized = {
+      ...result,
+      items: stripInternalFields(result.items, collection),
+    };
+
+    return new Response(JSON.stringify(sanitized), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

@@ -82,7 +82,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
             {(featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url) ? (
               <div class="flex flex-col md:flex-row">
                 <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
-                  <img src={featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image.url} alt={featuredAnnouncement.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <img src={featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url} alt={featuredAnnouncement.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                 </div>
                 <div class="p-6 md:w-2/3 relative">
                   <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
@@ -156,7 +156,7 @@ const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnounceme
                 >
                   {(announcement['blog-body-image']?.url || announcement.image?.url) ? (
                     <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
-                      <img src={announcement['blog-body-image']?.url || announcement.image.url} alt={announcement.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" />
+                      <img src={announcement['blog-body-image']?.url || announcement.image?.url} alt={announcement.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" />
                     </div>
                   ) : (
                     <div class={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${

@@ -26,6 +26,14 @@ const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/je
     <style>
       .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
       @media (max-width: 767px) { .mobile-safe-area { padding-top: max(4.5rem, env(safe-area-inset-top, 0px)); } }
+      /* Keyboard-only focus ring for sidebar icon links — the visited / hover
+         states already handle pointer use; this fills the a11y gap for tab
+         navigation without altering the visual at rest. */
+      aside a:focus-visible {
+        outline: 2px solid rgb(59, 130, 246);
+        outline-offset: 2px;
+        border-radius: 0.75rem;
+      }
     </style>
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">

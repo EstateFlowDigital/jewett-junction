@@ -98,9 +98,47 @@ function formatTenure(startDate: string | undefined) {
   return `${years} year${years > 1 ? 's' : ''}`;
 }
 
+// Leadership display order — these names appear first in the directory, in
+// this exact sequence, then everyone else is alphabetical by name. Matches
+// the order on the public Team page on jewettconstruction.com.
+const LEADERSHIP_ORDER: string[] = [
+  'Craig Jewett',
+  'Greg Stewart',
+  'Dan Ray',
+  'Andrew Affronti',
+  'Damon Brown',
+  'Lori Smith',
+  'Jon Warner',
+  'Nate Weeks',
+  'Diane Grillo',
+  'Lynn Palmer',
+  'Doug Reymore',
+  'Sarah LeBlanc',
+];
+const LEADERSHIP_INDEX = new Map(
+  LEADERSHIP_ORDER.map((name, i) => [name.trim().toLowerCase(), i]),
+);
+function directorySortOrder(name: string | undefined): number {
+  const key = (name || '').trim().toLowerCase();
+  const idx = LEADERSHIP_INDEX.get(key);
+  return idx === undefined ? LEADERSHIP_ORDER.length : idx;
+}
+
 export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [], settings = {} }: DirectoryContentProps) {
-  // Use CMS employees only - no hardcoded fallback
-  const allEmployees = cmsEmployees;
+  // Apply the leadership-first-then-alphabetical sort once up front. Search
+  // and department filtering downstream preserve this order automatically
+  // because Array.filter is stable; fuzzySearch is the only step that re-ranks
+  // and only kicks in when there's an active search term.
+  const allEmployees = React.useMemo(() => {
+    return [...cmsEmployees].sort((a, b) => {
+      const oa = directorySortOrder(a.name);
+      const ob = directorySortOrder(b.name);
+      if (oa !== ob) return oa - ob;
+      // Both leadership in same slot (shouldn't happen) or both non-leadership:
+      // alphabetical by name.
+      return (a.name || '').localeCompare(b.name || '');
+    });
+  }, [cmsEmployees]);
   const hrEmail = settings['hr-email'] || 'hr@jewettconstruction.com';
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All');
@@ -591,37 +629,6 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
         </Card>
       )}
 
-      {/* Need Help CTA */}
-      <Card className="bg-gradient-to-r from-cyan-600 to-blue-600 border-0 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
-        <CardContent className="py-8 px-6 md:px-8 relative">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  Can't Find Who You're Looking For?
-                </h2>
-                <p className="text-cyan-100">
-                  Contact HR and we'll help you connect with the right person.
-                </p>
-              </div>
-            </div>
-            <Button
-              size="lg"
-              className="bg-white text-cyan-700 hover:bg-cyan-50 flex-shrink-0"
-              asChild
-            >
-              <a href={`mailto:${hrEmail}`}>
-                Contact HR
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </a>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

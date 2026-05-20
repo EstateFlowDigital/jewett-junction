@@ -340,10 +340,10 @@ export interface Employee {
   name: string;
   slug: string;
   role: string;
-  /** legacy alias of `team-department` (placeholder Option, single value) */
-  department: string;
-  /** real Webflow slug, full options */
-  'team-department'?: string;
+  /** Canonical department — Webflow 'dept' Option field, 8 values */
+  dept?: string;
+  /** Legacy alias, mirrored from `dept` at fetch time for items not yet re-saved */
+  department?: string;
   email?: string;
   phone?: string;
   photo?: { url: string; alt?: string };
@@ -499,7 +499,10 @@ export const COLLECTIONS = {
 // new fields with distinct slugs. This map lets fetched items expose BOTH keys
 // so downstream display code can keep reading the older human-friendly name.
 Object.assign(COLLECTION_FIELD_ALIASES, {
-  [COLLECTIONS.employees]: { department: 'dept', 'team-department': 'dept' },
+  // `dept` is the canonical employee department field; alias mirrors to
+  // legacy `department` key so display code that hasn't been migrated still reads it.
+  // The retired `team-department` field is no longer mirrored or written to.
+  [COLLECTIONS.employees]: { department: 'dept' },
   [COLLECTIONS.announcements]: { priority: 'priority-level', category: 'news-category' },
   [COLLECTIONS.events]: { category: 'event-category' },
   [COLLECTIONS.jobPostings]: { department: 'job-department' },

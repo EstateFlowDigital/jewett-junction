@@ -6,21 +6,29 @@ const GATED_PREFIXES = [
   '/jewett-junction',
   '/admin',
   '/announcements',
+  '/careers',
   '/culture',
   '/directory',
   '/events',
   '/help',
   '/hr',
   '/it-helpdesk',
+  '/it-ticket',
   '/marketing',
   '/notifications',
   '/profile',
   '/resources',
   '/safety',
+  '/safety-incident',
   '/settings',
   '/submit-idea',
   '/api/admin',
   '/jewett-junction/api/admin',
+  // Gate the public read endpoint too — only intranet users (IP-allowed) should
+  // be able to enumerate CMS content from outside the rendered pages. We still
+  // strip PII fields in the endpoint itself as defense in depth.
+  '/api/cms',
+  '/jewett-junction/api/cms',
 ];
 
 function getCorsHeaders(request: Request): Record<string, string> {
@@ -40,6 +48,10 @@ function getCorsHeaders(request: Request): Record<string, string> {
 }
 
 function isGatedPath(pathname: string): boolean {
+  // Dashboard moved to the mount root, so the bare path needs explicit gating —
+  // it doesn't match any of the GATED_PREFIXES via startsWith without matching
+  // every other path too.
+  if (pathname === '/') return true;
   return GATED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
@@ -83,8 +95,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
+  // Local-dev convenience: typing /jewett-junction in the dev server should hit
+  // the dashboard (the root index.astro). In production Webflow Cloud strips
+  // /jewett-junction at the edge, so this branch never fires there.
+  // The previous rewrite target was /dashboard, which now permanently redirects
+  // back to /jewett-junction — that caused an infinite loop. Send to / instead.
   if (pathname === '/jewett-junction' || pathname === '/jewett-junction/') {
-    return context.rewrite('/dashboard');
+    return context.rewrite('/');
   }
 
   const response = await next();

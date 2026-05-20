@@ -31,8 +31,9 @@ const VALID_FIELDS: Record<string, string[]> = {
     'featured', 'published-date', 'category', 'image'
   ],
   employees: [
-    'name', 'slug', 'photo', 'role', 'dept', 'team-department', 'office-location', 'email',
-    'phone', 'extension', 'linkedin-url', 'start-date', 'bio', 'skills',
+    'name', 'slug', 'photo', 'role', 'dept', 'office-location', 'email',
+    'phone', 'extension', 'linkedin-url', 'portal-url', 'portal-message',
+    'start-date', 'bio', 'skills',
     'certifications', 'is-featured', 'leadership-team', 'page-contact-for',
   ],
   resources: [

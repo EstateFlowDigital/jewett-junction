@@ -2,7 +2,6 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Presentation, Download, ArrowLeft } from 'lucide-react';
 import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
@@ -51,23 +50,30 @@ const getImageUrl = (img: any) => {
             {presentations.map((pres) => {
               const imageUrl = getImageUrl(pres['preview-image']) || getImageUrl(pres.thumbnail);
               const downloadUrl = pres['download-link'];
+              const detailUrl = `/jewett-junction/marketing/${pres.slug || pres.id}`;
               return (
-                <a
-                  href={`/jewett-junction/marketing/${pres.slug || pres.id}`}
-                  class="border border-slate-600 rounded-lg overflow-hidden bg-slate-700/50 hover:border-green-500/50 hover:bg-slate-700 transition-colors flex flex-col"
-                >
-                  <div class="h-36 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center overflow-hidden">
+                <div class="group border border-slate-600 rounded-lg overflow-hidden bg-slate-700/50 hover:border-green-500/50 hover:bg-slate-700 transition-colors flex flex-col">
+                  {/* Preview links to detail */}
+                  <a
+                    href={detailUrl}
+                    class="block h-36 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center overflow-hidden"
+                    aria-label={`View ${pres.name} details`}
+                  >
                     {imageUrl ? (
-                      <img src={imageUrl} alt={pres.name} class="w-full h-full object-cover" loading="lazy" />
+                      <img src={imageUrl} alt={pres.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                     ) : (
                       <Presentation className="h-10 w-10 text-white/80" />
                     )}
-                  </div>
+                  </a>
+
                   <div class="p-4 flex flex-col gap-2 flex-1">
-                    <p class="font-medium text-sm text-white truncate">{pres.name}</p>
-                    {pres.description && (
-                      <p class="text-xs text-slate-400 line-clamp-2">{pres.description}</p>
-                    )}
+                    <a href={detailUrl} class="block">
+                      <p class="font-medium text-sm text-white truncate group-hover:text-green-400 transition-colors">{pres.name}</p>
+                      {pres.description && (
+                        <p class="text-xs text-slate-400 line-clamp-2 mt-1">{pres.description}</p>
+                      )}
+                    </a>
+
                     <div class="flex items-center justify-between mt-auto gap-2">
                       {pres['file-format'] && (
                         <Badge variant="secondary" className="bg-slate-600 text-slate-300 uppercase text-xs">
@@ -75,15 +81,20 @@ const getImageUrl = (img: any) => {
                         </Badge>
                       )}
                       {downloadUrl && (
-                        <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600 ml-auto" asChild>
-                          <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-3 w-3 mr-1" /> Download
-                          </a>
-                        </Button>
+                        <a
+                          href={downloadUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="inline-flex items-center gap-1 px-3 py-1.5 min-h-[32px] text-xs font-medium border border-slate-600 hover:border-green-500 text-slate-300 hover:text-white hover:bg-green-600 rounded-md transition-colors ml-auto"
+                          aria-label={`Download ${pres.name}`}
+                        >
+                          <Download className="h-3 w-3" />
+                          Download
+                        </a>
                       )}
                     </div>
                   </div>
-                </a>
+                </div>
               );
             })}
           </div>

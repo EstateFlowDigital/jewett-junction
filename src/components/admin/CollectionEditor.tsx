@@ -1743,7 +1743,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             // Filter items by the list search term — matches against name,
             // title, department, category, location, and the slug. Case-insensitive.
             const q = listSearch.trim().toLowerCase();
-            const filteredItems = q
+            const searched = q
               ? items.filter((it) => {
                   const fd = it.fieldData || {};
                   const haystack = [
@@ -1757,6 +1757,33 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   return haystack.includes(q);
                 })
               : items;
+
+            // For collections where chronology matters more than manual sort-order
+            // (form submissions, announcements, events…), surface the newest items
+            // first. Pick the first available timestamp field and sort descending.
+            // Other collections keep Webflow's default ordering.
+            const TIME_SORTED_COLLECTIONS = new Set([
+              'formSubmissions',
+              'announcements',
+              'events',
+              'submittedIdeas',
+              'jobApplications',
+            ]);
+            const TIME_KEYS = ['submitted-at', 'submitted-on', 'published-date', 'event-date', 'created-at', 'date'];
+            const getTimestamp = (it: any): number => {
+              const fd = it.fieldData || {};
+              for (const k of TIME_KEYS) {
+                if (fd[k]) {
+                  const t = new Date(fd[k]).getTime();
+                  if (!isNaN(t)) return t;
+                }
+              }
+              const top = it.lastUpdated || it.createdOn || it.lastPublished;
+              return top ? new Date(top).getTime() : 0;
+            };
+            const filteredItems = TIME_SORTED_COLLECTIONS.has(collectionKey)
+              ? [...searched].sort((a, b) => getTimestamp(b) - getTimestamp(a))
+              : searched;
 
             if (filteredItems.length === 0) {
               return (

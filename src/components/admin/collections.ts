@@ -162,6 +162,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'extension', label: 'Phone Extension', type: 'text', placeholder: 'ext. 123', icon: 'Phone', group: 'Contact' },
       { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: 'MapPin', group: 'Contact' },
       { key: 'linkedin-url', label: 'LinkedIn Profile', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin', group: 'Contact' },
+      { key: 'portal-url', label: 'Support Portal URL', type: 'url', placeholder: 'https://portal.example.com/login', helpText: 'Optional. When set, the team contact card on the matching page (HR, IT, Safety, Marketing) shows this portal link INSTEAD of the email — useful for outsourced vendors like a managed IT provider.', icon: 'ExternalLink', group: 'Contact' },
+      { key: 'portal-message', label: 'Support Portal Message', type: 'textarea', placeholder: 'For IT related issues please log in to the portal:', helpText: 'Short instruction shown above the portal link. Leave blank for a sensible default.', group: 'Contact' },
 
       // Background
       { key: 'start-date', label: 'Start Date', type: 'datetime', helpText: 'When did they join the company?', icon: 'Calendar', group: 'Background' },

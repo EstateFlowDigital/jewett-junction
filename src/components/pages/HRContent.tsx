@@ -17,6 +17,9 @@ interface HRItem {
   'effective-date'?: string;
   featured?: boolean;
   icon?: { url: string };
+  /** Custom hex color (e.g. #d22630) for the benefit/policy icon tile. Optional;
+   *  falls back to the theme default when blank. */
+  'icon-color'?: string;
 }
 
 interface SiteSettingsLite {
@@ -83,7 +86,15 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
   // Filter items by type - handle case where content-type is not set
   const announcements = hrItems.filter(item => item['content-type'] === 'Announcement' && item.featured);
   const policies = hrItems.filter(item => item['content-type'] === 'Policy');
-  const benefits = hrItems.filter(item => item['content-type'] === 'Benefit');
+  // Benefits Overview also surfaces holiday/PTO/time-off items even if their
+  // content-type is set to Policy or left blank — they belong here visually
+  // and the client expects them to show alongside health/401k benefits.
+  const BENEFIT_NAME_HINTS = /benefit|holiday|pto|vacation|time\s*off|leave|wellness|401|health|insurance/i;
+  const benefits = hrItems.filter(
+    (item) =>
+      item['content-type'] === 'Benefit' ||
+      BENEFIT_NAME_HINTS.test(item.name || ''),
+  );
   const forms = hrItems.filter(item => item['content-type'] === 'Form');
   const featuredItem = announcements[0] || hrItems.find(item => item.featured);
 
@@ -275,35 +286,56 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Show benefits from CMS, or display items without content-type, or empty state */}
-                {(benefits.length > 0 ? benefits.slice(0, 2) : displayItems.slice(0, 2)).map((benefit, i) => ({
-                  source: benefit,
-                  name: benefit.name,
-                  href: `/jewett-junction/hr/${benefit.slug || benefit.id}`,
-                  desc: stripHtml(benefit.description || getContent(benefit))?.substring(0, 100),
-                  icon: i === 0 ? Heart : DollarSign,
-                  color: i === 0 ? 'red' : 'green',
-                })).map((benefit) => (
-                  <a
-                    key={benefit.name}
-                    href={benefit.href}
-                    className="block group"
-                    aria-label={`View benefit: ${benefit.name}`}
-                  >
-                    <Card className={`border h-full transition-all min-h-[44px] ${isDark ? 'bg-slate-700 border-slate-600 hover:border-purple-500/50 hover:bg-slate-700/80' : 'hover:border-purple-300 hover:shadow-md'}`}>
-                      <CardContent className="pt-4">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-10 h-10 ${isDark ? `bg-${benefit.color}-900` : `bg-${benefit.color}-100`} rounded-lg flex items-center justify-center`}>
-                            <benefit.icon className={`h-5 w-5 text-${benefit.color}-600`} />
+                {/* Up to 4 benefit-like items. Honors CMS-provided icon image
+                    and `icon-color` hex for the tile, falling back to a
+                    pleasant default rotation when not set. */}
+                {(benefits.length > 0 ? benefits : displayItems).slice(0, 4).map((benefit, i) => {
+                  const FALLBACK_ICONS = [Heart, DollarSign, Calendar, Shield];
+                  const FALLBACK_COLORS = ['red', 'green', 'blue', 'purple'];
+                  const FallbackIcon = FALLBACK_ICONS[i % FALLBACK_ICONS.length];
+                  const fallbackColor = FALLBACK_COLORS[i % FALLBACK_COLORS.length];
+                  const customHex = /^#[0-9a-fA-F]{6}$/.test(benefit['icon-color'] || '')
+                    ? benefit['icon-color']
+                    : undefined;
+                  const iconUrl = benefit.icon?.url;
+                  return (
+                    <a
+                      key={benefit.id || benefit.name}
+                      href={`/jewett-junction/hr/${benefit.slug || benefit.id}`}
+                      className="block group"
+                      aria-label={`View benefit: ${benefit.name}`}
+                    >
+                      <Card className={`border h-full transition-all min-h-[44px] ${isDark ? 'bg-slate-700 border-slate-600 hover:border-purple-500/50 hover:bg-slate-700/80' : 'hover:border-purple-300 hover:shadow-md'}`}>
+                        <CardContent className="pt-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div
+                              className={
+                                customHex
+                                  ? 'w-10 h-10 rounded-lg flex items-center justify-center'
+                                  : `w-10 h-10 rounded-lg flex items-center justify-center ${isDark ? `bg-${fallbackColor}-900` : `bg-${fallbackColor}-100`}`
+                              }
+                              style={customHex ? { backgroundColor: `${customHex}33` } : undefined}
+                            >
+                              {iconUrl ? (
+                                <img src={iconUrl} alt="" className="h-5 w-5 object-contain" loading="lazy" />
+                              ) : (
+                                <FallbackIcon
+                                  className={customHex ? 'h-5 w-5' : `h-5 w-5 text-${fallbackColor}-600`}
+                                  style={customHex ? { color: customHex } : undefined}
+                                />
+                              )}
+                            </div>
+                            <h3 className={`font-semibold group-hover:text-purple-500 transition-colors ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
+                            <ChevronRight className={`h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
                           </div>
-                          <h3 className={`font-semibold group-hover:text-purple-500 transition-colors ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
-                          <ChevronRight className={`h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
-                        </div>
-                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{benefit.desc}</p>
-                      </CardContent>
-                    </Card>
-                  </a>
-                ))}
+                          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                            {stripHtml(benefit.description || getContent(benefit))?.substring(0, 100)}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

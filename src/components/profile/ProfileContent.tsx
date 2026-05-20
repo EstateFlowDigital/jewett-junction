@@ -24,8 +24,10 @@ interface EmployeeRecord {
   email?: string;
   phone?: string;
   role?: string;
+  /** Canonical department field — Webflow Option, 8 fixed values */
+  dept?: string;
+  /** Legacy alias kept for items not yet re-saved on the new schema */
   department?: string;
-  'team-department'?: string;
   'office-location'?: string;
   bio?: string;
   skills?: string;
@@ -91,7 +93,7 @@ export function ProfileContent() {
     name: profile.name || 'Employee',
     email: profile.email || profileEmail,
     phone: profile.phone || '',
-    department: profile['team-department'] || profile.department || '',
+    department: profile.dept || profile.department || '',
     role: profile.role || '',
     location: profile['office-location'] || '',
     startDate: profile['start-date'] || '',

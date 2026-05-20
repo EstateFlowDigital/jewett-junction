@@ -72,7 +72,7 @@ const priorityKey = (announcement.priority || '').toString().toLowerCase();
       {(announcement['blog-body-image']?.url || announcement.image?.url) && (
         <div class={`w-full overflow-hidden relative ${announcement['blog-body-image']?.url ? 'aspect-video' : 'h-64'}`}>
           <img
-            src={announcement['blog-body-image']?.url || announcement.image.url}
+            src={announcement['blog-body-image']?.url || announcement.image?.url}
             alt={`Image for ${announcement.name}`}
             class="w-full h-full object-cover"
             loading="lazy"

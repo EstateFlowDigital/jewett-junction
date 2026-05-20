@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../../lib/webflow-cms';
 import { getWebflowApiToken } from '../../../lib/admin-auth';
 import { mapSubmissionToFieldData, mapWebhookPayload, submissionSlug } from '../../../lib/form-submission-mapper';
+import { sendNotification, type InboxKey } from '../../../lib/notify';
 
 export const prerender = false;
 
@@ -24,10 +25,25 @@ async function findExistingByDedupSlug(collectionId: string, apiToken: string, s
   return match?.id || null;
 }
 
+// Pick the right notification inbox from the submitted form's display name.
+// Falls back to 'ideas' (general inbox) for anything we don't recognize.
+function inboxForForm(formName: string | undefined): InboxKey {
+  const n = (formName || '').toLowerCase();
+  if (/safety|incident|injury|hazard/.test(n)) return 'safety';
+  if (/it\b|helpdesk|tech|software/.test(n)) return 'it';
+  if (/hr\b|human\s*resources|benefits|payroll/.test(n)) return 'hr';
+  if (/signage|sign\b|marketing/.test(n)) return 'signage';
+  return 'ideas';
+}
+
 export const POST: APIRoute = async ({ request, url, locals }) => {
-  // Simple shared-secret auth via query param. Webflow webhooks don't sign
-  // requests in a v2-universal way, so we gate on a per-site secret instead.
-  const providedSecret = url.searchParams.get('secret');
+  // Shared-secret auth. Prefer the X-Webflow-Secret header (doesn't appear in
+  // browser/CDN/proxy logs), but fall back to the ?secret= query param for
+  // older Webflow webhook configurations that can only use URL params.
+  const providedSecret =
+    request.headers.get('x-webflow-secret') ||
+    request.headers.get('x-webhook-secret') ||
+    url.searchParams.get('secret');
   const expectedSecret = getWebhookSecret(locals);
   if (!expectedSecret || providedSecret !== expectedSecret) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -83,5 +99,29 @@ export const POST: APIRoute = async ({ request, url, locals }) => {
     return new Response(JSON.stringify({ error: 'Unable to record submission' }), { status: 502, headers: { 'Content-Type': 'application/json' } });
   }
   const created = await res.json();
+
+  // Email-notify the right inbox. Best-effort — failures are logged inside
+  // sendNotification but never fail the webhook (the CMS write is the source
+  // of truth; the email is a convenience for the team).
+  try {
+    const inbox = inboxForForm(fieldData['form-name']);
+    const summaryFields = [
+      { label: 'Form', value: fieldData['form-name'] },
+      { label: 'Submitted', value: fieldData['submitted-at'] },
+      { label: 'Name', value: fieldData['submitter-name'] },
+      { label: 'Email', value: fieldData['submitter-email'] },
+      { label: 'Phone', value: fieldData['submitter-phone'] },
+      { label: 'Page', value: fieldData['published-path'] },
+    ];
+    await sendNotification(locals, {
+      inbox,
+      subject: `[Jewett Junction] ${fieldData['form-name'] || 'New form submission'}${fieldData['submitter-name'] ? ` from ${fieldData['submitter-name']}` : ''}`,
+      fields: summaryFields,
+      replyTo: fieldData['submitter-email'] || undefined,
+    });
+  } catch (err: any) {
+    console.error('webhook form-submission: notify exception', err?.message);
+  }
+
   return new Response(JSON.stringify({ success: true, id: created.id }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 };

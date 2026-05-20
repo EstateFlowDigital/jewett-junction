@@ -2,7 +2,6 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
 import { Image, Download, ArrowLeft, FileType, Palette } from 'lucide-react';
 import { initCMS, getMarketingAssets, getSiteSettings } from '../../lib/webflow-cms';
 
@@ -75,37 +74,59 @@ const getImageUrl = (img: any) => {
       </CardHeader>
       <CardContent>
         {logos.length > 0 ? (
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {logos.map((asset) => {
               const imageUrl = getImageUrl(asset['preview-image']) || getImageUrl(asset.thumbnail);
               const downloadUrl = asset['download-link'];
+              const detailUrl = `/jewett-junction/marketing/${asset.slug || asset.id}`;
               return (
-                <a
-                  href={`/jewett-junction/marketing/${asset.slug || asset.id}`}
-                  class="border border-slate-600 rounded-lg p-4 bg-slate-700/50 hover:border-blue-500/50 hover:bg-slate-700 transition-colors block"
-                >
-                  <div class="h-32 bg-white rounded flex items-center justify-center mb-3 overflow-hidden">
+                <div class="group border border-slate-600 rounded-xl bg-slate-700/40 hover:border-blue-500/50 hover:bg-slate-700/70 transition-colors overflow-hidden flex flex-col">
+                  {/* Image preview links to detail page */}
+                  <a
+                    href={detailUrl}
+                    class="block h-32 bg-white flex items-center justify-center overflow-hidden"
+                    aria-label={`View ${asset.name} details`}
+                  >
                     {imageUrl ? (
-                      <img src={imageUrl} alt={asset.name} class="max-w-full max-h-full object-contain p-2" loading="lazy" />
+                      <img
+                        src={imageUrl}
+                        alt={asset.name}
+                        class="max-w-full max-h-full object-contain p-3 group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                      />
                     ) : (
                       <Image className="h-8 w-8 text-slate-400" />
                     )}
-                  </div>
-                  <p class="font-medium text-sm text-white truncate">{asset.name}</p>
-                  <p class="text-xs text-slate-400 mb-3">{asset['file-format'] || 'Logo'}</p>
-                  {downloadUrl && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-600"
-                      asChild
-                    >
-                      <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                        <Download className="h-3 w-3 mr-1" /> Download
+                  </a>
+
+                  {/* Meta + actions */}
+                  <div class="p-3 flex-1 flex flex-col gap-2">
+                    <a href={detailUrl} class="block group/title">
+                      <p class="font-medium text-sm text-white truncate group-hover/title:text-blue-400 transition-colors">{asset.name}</p>
+                      <p class="text-xs text-slate-400 uppercase tracking-wider">{asset['file-format'] || 'Logo'}</p>
+                    </a>
+
+                    {downloadUrl ? (
+                      <a
+                        href={downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center justify-center gap-1.5 w-full mt-1 px-3 py-2 min-h-[36px] text-xs font-medium bg-slate-600/60 hover:bg-blue-600 text-slate-200 hover:text-white border border-slate-500/50 hover:border-blue-500 rounded-lg transition-colors"
+                        aria-label={`Download ${asset.name}`}
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Download
                       </a>
-                    </Button>
-                  )}
-                </a>
+                    ) : (
+                      <a
+                        href={detailUrl}
+                        class="inline-flex items-center justify-center gap-1.5 w-full mt-1 px-3 py-2 min-h-[36px] text-xs font-medium bg-slate-600/60 hover:bg-slate-600 text-slate-200 border border-slate-500/50 rounded-lg transition-colors"
+                      >
+                        View Details
+                      </a>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -188,31 +209,36 @@ const getImageUrl = (img: any) => {
           <CardDescription className="text-slate-400">Complete brand standards and usage</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {guides.map((guide) => (
-            <a
-              href={`/jewett-junction/marketing/${guide.slug || guide.id}`}
-              class="flex items-center justify-between p-4 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors"
-            >
-              <div class="flex items-center gap-4">
-                <div class="h-12 w-12 bg-red-900/50 rounded flex items-center justify-center">
-                  <FileType className="h-6 w-6 text-red-400" />
-                </div>
-                <div>
-                  <p class="font-medium text-white">{guide.name}</p>
-                  <p class="text-sm text-slate-400">
-                    {[guide['file-format'], guide['file-size'], guide.version].filter(Boolean).join(' • ') || 'Brand Guide'}
-                  </p>
-                </div>
-              </div>
-              {guide['download-link'] && (
-                <Button className="bg-blue-600 hover:bg-blue-700" asChild>
-                  <a href={guide['download-link']} target="_blank" rel="noopener noreferrer">
-                    <Download className="h-4 w-4 mr-2" /> Download
+          {guides.map((guide) => {
+            const detailUrl = `/jewett-junction/marketing/${guide.slug || guide.id}`;
+            return (
+              <div class="flex items-center justify-between gap-4 p-4 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors group">
+                <a href={detailUrl} class="flex items-center gap-4 flex-1 min-w-0 min-h-[44px]" aria-label={`View ${guide.name} details`}>
+                  <div class="h-12 w-12 bg-red-900/50 rounded flex items-center justify-center flex-shrink-0">
+                    <FileType className="h-6 w-6 text-red-400" />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="font-medium text-white truncate group-hover:text-blue-400 transition-colors">{guide.name}</p>
+                    <p class="text-sm text-slate-400 truncate">
+                      {[guide['file-format'], guide['file-size'], guide.version].filter(Boolean).join(' • ') || 'Brand Guide'}
+                    </p>
+                  </div>
+                </a>
+                {guide['download-link'] && (
+                  <a
+                    href={guide['download-link']}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+                    aria-label={`Download ${guide.name}`}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
                   </a>
-                </Button>
-              )}
-            </a>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
     )}

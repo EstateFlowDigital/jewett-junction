@@ -60,7 +60,7 @@ const formatDate = (dateStr: string) => {
       {(story['featured-image']?.url || story.image?.url) && (
         <div class="aspect-video relative">
           <img
-            src={story['featured-image']?.url || story.image.url}
+            src={story['featured-image']?.url || story.image?.url}
             alt={story['featured-image']?.alt || story.image?.alt || story.name}
             class="w-full h-full object-cover"
           />
@@ -123,8 +123,8 @@ const formatDate = (dateStr: string) => {
             >
               {(related['featured-image']?.url || related.image?.url) ? (
                 <img
-                  src={related['featured-image']?.url || related.image.url}
-                  alt=""
+                  src={related['featured-image']?.url || related.image?.url}
+                  alt={related.name}
                   class="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                 />
               ) : (

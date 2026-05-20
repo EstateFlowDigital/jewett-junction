@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Mirror signage requests into Form Submissions for unified intake triage.
     const collectionId = COLLECTIONS.formSubmissions;
     if (!collectionId) {
-      console.error('submittedIdeas collection ID not found');
+      console.error('formSubmissions collection ID not found');
       return new Response(
         JSON.stringify({ success: false, error: 'Collection not configured' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
