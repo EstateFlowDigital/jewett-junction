@@ -35,13 +35,22 @@ interface SafetySettings {
   'safety-active-sites'?: number;
 }
 
+interface SafetyPageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+}
+
 interface SafetyContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: SafetyItem[];
   settings?: SafetySettings;
+  pageCopy?: SafetyPageCopy | null;
 }
 
-export function SafetyContent({ theme = 'modern', initialItems = [], settings = {} }: SafetyContentProps) {
+const SAFETY_DEFAULT_HEADLINE = 'Safety Hub';
+const SAFETY_DEFAULT_SUBTITLE = '4EverSafe — Our commitment to bringing everyone home safely';
+
+export function SafetyContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: SafetyContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const safetyEmail = settings['safety-email'] || 'safety@jewettconstruction.com';
@@ -119,17 +128,25 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
     return date.toLocaleDateString();
   };
 
+  const heroHeadline = pageCopy?.['hero-headline'] || SAFETY_DEFAULT_HEADLINE;
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || SAFETY_DEFAULT_SUBTITLE;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
             <Shield className="h-7 w-7 text-green-600" />
-            Safety Hub
+            {heroHeadline}
           </h1>
-          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-            4EverSafe - Our commitment to bringing everyone home safely
-          </p>
+          {/^\s*<\w/.test(heroSubtitle) ? (
+            <div
+              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+            />
+          ) : (
+            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          )}
         </div>
       </div>
 

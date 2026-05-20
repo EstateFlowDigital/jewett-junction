@@ -768,7 +768,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Editable hero and section copy for fixed pages (Careers, HR, Safety, etc.). One record per page slug.',
     fields: [
       { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'e.g., Careers Page Copy', helpText: 'Identifier — not shown publicly', icon: 'FileText' },
-      { key: 'slug', label: 'Page Slug', type: 'text', required: true, placeholder: 'careers', helpText: 'Matches the URL — use lowercase, no slashes. e.g. "careers", "hr", "safety", "it-helpdesk", "marketing".', icon: 'Link' },
+      { key: 'slug', label: 'Page Slug', type: 'text', required: true, placeholder: 'careers', helpText: 'Matches the URL — lowercase, no slashes. Currently wired pages: "careers", "hr", "safety", "it-helpdesk", "marketing".', icon: 'Link' },
       { key: 'hero-headline', label: 'Hero Headline', type: 'text', placeholder: 'Build Your Career with a Team That Puts People First', helpText: 'Big bold headline at the top of the page', icon: 'Type' },
       { key: 'hero-subtitle', label: 'Hero Subtitle', type: 'richtext', placeholder: 'Supporting paragraph under the hero headline...', helpText: 'Body copy that introduces the page' },
       { key: 'section-headline', label: 'Section Headline', type: 'text', placeholder: 'Why Jewett Construction?', helpText: 'Optional second headline lower on the page', icon: 'Type' },

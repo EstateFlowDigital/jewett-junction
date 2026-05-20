@@ -63,13 +63,22 @@ const STATUS_THEME: Record<string, { card: string; header: string; title: string
   },
 };
 
+interface ITPageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+}
+
 interface ITHelpdeskContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: ITArticle[];
   settings?: ITSettings;
+  pageCopy?: ITPageCopy | null;
 }
 
-export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {} }: ITHelpdeskContentProps) {
+const IT_DEFAULT_HEADLINE = 'IT Help Desk';
+const IT_DEFAULT_SUBTITLE = 'Technical support, resources, and self-service tools';
+
+export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
@@ -128,16 +137,24 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
     return HelpCircle;
   };
 
+  const heroHeadline = pageCopy?.['hero-headline'] || IT_DEFAULT_HEADLINE;
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || IT_DEFAULT_SUBTITLE;
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
           <Headphones className="h-7 w-7 text-blue-600" />
-          IT Help Desk
+          {heroHeadline}
         </h1>
-        <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-          Technical support, resources, and self-service tools
-        </p>
+        {/^\s*<\w/.test(heroSubtitle) ? (
+          <div
+            className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+          />
+        ) : (
+          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+        )}
       </div>
 
       {/* Quick Actions */}

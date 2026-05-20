@@ -30,13 +30,22 @@ interface SiteSettingsLite {
 
 const getContent = (item: { 'full-content'?: string; content?: string }) => item['full-content'] || item.content;
 
+interface HRPageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+}
+
 interface HRContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: HRItem[];
   settings?: SiteSettingsLite;
+  pageCopy?: HRPageCopy | null;
 }
 
-export function HRContent({ theme = 'modern', initialItems = [], settings = {} }: HRContentProps) {
+const HR_DEFAULT_HEADLINE = 'HR Resources';
+const HR_DEFAULT_SUBTITLE = 'Benefits, policies, forms, and employee support';
+
+export function HRContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: HRContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const eapPhone = settings['eap-phone'] || '';
@@ -101,17 +110,27 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {} }
   const timeOffLink = findHRLink(['time off', 'pto', 'vacation', 'leave', 'holiday']);
   const benefitsLink = findHRLink(['benefits guide', 'benefits package', 'open enrollment', 'benefit', 'health', 'insurance', '401k']);
 
+  const heroHeadline = pageCopy?.['hero-headline'] || HR_DEFAULT_HEADLINE;
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || HR_DEFAULT_SUBTITLE;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
             <Users className="h-7 w-7 text-purple-600" />
-            HR Resources
+            {heroHeadline}
           </h1>
-          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-            Benefits, policies, forms, and employee support
-          </p>
+          {/* Subtitle may be richtext (from CMS) or plain text fallback. Render
+              richtext via dangerouslySetInnerHTML when it looks like HTML. */}
+          {/^\s*<\w/.test(heroSubtitle) ? (
+            <div
+              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+            />
+          ) : (
+            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          )}
         </div>
       </div>
 

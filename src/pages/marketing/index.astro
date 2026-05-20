@@ -2,19 +2,18 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { MarketingContent } from '../../components/pages/MarketingContent';
-import { initCMS, getMarketingAssets, getSiteSettings } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssets, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch Marketing content + global settings server-side
-const [marketingResult, settings] = await Promise.all([
+const [marketingResult, settings, pageCopy] = await Promise.all([
   getMarketingAssets({ limit: 50 }),
   getSiteSettings(),
+  getPageCopy('marketing'),
 ]);
 const marketingAssets = marketingResult.items;
 ---
 
 <ThemedPage title="Marketing | Jewett Junction" theme="dark" currentSection="marketing">
-  <MarketingContent client:load theme="dark" initialItems={marketingAssets} settings={settings} />
+  <MarketingContent client:load theme="dark" initialItems={marketingAssets} settings={settings} pageCopy={pageCopy} />
 </ThemedPage>

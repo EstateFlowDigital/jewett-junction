@@ -28,13 +28,22 @@ interface MarketingSettings {
   'social-youtube-url'?: string;
 }
 
+interface MarketingPageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+}
+
 interface MarketingContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: MarketingAsset[];
   settings?: MarketingSettings;
+  pageCopy?: MarketingPageCopy | null;
 }
 
-export function MarketingContent({ theme = 'modern', initialItems = [], settings = {} }: MarketingContentProps) {
+const MARKETING_DEFAULT_HEADLINE = 'Marketing Hub';
+const MARKETING_DEFAULT_SUBTITLE = 'Brand assets, templates, and marketing resources';
+
+export function MarketingContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: MarketingContentProps) {
   const isDark = theme === 'dark';
   const marketingEmail = settings['marketing-email'] || 'marketing@jewettconstruction.com';
   const socialLinks = [
@@ -94,16 +103,24 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
     { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink' },
   ];
 
+  const heroHeadline = pageCopy?.['hero-headline'] || MARKETING_DEFAULT_HEADLINE;
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || MARKETING_DEFAULT_SUBTITLE;
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
           <Megaphone className="h-7 w-7 text-rose-600" />
-          Marketing Hub
+          {heroHeadline}
         </h1>
-        <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-          Brand assets, templates, and marketing resources
-        </p>
+        {/^\s*<\w/.test(heroSubtitle) ? (
+          <div
+            className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+          />
+        ) : (
+          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+        )}
       </div>
 
       {/* Brand Banner */}

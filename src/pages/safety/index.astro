@@ -2,19 +2,18 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { SafetyContent } from '../../components/pages/SafetyContent';
-import { initCMS, getSafetyContent, getSiteSettings } from '../../lib/webflow-cms';
+import { initCMS, getSafetyContent, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch Safety content + global settings server-side
-const [safetyResult, settings] = await Promise.all([
+const [safetyResult, settings, pageCopy] = await Promise.all([
   getSafetyContent({ limit: 50 }),
   getSiteSettings(),
+  getPageCopy('safety'),
 ]);
 const safetyItems = safetyResult.items;
 ---
 
 <ThemedPage title="Safety Hub | Jewett Junction" theme="dark" currentSection="safety">
-  <SafetyContent client:load theme="dark" initialItems={safetyItems} settings={settings} />
+  <SafetyContent client:load theme="dark" initialItems={safetyItems} settings={settings} pageCopy={pageCopy} />
 </ThemedPage>
