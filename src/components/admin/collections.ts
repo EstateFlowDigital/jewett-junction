@@ -49,6 +49,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       // Categorization
       { key: 'news-category', label: 'News Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: 'Tag', group: 'Categorization' },
       { key: 'priority-level', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: 'Bell', group: 'Categorization' },
+      { key: 'published-date', label: 'Published Date', type: 'datetime', helpText: 'When the announcement should appear as published. Drives the timestamp on the dashboard feed.', icon: 'Calendar', group: 'Categorization' },
       { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional — when should this announcement auto-hide?', icon: 'Clock', group: 'Categorization' },
       { key: 'is-pinned', label: 'Pin to Top', type: 'boolean', helpText: 'Pinned announcements appear first', group: 'Categorization' },
 
@@ -140,6 +141,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
       // Publishing
       { key: 'author', label: 'Written By', type: 'text', placeholder: 'Author name', icon: 'Users', group: 'Publishing' },
+      { key: 'published-date', label: 'Published Date', type: 'datetime', helpText: 'Sort order on the Culture page is newest first by this date.', icon: 'Calendar', group: 'Publishing' },
       { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on the dashboard Culture Corner', group: 'Publishing' },
     ]
   },
@@ -189,6 +191,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'resource-category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: 'Tag', group: 'Basics' },
       { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content', group: 'Basics' },
       { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', helpText: 'Recommended: 600×600px (square). Used as the resource card preview.', icon: 'Image', group: 'Basics' },
+      { key: 'icon', label: 'Icon', type: 'image', helpText: 'Optional. Small icon shown on the resource detail page header in place of the default folder glyph. Square SVG/PNG recommended.', icon: 'Image', group: 'Basics' },
 
       // File / Link
       { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: 'FileText', group: 'File / Link' },
@@ -381,6 +384,18 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'video-visibility', label: 'Show Video', type: 'boolean', helpText: 'Display the video embed on the article page', group: 'Additional Media' },
       { key: 'video', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video', group: 'Additional Media' },
       { key: 'additional-content-visibility', label: 'Show Additional Content', type: 'boolean', helpText: 'Display the optional secondary content block', group: 'Additional Media' },
+
+      // Image Layout — fine-tunes how images render on the public article page
+      { key: 'min-image-height', label: 'Min Image Height', type: 'text', placeholder: 'e.g., 25rem', helpText: 'CSS min-height for the body image. Leave blank for default.', group: 'Image Layout' },
+      { key: 'object-position-2', label: 'Image Object Position', type: 'text', placeholder: 'e.g., center top', helpText: 'CSS object-position for the body image. Leave blank for center.', group: 'Image Layout' },
+
+      // Inline Gallery — up to 2 gallery slots shown mid-article
+      { key: 'gallery-image-1-visibility', label: 'Show Gallery Image 1', type: 'boolean', group: 'Inline Gallery' },
+      { key: 'gallery-image-1', label: 'Gallery Image 1 URL', type: 'text', placeholder: 'https://...', icon: 'Image', group: 'Inline Gallery' },
+      { key: 'gallery-image-1-alt-text', label: 'Gallery Image 1 Alt Text', type: 'text', placeholder: 'Describe the image…', group: 'Inline Gallery' },
+      { key: 'gallery-image-2-visibility', label: 'Show Gallery Image 2', type: 'boolean', group: 'Inline Gallery' },
+      { key: 'gallery-image-2', label: 'Gallery Image 2 URL', type: 'text', placeholder: 'https://...', icon: 'Image', group: 'Inline Gallery' },
+      { key: 'gallery-image-2-alt-text', label: 'Gallery Image 2 Alt Text', type: 'text', placeholder: 'Describe the image…', group: 'Inline Gallery' },
 
       // SEO
       { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50\u201360 chars)', icon: 'Tag', group: 'SEO' },
