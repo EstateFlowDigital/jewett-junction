@@ -23,7 +23,9 @@ import {
   MapPin,
   Sparkles,
   Image,
-  Mail
+  Mail,
+  Settings,
+  Award
 } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
@@ -73,6 +75,10 @@ const COLLECTION_GROUPS: CollectionGroup[] = [
       { key: 'submittedIdeas', name: 'Ideas', icon: Lightbulb, color: 'yellow', gradient: 'from-yellow-500 to-amber-500', href: '/jewett-junction/admin/ideas' },
       { key: 'jobApplications', name: 'Job Applications', icon: Briefcase, color: 'emerald', gradient: 'from-emerald-500 to-green-500', href: '/jewett-junction/admin/applications' },
       { key: 'formSubmissions', name: 'Form Submissions', icon: Mail, color: 'cyan', gradient: 'from-cyan-500 to-sky-500', href: '/jewett-junction/admin/form-submissions' },
+      { key: 'settings', name: 'Site Settings', icon: Settings, color: 'slate', gradient: 'from-slate-500 to-zinc-500', href: '/jewett-junction/admin/site-settings' },
+      { key: 'coreValues', name: 'Core Values', icon: Heart, color: 'pink', gradient: 'from-pink-500 to-rose-500', href: '/jewett-junction/admin/core-values' },
+      { key: 'employeeBenefits', name: 'Employee Benefits', icon: Heart, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', href: '/jewett-junction/admin/employee-benefits' },
+      { key: 'companyAwards', name: 'Company Awards', icon: Award, color: 'amber', gradient: 'from-amber-500 to-yellow-500', href: '/jewett-junction/admin/company-awards' },
     ],
   },
   {

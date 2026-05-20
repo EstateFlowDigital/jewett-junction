@@ -1,0 +1,16 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Employee Benefits | Admin">
+  <AdminLayout client:load currentPage="employee-benefits" title="Employee Benefits">
+    <CollectionEditor
+      client:load
+      collectionKey="employeeBenefits"
+      config={COLLECTIONS.employeeBenefits}
+    />
+  </AdminLayout>
+</AdminBase>

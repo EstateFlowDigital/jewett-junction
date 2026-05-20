@@ -45,9 +45,25 @@ interface CMSCultureStory {
   quote?: string;
 }
 
+interface CultureSettings {
+  'culture-volunteer-hours'?: string;
+}
+
+interface CMSCoreValue {
+  id: string;
+  name?: string;
+  tagline?: string;
+  description?: string;
+  'icon-name'?: string;
+  color?: string;
+  'sort-order'?: number;
+}
+
 interface CultureContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   stories?: CMSCultureStory[];
+  settings?: CultureSettings;
+  coreValues?: CMSCoreValue[];
 }
 
 function stripHtml(html: string | undefined) {
@@ -59,40 +75,30 @@ function getInitials(name: string) {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }
 
-// Core values data
-const coreValues = [
-  {
-    icon: Shield,
-    name: 'Safety First',
-    tagline: '4EverSafe',
-    description: 'Nothing is more important than everyone going home safe. We never compromise on safety.',
-    color: 'orange',
-    gradient: 'from-orange-500 to-red-500'
-  },
-  {
-    icon: Star,
-    name: 'Excellence',
-    tagline: 'Quality in all we do',
-    description: 'We take pride in our work and strive for excellence in every project we undertake.',
-    color: 'amber',
-    gradient: 'from-amber-500 to-yellow-500'
-  },
-  {
-    icon: Users,
-    name: 'Teamwork',
-    tagline: 'Better together',
-    description: 'Our greatest strength is our people working together toward shared goals.',
-    color: 'blue',
-    gradient: 'from-blue-500 to-cyan-500'
-  },
-  {
-    icon: Target,
-    name: 'Integrity',
-    tagline: 'Do the right thing',
-    description: 'We act with honesty and transparency, earning trust through our actions.',
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-teal-500'
-  },
+// Maps lucide icon-name strings (from CMS) to actual components.
+const VALUE_ICONS: Record<string, any> = {
+  Shield, Star, Users, Target, Heart, Award, Trophy, Sparkles, HandHeart,
+  Medal, Zap, Flame, Gift, ThumbsUp, Quote, MessageCircle, PartyPopper,
+};
+
+// Maps tailwind color names to a from-X-500 to-Y-500 gradient pair.
+const COLOR_GRADIENTS: Record<string, string> = {
+  orange: 'from-orange-500 to-red-500',
+  amber: 'from-amber-500 to-yellow-500',
+  blue: 'from-blue-500 to-cyan-500',
+  emerald: 'from-emerald-500 to-teal-500',
+  pink: 'from-pink-500 to-rose-500',
+  purple: 'from-purple-500 to-violet-500',
+  red: 'from-red-500 to-rose-500',
+  green: 'from-green-500 to-emerald-500',
+};
+
+// Hardcoded fallback used if CMS returns no Core Values.
+const FALLBACK_CORE_VALUES: CMSCoreValue[] = [
+  { id: 'fallback-1', name: 'Safety First', tagline: '4EverSafe', description: 'Nothing is more important than everyone going home safe. We never compromise on safety.', 'icon-name': 'Shield', color: 'orange' },
+  { id: 'fallback-2', name: 'Excellence', tagline: 'Quality in all we do', description: 'We take pride in our work and strive for excellence in every project we undertake.', 'icon-name': 'Star', color: 'amber' },
+  { id: 'fallback-3', name: 'Teamwork', tagline: 'Better together', description: 'Our greatest strength is our people working together toward shared goals.', 'icon-name': 'Users', color: 'blue' },
+  { id: 'fallback-4', name: 'Integrity', tagline: 'Do the right thing', description: 'We act with honesty and transparency, earning trust through our actions.', 'icon-name': 'Target', color: 'emerald' },
 ];
 
 const typeConfig: Record<string, { icon: any; color: string; gradient: string; label: string }> = {
@@ -113,9 +119,18 @@ function getTypeConfig(type: string | undefined) {
   return typeConfig[normalized] || typeConfig['default'];
 }
 
-export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: CultureContentProps) {
+export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [] }: CultureContentProps) {
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
+  const volunteerHours = settings['culture-volunteer-hours'] || '450+';
+  const coreValues = (cmsCoreValues.length > 0 ? cmsCoreValues : FALLBACK_CORE_VALUES).map((v) => ({
+    icon: VALUE_ICONS[v['icon-name'] || ''] || Sparkles,
+    name: v.name || '',
+    tagline: v.tagline || '',
+    description: v.description || '',
+    color: v.color || 'slate',
+    gradient: COLOR_GRADIENTS[v.color || ''] || 'from-slate-500 to-slate-600',
+  }));
   const [activeValueIndex, setActiveValueIndex] = React.useState(0);
   const [spotlightIndex, setSpotlightIndex] = React.useState(0);
 
@@ -235,7 +250,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [] }: Cul
           { label: 'Team Spotlights', count: spotlightStories.length || 12, icon: Star, color: 'amber' },
           { label: 'Team Wins', count: winStories.length || 24, icon: Trophy, color: 'emerald' },
           { label: 'Recognitions', count: recognitionStories.length + otherStories.length || 156, icon: Award, color: 'blue' },
-          { label: 'Volunteer Hours', count: '450+', icon: HandHeart, color: 'pink' },
+          { label: 'Volunteer Hours', count: volunteerHours, icon: HandHeart, color: 'pink' },
         ].map((stat) => (
           <Card key={stat.label} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
             <CardContent className="p-4 flex items-center gap-4">

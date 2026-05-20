@@ -26,6 +26,7 @@ import {
   Search,
   ChevronDown,
   DollarSign,
+  Star,
   X
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
@@ -51,55 +52,55 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
+interface CareersSettings {
+  'careers-email'?: string;
+  'default-referral-bonus'?: number;
+}
+
+interface CMSEmployeeBenefit {
+  id: string;
+  name?: string;
+  description?: string;
+  'icon-name'?: string;
+  'sort-order'?: number;
+}
+
+interface CMSCompanyAward {
+  id: string;
+  name?: string;
+  year?: string;
+  'sort-order'?: number;
+}
+
 interface CareersContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   jobs?: JobPosting[];
+  settings?: CareersSettings;
+  benefits?: CMSEmployeeBenefit[];
+  awards?: CMSCompanyAward[];
 }
 
-const benefits = [
-  {
-    icon: Heart,
-    title: 'Medical, Dental & Vision',
-    description: 'Comprehensive health coverage with multiple plan options and 4-tier coverage to protect you and your family.',
-  },
-  {
-    icon: PiggyBank,
-    title: '401(k) with Company Match',
-    description: '100% company match on your contributions up to 4%, with no vesting schedule. Your future starts day one.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Tuition Reimbursement',
-    description: 'Up to $3,000 annually toward accredited degree programs. We invest in your growth because your development matters.',
-  },
-  {
-    icon: Calendar,
-    title: 'Paid Time Off',
-    description: 'Generous PTO accrual for vacation, sick time, and personal days — because balance builds better teams.',
-  },
-  {
-    icon: Shield,
-    title: 'Insurance & Protection',
-    description: 'Company-sponsored short and long-term disability insurance plus life insurance coverage at no cost to you.',
-  },
-  {
-    icon: Home,
-    title: 'Flexible Work Options',
-    description: 'Remote and hybrid arrangements available for qualifying roles, with the tools and support to work from anywhere.',
-  },
-  {
-    icon: Users,
-    title: 'Wellness & Community',
-    description: 'Team outings, wellness challenges, cooking classes, book clubs, and volunteer events to stay connected.',
-  },
-  {
-    icon: Gift,
-    title: 'Employee Referral Bonuses',
-    description: 'Know someone who belongs on this team? Earn cash bonuses for every successful referral you make.',
-  },
+// Maps lucide icon-name strings (from CMS) to actual components.
+const BENEFIT_ICONS: Record<string, any> = {
+  Heart, PiggyBank, GraduationCap, Calendar, Shield, Home, Users, Gift,
+  Award, Briefcase, MapPin, Clock, Star, DollarSign, FileText, Mail, Phone,
+};
+
+type BenefitDisplay = { icon: any; title: string; description: string };
+type AwardDisplay = { year: string; title: string };
+
+const FALLBACK_BENEFITS: BenefitDisplay[] = [
+  { icon: Heart, title: 'Medical, Dental & Vision', description: 'Comprehensive health coverage with multiple plan options and 4-tier coverage to protect you and your family.' },
+  { icon: PiggyBank, title: '401(k) with Company Match', description: '100% company match on your contributions up to 4%, with no vesting schedule. Your future starts day one.' },
+  { icon: GraduationCap, title: 'Tuition Reimbursement', description: 'Up to $3,000 annually toward accredited degree programs. We invest in your growth because your development matters.' },
+  { icon: Calendar, title: 'Paid Time Off', description: 'Generous PTO accrual for vacation, sick time, and personal days — because balance builds better teams.' },
+  { icon: Shield, title: 'Insurance & Protection', description: 'Company-sponsored short and long-term disability insurance plus life insurance coverage at no cost to you.' },
+  { icon: Home, title: 'Flexible Work Options', description: 'Remote and hybrid arrangements available for qualifying roles, with the tools and support to work from anywhere.' },
+  { icon: Users, title: 'Wellness & Community', description: 'Team outings, wellness challenges, cooking classes, book clubs, and volunteer events to stay connected.' },
+  { icon: Gift, title: 'Employee Referral Bonuses', description: 'Know someone who belongs on this team? Earn cash bonuses for every successful referral you make.' },
 ];
 
-const awards = [
+const FALLBACK_AWARDS: AwardDisplay[] = [
   { year: '2024', title: 'Best Company to Work For' },
   { year: '2023', title: 'Best Companies to Work For' },
   { year: '2023', title: 'Verified Employer Silver' },
@@ -597,7 +598,18 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   );
 }
 
-export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProps) {
+export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [] }: CareersContentProps) {
+  const careersEmail = settings['careers-email'] || 'careers@jewett.com';
+  const benefits: BenefitDisplay[] = cmsBenefits.length > 0
+    ? cmsBenefits.map((b) => ({
+        icon: BENEFIT_ICONS[b['icon-name'] || ''] || Star,
+        title: b.name || '',
+        description: b.description || '',
+      }))
+    : FALLBACK_BENEFITS;
+  const awards: AwardDisplay[] = cmsAwards.length > 0
+    ? cmsAwards.map((a) => ({ year: a.year || '', title: a.name || '' }))
+    : FALLBACK_AWARDS;
   // Use CMS jobs only - no hardcoded fallback
   const allJobs = jobs;
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -958,7 +970,7 @@ export function CareersContent({ theme = 'dark', jobs = [] }: CareersContentProp
               </p>
             </div>
             <Button className="bg-blue-600 hover:bg-blue-700 flex-shrink-0" asChild>
-              <a href="mailto:careers@jewett.com">Email Our Recruiting Team</a>
+              <a href={`mailto:${careersEmail}`}>Email Our Recruiting Team</a>
             </Button>
           </div>
         </CardContent>

@@ -25,14 +25,28 @@ interface ITArticle {
   icon?: { url: string };
 }
 
+interface ITSettings {
+  'it-phone'?: string;
+  'it-email'?: string;
+  'it-hours-weekday'?: string;
+  'it-hours-saturday'?: string;
+  'it-emergency-hours'?: string;
+}
+
 interface ITHelpdeskContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: ITArticle[];
+  settings?: ITSettings;
 }
 
-export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHelpdeskContentProps) {
+export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {} }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
+  const itPhone = settings['it-phone'] || '';
+  const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
+  const itHoursWeekday = settings['it-hours-weekday'] || '7:00 AM - 6:00 PM';
+  const itHoursSaturday = settings['it-hours-saturday'] || '8:00 AM - 12:00 PM';
+  const itEmergencyHours = settings['it-emergency-hours'] || '24/7 On-Call';
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [articles, setArticles] = React.useState<ITArticle[]>(initialItems);
@@ -229,17 +243,19 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
               <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>IT Support</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href="tel:555-4357" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                <Phone className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                <div>
-                  <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>(555) 4-HELP</div>
-                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Call for urgent issues</div>
-                </div>
-              </a>
-              <a href="mailto:it@jewettconstruction.com" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
+              {itPhone && (
+                <a href={`tel:${itPhone.replace(/[^\d+]/g, '')}`} className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
+                  <Phone className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
+                  <div>
+                    <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>{itPhone}</div>
+                    <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Call for urgent issues</div>
+                  </div>
+                </a>
+              )}
+              <a href={`mailto:${itEmail}`} className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
                 <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
                 <div>
-                  <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>it@jewettconstruction.com</div>
+                  <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>{itEmail}</div>
                   <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Non-urgent requests</div>
                 </div>
               </a>
@@ -269,15 +285,15 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [] }: ITHel
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Mon - Fri</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>7:00 AM - 6:00 PM</span>
+                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itHoursWeekday}</span>
               </div>
               <div className="flex justify-between">
                 <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Saturday</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>8:00 AM - 12:00 PM</span>
+                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itHoursSaturday}</span>
               </div>
               <div className="flex justify-between">
                 <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Emergency</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>24/7 On-Call</span>
+                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itEmergencyHours}</span>
               </div>
             </CardContent>
           </Card>

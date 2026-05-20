@@ -2,16 +2,19 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { HRContent } from '../../components/pages/HRContent';
-import { initCMS, getHRContent } from '../../lib/webflow-cms';
+import { initCMS, getHRContent, getSiteSettings } from '../../lib/webflow-cms';
 
 // Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch HR content server-side
-const hrResult = await getHRContent({ limit: 50 });
+// Fetch HR content + global settings server-side
+const [hrResult, settings] = await Promise.all([
+  getHRContent({ limit: 50 }),
+  getSiteSettings(),
+]);
 const hrItems = hrResult.items;
 ---
 
 <ThemedPage title="HR Resources | Jewett Junction" theme="dark" currentSection="hr">
-  <HRContent client:load theme="dark" initialItems={hrItems} />
+  <HRContent client:load theme="dark" initialItems={hrItems} settings={settings} />
 </ThemedPage>

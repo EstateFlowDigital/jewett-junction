@@ -1,6 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getJobPostingBySlug, getJobPostings, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { initCMS, getJobPostingBySlug, getJobPostings, getSiteSettings, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -12,14 +12,18 @@ const { slug } = Astro.params;
 // Fetch the job posting by slug
 let job: any = null;
 let relatedJobs: any[] = [];
+let careersEmail = 'careers@jewettconstruction.com';
 
 try {
   if (slug) {
-    job = await getJobPostingBySlug(slug);
-
-    // Also fetch related jobs
-    const result = await getJobPostings({ limit: 4 });
-    relatedJobs = result.items.filter(j => j.slug !== slug).slice(0, 3);
+    const [jobResult, allJobsResult, settingsResult] = await Promise.all([
+      getJobPostingBySlug(slug),
+      getJobPostings({ limit: 4 }),
+      getSiteSettings(),
+    ]);
+    job = jobResult;
+    relatedJobs = allJobsResult.items.filter(j => j.slug !== slug).slice(0, 3);
+    careersEmail = settingsResult['careers-email'] || careersEmail;
   }
 } catch (error) {
   console.error('Error fetching job posting:', error);
@@ -200,7 +204,7 @@ const salaryRange = formatSalary(job['salary-min'], job['salary-max']);
             </a>
           ) : (
             <a
-              href="mailto:careers@jewettconstruction.com"
+              href={`mailto:${careersEmail}`}
               class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
               aria-label="Apply via Email"
             >

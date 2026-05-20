@@ -4,6 +4,7 @@ import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper,
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { TeamContactCard } from './TeamContactCard';
 
 interface SafetyItem {
   id: string;
@@ -25,14 +26,32 @@ interface SafetyItem {
 
 const getContent = (item: { 'full-content'?: string; content?: string }) => item['full-content'] || item.content;
 
+interface SafetySettings {
+  'safety-email'?: string;
+  'poison-control-phone'?: string;
+  'safety-days-without-incident'?: number;
+  'safety-company-record-days'?: number;
+  'safety-training-compliance'?: number;
+  'safety-active-sites'?: number;
+}
+
 interface SafetyContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: SafetyItem[];
+  settings?: SafetySettings;
 }
 
-export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyContentProps) {
+export function SafetyContent({ theme = 'modern', initialItems = [], settings = {} }: SafetyContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
+  const safetyEmail = settings['safety-email'] || 'safety@jewettconstruction.com';
+  const poisonControlPhone = settings['poison-control-phone'] || '1-800-222-1222';
+  const stats = [
+    { label: 'Days Without Incident', value: settings['safety-days-without-incident'] },
+    { label: 'Company Record', value: settings['safety-company-record-days'] },
+    { label: 'Training Compliance', value: settings['safety-training-compliance'] != null ? `${settings['safety-training-compliance']}%` : null },
+    { label: 'Active Sites', value: settings['safety-active-sites'] },
+  ].filter((s) => s.value != null && s.value !== '');
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>(initialItems);
@@ -96,29 +115,21 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
         </div>
       </div>
 
-      {/* Safety Stats Banner */}
-      <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white border-0">
-        <CardContent className="py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-4xl md:text-5xl font-bold mb-1">247</div>
-              <div className="text-green-100 text-sm">Days Without Incident</div>
+      {/* Safety Stats Banner — driven by Site Settings */}
+      {stats.length > 0 && (
+        <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white border-0">
+          <CardContent className="py-6">
+            <div className={`grid gap-6 text-center grid-cols-2 ${stats.length >= 4 ? 'md:grid-cols-4' : `md:grid-cols-${stats.length}`}`}>
+              {stats.map((s) => (
+                <div key={s.label}>
+                  <div className="text-4xl md:text-5xl font-bold mb-1">{s.value}</div>
+                  <div className="text-green-100 text-sm">{s.label}</div>
+                </div>
+              ))}
             </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold mb-1">312</div>
-              <div className="text-green-100 text-sm">Company Record</div>
-            </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold mb-1">98%</div>
-              <div className="text-green-100 text-sm">Training Compliance</div>
-            </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold mb-1">42</div>
-              <div className="text-green-100 text-sm">Active Sites</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -338,30 +349,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Safety Contact */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Safety Team Contact</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-green-600">JM</span>
-                </div>
-                <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>James Mitchell</h3>
-                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Director of Safety</p>
-              </div>
-              <div className="space-y-3">
-                <a href="mailto:safety@jewettconstruction.com" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>safety@jewettconstruction.com</span>
-                </a>
-                <a href="/jewett-junction/directory" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View Safety Team Directory</span>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
+          <TeamContactCard
+            department="Safety"
+            title="Safety Team Contact"
+            fallbackEmail={safetyEmail}
+            theme={theme}
+            accent="green"
+          />
 
           {/* Emergency Numbers */}
           <Card className={isDark ? 'bg-red-900/30 border-red-800' : 'bg-red-50 border-red-200'}>
@@ -373,13 +367,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [] }: SafetyCon
                 <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Emergency Services</span>
                 <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>911</span>
               </div>
-              <div className="flex items-center justify-between">
+              <a href={`tel:${poisonControlPhone.replace(/[^\d+]/g, '')}`} className="flex items-center justify-between hover:opacity-80 transition-opacity">
                 <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Poison Control</span>
-                <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>1-800-222-1222</span>
-              </div>
-              <a href="mailto:safety@jewettconstruction.com" className="flex items-center justify-between hover:opacity-80 transition-opacity">
+                <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>{poisonControlPhone}</span>
+              </a>
+              <a href={`mailto:${safetyEmail}`} className="flex items-center justify-between hover:opacity-80 transition-opacity">
                 <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Safety Email (24/7)</span>
-                <span className={`font-bold text-xs ${isDark ? 'text-red-200' : 'text-red-900'}`}>safety@jewettconstruction.com</span>
+                <span className={`font-bold text-xs ${isDark ? 'text-red-200' : 'text-red-900'}`}>{safetyEmail}</span>
               </a>
             </CardContent>
           </Card>

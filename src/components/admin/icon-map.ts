@@ -45,6 +45,7 @@ import {
   BookOpen,
   CircleHelp,
   Wrench,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -96,6 +97,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
   CircleHelp,
   Wrench,
+  Settings,
 };
 
 // Helper function to get icon component from string identifier

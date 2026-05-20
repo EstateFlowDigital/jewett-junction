@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
+import { TeamContactCard } from './TeamContactCard';
 
 interface MarketingAsset {
   id: string;
@@ -19,13 +20,19 @@ interface MarketingAsset {
   featured?: boolean;
 }
 
+interface MarketingSettings {
+  'marketing-email'?: string;
+}
+
 interface MarketingContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: MarketingAsset[];
+  settings?: MarketingSettings;
 }
 
-export function MarketingContent({ theme = 'modern', initialItems = [] }: MarketingContentProps) {
+export function MarketingContent({ theme = 'modern', initialItems = [], settings = {} }: MarketingContentProps) {
   const isDark = theme === 'dark';
+  const marketingEmail = settings['marketing-email'] || 'marketing@jewettconstruction.com';
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [assets, setAssets] = React.useState<MarketingAsset[]>(initialItems);
@@ -185,23 +192,13 @@ export function MarketingContent({ theme = 'modern', initialItems = [] }: Market
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Marketing Contact</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-rose-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-rose-600">LW</span>
-                </div>
-                <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Lisa Wang</h3>
-                <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>Marketing Director</p>
-                <a href="mailto:marketing@jewettconstruction.com" className="w-full">
-                  <Button className="w-full" variant="outline">Contact Marketing</Button>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
+          <TeamContactCard
+            department="Marketing"
+            title="Marketing Contact"
+            fallbackEmail={marketingEmail}
+            theme={theme}
+            accent="rose"
+          />
 
           <Card className={isDark ? 'bg-rose-900/30 border-rose-800' : 'bg-rose-50 border-rose-200'}>
             <CardContent className="pt-6 text-center">

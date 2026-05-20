@@ -6,7 +6,7 @@ import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -21,9 +21,10 @@ let safetyContent: any[] = [];
 let itArticles: any[] = [];
 let marketingAssets: any[] = [];
 let bannerMessages: any[] = [];
+let siteSettings: any = {};
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
@@ -33,7 +34,9 @@ try {
     getITKnowledgeBase({ limit: 3, featured: true }),
     getMarketingAssets({ limit: 6, featured: true }),
     getBannerMessages({ limit: 20 }),
+    getSiteSettings(),
   ]);
+  siteSettings = settingsRes;
   announcements = announcementsRes.items;
   events = eventsRes.items;
   jobs = jobsRes.items;
@@ -51,6 +54,10 @@ try {
 const featuredHR = hrContent[0];
 const featuredSafety = safetyContent.find(s => s.severity === 'Critical' || s.severity === 'Emergency') || safetyContent[0];
 const featuredIT = itArticles[0];
+
+// Default referral bonus from Site Settings (CMS-driven)
+const defaultReferralBonus = Number(siteSettings['default-referral-bonus']) || 500;
+const referralBonusDisplay = `$${defaultReferralBonus.toLocaleString()}`;
 
 // Format date helper - safely handles invalid dates
 function formatDate(dateStr: string) {
@@ -382,7 +389,7 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
                 <span class="text-sm text-blue-200">Referral Bonus</span>
                 <svg class="w-6 h-6 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
-              <div class="text-4xl font-bold text-white">$500</div>
+              <div class="text-4xl font-bold text-white">{referralBonusDisplay}</div>
               <div class="text-sm text-blue-200 mt-1">Per successful hire</div>
             </a>
           </div>
@@ -680,7 +687,7 @@ const bannerLoop = [...bannerDisplay, ...bannerDisplay];
               <div class="flex items-center justify-between">
                 <div>
                   <div class="font-medium text-white">Refer a Friend</div>
-                  <div class="text-sm text-slate-400">Earn $500 for each successful hire</div>
+                  <div class="text-sm text-slate-400">Earn {referralBonusDisplay} for each successful hire</div>
                 </div>
                 <a href="/jewett-junction/careers#apply" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors">Submit Referral</a>
               </div>

@@ -2,21 +2,31 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CareersContent } from '../../components/pages/CareersContent';
-import { initCMS, getJobPostings } from '../../lib/webflow-cms';
+import { initCMS, getJobPostings, getSiteSettings, getEmployeeBenefits, getCompanyAwards } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
 
-// Fetch job postings from CMS
 let jobs: any[] = [];
+let settings: any = {};
+let benefits: any[] = [];
+let awards: any[] = [];
 try {
-  const result = await getJobPostings();
-  jobs = result.items;
+  const [jobsResult, siteSettings, benefitsResult, awardsResult] = await Promise.all([
+    getJobPostings(),
+    getSiteSettings(),
+    getEmployeeBenefits(),
+    getCompanyAwards(),
+  ]);
+  jobs = jobsResult.items;
+  settings = siteSettings;
+  benefits = benefitsResult.items;
+  awards = awardsResult.items;
 } catch (error) {
-  console.error('Error fetching job postings:', error);
+  console.error('Error fetching careers data:', error);
 }
 ---
 
 <ThemedPage title="Careers | Jewett Junction" theme="dark" currentSection="careers">
-  <CareersContent client:load theme="dark" jobs={jobs} />
+  <CareersContent client:load theme="dark" jobs={jobs} settings={settings} benefits={benefits} awards={awards} />
 </ThemedPage>

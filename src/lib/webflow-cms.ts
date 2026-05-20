@@ -484,6 +484,10 @@ export const COLLECTIONS = {
   banner: '69e83787ba03eb7aaf73abf0',
   jobApplications: '69e92188c048862f1a049a8d',
   formSubmissions: '69e95d7506997240e17e09bd',
+  settings: '69fcc0eda58c76d3e2a92ad3',
+  coreValues: '69fcc5395999a5288927fdea',
+  employeeBenefits: '69fcc53b891ff14c73b15107',
+  companyAwards: '69fcc53c891ff14c73b151de',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -508,6 +512,114 @@ Object.assign(COLLECTION_FIELD_ALIASES, {
 // ============================================
 // Helper functions for specific collections
 // ============================================
+
+export interface SiteSettings {
+  name?: string;
+  slug?: string;
+  'eap-phone'?: string;
+  'eap-portal-url'?: string;
+  'poison-control-phone'?: string;
+  'it-phone'?: string;
+  'it-email'?: string;
+  'it-hours-weekday'?: string;
+  'it-hours-saturday'?: string;
+  'it-emergency-hours'?: string;
+  'hr-email'?: string;
+  'careers-email'?: string;
+  'marketing-email'?: string;
+  'safety-email'?: string;
+  'default-referral-bonus'?: number;
+  'hr-portal-adp'?: string;
+  'hr-portal-bcbs'?: string;
+  'hr-portal-fidelity'?: string;
+  'safety-days-without-incident'?: number;
+  'safety-company-record-days'?: number;
+  'safety-training-compliance'?: number;
+  'safety-active-sites'?: number;
+  'culture-volunteer-hours'?: string;
+}
+
+/**
+ * Site-wide configuration singleton. Returns the first item from the
+ * Site Settings collection, or {} if the collection is empty.
+ * Memoised per request so repeat callers in the same SSR pass don't refetch.
+ */
+let _siteSettingsCache: { data: SiteSettings; ts: number } | null = null;
+const SETTINGS_CACHE_MS = 60 * 1000; // 60s within a runtime
+export async function getSiteSettings(): Promise<SiteSettings> {
+  const now = Date.now();
+  if (_siteSettingsCache && now - _siteSettingsCache.ts < SETTINGS_CACHE_MS) {
+    return _siteSettingsCache.data;
+  }
+  if (!COLLECTIONS.settings) return {};
+  try {
+    const result = await getCollection<SiteSettings>(COLLECTIONS.settings, { limit: 1 });
+    const data = result.items[0] || {};
+    _siteSettingsCache = { data, ts: now };
+    return data;
+  } catch {
+    return {};
+  }
+}
+
+export interface CoreValue {
+  id: string;
+  name?: string;
+  slug?: string;
+  tagline?: string;
+  description?: string;
+  'icon-name'?: string;
+  color?: string;
+  'sort-order'?: number;
+}
+
+export async function getCoreValues(): Promise<{ items: CoreValue[]; total: number }> {
+  if (!COLLECTIONS.coreValues) return { items: [], total: 0 };
+  const result = await getCollection<CoreValue>(COLLECTIONS.coreValues, { limit: 50 });
+  const sorted = [...result.items].sort(
+    (a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999),
+  );
+  return { items: sorted, total: result.total };
+}
+
+export interface EmployeeBenefit {
+  id: string;
+  name?: string;
+  slug?: string;
+  description?: string;
+  'icon-name'?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+export async function getEmployeeBenefits(): Promise<{ items: EmployeeBenefit[]; total: number }> {
+  if (!COLLECTIONS.employeeBenefits) return { items: [], total: 0 };
+  const result = await getCollection<EmployeeBenefit>(COLLECTIONS.employeeBenefits, { limit: 50 });
+  const filtered = result.items.filter((b) => b['is-active'] !== false);
+  const sorted = [...filtered].sort(
+    (a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999),
+  );
+  return { items: sorted, total: sorted.length };
+}
+
+export interface CompanyAward {
+  id: string;
+  name?: string;
+  slug?: string;
+  year?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+export async function getCompanyAwards(): Promise<{ items: CompanyAward[]; total: number }> {
+  if (!COLLECTIONS.companyAwards) return { items: [], total: 0 };
+  const result = await getCollection<CompanyAward>(COLLECTIONS.companyAwards, { limit: 50 });
+  const filtered = result.items.filter((a) => a['is-active'] !== false);
+  const sorted = [...filtered].sort(
+    (a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999),
+  );
+  return { items: sorted, total: sorted.length };
+}
 
 export async function getEmployees(options?: { limit?: number; featured?: boolean }) {
   if (!COLLECTIONS.employees) return { items: [], total: 0 };

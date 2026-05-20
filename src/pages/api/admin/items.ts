@@ -142,6 +142,26 @@ const VALID_FIELDS: Record<string, string[]> = {
     'submitted-at', 'submitter-name', 'submitter-email', 'submitter-phone',
     'published-path', 'full-response', 'admin-notes', 'status',
   ],
+  settings: [
+    'name', 'slug',
+    'eap-phone', 'eap-portal-url', 'poison-control-phone',
+    'it-phone', 'it-email', 'it-hours-weekday', 'it-hours-saturday', 'it-emergency-hours',
+    'hr-email', 'careers-email', 'marketing-email', 'safety-email',
+    'default-referral-bonus',
+    'hr-portal-adp', 'hr-portal-bcbs', 'hr-portal-fidelity',
+    'safety-days-without-incident', 'safety-company-record-days',
+    'safety-training-compliance', 'safety-active-sites',
+    'culture-volunteer-hours',
+  ],
+  coreValues: [
+    'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',
+  ],
+  employeeBenefits: [
+    'name', 'slug', 'description', 'icon-name', 'sort-order', 'is-active',
+  ],
+  companyAwards: [
+    'name', 'slug', 'year', 'sort-order', 'is-active',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection.

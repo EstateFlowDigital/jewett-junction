@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, AlertCircle } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
+import { TeamContactCard } from './TeamContactCard';
 
 interface HRItem {
   id: string;
@@ -18,16 +19,34 @@ interface HRItem {
   icon?: { url: string };
 }
 
+interface SiteSettingsLite {
+  'eap-phone'?: string;
+  'eap-portal-url'?: string;
+  'hr-email'?: string;
+  'hr-portal-adp'?: string;
+  'hr-portal-bcbs'?: string;
+  'hr-portal-fidelity'?: string;
+}
+
 const getContent = (item: { 'full-content'?: string; content?: string }) => item['full-content'] || item.content;
 
 interface HRContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   initialItems?: HRItem[];
+  settings?: SiteSettingsLite;
 }
 
-export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProps) {
+export function HRContent({ theme = 'modern', initialItems = [], settings = {} }: HRContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
+  const eapPhone = settings['eap-phone'] || '';
+  const eapPortalUrl = settings['eap-portal-url'] || '';
+  const hrEmail = settings['hr-email'] || 'hr@jewettconstruction.com';
+  const portalLinks: { name: string; desc: string; href: string }[] = [
+    { name: 'ADP Workforce Now', desc: 'Payroll & Time', href: settings['hr-portal-adp'] || '' },
+    { name: 'Benefits Portal', desc: 'BCBS & Wellness', href: settings['hr-portal-bcbs'] || '' },
+    { name: '401(k) Portal', desc: 'Fidelity NetBenefits', href: settings['hr-portal-fidelity'] || '' },
+  ].filter((l) => l.href);
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [hrItems, setHrItems] = React.useState<HRItem[]>(initialItems);
@@ -214,7 +233,7 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
             </CardContent>
           </Card>
         </a>
-        <a href="tel:1-800-327-4968">
+        <a href={eapPhone ? `tel:${eapPhone.replace(/[^\d+]/g, '')}` : '#hr-contact'}>
           <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-orange-800 hover:border-orange-600' : 'border-orange-200 bg-orange-50/50 hover:border-orange-400'}`}>
             <CardContent className="py-4 text-center">
               <div className={`w-12 h-12 ${isDark ? 'bg-orange-900' : 'bg-orange-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
@@ -298,69 +317,60 @@ export function HRContent({ theme = 'modern', initialItems = [] }: HRContentProp
         {/* Sidebar */}
         <div className="space-y-6">
           {/* HR Contact */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>HR Team</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-purple-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-purple-600">JD</span>
-                </div>
-                <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>Jennifer Davis</h3>
-                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>HR Manager</p>
-              </div>
-              <div className="space-y-3">
-                <a href="mailto:hr@jewettconstruction.com" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>hr@jewettconstruction.com</span>
-                </a>
-                <a href="/jewett-junction/directory" className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View HR Team Directory</span>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
+          <div id="hr-contact">
+            <TeamContactCard
+              department="HR"
+              title="HR Team"
+              fallbackEmail={hrEmail}
+              theme={theme}
+              accent="purple"
+            />
+          </div>
 
           {/* EAP */}
-          <Card className={isDark ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'}>
-            <CardHeader className={isDark ? 'bg-green-900/50 border-b border-green-800' : 'bg-green-100 border-b border-green-200'}>
-              <CardTitle className={`text-base ${isDark ? 'text-green-300' : 'text-green-900'}`}>Employee Assistance</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <p className={`text-sm mb-4 ${isDark ? 'text-green-300' : 'text-green-800'}`}>Free, confidential support for you and your family.</p>
-              <div className="flex items-center justify-between mb-3">
-                <span className={`text-sm ${isDark ? 'text-green-300' : 'text-green-800'}`}>24/7 Helpline</span>
-                <span className={`font-bold ${isDark ? 'text-green-200' : 'text-green-900'}`}>1-800-EAP-4YOU</span>
-              </div>
-              <Button className="w-full bg-green-600 hover:bg-green-700">Access EAP Portal</Button>
-            </CardContent>
-          </Card>
+          {(eapPhone || eapPortalUrl) && (
+            <Card className={isDark ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'}>
+              <CardHeader className={isDark ? 'bg-green-900/50 border-b border-green-800' : 'bg-green-100 border-b border-green-200'}>
+                <CardTitle className={`text-base ${isDark ? 'text-green-300' : 'text-green-900'}`}>Employee Assistance</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <p className={`text-sm mb-4 ${isDark ? 'text-green-300' : 'text-green-800'}`}>Free, confidential support for you and your family.</p>
+                {eapPhone && (
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`text-sm ${isDark ? 'text-green-300' : 'text-green-800'}`}>24/7 Helpline</span>
+                    <a href={`tel:${eapPhone.replace(/[^\d+]/g, '')}`} className={`font-bold hover:underline ${isDark ? 'text-green-200' : 'text-green-900'}`}>{eapPhone}</a>
+                  </div>
+                )}
+                {eapPortalUrl && (
+                  <Button asChild className="w-full bg-green-600 hover:bg-green-700">
+                    <a href={eapPortalUrl} target="_blank" rel="noopener">Access EAP Portal</a>
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* External Links */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {[
-                { name: 'ADP Workforce Now', desc: 'Payroll & Time', href: 'https://adp.com' },
-                { name: 'Benefits Portal', desc: 'BCBS & Wellness', href: 'https://bcbs.com' },
-                { name: '401(k) Portal', desc: 'Fidelity NetBenefits', href: 'https://netbenefits.fidelity.com' },
-              ].map((link) => (
-                <a key={link.name} href={link.href} target="_blank" rel="noopener" className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                  <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                    <ExternalLink className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className={`font-medium text-sm ${isDark ? 'text-white' : ''}`}>{link.name}</div>
-                    <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{link.desc}</div>
-                  </div>
-                </a>
-              ))}
-            </CardContent>
-          </Card>
+          {portalLinks.length > 0 && (
+            <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+              <CardHeader>
+                <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Quick Links</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {portalLinks.map((link) => (
+                  <a key={link.name} href={link.href} target="_blank" rel="noopener" className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                    <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                      <ExternalLink className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className={`font-medium text-sm ${isDark ? 'text-white' : ''}`}>{link.name}</div>
+                      <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{link.desc}</div>
+                    </div>
+                  </a>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
