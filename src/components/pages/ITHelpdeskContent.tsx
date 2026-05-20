@@ -71,18 +71,17 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
     fetchITContent();
   }, [initialItems.length]);
 
-  // article-type is the real Webflow slug. Webflow option names are
-  // "How-To Guide", "Troubleshooting", "Software", "Hardware", "Security",
-  // "Policy", "FAQ". Older items may still use legacy `category` values.
-  const howToArticles = articles.filter(a =>
-    a['article-type'] === 'How-To Guide' || a['article-type'] === 'Troubleshooting' ||
-    a.category === 'How-To Guide' || a.category === 'Troubleshooting' || a.category === 'How-To'
-  );
-  const softwareArticles = articles.filter(a =>
-    a['article-type'] === 'Software' || a.category === 'Software'
-  );
+  // article-type is the real Webflow slug. Valid options are:
+  // FAQ, How-To Guide, Troubleshooting, Software, Hardware, Security, Policy.
+  // Older items may still use the legacy `category` field.
+  const articleType = (a: ITArticle) => a['article-type'] || a.category || '';
+  // The Software section gets its own dedicated bucket. Everything else lives
+  // in the general "Help Articles" bucket so FAQ/Hardware/Security/Policy
+  // articles don't disappear from the listing.
+  const softwareArticles = articles.filter(a => articleType(a) === 'Software');
+  const howToArticles = articles.filter(a => articleType(a) && articleType(a) !== 'Software');
 
-  // If no items have article-type or category set, use all items as fallback
+  // If nothing has article-type set, fall back to showing every article.
   const hasTypes = howToArticles.length > 0 || softwareArticles.length > 0;
   const displayArticles = hasTypes ? [] : articles;
 

@@ -1,5 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
+import FilePreview from '../../components/shared/FilePreview.astro';
 import { initCMS, getITArticleBySlug, getITKnowledgeBase, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
@@ -33,20 +34,25 @@ if (!item) {
 // Get header image
 const headerImage = item.image?.url || item.icon?.url || item['preview-image']?.url;
 
-// Article type badge colors
+// Article type badge colors — keys MUST match the article-type dropdown options
+// in collections.ts (FAQ, How-To Guide, Troubleshooting, Software, Hardware, Security, Policy).
 const typeColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
-  'How-To': { bg: 'bg-cyan-500/20', text: 'text-cyan-400', border: 'border-cyan-500/30', gradient: 'from-cyan-500 to-blue-500' },
+  'FAQ': { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30', gradient: 'from-blue-500 to-indigo-500' },
+  'How-To Guide': { bg: 'bg-cyan-500/20', text: 'text-cyan-400', border: 'border-cyan-500/30', gradient: 'from-cyan-500 to-blue-500' },
   'Troubleshooting': { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30', gradient: 'from-amber-500 to-orange-500' },
   'Software': { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30', gradient: 'from-purple-500 to-violet-500' },
+  'Hardware': { bg: 'bg-teal-500/20', text: 'text-teal-400', border: 'border-teal-500/30', gradient: 'from-teal-500 to-emerald-500' },
   'Security': { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30', gradient: 'from-red-500 to-rose-500' },
+  'Policy': { bg: 'bg-violet-500/20', text: 'text-violet-400', border: 'border-violet-500/30', gradient: 'from-violet-500 to-purple-500' },
   'default': { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30', gradient: 'from-slate-500 to-slate-600' }
 };
 
 const typeStyle = typeColors[item['article-type'] || ''] || typeColors.default;
 
-// Difficulty badge colors
+// Difficulty badge colors — keys MUST match the difficulty dropdown options
+// in collections.ts (Easy, Intermediate, Advanced).
 const difficultyColors: Record<string, string> = {
-  'Beginner': 'bg-green-500/20 text-green-400 border-green-500/30',
+  'Easy': 'bg-green-500/20 text-green-400 border-green-500/30',
   'Intermediate': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
   'Advanced': 'bg-red-500/20 text-red-400 border-red-500/30'
 };
@@ -142,6 +148,17 @@ const difficultyColors: Record<string, string> = {
       {(item['full-content'] || item.content) && (
         <div class="mb-8 prose prose-invert max-w-none">
           <div class="text-slate-300 leading-relaxed" set:html={decodeHtmlEntities(item['full-content'] || item.content)} />
+        </div>
+      )}
+
+      <!-- Inline file/video preview -->
+      {(item['download-link'] || item['video-tutorial'] || item['video-link']) && (
+        <div class="mb-6">
+          <FilePreview
+            url={item['download-link'] || item['video-tutorial'] || item['video-link']}
+            name={item.name}
+            accent="cyan"
+          />
         </div>
       )}
 

@@ -2,19 +2,15 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Image, ArrowLeft, Download, Search, Filter, Building2, HardHat, Users, Calendar, ExternalLink } from 'lucide-react';
+import { Image, ArrowLeft, Download } from 'lucide-react';
 import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch photo assets from CMS
+// Photo Library — pulls Marketing Assets tagged Photo or Video.
 const photosResult = await getMarketingAssets({ type: ['Photo', 'Video'], limit: 50 });
 const photos = photosResult.items;
 
-// Helper to get image URL
 const getImageUrl = (img: any) => {
   if (!img) return null;
   if (typeof img === 'string') return img;
@@ -26,7 +22,7 @@ const getImageUrl = (img: any) => {
 <ThemedPage title="Photo Library | Jewett Junction" theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
-      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors">
+      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label="Back to Marketing Hub">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
@@ -34,78 +30,35 @@ const getImageUrl = (img: any) => {
           <Image className="h-7 w-7 text-purple-500" />
           Photo Library
         </h1>
-        <p class="text-slate-400 mt-1">
-          Browse and download project photos and company imagery
-        </p>
+        <p class="text-slate-400 mt-1">Project photos, job site shots, team photos, and events</p>
       </div>
     </div>
 
-    <!-- Photo Categories -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="bg-slate-800 border-slate-700 hover:border-blue-600 transition-all">
-        <CardContent className="pt-6">
-          <div class="h-32 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg mb-3 flex items-center justify-center">
-            <Building2 className="h-12 w-12 text-white/80" />
-          </div>
-          <h3 class="font-semibold text-white">Project Photos</h3>
-          <p class="text-sm text-slate-400">Completed projects</p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-slate-800 border-slate-700 hover:border-orange-600 transition-all">
-        <CardContent className="pt-6">
-          <div class="h-32 bg-gradient-to-br from-orange-500 to-orange-700 rounded-lg mb-3 flex items-center justify-center">
-            <HardHat className="h-12 w-12 text-white/80" />
-          </div>
-          <h3 class="font-semibold text-white">Job Site</h3>
-          <p class="text-sm text-slate-400">In-progress photos</p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-slate-800 border-slate-700 hover:border-green-600 transition-all">
-        <CardContent className="pt-6">
-          <div class="h-32 bg-gradient-to-br from-green-500 to-green-700 rounded-lg mb-3 flex items-center justify-center">
-            <Users className="h-12 w-12 text-white/80" />
-          </div>
-          <h3 class="font-semibold text-white">Team Photos</h3>
-          <p class="text-sm text-slate-400">Staff and crew</p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-slate-800 border-slate-700 hover:border-purple-600 transition-all">
-        <CardContent className="pt-6">
-          <div class="h-32 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg mb-3 flex items-center justify-center">
-            <Calendar className="h-12 w-12 text-white/80" />
-          </div>
-          <h3 class="font-semibold text-white">Events</h3>
-          <p class="text-sm text-slate-400">Company events</p>
-        </CardContent>
-      </Card>
-    </div>
-
-    <!-- CMS Photos Gallery -->
-    {photos.length > 0 ? (
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <div class="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-white">Photo Library</CardTitle>
-              <CardDescription className="text-slate-400">{photos.length} photos from the CMS</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
+    <Card className="bg-slate-800 border-slate-700">
+      <CardHeader>
+        <CardTitle className="text-white">Photos & Videos</CardTitle>
+        <CardDescription className="text-slate-400">
+          {photos.length > 0
+            ? `${photos.length} item${photos.length > 1 ? 's' : ''} available`
+            : 'Upload photos in the admin under Marketing Assets → Asset Type: Photo / Video.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {photos.length > 0 ? (
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {photos.map((photo) => {
               const imageUrl = getImageUrl(photo.thumbnail) || getImageUrl(photo['preview-image']);
               const downloadUrl = photo['download-link'];
               return (
-                <div class="group relative aspect-square bg-slate-700 rounded-lg overflow-hidden">
+                <a
+                  href={`/jewett-junction/marketing/${photo.slug || photo.id}`}
+                  class="group relative aspect-square bg-slate-700 rounded-lg overflow-hidden block"
+                >
                   {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={photo.name}
-                      class="w-full h-full object-cover"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
                   ) : (
@@ -113,52 +66,27 @@ const getImageUrl = (img: any) => {
                       <Image className="h-8 w-8 text-slate-500" />
                     </div>
                   )}
-                  <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-3">
-                    <p class="text-white text-sm font-medium text-center mb-2 line-clamp-2">{photo.name}</p>
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                    <p class="text-white text-sm font-medium line-clamp-2">{photo.name}</p>
                     {downloadUrl && (
-                      <a href={downloadUrl} target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-xs">
-                        <Download className="h-3 w-3" /> Download
-                      </a>
+                      <span class="text-purple-300 flex items-center gap-1 text-xs mt-1">
+                        <Download className="h-3 w-3" /> Available to download
+                      </span>
                     )}
                   </div>
-                </div>
+                </a>
               );
             })}
           </div>
-        </CardContent>
-      </Card>
-    ) : (
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Recent Uploads</CardTitle>
-          <CardDescription className="text-slate-400">Latest photos added to the library</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div class="aspect-square bg-slate-700 rounded-lg relative group cursor-pointer overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-800"></div>
-                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Download className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            ))}
+        ) : (
+          <div class="text-center py-12 text-slate-400">
+            <Image className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p class="text-sm">No photos uploaded yet.</p>
+            <a href="/jewett-junction/admin/marketing" class="text-purple-400 hover:underline text-sm mt-1 inline-block">
+              Add photos in the admin panel →
+            </a>
           </div>
-          <p class="text-center text-slate-500 mt-4 text-sm">Add photos via the Admin Dashboard to display them here.</p>
-        </CardContent>
-      </Card>
-    )}
-
-    <!-- Usage Guidelines -->
-    <Card className="bg-amber-900/30 border-amber-800">
-      <CardContent className="pt-6">
-        <h3 class="font-semibold text-amber-300 mb-2">Photo Usage Guidelines</h3>
-        <ul class="text-sm text-amber-400 space-y-1">
-          <li>• All photos are for official Jewett Construction business use only</li>
-          <li>• Always credit the photographer when known</li>
-          <li>• Contact Marketing before using photos in external publications</li>
-          <li>• High-resolution versions available upon request</li>
-        </ul>
+        )}
       </CardContent>
     </Card>
   </div>

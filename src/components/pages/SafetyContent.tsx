@@ -313,33 +313,37 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                 {/* Show training items if they have content-type, otherwise show items with video-link as training */}
                 {(training.length > 0 ? training.slice(0, 2) : safetyItems.filter(item => item['video-link']).slice(0, 2)).map((item, i) => ({
                   name: item.name,
+                  href: `/jewett-junction/safety/${item.slug || item.id}`,
                   desc: stripHtml(item.description || getContent(item))?.substring(0, 80),
-                  link: item['document-link'] || item['video-link'],
                   color: i === 0 ? 'green' : 'blue',
-                  icon: i === 0 ? Shield : HardHat
+                  icon: i === 0 ? Shield : HardHat,
                 })).map((course) => (
-                  <Card key={course.name} className={`border transition-colors ${isDark ? `bg-slate-700 border-slate-600 hover:border-${course.color}-600` : `hover:border-${course.color}-300`}`}>
-                    <CardContent className="pt-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className={`w-10 h-10 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
-                          <course.icon className={`h-5 w-5 text-${course.color}-600`} />
+                  <a
+                    key={course.name}
+                    href={course.href}
+                    className="block group"
+                    aria-label={`Open training: ${course.name}`}
+                  >
+                    <Card className={`border h-full transition-colors min-h-[44px] ${isDark ? `bg-slate-700 border-slate-600 group-hover:border-${course.color}-600 group-hover:bg-slate-700/80` : `group-hover:border-${course.color}-300 group-hover:shadow-md`}`}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className={`w-10 h-10 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
+                            <course.icon className={`h-5 w-5 text-${course.color}-600`} />
+                          </div>
+                          <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
                         </div>
-                        <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
-                      </div>
-                      <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : ''}`}>{course.name}</h3>
-                      <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Required</span>
-                        {course.link ? (
-                          <a href={course.link} target="_blank" rel="noopener">
-                            <Button size="sm" className={`bg-${course.color}-600 hover:bg-${course.color}-700`}>Start Course</Button>
-                          </a>
-                        ) : (
-                          <Button size="sm" className={`bg-${course.color}-600 hover:bg-${course.color}-700`}>Start Course</Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <h3 className={`font-semibold mb-1 group-hover:text-${course.color}-500 transition-colors ${isDark ? 'text-white' : ''}`}>{course.name}</h3>
+                        <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Required</span>
+                          <span className={`inline-flex items-center gap-1 text-sm font-medium text-${course.color}-500 group-hover:gap-2 transition-all`}>
+                            View Details
+                            <ChevronRight className="h-4 w-4" />
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </a>
                 ))}
               </div>
             </CardContent>

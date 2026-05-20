@@ -69,9 +69,6 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
 
   // Filter assets by type
   const recentAssets = assets.slice(0, 4);
-  const brandAssets = assets.filter(a => a['asset-type'] === 'Brand Asset');
-  const templates = assets.filter(a => a['asset-type'] === 'Template');
-  const photos = assets.filter(a => a['asset-type'] === 'Photo');
 
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';

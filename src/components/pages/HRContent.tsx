@@ -258,22 +258,32 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {} }
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Show benefits from CMS, or display items without content-type, or empty state */}
                 {(benefits.length > 0 ? benefits.slice(0, 2) : displayItems.slice(0, 2)).map((benefit, i) => ({
+                  source: benefit,
                   name: benefit.name,
+                  href: `/jewett-junction/hr/${benefit.slug || benefit.id}`,
                   desc: stripHtml(benefit.description || getContent(benefit))?.substring(0, 100),
                   icon: i === 0 ? Heart : DollarSign,
-                  color: i === 0 ? 'red' : 'green'
-                })).map((benefit, index) => (
-                  <Card key={benefit.name} className={`border ${isDark ? 'bg-slate-700 border-slate-600' : ''}`}>
-                    <CardContent className="pt-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 ${isDark ? `bg-${benefit.color}-900` : `bg-${benefit.color}-100`} rounded-lg flex items-center justify-center`}>
-                          <benefit.icon className={`h-5 w-5 text-${benefit.color}-600`} />
+                  color: i === 0 ? 'red' : 'green',
+                })).map((benefit) => (
+                  <a
+                    key={benefit.name}
+                    href={benefit.href}
+                    className="block group"
+                    aria-label={`View benefit: ${benefit.name}`}
+                  >
+                    <Card className={`border h-full transition-all min-h-[44px] ${isDark ? 'bg-slate-700 border-slate-600 hover:border-purple-500/50 hover:bg-slate-700/80' : 'hover:border-purple-300 hover:shadow-md'}`}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`w-10 h-10 ${isDark ? `bg-${benefit.color}-900` : `bg-${benefit.color}-100`} rounded-lg flex items-center justify-center`}>
+                            <benefit.icon className={`h-5 w-5 text-${benefit.color}-600`} />
+                          </div>
+                          <h3 className={`font-semibold group-hover:text-purple-500 transition-colors ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
+                          <ChevronRight className={`h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
                         </div>
-                        <h3 className={`font-semibold ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
-                      </div>
-                      <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{benefit.desc}</p>
-                    </CardContent>
-                  </Card>
+                        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{benefit.desc}</p>
+                      </CardContent>
+                    </Card>
+                  </a>
                 ))}
               </div>
             </CardContent>

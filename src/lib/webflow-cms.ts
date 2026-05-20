@@ -499,7 +499,7 @@ export const COLLECTIONS = {
 // so downstream display code can keep reading the older human-friendly name.
 Object.assign(COLLECTION_FIELD_ALIASES, {
   [COLLECTIONS.employees]: { department: 'dept', 'team-department': 'dept' },
-  [COLLECTIONS.announcements]: { priority: 'priority-level' },
+  [COLLECTIONS.announcements]: { priority: 'priority-level', category: 'news-category' },
   [COLLECTIONS.events]: { category: 'event-category' },
   [COLLECTIONS.jobPostings]: { department: 'job-department' },
   [COLLECTIONS.resources]: { category: 'resource-category' },
@@ -507,8 +507,8 @@ Object.assign(COLLECTION_FIELD_ALIASES, {
   [COLLECTIONS.hrContent]: { content: 'full-content' },
   [COLLECTIONS.safetyContent]: { content: 'full-content' },
   [COLLECTIONS.itKnowledgeBase]: { content: 'full-content', 'video-link': 'video-tutorial' },
-  // Culture Stories: renamed slug
-  [COLLECTIONS.cultureStories]: { type: 'story-type' },
+  // Culture Stories: renamed slug + dashboard reads `category`
+  [COLLECTIONS.cultureStories]: { type: 'story-type', category: 'story-type' },
   // Submitted Ideas: placeholder renamed
   [COLLECTIONS.submittedIdeas]: { 'submitter-email': 'email' },
 });
@@ -541,6 +541,10 @@ export interface SiteSettings {
   'safety-training-compliance'?: number;
   'safety-active-sites'?: number;
   'culture-volunteer-hours'?: string;
+  'culture-donations'?: string;
+  'signage-review-days'?: string;
+  'signage-production-days'?: string;
+  'signage-delivery-days'?: string;
   'social-facebook-url'?: string;
   'social-instagram-url'?: string;
   'social-linkedin-url'?: string;

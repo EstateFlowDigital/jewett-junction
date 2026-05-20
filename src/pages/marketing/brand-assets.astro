@@ -3,30 +3,52 @@ export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { Image, Download, Palette, FileType, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Image, Download, ArrowLeft, FileType, Palette } from 'lucide-react';
 import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch brand assets from CMS
-const brandResult = await getMarketingAssets({ type: ['Logo', 'Brand Guide'], limit: 50 });
-const brandAssets = brandResult.items;
+// Logos and brand guide PDFs come from Marketing Assets. Match by asset-type
+// first, then fall back to a name-keyword check so assets uploaded without an
+// asset-type set (e.g. "Logo - Vertical") still surface.
+const result = await getMarketingAssets({ limit: 100 });
+const allAssets = result.items;
 
-// Helper to get image URL
+function matchesAny(value: string | undefined, needles: string[]): boolean {
+  if (!value) return false;
+  const v = value.toLowerCase();
+  return needles.some((n) => v.includes(n));
+}
+
+const logos = allAssets.filter((a: any) =>
+  matchesAny(a['asset-type'], ['logo']) || matchesAny(a.name, ['logo']),
+);
+const guides = allAssets.filter((a: any) =>
+  matchesAny(a['asset-type'], ['brand guide', 'guideline']) ||
+  matchesAny(a.name, ['brand guideline', 'brand guide', 'brand standard']),
+);
+
 const getImageUrl = (img: any) => {
   if (!img) return null;
   if (typeof img === 'string') return img;
   if (img.url) return img.url;
   return null;
 };
+
+// Brand palette + typography — client-provided values from
+// jewettconstruction.com. Move to a Settings record if the client wants
+// to tweak these without a code change.
+const brandColors = [
+  { name: 'Jewett Red', hex: '#D22630' },
+  { name: 'Jewett Grey', hex: '#78787F' },
+  { name: 'Jewett Dark', hex: '#2A2A2A' },
+];
 ---
 
 <ThemedPage title="Brand Assets | Jewett Junction" theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
-      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors">
+      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label="Back to Marketing Hub">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
@@ -34,108 +56,67 @@ const getImageUrl = (img: any) => {
           <Image className="h-7 w-7 text-blue-500" />
           Brand Assets
         </h1>
-        <p class="text-slate-400 mt-1">
-          Official logos, colors, and brand guidelines
-        </p>
+        <p class="text-slate-400 mt-1">Official logos and brand guidelines</p>
       </div>
     </div>
 
-    <!-- Logo Downloads -->
+    <!-- Logos -->
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white">Company Logos</CardTitle>
-        <CardDescription className="text-slate-400">Download official Jewett Construction logos in various formats</CardDescription>
+        <CardDescription className="text-slate-400">
+          {logos.length > 0
+            ? `${logos.length} logo${logos.length > 1 ? 's' : ''} available`
+            : 'Upload logos in the admin panel under Marketing → Asset Type: Logo'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="border border-slate-600 rounded-lg p-4 text-center bg-slate-700/50">
-            <div class="h-24 bg-slate-100 rounded flex items-center justify-center mb-3">
-              <div class="text-2xl font-bold text-blue-600">JC</div>
-            </div>
-            <p class="font-medium text-sm text-white">Primary Logo</p>
-            <p class="text-xs text-slate-400 mb-3">Full color, horizontal</p>
-            <div class="flex gap-2 justify-center">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> PNG
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> SVG
-              </Button>
-            </div>
-          </div>
-
-          <div class="border border-slate-600 rounded-lg p-4 text-center bg-slate-700/50">
-            <div class="h-24 bg-slate-900 rounded flex items-center justify-center mb-3">
-              <div class="text-2xl font-bold text-white">JC</div>
-            </div>
-            <p class="font-medium text-sm text-white">White Logo</p>
-            <p class="text-xs text-slate-400 mb-3">For dark backgrounds</p>
-            <div class="flex gap-2 justify-center">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> PNG
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> SVG
-              </Button>
-            </div>
-          </div>
-
-          <div class="border border-slate-600 rounded-lg p-4 text-center bg-slate-700/50">
-            <div class="h-24 bg-slate-100 rounded flex items-center justify-center mb-3">
-              <div class="text-2xl font-bold text-slate-800">JC</div>
-            </div>
-            <p class="font-medium text-sm text-white">Black Logo</p>
-            <p class="text-xs text-slate-400 mb-3">Single color version</p>
-            <div class="flex gap-2 justify-center">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> PNG
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-                <Download className="h-3 w-3 mr-1" /> SVG
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- CMS Brand Assets -->
-    {brandAssets.length > 0 && (
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Additional Brand Assets</CardTitle>
-          <CardDescription className="text-slate-400">{brandAssets.length} assets from the CMS</CardDescription>
-        </CardHeader>
-        <CardContent>
+        {logos.length > 0 ? (
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {brandAssets.map((asset) => {
-              const imageUrl = getImageUrl(asset.thumbnail) || getImageUrl(asset['preview-image']);
+            {logos.map((asset) => {
+              const imageUrl = getImageUrl(asset['preview-image']) || getImageUrl(asset.thumbnail);
               const downloadUrl = asset['download-link'];
               return (
-                <div class="border border-slate-600 rounded-lg p-4 bg-slate-700/50">
-                  <div class="h-24 bg-slate-600 rounded flex items-center justify-center mb-3 overflow-hidden">
+                <a
+                  href={`/jewett-junction/marketing/${asset.slug || asset.id}`}
+                  class="border border-slate-600 rounded-lg p-4 bg-slate-700/50 hover:border-blue-500/50 hover:bg-slate-700 transition-colors block"
+                >
+                  <div class="h-32 bg-white rounded flex items-center justify-center mb-3 overflow-hidden">
                     {imageUrl ? (
-                      <img src={imageUrl} alt={asset.name} class="w-full h-full object-contain" loading="lazy" />
+                      <img src={imageUrl} alt={asset.name} class="max-w-full max-h-full object-contain p-2" loading="lazy" />
                     ) : (
                       <Image className="h-8 w-8 text-slate-400" />
                     )}
                   </div>
-                  <p class="font-medium text-sm text-white">{asset.name}</p>
-                  <p class="text-xs text-slate-400 mb-3">{asset['file-format'] || 'Asset'}</p>
+                  <p class="font-medium text-sm text-white truncate">{asset.name}</p>
+                  <p class="text-xs text-slate-400 mb-3">{asset['file-format'] || 'Logo'}</p>
                   {downloadUrl && (
-                    <a href={downloadUrl} target="_blank" rel="noopener">
-                      <Button size="sm" variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-600">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-600"
+                      asChild
+                    >
+                      <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
                         <Download className="h-3 w-3 mr-1" /> Download
-                      </Button>
-                    </a>
+                      </a>
+                    </Button>
                   )}
-                </div>
+                </a>
               );
             })}
           </div>
-        </CardContent>
-      </Card>
-    )}
+        ) : (
+          <div class="text-center py-8 text-slate-400">
+            <Image className="h-10 w-10 mx-auto mb-2 opacity-50" />
+            <p>No logos uploaded yet.</p>
+            <a href="/jewett-junction/admin/marketing" class="text-blue-400 hover:underline text-sm mt-1 inline-block">
+              Add one in the admin panel →
+            </a>
+          </div>
+        )}
+      </CardContent>
+    </Card>
 
     <!-- Brand Colors -->
     <Card className="bg-slate-800 border-slate-700">
@@ -144,30 +125,19 @@ const getImageUrl = (img: any) => {
           <Palette className="h-5 w-5" />
           Brand Colors
         </CardTitle>
-        <CardDescription className="text-slate-400">Official color palette for all marketing materials</CardDescription>
+        <CardDescription className="text-slate-400">Use these hex values across all materials</CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="space-y-2">
-            <div class="h-20 rounded-lg bg-blue-600"></div>
-            <p class="font-medium text-sm text-white">Jewett Blue</p>
-            <p class="text-xs text-slate-400 font-mono">#2563EB</p>
-          </div>
-          <div class="space-y-2">
-            <div class="h-20 rounded-lg bg-slate-800 border border-slate-600"></div>
-            <p class="font-medium text-sm text-white">Slate Dark</p>
-            <p class="text-xs text-slate-400 font-mono">#1E293B</p>
-          </div>
-          <div class="space-y-2">
-            <div class="h-20 rounded-lg bg-orange-500"></div>
-            <p class="font-medium text-sm text-white">Safety Orange</p>
-            <p class="text-xs text-slate-400 font-mono">#F97316</p>
-          </div>
-          <div class="space-y-2">
-            <div class="h-20 rounded-lg bg-green-600"></div>
-            <p class="font-medium text-sm text-white">Success Green</p>
-            <p class="text-xs text-slate-400 font-mono">#16A34A</p>
-          </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {brandColors.map((c) => (
+            <div class="rounded-lg border border-slate-600 overflow-hidden">
+              <div class="h-24" style={`background-color: ${c.hex}`}></div>
+              <div class="p-3 bg-slate-700/40">
+                <p class="font-medium text-sm text-white">{c.name}</p>
+                <p class="text-xs text-slate-400 font-mono mt-0.5">{c.hex}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
@@ -179,56 +149,69 @@ const getImageUrl = (img: any) => {
           <FileType className="h-5 w-5" />
           Typography
         </CardTitle>
-        <CardDescription className="text-slate-400">Approved fonts for digital and print materials</CardDescription>
+        <CardDescription className="text-slate-400">Approved fonts for digital and print</CardDescription>
       </CardHeader>
       <CardContent>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="space-y-3">
-            <h4 class="font-semibold text-white">Primary: Inter</h4>
-            <p class="text-slate-400 text-sm">Used for headlines, titles, and emphasis</p>
-            <div class="space-y-1 text-white">
-              <p class="text-2xl font-bold">Aa Bb Cc 123</p>
-              <p class="text-lg font-semibold">The quick brown fox</p>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500 mb-1">Headings</p>
+              <h4 class="text-xl font-semibold text-white">Politica</h4>
             </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600">
-              <Download className="h-3 w-3 mr-2" /> Download Font
-            </Button>
+            <div class="space-y-1 text-white">
+              <p class="text-3xl font-bold uppercase tracking-wide">Aa Bb Cc 123</p>
+              <p class="text-lg uppercase tracking-wide">The Quick Brown Fox</p>
+            </div>
           </div>
           <div class="space-y-3">
-            <h4 class="font-semibold text-white">Secondary: System UI</h4>
-            <p class="text-slate-400 text-sm">Used for body text and UI elements</p>
-            <div class="space-y-1 font-sans text-white">
-              <p class="text-2xl">Aa Bb Cc 123</p>
-              <p class="text-lg">The quick brown fox</p>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500 mb-1">Body</p>
+              <h4 class="text-xl font-semibold text-white">Lato</h4>
             </div>
-            <Badge variant="secondary" className="bg-slate-700 text-slate-300">System Default</Badge>
+            <div class="space-y-1 text-white" style="font-family: Lato, system-ui, sans-serif;">
+              <p class="text-2xl">Aa Bb Cc 123</p>
+              <p class="text-lg">The quick brown fox jumps over the lazy dog</p>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
 
     <!-- Brand Guidelines -->
-    <Card className="bg-slate-800 border-slate-700">
-      <CardHeader>
-        <CardTitle className="text-white">Brand Guidelines PDF</CardTitle>
-        <CardDescription className="text-slate-400">Complete brand standards and usage guidelines</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex items-center justify-between p-4 bg-slate-700 rounded-lg">
-          <div class="flex items-center gap-4">
-            <div class="h-12 w-12 bg-red-900/50 rounded flex items-center justify-center">
-              <FileType className="h-6 w-6 text-red-400" />
-            </div>
-            <div>
-              <p class="font-medium text-white">Jewett_Brand_Guidelines_2026.pdf</p>
-              <p class="text-sm text-slate-400">2.4 MB • Last updated Jan 2026</p>
-            </div>
-          </div>
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Download className="h-4 w-4 mr-2" /> Download PDF
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    {guides.length > 0 && (
+      <Card className="bg-slate-800 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-white">Brand Guidelines</CardTitle>
+          <CardDescription className="text-slate-400">Complete brand standards and usage</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {guides.map((guide) => (
+            <a
+              href={`/jewett-junction/marketing/${guide.slug || guide.id}`}
+              class="flex items-center justify-between p-4 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors"
+            >
+              <div class="flex items-center gap-4">
+                <div class="h-12 w-12 bg-red-900/50 rounded flex items-center justify-center">
+                  <FileType className="h-6 w-6 text-red-400" />
+                </div>
+                <div>
+                  <p class="font-medium text-white">{guide.name}</p>
+                  <p class="text-sm text-slate-400">
+                    {[guide['file-format'], guide['file-size'], guide.version].filter(Boolean).join(' • ') || 'Brand Guide'}
+                  </p>
+                </div>
+              </div>
+              {guide['download-link'] && (
+                <Button className="bg-blue-600 hover:bg-blue-700" asChild>
+                  <a href={guide['download-link']} target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4 mr-2" /> Download
+                  </a>
+                </Button>
+              )}
+            </a>
+          ))}
+        </CardContent>
+      </Card>
+    )}
   </div>
 </ThemedPage>

@@ -2,21 +2,25 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { DirectoryContent } from '../../components/pages/DirectoryContent';
-import { initCMS, getEmployees } from '../../lib/webflow-cms';
+import { initCMS, getEmployees, getSiteSettings } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
 
-// Fetch employees from CMS
 let employees: any[] = [];
+let settings: any = {};
 try {
-  const result = await getEmployees();
-  employees = result.items;
+  const [empResult, siteSettings] = await Promise.all([
+    getEmployees(),
+    getSiteSettings(),
+  ]);
+  employees = empResult.items;
+  settings = siteSettings;
 } catch (error) {
-  console.error('Error fetching employees:', error);
+  console.error('Error fetching directory data:', error);
 }
 ---
 
 <ThemedPage title="Directory | Jewett Junction" theme="dark" currentSection="directory">
-  <DirectoryContent client:load theme="dark" employees={employees} />
+  <DirectoryContent client:load theme="dark" employees={employees} settings={settings} />
 </ThemedPage>

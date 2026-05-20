@@ -4,24 +4,37 @@ import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { FileText, Download, ArrowLeft, File, FileSpreadsheet, Mail } from 'lucide-react';
+import { FileText, Download, ArrowLeft, File } from 'lucide-react';
 import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch letterhead/form assets from CMS
-const formsResult = await getMarketingAssets({ type: ['Letterhead', 'Template'], limit: 50 });
-const forms = formsResult.items;
+// Single source: Marketing Assets in the admin. Bucket by asset-type / name.
+const result = await getMarketingAssets({ limit: 100 });
+const assets = result.items;
 
-// Helper to get download URL
-const getDownloadUrl = (item: any) => item['download-link'] || null;
+function matchesAny(value: string | undefined, needles: string[]): boolean {
+  if (!value) return false;
+  const v = value.toLowerCase();
+  return needles.some((n) => v.includes(n));
+}
+
+const letterheadAssets = assets.filter((a: any) =>
+  matchesAny(a['asset-type'], ['letterhead']) || matchesAny(a.name, ['letterhead']),
+);
+const formAssets = assets.filter((a: any) => {
+  if (matchesAny(a['asset-type'], ['form'])) return true;
+  if (matchesAny(a.name, ['form', 'request', 'log', 'expense', 'time off', 'mileage'])) return true;
+  return false;
+});
+
+const getDownloadUrl = (item: any): string | null => item['download-link'] || null;
 ---
 
 <ThemedPage title="Letterhead & Forms | Jewett Junction" theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
-      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors">
+      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors" aria-label="Back to Marketing">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
@@ -29,9 +42,7 @@ const getDownloadUrl = (item: any) => item['download-link'] || null;
           <FileText className="h-7 w-7 text-blue-500" />
           Letterhead & Forms
         </h1>
-        <p class="text-slate-400 mt-1">
-          Official document templates and forms
-        </p>
+        <p class="text-slate-400 mt-1">Official document templates and forms</p>
       </div>
     </div>
 
@@ -39,209 +50,104 @@ const getDownloadUrl = (item: any) => item['download-link'] || null;
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white">Letterhead Templates</CardTitle>
-        <CardDescription className="text-slate-400">Official company letterhead for correspondence</CardDescription>
+        <CardDescription className="text-slate-400">
+          {letterheadAssets.length > 0
+            ? `${letterheadAssets.length} ${letterheadAssets.length === 1 ? 'template' : 'templates'} available`
+            : 'Upload letterhead in the admin under Marketing Assets to populate this section.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="border border-slate-600 rounded-lg p-4 bg-slate-700/50">
-            <div class="h-32 bg-slate-900 rounded border border-slate-600 mb-3 flex items-start justify-center pt-4">
-              <div class="text-center">
-                <div class="text-lg font-bold text-blue-400">JC</div>
-                <div class="text-[8px] text-slate-400 mt-1">JEWETT CONSTRUCTION</div>
-                <div class="w-16 h-px bg-slate-600 mx-auto mt-2"></div>
-              </div>
-            </div>
-            <p class="font-medium text-sm text-white">Standard Letterhead</p>
-            <p class="text-xs text-slate-400 mb-3">For general correspondence</p>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Word
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> PDF
-              </Button>
-            </div>
-          </div>
-
-          <div class="border border-slate-600 rounded-lg p-4 bg-slate-700/50">
-            <div class="h-32 bg-slate-900 rounded border border-slate-600 mb-3 flex items-start justify-center pt-4">
-              <div class="text-center">
-                <div class="text-lg font-bold text-blue-400">JC</div>
-                <div class="text-[8px] text-slate-400 mt-1">EXECUTIVE OFFICE</div>
-                <div class="w-16 h-px bg-blue-500/50 mx-auto mt-2"></div>
-              </div>
-            </div>
-            <p class="font-medium text-sm text-white">Executive Letterhead</p>
-            <p class="text-xs text-slate-400 mb-3">For leadership communications</p>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Word
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> PDF
-              </Button>
-            </div>
-          </div>
-
-          <div class="border border-slate-600 rounded-lg p-4 bg-slate-700/50">
-            <div class="h-32 bg-slate-900 rounded border border-slate-600 mb-3 flex items-start justify-center pt-4">
-              <div class="text-center">
-                <div class="text-lg font-bold text-blue-400">JC</div>
-                <div class="text-[8px] text-slate-400 mt-1">PROJECT CORRESPONDENCE</div>
-                <div class="w-16 h-px bg-orange-500/50 mx-auto mt-2"></div>
-              </div>
-            </div>
-            <p class="font-medium text-sm text-white">Project Letterhead</p>
-            <p class="text-xs text-slate-400 mb-3">For project communications</p>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Word
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> PDF
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- CMS Forms (if available) -->
-    {forms.length > 0 && (
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Available Forms</CardTitle>
-          <CardDescription className="text-slate-400">{forms.length} forms from the CMS</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="space-y-3">
-            {forms.map((form) => (
-              <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                <div class="flex items-center gap-3">
-                  <File className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p class="font-medium text-sm text-white">{form.name}</p>
-                    {form.description && <p class="text-xs text-slate-400">{form.description}</p>}
+        {letterheadAssets.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {letterheadAssets.map((asset: any) => {
+              const thumb = asset['preview-image']?.url || asset.thumbnail?.url;
+              const downloadUrl = getDownloadUrl(asset);
+              return (
+                <div class="border border-slate-600 rounded-lg overflow-hidden bg-slate-700/40 flex flex-col">
+                  <div class="h-36 bg-slate-100 flex items-center justify-center p-3">
+                    {thumb ? (
+                      <img src={thumb} alt={asset.name} class="max-w-full max-h-full object-contain" loading="lazy" />
+                    ) : (
+                      <FileText className="h-10 w-10 text-slate-400" />
+                    )}
+                  </div>
+                  <div class="p-4 flex flex-col gap-3 flex-1">
+                    <div>
+                      <p class="font-medium text-sm text-white">{asset.name}</p>
+                      {asset.description && <p class="text-xs text-slate-400 mt-1">{asset.description}</p>}
+                    </div>
+                    {downloadUrl && (
+                      <a href={downloadUrl} target="_blank" rel="noopener noreferrer" class="mt-auto">
+                        <Button size="sm" variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-600">
+                          <Download className="h-3 w-3 mr-1" /> Download
+                        </Button>
+                      </a>
+                    )}
                   </div>
                 </div>
-                {getDownloadUrl(form) && (
-                  <a href={getDownloadUrl(form)} target="_blank" rel="noopener">
-                    <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                      <Download className="h-3 w-3 mr-1" /> Download
-                    </Button>
-                  </a>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </CardContent>
-      </Card>
-    )}
+        ) : (
+          <div class="rounded-lg border border-dashed border-slate-600 bg-slate-900/40 p-8 text-center">
+            <FileText className="h-10 w-10 mx-auto text-slate-500 mb-3" />
+            <p class="text-sm text-slate-400">No letterhead templates uploaded yet.</p>
+            <a href="/jewett-junction/admin/marketing" class="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block">
+              Upload a template →
+            </a>
+          </div>
+        )}
+      </CardContent>
+    </Card>
 
     <!-- Business Forms -->
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white">Business Forms</CardTitle>
-        <CardDescription className="text-slate-400">Commonly used internal and external forms</CardDescription>
+        <CardDescription className="text-slate-400">
+          {formAssets.length > 0
+            ? `${formAssets.length} ${formAssets.length === 1 ? 'form' : 'forms'} available`
+            : 'Upload forms in the admin under Marketing Assets.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <File className="h-5 w-5 text-blue-400" />
-              <div>
-                <p class="font-medium text-sm text-white">Expense Report Form</p>
-                <p class="text-xs text-slate-400">Submit expense reimbursements</p>
-              </div>
-            </div>
-            <div class="flex gap-2 items-center">
-              <Badge variant="secondary" className="bg-slate-600 text-slate-300">Excel</Badge>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Download
-              </Button>
-            </div>
+        {formAssets.length > 0 ? (
+          <div class="space-y-3">
+            {formAssets.map((form: any) => {
+              const downloadUrl = getDownloadUrl(form);
+              const format = (form['file-format'] || '').toString();
+              return (
+                <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <File className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                    <div class="min-w-0">
+                      <p class="font-medium text-sm text-white truncate">{form.name}</p>
+                      {form.description && <p class="text-xs text-slate-400 truncate">{form.description}</p>}
+                    </div>
+                  </div>
+                  <div class="flex gap-2 items-center flex-shrink-0">
+                    {format && <Badge variant="secondary" className="bg-slate-600 text-slate-300 uppercase">{format}</Badge>}
+                    {downloadUrl && (
+                      <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                        <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                          <Download className="h-3 w-3 mr-1" /> Download
+                        </Button>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <File className="h-5 w-5 text-green-400" />
-              <div>
-                <p class="font-medium text-sm text-white">Time Off Request</p>
-                <p class="text-xs text-slate-400">PTO and leave requests</p>
-              </div>
-            </div>
-            <div class="flex gap-2 items-center">
-              <Badge variant="secondary" className="bg-slate-600 text-slate-300">PDF</Badge>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Download
-              </Button>
-            </div>
+        ) : (
+          <div class="rounded-lg border border-dashed border-slate-600 bg-slate-900/40 p-8 text-center">
+            <File className="h-10 w-10 mx-auto text-slate-500 mb-3" />
+            <p class="text-sm text-slate-400">No forms uploaded yet.</p>
+            <a href="/jewett-junction/admin/marketing" class="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block">
+              Upload a form →
+            </a>
           </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <FileSpreadsheet className="h-5 w-5 text-orange-400" />
-              <div>
-                <p class="font-medium text-sm text-white">Purchase Order Form</p>
-                <p class="text-xs text-slate-400">Material and equipment orders</p>
-              </div>
-            </div>
-            <div class="flex gap-2 items-center">
-              <Badge variant="secondary" className="bg-slate-600 text-slate-300">Excel</Badge>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Download
-              </Button>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-            <div class="flex items-center gap-3">
-              <File className="h-5 w-5 text-purple-400" />
-              <div>
-                <p class="font-medium text-sm text-white">Mileage Log</p>
-                <p class="text-xs text-slate-400">Track business travel mileage</p>
-              </div>
-            </div>
-            <div class="flex gap-2 items-center">
-              <Badge variant="secondary" className="bg-slate-600 text-slate-300">Excel</Badge>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Download
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- Email Signature -->
-    <Card className="bg-slate-800 border-slate-700">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <Mail className="h-5 w-5" />
-          Email Signature
-        </CardTitle>
-        <CardDescription className="text-slate-400">Standard email signature template</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="border border-slate-600 rounded-lg p-4 bg-white">
-          <div class="border-l-4 border-blue-600 pl-4">
-            <p class="font-semibold text-slate-800">[Your Name]</p>
-            <p class="text-sm text-slate-600">[Your Title]</p>
-            <p class="text-sm text-slate-600">Jewett Construction</p>
-            <div class="mt-2 text-sm text-slate-500">
-              <p>P: [Your Phone]</p>
-              <p>E: [your.email]@jewett.com</p>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 flex gap-2">
-          <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-            <Download className="h-4 w-4 mr-2" /> Download HTML
-          </Button>
-          <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-            View Setup Guide
-          </Button>
-        </div>
+        )}
       </CardContent>
     </Card>
   </div>

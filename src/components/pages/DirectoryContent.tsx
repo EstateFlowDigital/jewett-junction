@@ -45,24 +45,35 @@ interface CMSEmployee {
   office?: string;
 }
 
+interface DirectorySettings {
+  'hr-email'?: string;
+}
+
 interface DirectoryContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   employees?: CMSEmployee[];
+  settings?: DirectorySettings;
 }
 
 const departmentConfig: Record<string, { color: string; gradient: string; icon: any; label: string }> = {
+  // New "Dept" field options (canonical)
+  'executive': { color: 'amber', gradient: 'from-amber-400 to-orange-500', icon: Star, label: 'Executive' },
+  'estimating': { color: 'cyan', gradient: 'from-cyan-500 to-teal-500', icon: Calculator, label: 'Estimating' },
+  'design': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Building, label: 'Design' },
+  'finance': { color: 'amber', gradient: 'from-amber-500 to-yellow-500', icon: Calculator, label: 'Finance' },
+  'field operations': { color: 'blue', gradient: 'from-blue-500 to-cyan-500', icon: HardHat, label: 'Field Operations' },
+  'hr': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Heart, label: 'HR' },
+  'marketing': { color: 'pink', gradient: 'from-pink-500 to-rose-500', icon: Megaphone, label: 'Marketing' },
+  'office operations': { color: 'emerald', gradient: 'from-emerald-500 to-green-500', icon: Briefcase, label: 'Office Operations' },
+  // Legacy team-department values still kept so existing records keep rendering
   'safety': { color: 'orange', gradient: 'from-orange-500 to-red-500', icon: Shield, label: 'Safety' },
   'human resources': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Heart, label: 'Human Resources' },
-  'hr': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Heart, label: 'HR' },
   'operations': { color: 'blue', gradient: 'from-blue-500 to-cyan-500', icon: HardHat, label: 'Operations' },
   'information technology': { color: 'indigo', gradient: 'from-indigo-500 to-blue-500', icon: Laptop, label: 'IT' },
   'it': { color: 'indigo', gradient: 'from-indigo-500 to-blue-500', icon: Laptop, label: 'IT' },
-  'finance': { color: 'amber', gradient: 'from-amber-500 to-yellow-500', icon: Calculator, label: 'Finance' },
-  'marketing': { color: 'pink', gradient: 'from-pink-500 to-rose-500', icon: Megaphone, label: 'Marketing' },
   'engineering': { color: 'cyan', gradient: 'from-cyan-500 to-teal-500', icon: Building, label: 'Engineering' },
   'commercial': { color: 'emerald', gradient: 'from-emerald-500 to-green-500', icon: Briefcase, label: 'Commercial' },
   'admin': { color: 'slate', gradient: 'from-slate-500 to-slate-600', icon: Users, label: 'Admin' },
-  'executive': { color: 'gold', gradient: 'from-amber-400 to-orange-500', icon: Star, label: 'Executive' },
   'default': { color: 'slate', gradient: 'from-slate-500 to-slate-600', icon: Users, label: 'Team' },
 };
 
@@ -87,9 +98,10 @@ function formatTenure(startDate: string | undefined) {
   return `${years} year${years > 1 ? 's' : ''}`;
 }
 
-export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] }: DirectoryContentProps) {
+export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [], settings = {} }: DirectoryContentProps) {
   // Use CMS employees only - no hardcoded fallback
   const allEmployees = cmsEmployees;
+  const hrEmail = settings['hr-email'] || 'hr@jewettconstruction.com';
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
@@ -210,7 +222,13 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                   className="bg-slate-800/50 border-slate-700 hover:border-cyan-500/50 transition-all group"
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
+                    {/* Clickable identity block — links to employee profile.
+                        Action buttons live outside so they don't nest inside <a>. */}
+                    <a
+                      href={`/jewett-junction/directory/${emp.slug || emp.id}`}
+                      className="flex items-center gap-4 rounded-lg -m-1 p-1 hover:bg-slate-800/40 transition-colors min-h-[44px]"
+                      aria-label={`View ${emp.name}'s profile`}
+                    >
                       {emp.photo?.url ? (
                         <img
                           src={emp.photo.url}
@@ -224,17 +242,15 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <a href={`/jewett-junction/directory/${emp.slug || emp.id}`} className="block">
-                          <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
-                            {emp.name}
-                          </h3>
-                        </a>
+                        <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+                          {emp.name}
+                        </h3>
                         <p className="text-sm text-slate-400 truncate">{emp.role}</p>
                         <Badge className={`mt-1 bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30 text-xs`}>
                           {config.label}
                         </Badge>
                       </div>
-                    </div>
+                    </a>
                     <div className="flex gap-2 mt-4">
                       {emp.phone && (
                         <Button
@@ -380,38 +396,44 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
 
                   {/* Content */}
                   <div className="pt-10 px-4 pb-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1 min-w-0">
-                        <a href={`/jewett-junction/directory/${emp.slug || emp.id}`} className="block">
+                    {/* Clickable identity + meta block — links to employee profile.
+                        Phone/Email buttons sit outside so they remain functional. */}
+                    <a
+                      href={`/jewett-junction/directory/${emp.slug || emp.id}`}
+                      className="block rounded-lg -m-1 p-1 hover:bg-slate-800/40 transition-colors min-h-[44px]"
+                      aria-label={`View ${emp.name}'s profile`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
                             {emp.name}
                           </h3>
-                        </a>
-                        <p className="text-sm text-slate-400 truncate">{emp.role}</p>
+                          <p className="text-sm text-slate-400 truncate">{emp.role}</p>
+                        </div>
+                        {emp['is-featured'] && (
+                          <Star className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                        )}
                       </div>
-                      {emp['is-featured'] && (
-                        <Star className="h-4 w-4 text-amber-400 flex-shrink-0" />
-                      )}
-                    </div>
 
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <config.icon className="h-4 w-4" />
-                        <span>{config.label}</span>
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-sm text-slate-400">
+                          <config.icon className="h-4 w-4" />
+                          <span>{config.label}</span>
+                        </div>
+                        {emp.location && (
+                          <div className="flex items-center gap-2 text-sm text-slate-400">
+                            <MapPin className="h-4 w-4" />
+                            <span>{emp.location}</span>
+                          </div>
+                        )}
+                        {tenure && (
+                          <div className="flex items-center gap-2 text-sm text-slate-400">
+                            <Calendar className="h-4 w-4" />
+                            <span>{tenure}</span>
+                          </div>
+                        )}
                       </div>
-                      {emp.location && (
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <MapPin className="h-4 w-4" />
-                          <span>{emp.location}</span>
-                        </div>
-                      )}
-                      {tenure && (
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <Calendar className="h-4 w-4" />
-                          <span>{tenure}</span>
-                        </div>
-                      )}
-                    </div>
+                    </a>
 
                     <div className="flex gap-2">
                       {emp.phone ? (
@@ -592,7 +614,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [] 
               className="bg-white text-cyan-700 hover:bg-cyan-50 flex-shrink-0"
               asChild
             >
-              <a href="mailto:hr@jewett.com">
+              <a href={`mailto:${hrEmail}`}>
                 Contact HR
                 <ChevronRight className="h-4 w-4 ml-1" />
               </a>

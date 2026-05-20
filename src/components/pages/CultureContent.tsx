@@ -47,6 +47,7 @@ interface CMSCultureStory {
 
 interface CultureSettings {
   'culture-volunteer-hours'?: string;
+  'culture-donations'?: string;
 }
 
 interface CMSCoreValue {
@@ -123,6 +124,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
   const volunteerHours = settings['culture-volunteer-hours'] || '450+';
+  const donations = settings['culture-donations'] || '$125K';
   const coreValues = (cmsCoreValues.length > 0 ? cmsCoreValues : FALLBACK_CORE_VALUES).map((v) => ({
     icon: VALUE_ICONS[v['icon-name'] || ''] || Sparkles,
     name: v.name || '',
@@ -244,12 +246,12 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats — counts come from real Culture Stories; volunteer hours from Site Settings. */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Team Spotlights', count: spotlightStories.length || 12, icon: Star, color: 'amber' },
-          { label: 'Team Wins', count: winStories.length || 24, icon: Trophy, color: 'emerald' },
-          { label: 'Recognitions', count: recognitionStories.length + otherStories.length || 156, icon: Award, color: 'blue' },
+          { label: 'Team Spotlights', count: spotlightStories.length, icon: Star, color: 'amber' },
+          { label: 'Team Wins', count: winStories.length, icon: Trophy, color: 'emerald' },
+          { label: 'Recognitions', count: recognitionStories.length + otherStories.length, icon: Award, color: 'blue' },
           { label: 'Volunteer Hours', count: volunteerHours, icon: HandHeart, color: 'pink' },
         ].map((stat) => (
           <Card key={stat.label} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
@@ -381,20 +383,20 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             {(winStories.length > 0 ? winStories : allStories.filter(s => s.type?.toLowerCase().includes('win'))).slice(0, 3).map((story) => {
               const config = getTypeConfig(story.type);
               return (
-                <div
+                <a
                   key={story.id}
-                  className="p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-emerald-500/30 transition-colors group"
+                  href={`/jewett-junction/culture/${story.slug || story.id}`}
+                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-emerald-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
+                  aria-label={`Read story: ${story.name}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
                       <config.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <a href={`/jewett-junction/culture/${story.slug || story.id}`} className="block">
-                        <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
-                          {story.name}
-                        </h4>
-                      </a>
+                      <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
+                        {story.name}
+                      </h4>
                       <p className="text-sm text-slate-400 line-clamp-2">
                         {stripHtml(story.content) || story.excerpt}
                       </p>
@@ -403,7 +405,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       )}
                     </div>
                   </div>
-                </div>
+                </a>
               );
             })}
             {winStories.length === 0 && (
@@ -428,20 +430,20 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             {([...recognitionStories, ...otherStories].slice(0, 3)).map((story) => {
               const config = getTypeConfig(story.type);
               return (
-                <div
+                <a
                   key={story.id}
-                  className="p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-blue-500/30 transition-colors group"
+                  href={`/jewett-junction/culture/${story.slug || story.id}`}
+                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-blue-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
+                  aria-label={`Read recognition: ${story.name}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
                       <config.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <a href={`/jewett-junction/culture/${story.slug || story.id}`} className="block">
-                        <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
-                          {story.name}
-                        </h4>
-                      </a>
+                      <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
+                        {story.name}
+                      </h4>
                       <p className="text-sm text-slate-400 line-clamp-2">
                         {stripHtml(story.content) || story.excerpt}
                       </p>
@@ -450,7 +452,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       )}
                     </div>
                   </div>
-                </div>
+                </a>
               );
             })}
             {recognitionStories.length === 0 && otherStories.length === 0 && (
@@ -481,11 +483,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             </div>
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-white/10 rounded-xl p-4">
-                <p className="text-3xl font-bold text-white">$125K</p>
-                <p className="text-sm text-cyan-100">Donated in 2025</p>
+                <p className="text-3xl font-bold text-white">{donations}</p>
+                <p className="text-sm text-cyan-100">Donated annually</p>
               </div>
               <div className="bg-white/10 rounded-xl p-4">
-                <p className="text-3xl font-bold text-white">450+</p>
+                <p className="text-3xl font-bold text-white">{volunteerHours}</p>
                 <p className="text-sm text-cyan-100">Volunteer Hours</p>
               </div>
             </div>

@@ -4,24 +4,27 @@ import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Presentation, Download, ArrowLeft, Monitor, Users, Building2, Award } from 'lucide-react';
+import { Presentation, Download, ArrowLeft } from 'lucide-react';
 import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 
-// Initialize CMS with runtime credentials
 initCMS(Astro.locals);
 
-// Fetch presentation assets from CMS
-const presentationsResult = await getMarketingAssets({ type: 'Presentation', limit: 50 });
-const presentations = presentationsResult.items;
+// Presentations are CMS-driven (Marketing Assets, asset-type: Presentation).
+const result = await getMarketingAssets({ type: 'Presentation', limit: 50 });
+const presentations = result.items;
 
-// Helper to get download URL
-const getDownloadUrl = (item: any) => item['download-link'] || null;
+const getImageUrl = (img: any) => {
+  if (!img) return null;
+  if (typeof img === 'string') return img;
+  if (img.url) return img.url;
+  return null;
+};
 ---
 
 <ThemedPage title="Presentations | Jewett Junction" theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
-      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors">
+      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label="Back to Marketing Hub">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
@@ -29,201 +32,70 @@ const getDownloadUrl = (item: any) => item['download-link'] || null;
           <Presentation className="h-7 w-7 text-green-500" />
           Presentation Templates
         </h1>
-        <p class="text-slate-400 mt-1">
-          PowerPoint templates and pitch decks
-        </p>
+        <p class="text-slate-400 mt-1">PowerPoint templates and pitch decks</p>
       </div>
     </div>
 
-    <!-- CMS Presentations (if available) -->
-    {presentations.length > 0 && (
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-white">Available Presentations</CardTitle>
-          <CardDescription className="text-slate-400">{presentations.length} presentations from the CMS</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {presentations.map((pres) => (
-              <div class="border border-slate-600 rounded-lg p-4 bg-slate-700/50">
-                <div class="h-32 bg-gradient-to-br from-green-600 to-green-800 rounded-lg mb-3 flex items-center justify-center">
-                  <Presentation className="h-10 w-10 text-white/80" />
-                </div>
-                <p class="font-medium text-sm text-white">{pres.name}</p>
-                {pres.description && <p class="text-xs text-slate-400 mb-3">{pres.description}</p>}
-                {getDownloadUrl(pres) && (
-                  <a href={getDownloadUrl(pres)} target="_blank" rel="noopener">
-                    <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                      <Download className="h-3 w-3 mr-1" /> Download
-                    </Button>
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    )}
-
-    <!-- Featured Templates -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="bg-slate-800 border-slate-700 border-2 border-blue-500/30">
-        <CardHeader>
-          <div class="flex items-center justify-between">
-            <Badge className="bg-blue-600">Most Popular</Badge>
-            <Monitor className="h-5 w-5 text-slate-400" />
-          </div>
-          <CardTitle className="mt-2 text-white">Corporate Presentation</CardTitle>
-          <CardDescription className="text-slate-400">Standard template for company presentations</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="h-40 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg mb-4 flex items-center justify-center">
-            <div class="text-white text-center">
-              <div class="text-3xl font-bold">JC</div>
-              <div class="text-sm opacity-80">Jewett Construction</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-400">25 slides • 16:9</span>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> PPTX
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Google
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <div class="flex items-center justify-between">
-            <Badge variant="secondary" className="bg-slate-600 text-slate-300">Client Facing</Badge>
-            <Users className="h-5 w-5 text-slate-400" />
-          </div>
-          <CardTitle className="mt-2 text-white">Project Proposal</CardTitle>
-          <CardDescription className="text-slate-400">For client pitches and proposals</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div class="h-40 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg mb-4 flex items-center justify-center">
-            <div class="text-white text-center">
-              <div class="text-xl font-semibold">Project Proposal</div>
-              <div class="text-sm opacity-60 mt-1">Your Project Name</div>
-            </div>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-slate-400">18 slides • 16:9</span>
-            <div class="flex gap-2">
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> PPTX
-              </Button>
-              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Download className="h-3 w-3 mr-1" /> Google
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-
-    <!-- Additional Templates -->
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-white">All Templates</CardTitle>
-        <CardDescription className="text-slate-400">Browse our complete collection of presentation templates</CardDescription>
+        <CardTitle className="text-white">Available Templates</CardTitle>
+        <CardDescription className="text-slate-400">
+          {presentations.length > 0
+            ? `${presentations.length} template${presentations.length > 1 ? 's' : ''} available`
+            : 'Upload templates in the admin under Marketing Assets → Asset Type: Presentation.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="space-y-3">
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 bg-blue-900/50 rounded flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-blue-400" />
-              </div>
-              <div>
-                <p class="font-medium text-sm text-white">Company Overview</p>
-                <p class="text-xs text-slate-400">General company introduction • 15 slides</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Download className="h-3 w-3 mr-1" /> Download
-            </Button>
+        {presentations.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {presentations.map((pres) => {
+              const imageUrl = getImageUrl(pres['preview-image']) || getImageUrl(pres.thumbnail);
+              const downloadUrl = pres['download-link'];
+              return (
+                <a
+                  href={`/jewett-junction/marketing/${pres.slug || pres.id}`}
+                  class="border border-slate-600 rounded-lg overflow-hidden bg-slate-700/50 hover:border-green-500/50 hover:bg-slate-700 transition-colors flex flex-col"
+                >
+                  <div class="h-36 bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center overflow-hidden">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={pres.name} class="w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <Presentation className="h-10 w-10 text-white/80" />
+                    )}
+                  </div>
+                  <div class="p-4 flex flex-col gap-2 flex-1">
+                    <p class="font-medium text-sm text-white truncate">{pres.name}</p>
+                    {pres.description && (
+                      <p class="text-xs text-slate-400 line-clamp-2">{pres.description}</p>
+                    )}
+                    <div class="flex items-center justify-between mt-auto gap-2">
+                      {pres['file-format'] && (
+                        <Badge variant="secondary" className="bg-slate-600 text-slate-300 uppercase text-xs">
+                          {pres['file-format']}
+                        </Badge>
+                      )}
+                      {downloadUrl && (
+                        <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-600 ml-auto" asChild>
+                          <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-3 w-3 mr-1" /> Download
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 bg-orange-900/50 rounded flex items-center justify-center">
-                <Award className="h-5 w-5 text-orange-400" />
-              </div>
-              <div>
-                <p class="font-medium text-sm text-white">Safety Training</p>
-                <p class="text-xs text-slate-400">4EverSafe program materials • 30 slides</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Download className="h-3 w-3 mr-1" /> Download
-            </Button>
+        ) : (
+          <div class="text-center py-8 text-slate-400">
+            <Presentation className="h-10 w-10 mx-auto mb-2 opacity-50" />
+            <p>No presentation templates uploaded yet.</p>
+            <a href="/jewett-junction/admin/marketing" class="text-green-400 hover:underline text-sm mt-1 inline-block">
+              Add one in the admin panel →
+            </a>
           </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 bg-green-900/50 rounded flex items-center justify-center">
-                <Users className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <p class="font-medium text-sm text-white">New Hire Orientation</p>
-                <p class="text-xs text-slate-400">Onboarding presentation • 40 slides</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Download className="h-3 w-3 mr-1" /> Download
-            </Button>
-          </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 bg-purple-900/50 rounded flex items-center justify-center">
-                <Presentation className="h-5 w-5 text-purple-400" />
-              </div>
-              <div>
-                <p class="font-medium text-sm text-white">Quarterly Review</p>
-                <p class="text-xs text-slate-400">Performance and metrics template • 20 slides</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Download className="h-3 w-3 mr-1" /> Download
-            </Button>
-          </div>
-
-          <div class="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 bg-red-900/50 rounded flex items-center justify-center">
-                <Monitor className="h-5 w-5 text-red-400" />
-              </div>
-              <div>
-                <p class="font-medium text-sm text-white">Project Closeout</p>
-                <p class="text-xs text-slate-400">Final project presentation • 12 slides</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-              <Download className="h-3 w-3 mr-1" /> Download
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-
-    <!-- Tips -->
-    <Card className="bg-blue-900/30 border-blue-800">
-      <CardContent className="pt-6">
-        <h3 class="font-semibold text-blue-300 mb-2">Presentation Tips</h3>
-        <ul class="text-sm text-blue-400 space-y-1">
-          <li>• Always use the latest template version for brand consistency</li>
-          <li>• Keep text minimal - use bullet points and visuals</li>
-          <li>• Include project photos when presenting to clients</li>
-          <li>• Contact Marketing for custom template requests</li>
-        </ul>
+        )}
       </CardContent>
     </Card>
   </div>

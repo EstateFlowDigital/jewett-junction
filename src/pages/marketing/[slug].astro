@@ -1,5 +1,6 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
+import FilePreview from '../../components/shared/FilePreview.astro';
 import { initCMS, getMarketingAssetBySlug, getMarketingAssets, getCollectionItem, COLLECTIONS, decodeHtmlEntities } from '../../lib/webflow-cms';
 import type { MarketingAsset } from '../../lib/webflow-cms';
 
@@ -144,6 +145,13 @@ const typeStyle = typeColors[item['asset-type'] || ''] || typeColors.default;
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      <!-- Inline file preview (PDF / image / Office / video) -->
+      {item['download-link'] && (
+        <div class="mb-6">
+          <FilePreview url={item['download-link']} name={item.name} accent="rose" />
         </div>
       )}
 
