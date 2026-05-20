@@ -132,6 +132,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'certifications', label: 'Certifications', type: 'text', placeholder: 'e.g., PMP, LEED AP, CPA', icon: 'Award' },
       { key: 'is-featured', label: 'Featured Employee', type: 'boolean', helpText: 'Show on homepage spotlight' },
       { key: 'leadership-team', label: 'Leadership Team', type: 'boolean', helpText: 'Part of leadership/management' },
+      { key: 'page-contact-for', label: 'Page Contact For', type: 'text', placeholder: 'HR, Safety, IT, Marketing', helpText: 'Comma-separated list — this person becomes the primary contact card on each listed page. Valid values: HR, Safety, IT, Marketing. Case-insensitive. Leave blank if not a page lead.', icon: 'Star' },
     ]
   },
   resources: {

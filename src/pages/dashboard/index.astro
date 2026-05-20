@@ -109,13 +109,6 @@ function stripHtml(html: string | undefined) {
 const today = new Date();
 const dateString = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
-// Debug: Log CMS data counts
-console.log('CMS Data:', {
-  announcements: announcements.length,
-  events: events.length,
-  jobs: jobs.length,
-  cultureStories: cultureStories.length
-});
 
 // Get pinned announcements for carousel (max 6)
 const pinnedAnnouncements = announcements.filter(a => a['is-pinned']).slice(0, 6);

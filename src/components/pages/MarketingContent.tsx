@@ -238,6 +238,7 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
         <div className="space-y-6">
           <TeamContactCard
             department="Marketing"
+            pageKey="Marketing"
             title="Marketing Contact"
             fallbackEmail={marketingEmail}
             theme={theme}

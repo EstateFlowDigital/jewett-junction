@@ -4,6 +4,7 @@ import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { TeamContactCard } from './TeamContactCard';
 
 interface ITArticle {
   id: string;
@@ -42,7 +43,6 @@ interface ITHelpdeskContentProps {
 export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {} }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
-  const itPhone = settings['it-phone'] || '';
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
   const itHoursWeekday = settings['it-hours-weekday'] || '7:00 AM - 6:00 PM';
   const itHoursSaturday = settings['it-hours-saturday'] || '8:00 AM - 12:00 PM';
@@ -237,30 +237,15 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* IT Contact */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>IT Support</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {itPhone && (
-                <a href={`tel:${itPhone.replace(/[^\d+]/g, '')}`} className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                  <Phone className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                  <div>
-                    <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>{itPhone}</div>
-                    <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Call for urgent issues</div>
-                  </div>
-                </a>
-              )}
-              <a href={`mailto:${itEmail}`} className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'}`}>
-                <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-                <div>
-                  <div className={`text-sm font-medium ${isDark ? 'text-white' : ''}`}>{itEmail}</div>
-                  <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Non-urgent requests</div>
-                </div>
-              </a>
-            </CardContent>
-          </Card>
+          {/* IT Contact — primary lead from Employees collection */}
+          <TeamContactCard
+            department="IT"
+            pageKey="IT"
+            title="IT Support"
+            fallbackEmail={itEmail}
+            theme={theme}
+            accent="sky"
+          />
 
           {/* System Status */}
           <Card className={isDark ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'}>

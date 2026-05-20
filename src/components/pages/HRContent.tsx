@@ -85,22 +85,21 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {} }
   // Helper to strip HTML
   const stripHtml = (html?: string) => html?.replace(/<[^>]*>/g, '').trim() || '';
 
-  // The four quick-action cards (Pay, Time Off, Benefits, Help) used to link to
-  // hardcoded slugs like '/hr/pay-tax-info' that don't exist in the CMS, so the
-  // [slug] page redirected back to /hr — making the cards appear unclickable.
-  // Find the first HR item whose name OR slug contains any of the keywords.
-  // Falls back to the HR listing so the click always goes somewhere visible.
-  const findHRLink = (keywords: string[]): string => {
+  // The four quick-action cards (Pay & Tax Info, Time Off, Benefits, Get Help)
+  // used to link to hardcoded slugs (/hr/pay-tax-info, /hr/time-off, etc.)
+  // that didn't exist as CMS items, so the [slug] page redirected back to
+  // /hr and the click looked broken. Resolve them dynamically by keyword.
+  const findHRLink = (keywords: string[], fallback = '/jewett-junction/hr'): string => {
     const needle = (s?: string) => (s || '').toLowerCase();
-    const match = hrItems.find((item) => {
-      const haystack = `${needle(item.name)} ${needle(item.slug)} ${needle(item['content-type'])}`;
+    const match = hrItems.find((it) => {
+      const haystack = `${needle(it.name)} ${needle(it.slug)} ${needle(it['content-type'])}`;
       return keywords.some((k) => haystack.includes(k.toLowerCase()));
     });
-    return match ? `/jewett-junction/hr/${match.slug || match.id}` : '/jewett-junction/hr';
+    return match ? `/jewett-junction/hr/${match.slug || match.id}` : fallback;
   };
-  const payLink = findHRLink(['pay', 'tax', 'salary', 'payroll']);
-  const timeOffLink = findHRLink(['time off', 'pto', 'vacation', 'holiday', 'leave']);
-  const benefitsLink = findHRLink(['benefit', 'health', 'insurance', '401k']);
+  const payLink = findHRLink(['pay & tax', 'pay and tax', 'paystub', 'tax info', 'payroll', 'w-2', 'w2', 'pay', 'salary']);
+  const timeOffLink = findHRLink(['time off', 'pto', 'vacation', 'leave', 'holiday']);
+  const benefitsLink = findHRLink(['benefits guide', 'benefits package', 'open enrollment', 'benefit', 'health', 'insurance', '401k']);
 
   return (
     <div className="space-y-6">
@@ -320,6 +319,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {} }
           <div id="hr-contact">
             <TeamContactCard
               department="HR"
+              pageKey="HR"
               title="HR Team"
               fallbackEmail={hrEmail}
               theme={theme}

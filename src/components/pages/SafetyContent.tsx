@@ -351,6 +351,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           {/* Safety Contact */}
           <TeamContactCard
             department="Safety"
+            pageKey="Safety"
             title="Safety Team Contact"
             fallbackEmail={safetyEmail}
             theme={theme}

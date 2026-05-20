@@ -18,7 +18,6 @@ import {
 
 interface IdeaSubmissionContentProps {
   theme?: 'dark';
-  notificationEmail?: string;
 }
 
 const categories = [
@@ -37,7 +36,7 @@ const impactLevels = [
   { id: 'critical', label: 'Game Changer', description: 'Could transform how we work' },
 ];
 
-export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: IdeaSubmissionContentProps) {
+export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentProps) {
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
@@ -87,7 +86,6 @@ export function IdeaSubmissionContent({ theme = 'dark', notificationEmail }: Ide
         body: JSON.stringify({
           ...formData,
           submittedAt: new Date().toISOString(),
-          notificationEmail,
         }),
       });
 

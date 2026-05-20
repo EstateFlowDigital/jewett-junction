@@ -10,14 +10,23 @@ interface Employee {
   phone?: string;
   department?: string;
   'team-department'?: string;
+  dept?: string;
   photo?: { url?: string };
   'is-featured'?: boolean;
   'leadership-team'?: boolean;
+  'page-contact-for'?: string;
 }
 
 interface TeamContactCardProps {
   /** Department slug or display name to match (case-insensitive substring match). */
   department: string;
+  /**
+   * Page tag this card represents (e.g., "HR", "Safety", "IT", "Marketing").
+   * An employee whose `page-contact-for` field includes this tag is picked
+   * as the primary contact, overriding any department match.
+   * Defaults to `department` when not set.
+   */
+  pageKey?: string;
   /** Headline shown on the card, e.g. "HR Team" / "IT Team". */
   title: string;
   /** Fallback team email if no employee record matches. */
@@ -39,6 +48,7 @@ const initials = (name = '') =>
 
 export function TeamContactCard({
   department,
+  pageKey,
   title,
   fallbackEmail,
   theme = 'modern',
@@ -47,18 +57,33 @@ export function TeamContactCard({
   const isDark = theme === 'dark';
   const [contact, setContact] = React.useState<Employee | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const tag = (pageKey || department).toLowerCase();
 
   React.useEffect(() => {
     fetch('/jewett-junction/api/cms/employees?limit=200')
       .then((r) => (r.ok ? r.json() : { items: [] }))
       .then((data: { items?: Employee[] }) => {
         const items = data.items || [];
+
+        // 1. Explicit page-contact tag wins. Parse comma-separated, case-insensitive.
+        const taggedLead = items.find((e) => {
+          const tags = (e['page-contact-for'] || '')
+            .split(',')
+            .map((t) => t.trim().toLowerCase())
+            .filter(Boolean);
+          return tags.includes(tag);
+        });
+        if (taggedLead) {
+          setContact(taggedLead);
+          return;
+        }
+
+        // 2. Fall back to substring match on any department-ish field.
         const needle = department.toLowerCase();
         const inDept = items.filter((e) => {
-          const dept = (e['team-department'] || e.department || '').toLowerCase();
+          const dept = (e.dept || e['team-department'] || e.department || '').toLowerCase();
           return dept.includes(needle);
         });
-        // Prefer leadership / featured employees as the "primary" contact.
         const lead =
           inDept.find((e) => e['leadership-team']) ||
           inDept.find((e) => e['is-featured']) ||
@@ -68,7 +93,7 @@ export function TeamContactCard({
       })
       .catch(() => setContact(null))
       .finally(() => setIsLoading(false));
-  }, [department]);
+  }, [department, tag]);
 
   const email = contact?.email || fallbackEmail;
   const accentBg = isDark ? `bg-${accent}-900/40` : `bg-${accent}-100`;
