@@ -25,7 +25,9 @@ import {
   Image,
   Mail,
   Settings,
-  Award
+  Award,
+  Inbox,
+  ChevronRight,
 } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
@@ -100,9 +102,29 @@ const COLLECTION_GROUPS: CollectionGroup[] = [
 
 const ALL_COLLECTIONS = COLLECTION_GROUPS.flatMap((g) => g.items.map((item) => ({ ...item, scope: g.scope })));
 
+function formatRelativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (!then) return '';
+  const diff = Date.now() - then;
+  const min = Math.round(diff / 60_000);
+  if (min < 1) return 'just now';
+  if (min < 60) return `${min}m ago`;
+  const hr = Math.round(min / 60);
+  if (hr < 24) return `${hr}h ago`;
+  const day = Math.round(hr / 24);
+  if (day < 30) return `${day}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+// Collections that produce inbound submissions admins need to triage. Items
+// with status "New" surface in the Needs Attention panel at the top of the
+// dashboard so triage work isn't buried beneath the collection grid.
+const TRIAGE_COLLECTIONS = new Set(['submittedIdeas', 'jobApplications', 'formSubmissions']);
+
 export function AdminOverview() {
   const [stats, setStats] = React.useState<CollectionStat[]>([]);
   const [recentItems, setRecentItems] = React.useState<any[]>([]);
+  const [triageItems, setTriageItems] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const getToken = () => localStorage.getItem('admin_token') || '';
@@ -113,52 +135,67 @@ export function AdminOverview() {
 
   const loadStats = async () => {
     setIsLoading(true);
+    const token = getToken();
+
+    // Fetch every collection in parallel — the previous sequential loop
+    // serialized ~27 requests and made the dashboard feel sluggish on first
+    // load. Each request is independent so Promise.all is safe.
+    const results = await Promise.all(
+      ALL_COLLECTIONS.map(async (meta) => {
+        try {
+          const response = await fetch(`${API_BASE}/api/admin/items?collection=${meta.key}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+          });
+          if (!response.ok) return { meta, items: [] as any[] };
+          const data = await response.json();
+          return { meta, items: (data.items || []) as any[] };
+        } catch {
+          return { meta, items: [] as any[] };
+        }
+      })
+    );
+
     const statsData: CollectionStat[] = [];
     const recent: any[] = [];
+    const triage: any[] = [];
 
-    for (const meta of ALL_COLLECTIONS) {
-      try {
-        const response = await fetch(`${API_BASE}/api/admin/items?collection=${meta.key}`, {
-          headers: {
-            'Authorization': `Bearer ${getToken()}`,
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        });
+    for (const { meta, items } of results) {
+      statsData.push({ ...meta, count: items.length });
 
-        if (response.ok) {
-          const data = await response.json();
-          const items = data.items || [];
-          statsData.push({
-            ...meta,
-            count: items.length
-          });
-
-          // Collect recent items (last 5 from each collection)
-          items.slice(0, 3).forEach((item: any) => {
-            recent.push({
-              ...item,
-              collectionKey: meta.key,
-              collectionName: meta.name,
-              icon: meta.icon,
-              color: meta.color,
-              href: meta.href
-            });
-          });
-        } else {
-          statsData.push({ ...meta, count: 0 });
+      for (const item of items) {
+        const enriched = {
+          ...item,
+          collectionKey: meta.key,
+          collectionName: meta.name,
+          icon: meta.icon,
+          color: meta.color,
+          href: meta.href,
+        };
+        recent.push(enriched);
+        if (TRIAGE_COLLECTIONS.has(meta.key) && (item.fieldData?.status === 'New' || !item.fieldData?.status)) {
+          triage.push(enriched);
         }
-      } catch {
-        statsData.push({ ...meta, count: 0 });
       }
     }
 
+    // Sort by lastUpdated (or createdOn) descending so the dashboard shows
+    // *recent* items, not the first three of each collection alphabetically.
+    const tsOf = (item: any) =>
+      new Date(item.lastUpdated || item.lastPublished || item.createdOn || 0).getTime();
+    recent.sort((a, b) => tsOf(b) - tsOf(a));
+    triage.sort((a, b) => tsOf(b) - tsOf(a));
+
     setStats(statsData);
-    // Sort recent items by lastUpdated or createdOn
-    setRecentItems(recent.slice(0, 10));
+    setRecentItems(recent.slice(0, 8));
+    setTriageItems(triage.slice(0, 6));
     setIsLoading(false);
   };
 
   const totalItems = stats.reduce((acc, stat) => acc + stat.count, 0);
+  const triageCount = triageItems.length;
 
   if (isLoading) {
     return (
@@ -225,18 +262,71 @@ export function AdminOverview() {
             </div>
           </div>
         </div>
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
+        <a
+          href="#needs-attention"
+          className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 hover:border-amber-500/40 hover:bg-slate-800/70 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          aria-label={`Needs attention: ${triageCount} pending`}
+        >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center">
-              <Clock className="h-6 w-6 text-white" aria-hidden="true" />
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${triageCount > 0 ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-slate-600 to-slate-700'}`}>
+              <Inbox className="h-6 w-6 text-white" aria-hidden="true" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-slate-400">Needs Attention</p>
+              <p className="text-2xl font-bold text-white">
+                {triageCount}
+                {triageCount > 0 && <span className="ml-2 text-sm font-normal text-amber-400">new</span>}
+              </p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-slate-600 group-hover:text-amber-400 transition-colors" aria-hidden="true" />
+          </div>
+        </a>
+      </div>
+
+      {/* Needs Attention — surfaces new submissions, applications, and ideas
+          so triage doesn't get buried below 27 collection tiles. */}
+      {triageItems.length > 0 && (
+        <div id="needs-attention" className="bg-amber-500/5 border border-amber-500/30 rounded-2xl overflow-hidden">
+          <div className="p-5 border-b border-amber-500/20 flex items-center gap-3">
+            <div className="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <Inbox className="h-5 w-5 text-amber-400" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-sm text-slate-400">Recent Activity</p>
-              <p className="text-2xl font-bold text-white">{recentItems.length}</p>
+              <h2 className="text-lg font-semibold text-white">Needs Your Attention</h2>
+              <p className="text-sm text-amber-200/70">New submissions, applications, and ideas waiting on you</p>
             </div>
           </div>
+          <div className="divide-y divide-amber-500/10" role="list">
+            {triageItems.map((item, index) => {
+              const Icon = item.icon;
+              const itemName = item.fieldData?.name || item.fieldData?.title || 'Untitled';
+              const submitter = item.fieldData?.['submitter-name'] || item.fieldData?.['submitted-by'] || item.fieldData?.['first-name'];
+              return (
+                <a
+                  key={`triage-${item.collectionKey}-${item.id}-${index}`}
+                  href={item.href}
+                  className="flex items-center gap-4 p-4 hover:bg-amber-500/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500"
+                  role="listitem"
+                  aria-label={`Review ${itemName} in ${item.collectionName}`}
+                >
+                  <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Icon className="h-5 w-5 text-amber-400" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-white truncate">{itemName}</h3>
+                    <p className="text-sm text-amber-200/70 truncate">
+                      {item.collectionName}{submitter && ` · from ${submitter}`}
+                    </p>
+                  </div>
+                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    New
+                  </span>
+                </a>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Collection Stats Grid */}
       <div>
@@ -295,13 +385,14 @@ export function AdminOverview() {
       {recentItems.length > 0 && (
         <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-slate-700/50">
-            <h2 className="text-lg font-semibold text-white">Recent Items</h2>
-            <p className="text-sm text-slate-400">Latest content across all collections</p>
+            <h2 className="text-lg font-semibold text-white">Recently Edited</h2>
+            <p className="text-sm text-slate-400">Sorted by latest change across all collections</p>
           </div>
           <div className="divide-y divide-slate-700/50" role="list">
             {recentItems.map((item, index) => {
               const Icon = item.icon;
               const itemName = item.fieldData?.name || item.fieldData?.title || 'Untitled';
+              const ts = item.lastUpdated || item.lastPublished || item.createdOn;
               return (
                 <a
                   key={`${item.collectionKey}-${item.id}-${index}`}
@@ -317,7 +408,10 @@ export function AdminOverview() {
                     <h3 className="font-medium text-white truncate">
                       {itemName}
                     </h3>
-                    <p className="text-sm text-slate-500">{item.collectionName}</p>
+                    <p className="text-sm text-slate-500 truncate">
+                      {item.collectionName}
+                      {ts && <span className="ml-1.5 text-slate-600">· {formatRelativeTime(ts)}</span>}
+                    </p>
                   </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     item.isDraft
