@@ -4,9 +4,20 @@ import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Image, Download, ArrowLeft, FileType, Palette } from 'lucide-react';
-import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssets, getSiteSettings } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
+
+// Brand identity is editable in the admin under Site Settings → Brand: …
+// Falls back to Jewett's published defaults so the page always renders.
+const settings = await getSiteSettings();
+const headingFont = settings['brand-heading-font'] || 'Politica';
+const bodyFont = settings['brand-body-font'] || 'Lato';
+const brandColors = [
+  { name: settings['brand-color-1-name'] || 'Jewett Red',  hex: settings['brand-color-1-hex']  || '#D22630' },
+  { name: settings['brand-color-2-name'] || 'Jewett Grey', hex: settings['brand-color-2-hex']  || '#78787F' },
+  { name: settings['brand-color-3-name'] || 'Jewett Dark', hex: settings['brand-color-3-hex']  || '#2A2A2A' },
+].filter((c) => /^#[0-9a-fA-F]{6}$/.test(c.hex));
 
 // Logos and brand guide PDFs come from Marketing Assets. Match by asset-type
 // first, then fall back to a name-keyword check so assets uploaded without an
@@ -35,14 +46,6 @@ const getImageUrl = (img: any) => {
   return null;
 };
 
-// Brand palette + typography — client-provided values from
-// jewettconstruction.com. Move to a Settings record if the client wants
-// to tweak these without a code change.
-const brandColors = [
-  { name: 'Jewett Red', hex: '#D22630' },
-  { name: 'Jewett Grey', hex: '#78787F' },
-  { name: 'Jewett Dark', hex: '#2A2A2A' },
-];
 ---
 
 <ThemedPage title="Brand Assets | Jewett Junction" theme="dark" currentSection="marketing">
@@ -156,9 +159,9 @@ const brandColors = [
           <div class="space-y-3">
             <div>
               <p class="text-xs uppercase tracking-wider text-slate-500 mb-1">Headings</p>
-              <h4 class="text-xl font-semibold text-white">Politica</h4>
+              <h4 class="text-xl font-semibold text-white">{headingFont}</h4>
             </div>
-            <div class="space-y-1 text-white">
+            <div class="space-y-1 text-white" style={`font-family: '${headingFont}', system-ui, sans-serif;`}>
               <p class="text-3xl font-bold uppercase tracking-wide">Aa Bb Cc 123</p>
               <p class="text-lg uppercase tracking-wide">The Quick Brown Fox</p>
             </div>
@@ -166,9 +169,9 @@ const brandColors = [
           <div class="space-y-3">
             <div>
               <p class="text-xs uppercase tracking-wider text-slate-500 mb-1">Body</p>
-              <h4 class="text-xl font-semibold text-white">Lato</h4>
+              <h4 class="text-xl font-semibold text-white">{bodyFont}</h4>
             </div>
-            <div class="space-y-1 text-white" style="font-family: Lato, system-ui, sans-serif;">
+            <div class="space-y-1 text-white" style={`font-family: '${bodyFont}', system-ui, sans-serif;`}>
               <p class="text-2xl">Aa Bb Cc 123</p>
               <p class="text-lg">The quick brown fox jumps over the lazy dog</p>
             </div>

@@ -156,6 +156,10 @@ const VALID_FIELDS: Record<string, string[]> = {
     'it-system-status-message', 'it-system-status-level',
     'social-facebook-url', 'social-instagram-url',
     'social-linkedin-url', 'social-youtube-url',
+    'brand-heading-font', 'brand-body-font',
+    'brand-color-1-name', 'brand-color-1-hex',
+    'brand-color-2-name', 'brand-color-2-hex',
+    'brand-color-3-name', 'brand-color-3-hex',
   ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',

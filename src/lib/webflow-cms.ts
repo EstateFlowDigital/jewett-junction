@@ -551,6 +551,14 @@ export interface SiteSettings {
   'social-instagram-url'?: string;
   'social-linkedin-url'?: string;
   'social-youtube-url'?: string;
+  'brand-heading-font'?: string;
+  'brand-body-font'?: string;
+  'brand-color-1-name'?: string;
+  'brand-color-1-hex'?: string;
+  'brand-color-2-name'?: string;
+  'brand-color-2-hex'?: string;
+  'brand-color-3-name'?: string;
+  'brand-color-3-hex'?: string;
 }
 
 /**
