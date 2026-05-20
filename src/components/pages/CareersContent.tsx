@@ -402,12 +402,12 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
                 ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500'
                 : 'border-slate-600 focus:border-blue-500 focus:ring-blue-500'
             }`}
-            placeholder="(555) 123-4567"
+            placeholder="e.g., 614-555-0100"
           />
           {validationErrors.phone ? (
             <p id="phone-error" className="mt-1 text-sm text-rose-400">{validationErrors.phone}</p>
           ) : (
-            <p id="phone-hint" className="mt-1 text-xs text-slate-500">Format: (555) 123-4567</p>
+            <p id="phone-hint" className="mt-1 text-xs text-slate-500">Include your area code</p>
           )}
         </div>
       </div>

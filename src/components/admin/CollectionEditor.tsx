@@ -22,6 +22,7 @@ import {
   Users,
   MapPin,
   Sparkles,
+  ChevronDown,
 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import type { FieldConfig, CollectionConfig } from './collections';
@@ -324,7 +325,11 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
       if (data.publishWarning) {
         setError(data.publishWarning);
       } else {
-        setSuccess(editingItem ? (publishLive ? 'Item updated & published!' : 'Item updated!') : (publishLive ? 'Item created & published!' : 'Item saved as draft'));
+        setSuccess(
+          editingItem
+            ? (publishLive ? 'Updated & published — live on the site' : 'Saved as draft — changes not yet live')
+            : (publishLive ? 'Created & published — live on the site' : 'Saved as draft — ready to publish later')
+        );
       }
       setIsEditing(false);
       setEditingItem(null);
@@ -1150,7 +1155,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
               <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-6 transition-transform"></div>
             </div>
             <span className="text-slate-400 group-hover/toggle:text-white transition-colors">
-              {formData[field.key] ? 'Enabled' : 'Disabled'}
+              {field.label}: <span className={formData[field.key] ? 'text-emerald-400 font-medium' : 'text-slate-500'}>{formData[field.key] ? 'on' : 'off'}</span>
             </span>
           </label>
         )}
@@ -1159,6 +1164,51 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
         {field.helpText && (
           <p className="mt-1.5 text-xs text-slate-500">{field.helpText}</p>
         )}
+      </div>
+    );
+  };
+
+  // When any field on the collection declares a `group`, render the editor as
+  // collapsible sections (open by default) instead of a flat field list. This
+  // is purely cosmetic — formData/save logic is unchanged. Collections without
+  // any `group` annotations still render flat for backwards compatibility.
+  const renderGroupedFields = (fields: FieldConfig[], render: (f: FieldConfig) => React.ReactNode) => {
+    const hasGroups = fields.some((f) => !!f.group);
+    if (!hasGroups) {
+      return <div className="space-y-6">{fields.map(render)}</div>;
+    }
+
+    const groupOrder: string[] = [];
+    const grouped: Record<string, FieldConfig[]> = {};
+    for (const f of fields) {
+      const g = f.group || 'General';
+      if (!grouped[g]) {
+        grouped[g] = [];
+        groupOrder.push(g);
+      }
+      grouped[g].push(f);
+    }
+
+    return (
+      <div className="space-y-3">
+        {groupOrder.map((groupName) => (
+          <details
+            key={groupName}
+            open
+            className="rounded-xl border border-slate-700/50 bg-slate-900/30 overflow-hidden [&[open]_.section-chevron]:rotate-180"
+          >
+            <summary className="cursor-pointer select-none flex items-center justify-between px-5 py-3 bg-slate-800/40 hover:bg-slate-800/60 transition-colors list-none [&::-webkit-details-marker]:hidden">
+              <h3 className="text-sm font-semibold text-white tracking-wide flex items-center gap-2">
+                <span className="text-xs uppercase text-slate-400 tracking-wider">Section</span>
+                <span>{groupName}</span>
+              </h3>
+              <ChevronDown className="section-chevron h-4 w-4 text-slate-400 transition-transform" aria-hidden="true" />
+            </summary>
+            <div className="p-5 space-y-5">
+              {grouped[groupName].map(render)}
+            </div>
+          </details>
+        ))}
       </div>
     );
   };
@@ -1503,8 +1553,8 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             </div>
           </div>
 
-          <div className="p-6 space-y-6">
-            {effectiveFields.map(renderField)}
+          <div className="p-6 space-y-4">
+            {renderGroupedFields(effectiveFields, renderField)}
           </div>
 
           <div className="p-5 border-t border-slate-700/50 flex items-center justify-end gap-3 bg-slate-800/50 rounded-b-2xl">

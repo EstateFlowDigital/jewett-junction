@@ -10,6 +10,13 @@ export interface FieldConfig {
   helpText?: string;
   options?: string[];
   icon?: string; // Changed from component to string identifier
+  /**
+   * Optional section heading. Fields that share a `group` are rendered
+   * together under a collapsible heading in the admin form. Fields with no
+   * group fall back to a "General" group when the collection has any groups
+   * defined; otherwise the collection renders as a flat list (legacy mode).
+   */
+  group?: string;
 }
 
 export interface CollectionConfig {
@@ -98,7 +105,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Story Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: 'Star' },
       { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], icon: 'Tag' },
-      { key: 'featured-image', label: 'Featured Image', type: 'image', placeholder: 'https://example.com/photo.jpg', helpText: 'Photo of employee or team', icon: 'Image' },
+      { key: 'featured-image', label: 'Featured Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Photo of employee or team.', icon: 'Image' },
       { key: 'video-url', label: 'Video URL', type: 'url', placeholder: 'YouTube or Vimeo link', helpText: 'Optional video content', icon: 'Video' },
       { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', helpText: 'Write the full story content' },
       { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards' },
@@ -118,12 +125,12 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Employee directory and profiles',
     fields: [
       { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: 'Users' },
-      { key: 'photo', label: 'Profile Photo', type: 'image', placeholder: 'https://example.com/photo.jpg', helpText: 'Square photo recommended (400x400px)', icon: 'Image' },
+      { key: 'photo', label: 'Profile Photo', type: 'image', helpText: 'Recommended: 400×400px (square). Used on the employee directory.', icon: 'Image' },
       { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase' },
       { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'HR', 'Marketing', 'Office Operations'], icon: 'Building' },
       { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: 'MapPin' },
       { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail' },
-      { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: '(555) 123-4567', icon: 'Phone' },
+      { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: 'e.g., 614-555-0100', icon: 'Phone' },
       { key: 'extension', label: 'Phone Extension', type: 'text', placeholder: 'ext. 123', icon: 'Phone' },
       { key: 'linkedin-url', label: 'LinkedIn Profile', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin' },
       { key: 'start-date', label: 'Start Date', type: 'datetime', helpText: 'When did they join the company?', icon: 'Calendar' },
@@ -143,7 +150,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Documents, links, and helpful resources',
     fields: [
       { key: 'name', label: 'Resource Name', type: 'text', required: true, placeholder: 'e.g., Employee Handbook', icon: 'FileText' },
-      { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', placeholder: 'https://example.com/thumbnail.jpg', helpText: 'Preview image or icon', icon: 'Image' },
+      { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', helpText: 'Recommended: 600×600px (square). Used as the resource card preview.', icon: 'Image' },
       { key: 'resource-category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: 'Tag' },
       { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content' },
       { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: 'FileText' },
@@ -190,7 +197,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Fall Protection Protocol', icon: 'FileText' },
       { key: 'content-type', label: 'Content Type', type: 'select', options: ['Alert', 'Training', 'Protocol', 'Certification', 'Incident Report', 'Best Practice', 'Equipment'], icon: 'Tag' },
       { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
-      { key: 'image', label: 'Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Safety-related image', icon: 'Image' },
+      { key: 'image', label: 'Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Used on safety cards.', icon: 'Image' },
       { key: 'severity', label: 'Severity Level', type: 'select', options: ['Info', 'Warning', 'Critical', 'Emergency'], icon: 'AlertCircle' },
       { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...' },
       { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full safety content...' },
@@ -237,8 +244,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       { key: 'name', label: 'Asset Name', type: 'text', required: true, placeholder: 'e.g., Company Logo - Primary', icon: 'FileText' },
       { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], helpText: 'Brand Assets page shows: Logo, Brand Guide. Letterhead & Forms shows: Letterhead, Template. Presentations shows: Presentation. Photo Library shows: Photo, Video.', icon: 'Tag' },
-      { key: 'thumbnail', label: 'Thumbnail', type: 'image', placeholder: 'https://example.com/thumb.jpg', helpText: 'Small preview image', icon: 'Image' },
-      { key: 'preview-image', label: 'Full Preview', type: 'image', placeholder: 'https://example.com/preview.jpg', helpText: 'Larger preview image', icon: 'Image' },
+      { key: 'thumbnail', label: 'Thumbnail', type: 'image', helpText: 'Recommended: 600×600px (square). Small preview on the asset grid.', icon: 'Image' },
+      { key: 'preview-image', label: 'Full Preview', type: 'image', helpText: 'Recommended: 1600×1067px. Shown when expanding an asset.', icon: 'Image' },
       { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this asset for?' },
       { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'https://...', icon: 'Link' },
       { key: 'file-format', label: 'File Format', type: 'select', options: ['PNG', 'JPG', 'SVG', 'PDF', 'PPTX', 'DOCX', 'AI', 'PSD', 'MP4'], icon: 'FileText' },
@@ -279,28 +286,41 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'blog-posts',
     description: 'Blog articles and company news',
     fields: [
-      { key: 'name', label: 'Post Title', type: 'text', required: true, placeholder: 'Enter blog post title', icon: 'FileText' },
-      { key: 'date', label: 'Publish Date', type: 'datetime', helpText: 'When to publish this post', icon: 'Calendar' },
-      { key: 'main-image', label: 'Thumbnail Image', type: 'image', helpText: 'Main thumbnail for the blog post', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Thumbnail Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'blog-body-image', label: 'Body Image', type: 'image', helpText: 'Landscape image displayed in the article body', icon: 'Image' },
-      { key: 'blog-body-image-alt', label: 'Body Image Alt Text', type: 'text', placeholder: 'Describe the body image...', icon: 'FileText' },
-      { key: 'blog-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main page heading...' },
-      { key: 'blog-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief description for the blog page...' },
-      { key: 'blog-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for blog card...' },
-      { key: 'blog-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for blog card...' },
-      { key: 'blog-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'blog-long-description', label: 'Full Content', type: 'richtext', placeholder: 'Write the full blog post content...' },
-      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
-      { key: 'cdn-image-visibility', label: 'Show CDN Image', type: 'boolean', helpText: 'Toggle CDN image visibility' },
-      { key: 'cdn-image-url', label: 'CDN Image URL', type: 'text', placeholder: 'https://...', icon: 'Link' },
-      { key: 'video-visibility', label: 'Show Video', type: 'boolean', helpText: 'Toggle video section visibility' },
-      { key: 'video', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video' },
-      { key: 'additional-content-visibility', label: 'Show Additional Content', type: 'boolean', helpText: 'Toggle additional content section' },
-      { key: 'blog-category', label: 'Blog Category (ID)', type: 'text', helpText: 'Webflow item ID from the Blog Categories collection', icon: 'Tag' },
-      { key: 'blog-related-to-industry', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link' },
-      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set by the Airtable integration', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter blog post title', icon: 'FileText', group: 'Basics' },
+      { key: 'date', label: 'Publish Date', type: 'datetime', helpText: 'When to publish this post', icon: 'Calendar', group: 'Basics' },
+
+      // Images
+      { key: 'main-image', label: 'Thumbnail Image', type: 'image', helpText: 'Recommended: 1200\u00d7800px (3:2 landscape). Used on listing cards.', icon: 'Image', group: 'Images' },
+      { key: 'main-image-alt-text', label: 'Thumbnail Alt Text', type: 'text', placeholder: 'Describe the image\u2026', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Images' },
+      { key: 'blog-body-image', label: 'Body Image', type: 'image', helpText: 'Recommended: 1600\u00d7900px (16:9). Hero image at the top of the article.', icon: 'Image', group: 'Images' },
+      { key: 'blog-body-image-alt', label: 'Body Image Alt Text', type: 'text', placeholder: 'Describe the body image\u2026', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Images' },
+
+      // Page Content
+      { key: 'blog-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main page heading\u2026', group: 'Page Content' },
+      { key: 'blog-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief description for the blog page\u2026', group: 'Page Content' },
+      { key: 'blog-long-description', label: 'Full Article Content', type: 'richtext', placeholder: 'Write the full blog post content\u2026', group: 'Page Content' },
+
+      // Card Display
+      { key: 'blog-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for blog card\u2026', helpText: 'Shown on listing cards', group: 'Card Display' },
+      { key: 'blog-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for blog card\u2026', group: 'Card Display' },
+      { key: 'blog-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view\u2026', group: 'Card Display' },
+
+      // Additional Media
+      { key: 'cdn-image-visibility', label: 'Show CDN Image', type: 'boolean', helpText: 'Display the extra CDN image block on the article page', group: 'Additional Media' },
+      { key: 'cdn-image-url', label: 'CDN Image URL', type: 'text', placeholder: 'https://...', icon: 'Link', group: 'Additional Media' },
+      { key: 'video-visibility', label: 'Show Video', type: 'boolean', helpText: 'Display the video embed on the article page', group: 'Additional Media' },
+      { key: 'video', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video', group: 'Additional Media' },
+      { key: 'additional-content-visibility', label: 'Show Additional Content', type: 'boolean', helpText: 'Display the optional secondary content block', group: 'Additional Media' },
+
+      // SEO
+      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50\u201360 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150\u2013160 characters for search results', icon: 'Tag', group: 'SEO' },
+
+      // Relationships (advanced \u2014 IDs only)
+      { key: 'blog-category', label: 'Blog Category (ID)', type: 'text', helpText: 'Webflow item ID from the Blog Categories collection', icon: 'Tag', group: 'Relationships' },
+      { key: 'blog-related-to-industry', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link', group: 'Relationships' },
+      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set automatically by the Airtable integration', icon: 'Tag', group: 'Relationships' },
     ]
   },
   blogCategories: {
@@ -450,29 +470,42 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'our-work',
     description: 'Project portfolio and case studies',
     fields: [
-      { key: 'name', label: 'Project Name', type: 'text', required: true, placeholder: 'Enter project name', icon: 'FileText' },
-      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Primary project image', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'our-work-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main project page heading...' },
-      { key: 'our-work-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief project description...' },
-      { key: 'our-work-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for project card...' },
-      { key: 'our-work-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for project card...' },
-      { key: 'our-work-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'our-work-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full project description...' },
-      { key: 'intro-section-heading-h2', label: 'Intro Heading (H2)', type: 'richtext', placeholder: 'Intro section heading...' },
-      { key: 'architect-designer', label: 'Architect / Designer', type: 'text', placeholder: 'Architect or designer name', icon: 'Users' },
-      { key: 'location', label: 'Location', type: 'text', placeholder: 'Project location', icon: 'MapPin' },
-      { key: 'video-url', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video' },
-      { key: 'featured-project', label: 'Featured Project', type: 'boolean', helpText: 'Highlight this project' },
-      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
-      { key: 'industries', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link' },
-      { key: 'related-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
-      { key: 'state-2', label: 'State Reference (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
-      { key: 'gallery', label: 'Gallery', type: 'multi-image', helpText: 'Drag and drop up to 25 images (max 4 MB each)', icon: 'Image' },
-      { key: 'gallery-2', label: 'Gallery 2', type: 'multi-image', helpText: 'Drag and drop up to 25 images (max 4 MB each)', icon: 'Image' },
-      { key: 'old-page-url', label: 'Old Page URL', type: 'text', placeholder: 'https://\u2026', icon: 'Link' },
-      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Project Name', type: 'text', required: true, placeholder: 'Enter project name', icon: 'FileText', group: 'Basics' },
+      { key: 'architect-designer', label: 'Architect / Designer', type: 'text', placeholder: 'Architect or designer name', icon: 'Users', group: 'Basics' },
+      { key: 'location', label: 'Location', type: 'text', placeholder: 'Project location', icon: 'MapPin', group: 'Basics' },
+      { key: 'featured-project', label: 'Featured Project', type: 'boolean', helpText: 'Highlight this project on the Our Work landing', group: 'Basics' },
+      { key: 'sort-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Basics' },
+
+      // Main Image
+      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Recommended: 1600\u00d71067px (3:2 landscape). Shows on listing cards and as the project hero.', icon: 'Image', group: 'Main Image' },
+      { key: 'main-image-alt-text', label: 'Main Image Alt Text', type: 'text', placeholder: 'Describe the image\u2026', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Main Image' },
+
+      // Page Content
+      { key: 'our-work-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main project page heading\u2026', group: 'Page Content' },
+      { key: 'our-work-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief project description\u2026', group: 'Page Content' },
+      { key: 'intro-section-heading-h2', label: 'Intro Heading (H2)', type: 'richtext', placeholder: 'Intro section heading\u2026', group: 'Page Content' },
+      { key: 'our-work-long-description', label: 'Full Project Description', type: 'richtext', placeholder: 'Full project description\u2026', group: 'Page Content' },
+
+      // Card Display
+      { key: 'our-work-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for project card\u2026', helpText: 'Shown on listing cards', group: 'Card Display' },
+      { key: 'our-work-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for project card\u2026', group: 'Card Display' },
+      { key: 'our-work-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view\u2026', group: 'Card Display' },
+
+      // Media
+      { key: 'video-url', label: 'Video URL', type: 'text', placeholder: 'Video embed URL', icon: 'Video', group: 'Media' },
+      { key: 'gallery', label: 'Gallery (Images 1\u201325)', type: 'multi-image', helpText: 'Drag & drop up to 25 images. Recommended: 1600\u00d71067px each (max 4 MB).', icon: 'Image', group: 'Media' },
+      { key: 'gallery-2', label: 'Gallery (Images 26\u201350)', type: 'multi-image', helpText: 'Overflow gallery for projects with 25+ images.', icon: 'Image', group: 'Media' },
+
+      // SEO
+      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50\u201360 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150\u2013160 characters for search results', icon: 'Tag', group: 'SEO' },
+
+      // Relationships (advanced)
+      { key: 'industries', label: 'Related Industry (ID)', type: 'text', helpText: 'Webflow item ID from the Industries collection', icon: 'Link', group: 'Relationships' },
+      { key: 'related-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link', group: 'Relationships' },
+      { key: 'state-2', label: 'State Reference (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link', group: 'Relationships' },
+      { key: 'old-page-url', label: 'Legacy URL (for redirects)', type: 'text', placeholder: 'https://\u2026', helpText: 'Optional \u2014 old URL this project used to live at', icon: 'Link', group: 'Relationships' },
     ]
   },
   imageGalleries: {
@@ -534,49 +567,64 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-slate-500 to-zinc-500',
     description: 'Singleton — global contact info, portal URLs, and defaults used across the intranet',
     fields: [
-      { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'Site Settings', helpText: 'Identifier for this singleton; not displayed publicly', icon: 'FileText' },
-      { key: 'eap-phone', label: 'EAP Phone', type: 'tel', placeholder: '1-800-XXX-XXXX', helpText: 'Employee Assistance Program — surfaced on HR page', icon: 'Phone' },
-      { key: 'eap-portal-url', label: 'EAP Portal URL', type: 'url', placeholder: 'https://...', helpText: 'Link to EAP self-service portal', icon: 'Link' },
-      { key: 'poison-control-phone', label: 'Poison Control Phone', type: 'tel', placeholder: '1-800-222-1222', helpText: 'Surfaced on Safety emergency contacts', icon: 'Phone' },
-      { key: 'it-phone', label: 'IT Helpdesk Phone', type: 'tel', placeholder: '(555) 123-4567', icon: 'Phone' },
-      { key: 'it-email', label: 'IT Helpdesk Email', type: 'email', placeholder: 'helpdesk@jewett.com', icon: 'Mail' },
-      { key: 'it-hours-weekday', label: 'IT Hours — Weekday', type: 'text', placeholder: 'Mon–Fri: 7am – 6pm', icon: 'Clock' },
-      { key: 'it-hours-saturday', label: 'IT Hours — Saturday', type: 'text', placeholder: 'Saturday: 9am – 1pm', icon: 'Clock' },
-      { key: 'it-emergency-hours', label: 'IT Emergency Hours', type: 'text', placeholder: '24/7 critical issues', icon: 'Clock' },
-      { key: 'hr-email', label: 'HR Email', type: 'email', placeholder: 'hr@jewett.com', icon: 'Mail' },
-      { key: 'careers-email', label: 'Careers Email', type: 'email', placeholder: 'careers@jewett.com', icon: 'Mail' },
-      { key: 'marketing-email', label: 'Marketing Email', type: 'email', placeholder: 'marketing@jewett.com', icon: 'Mail' },
-      { key: 'safety-email', label: 'Safety Email', type: 'email', placeholder: 'safety@jewett.com', icon: 'Mail' },
-      { key: 'default-referral-bonus', label: 'Default Referral Bonus ($)', type: 'number', placeholder: '500', helpText: 'Fallback bonus shown when a job posting has no specific value', icon: 'DollarSign' },
-      { key: 'hr-portal-adp', label: 'ADP Portal URL', type: 'url', placeholder: 'https://workforcenow.adp.com/...', icon: 'Link' },
-      { key: 'hr-portal-bcbs', label: 'BCBS Portal URL', type: 'url', placeholder: 'https://bcbs.com/...', icon: 'Link' },
-      { key: 'hr-portal-fidelity', label: 'Fidelity Portal URL', type: 'url', placeholder: 'https://netbenefits.fidelity.com/...', icon: 'Link' },
-      { key: 'safety-days-without-incident', label: 'Safety: Days Without Incident', type: 'number', placeholder: '247', helpText: 'Drives the live counter on the Safety page banner', icon: 'Award' },
-      { key: 'safety-company-record-days', label: 'Safety: Company Record (Days)', type: 'number', placeholder: '312', helpText: 'All-time best streak of incident-free days', icon: 'Award' },
-      { key: 'safety-training-compliance', label: 'Safety: Training Compliance %', type: 'number', placeholder: '98', helpText: 'Percentage 0-100 — rendered as N%', icon: 'Award' },
-      { key: 'safety-active-sites', label: 'Safety: Active Sites', type: 'number', placeholder: '42', helpText: 'Number of active job sites', icon: 'Building' },
-      { key: 'culture-volunteer-hours', label: 'Culture: Volunteer Hours', type: 'text', placeholder: '450+', helpText: 'Annual volunteer hours — accepts string suffixes like "450+"', icon: 'Star' },
-      { key: 'culture-donations', label: 'Culture: Annual Donations', type: 'text', placeholder: '$125K', helpText: 'Annual donation total shown on the Culture page Community Impact banner', icon: 'DollarSign' },
-      { key: 'signage-review-days', label: 'Signage: Review Time', type: 'text', placeholder: '1-2 business days', helpText: 'Shown in the Signage Request page processing timeline (step 1)', icon: 'Clock' },
-      { key: 'signage-production-days', label: 'Signage: Production Time', type: 'text', placeholder: '3-5 business days', helpText: 'Shown in the Signage Request page processing timeline (step 2)', icon: 'Clock' },
-      { key: 'signage-delivery-days', label: 'Signage: Delivery Time', type: 'text', placeholder: '1-3 business days', helpText: 'Shown in the Signage Request page processing timeline (step 3)', icon: 'Clock' },
-      { key: 'it-system-status-message', label: 'IT: System Status Message', type: 'text', placeholder: 'All systems operational', helpText: 'Shown on the IT Helpdesk sidebar. Leave blank to hide the panel entirely.', icon: 'AlertCircle' },
-      { key: 'it-system-status-level', label: 'IT: System Status Level', type: 'select', options: ['Operational', 'Degraded', 'Outage', 'Maintenance'], helpText: 'Drives the color of the IT status panel', icon: 'Tag' },
-      { key: 'social-facebook-url', label: 'Social: Facebook URL', type: 'url', placeholder: 'https://www.facebook.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
-      { key: 'social-instagram-url', label: 'Social: Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
-      { key: 'social-linkedin-url', label: 'Social: LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin' },
-      { key: 'social-youtube-url', label: 'Social: YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
+      { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'Site Settings', helpText: 'Identifier for this singleton; not displayed publicly', icon: 'FileText', group: 'General' },
+
+      // Emergency & Support
+      { key: 'eap-phone', label: 'EAP Phone', type: 'tel', placeholder: '1-800-XXX-XXXX', helpText: 'Employee Assistance Program — surfaced on HR page', icon: 'Phone', group: 'Emergency & Support' },
+      { key: 'eap-portal-url', label: 'EAP Portal URL', type: 'url', placeholder: 'https://...', helpText: 'Link to EAP self-service portal', icon: 'Link', group: 'Emergency & Support' },
+      { key: 'poison-control-phone', label: 'Poison Control Phone', type: 'tel', placeholder: '1-800-222-1222', helpText: 'Surfaced on Safety emergency contacts', icon: 'Phone', group: 'Emergency & Support' },
+
+      // IT Helpdesk
+      { key: 'it-phone', label: 'IT Helpdesk Phone', type: 'tel', placeholder: 'e.g., 614-555-0100', icon: 'Phone', group: 'IT Helpdesk' },
+      { key: 'it-email', label: 'IT Helpdesk Email', type: 'email', placeholder: 'helpdesk@jewett.com', icon: 'Mail', group: 'IT Helpdesk' },
+      { key: 'it-hours-weekday', label: 'IT Hours — Weekday', type: 'text', placeholder: 'Mon–Fri: 7am – 6pm', icon: 'Clock', group: 'IT Helpdesk' },
+      { key: 'it-hours-saturday', label: 'IT Hours — Saturday', type: 'text', placeholder: 'Saturday: 9am – 1pm', icon: 'Clock', group: 'IT Helpdesk' },
+      { key: 'it-emergency-hours', label: 'IT Emergency Hours', type: 'text', placeholder: '24/7 critical issues', icon: 'Clock', group: 'IT Helpdesk' },
+      { key: 'it-system-status-message', label: 'System Status Message', type: 'text', placeholder: 'All systems operational', helpText: 'Shown on the IT Helpdesk sidebar. Leave blank to hide the panel entirely.', icon: 'AlertCircle', group: 'IT Helpdesk' },
+      { key: 'it-system-status-level', label: 'System Status Level', type: 'select', options: ['Operational', 'Degraded', 'Outage', 'Maintenance'], helpText: 'Drives the color of the IT status panel', icon: 'Tag', group: 'IT Helpdesk' },
+
+      // HR & Careers
+      { key: 'hr-email', label: 'HR Email', type: 'email', placeholder: 'hr@jewett.com', icon: 'Mail', group: 'HR & Careers' },
+      { key: 'careers-email', label: 'Careers Email', type: 'email', placeholder: 'careers@jewett.com', icon: 'Mail', group: 'HR & Careers' },
+      { key: 'default-referral-bonus', label: 'Default Referral Bonus ($)', type: 'number', placeholder: '500', helpText: 'Fallback bonus shown when a job posting has no specific value', icon: 'DollarSign', group: 'HR & Careers' },
+      { key: 'hr-portal-adp', label: 'ADP Portal URL', type: 'url', placeholder: 'https://workforcenow.adp.com/...', icon: 'Link', group: 'HR & Careers' },
+      { key: 'hr-portal-bcbs', label: 'BCBS Portal URL', type: 'url', placeholder: 'https://bcbs.com/...', icon: 'Link', group: 'HR & Careers' },
+      { key: 'hr-portal-fidelity', label: 'Fidelity Portal URL', type: 'url', placeholder: 'https://netbenefits.fidelity.com/...', icon: 'Link', group: 'HR & Careers' },
+
+      // Safety
+      { key: 'safety-email', label: 'Safety Email', type: 'email', placeholder: 'safety@jewett.com', icon: 'Mail', group: 'Safety' },
+      { key: 'safety-days-without-incident', label: 'Days Without Incident', type: 'number', placeholder: '247', helpText: 'Drives the live counter on the Safety page banner', icon: 'Award', group: 'Safety' },
+      { key: 'safety-company-record-days', label: 'Company Record (Days)', type: 'number', placeholder: '312', helpText: 'All-time best streak of incident-free days', icon: 'Award', group: 'Safety' },
+      { key: 'safety-training-compliance', label: 'Training Compliance %', type: 'number', placeholder: '98', helpText: 'Percentage 0-100 — rendered as N%', icon: 'Award', group: 'Safety' },
+      { key: 'safety-active-sites', label: 'Active Sites', type: 'number', placeholder: '42', helpText: 'Number of active job sites', icon: 'Building', group: 'Safety' },
+
+      // Culture Stats
+      { key: 'culture-volunteer-hours', label: 'Volunteer Hours', type: 'text', placeholder: '450+', helpText: 'Annual volunteer hours — accepts string suffixes like "450+"', icon: 'Star', group: 'Culture Stats' },
+      { key: 'culture-donations', label: 'Annual Donations', type: 'text', placeholder: '$125K', helpText: 'Annual donation total shown on the Culture page Community Impact banner', icon: 'DollarSign', group: 'Culture Stats' },
+
+      // Marketing
+      { key: 'marketing-email', label: 'Marketing Email', type: 'email', placeholder: 'marketing@jewett.com', icon: 'Mail', group: 'Marketing' },
+      { key: 'signage-review-days', label: 'Signage: Review Time', type: 'text', placeholder: '1-2 business days', helpText: 'Shown in the Signage Request page processing timeline (step 1)', icon: 'Clock', group: 'Marketing' },
+      { key: 'signage-production-days', label: 'Signage: Production Time', type: 'text', placeholder: '3-5 business days', helpText: 'Shown in the Signage Request page processing timeline (step 2)', icon: 'Clock', group: 'Marketing' },
+      { key: 'signage-delivery-days', label: 'Signage: Delivery Time', type: 'text', placeholder: '1-3 business days', helpText: 'Shown in the Signage Request page processing timeline (step 3)', icon: 'Clock', group: 'Marketing' },
+
+      // Social Media
+      { key: 'social-facebook-url', label: 'Facebook URL', type: 'url', placeholder: 'https://www.facebook.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
+      { key: 'social-instagram-url', label: 'Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
+      { key: 'social-linkedin-url', label: 'LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin', group: 'Social Media' },
+      { key: 'social-youtube-url', label: 'YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
+
       // Brand identity — drives the Brand Assets page swatches + typography card.
       // Leave any field blank to fall back to the built-in Jewett defaults
       // (#D22630 / #78787F / #2A2A2A, Politica / Lato).
-      { key: 'brand-heading-font', label: 'Brand: Heading Font', type: 'text', placeholder: 'Politica', helpText: 'Font family name used for headings on the Brand Assets page', icon: 'FileType' },
-      { key: 'brand-body-font', label: 'Brand: Body Font', type: 'text', placeholder: 'Lato', helpText: 'Font family name used for body copy on the Brand Assets page', icon: 'FileType' },
-      { key: 'brand-color-1-name', label: 'Brand: Color 1 Name', type: 'text', placeholder: 'Jewett Red', icon: 'Palette' },
-      { key: 'brand-color-1-hex', label: 'Brand: Color 1 Hex', type: 'color', helpText: 'Primary brand color shown first on the Brand Assets page' },
-      { key: 'brand-color-2-name', label: 'Brand: Color 2 Name', type: 'text', placeholder: 'Jewett Grey', icon: 'Palette' },
-      { key: 'brand-color-2-hex', label: 'Brand: Color 2 Hex', type: 'color' },
-      { key: 'brand-color-3-name', label: 'Brand: Color 3 Name', type: 'text', placeholder: 'Jewett Dark', icon: 'Palette' },
-      { key: 'brand-color-3-hex', label: 'Brand: Color 3 Hex', type: 'color' },
+      { key: 'brand-heading-font', label: 'Heading Font', type: 'text', placeholder: 'Politica', helpText: 'Font family name used for headings on the Brand Assets page', icon: 'FileType', group: 'Brand Identity' },
+      { key: 'brand-body-font', label: 'Body Font', type: 'text', placeholder: 'Lato', helpText: 'Font family name used for body copy on the Brand Assets page', icon: 'FileType', group: 'Brand Identity' },
+      { key: 'brand-color-1-name', label: 'Color 1 — Name', type: 'text', placeholder: 'Jewett Red', icon: 'Palette', group: 'Brand Identity' },
+      { key: 'brand-color-1-hex', label: 'Color 1 — Hex', type: 'color', helpText: 'Primary brand color shown first on the Brand Assets page', group: 'Brand Identity' },
+      { key: 'brand-color-2-name', label: 'Color 2 — Name', type: 'text', placeholder: 'Jewett Grey', icon: 'Palette', group: 'Brand Identity' },
+      { key: 'brand-color-2-hex', label: 'Color 2 — Hex', type: 'color', group: 'Brand Identity' },
+      { key: 'brand-color-3-name', label: 'Color 3 — Name', type: 'text', placeholder: 'Jewett Dark', icon: 'Palette', group: 'Brand Identity' },
+      { key: 'brand-color-3-hex', label: 'Color 3 — Hex', type: 'color', group: 'Brand Identity' },
     ],
   },
   pageCopy: {

@@ -163,7 +163,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                 Browse Resources
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
-              <a href="/jewett-junction/submit-idea">
+              <a href="/jewett-junction/submit-idea?category=resource">
                 <Button
                   size="lg"
                   variant="outline"
@@ -524,7 +524,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [] 
                 </p>
               </div>
             </div>
-            <a href="/jewett-junction/submit-idea">
+            <a href="/jewett-junction/submit-idea?category=resource">
               <Button
                 size="lg"
                 className="bg-white text-amber-700 hover:bg-amber-50 flex-shrink-0"

@@ -18,12 +18,30 @@ interface IdeaSubmission {
   resources?: string;
 }
 
+// Maps form category ids → Webflow Submitted Ideas "category" Select option names.
+// Webflow only allows the values defined on the collection's Select field, so
+// Marketing and Resource Requests fall through to 'Other'. The human-readable
+// label is preserved in the email subject and prepended to the description so
+// admins can still triage them at a glance.
 const categoryLabels: Record<string, string> = {
   process: 'Process Improvement',
   safety: 'Safety',
   cost: 'Cost Savings',
   culture: 'Culture',
+  marketing: 'Other',
+  resource: 'Other',
   innovation: 'Technology',
+  other: 'Other',
+};
+
+const categoryDisplayName: Record<string, string> = {
+  process: 'Process Improvement',
+  safety: 'Safety Enhancement',
+  cost: 'Cost Savings',
+  culture: 'Team & Culture',
+  marketing: 'Marketing Request',
+  resource: 'Resource Request',
+  innovation: 'New Initiative',
   other: 'Other',
 };
 
@@ -98,8 +116,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // Build description with benefits and resources appended
-    let fullDescription = data.description;
+    // Build description with benefits and resources appended. Prepend the
+    // human-readable category so Marketing/Resource Requests don't lose their
+    // signal when stored under the 'Other' Webflow option.
+    const displayCategory = categoryDisplayName[data.category] || data.category;
+    let fullDescription = `Category: ${displayCategory}\n\n${data.description}`;
     if (data.benefits) {
       fullDescription += `\n\nExpected Benefits:\n${data.benefits}`;
     }
@@ -151,15 +172,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const result = await response.json();
 
+    // Surface Marketing/Resource Requests in the subject line so they get
+    // triaged by the right person without opening every email.
+    const subjectPrefix =
+      data.category === 'marketing'
+        ? '[Marketing Request]'
+        : data.category === 'resource'
+        ? '[Resource Request]'
+        : '[Idea]';
+
     await sendNotification(locals, {
       inbox: 'ideas',
-      subject: `[Idea] ${data.title}`,
+      subject: `${subjectPrefix} ${data.title}`,
       replyTo: data.email,
       fields: [
         { label: 'Submitter', value: data.name },
         { label: 'Email', value: data.email },
         { label: 'Department', value: data.department },
-        { label: 'Category', value: categoryLabels[data.category] || data.category },
+        { label: 'Category', value: displayCategory },
         { label: 'Impact', value: impactLabels[data.impact || ''] || data.impact },
         { label: 'Description', value: data.description },
         { label: 'Expected Benefits', value: data.benefits },

@@ -182,7 +182,7 @@ export function SafetyIncidentContent({ safetyEmail, safetyPhone }: SafetyIncide
                   <Field label="Email" required type="email" value={formData.email} onChange={(v) => update('email', v)} maxLength={160} placeholder="you@jewettconstruction.com" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Phone" type="tel" value={formData.phone} onChange={(v) => update('phone', v)} maxLength={40} placeholder="(555) 123-4567" />
+                  <Field label="Phone" type="tel" value={formData.phone} onChange={(v) => update('phone', v)} maxLength={40} placeholder="e.g., 614-555-0100" />
                   <Select label="Department" value={formData.department} onChange={(v) => update('department', v)} options={DEPARTMENTS} placeholder="Select your department" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

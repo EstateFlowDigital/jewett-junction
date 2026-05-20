@@ -13,7 +13,9 @@ import {
   Shield,
   Users,
   Wrench,
-  DollarSign
+  DollarSign,
+  Palette,
+  FolderOpen,
 } from 'lucide-react';
 
 interface IdeaSubmissionContentProps {
@@ -25,6 +27,8 @@ const categories = [
   { id: 'safety', label: 'Safety Enhancement', icon: Shield, description: 'Improve workplace safety' },
   { id: 'cost', label: 'Cost Savings', icon: DollarSign, description: 'Reduce expenses or increase efficiency' },
   { id: 'culture', label: 'Team & Culture', icon: Users, description: 'Enhance workplace culture' },
+  { id: 'marketing', label: 'Marketing Request', icon: Palette, description: 'Request marketing collateral or signage' },
+  { id: 'resource', label: 'Resource Request', icon: FolderOpen, description: 'Ask for a new policy, form, or resource' },
   { id: 'innovation', label: 'New Initiative', icon: Sparkles, description: 'Propose something new' },
   { id: 'other', label: 'Other', icon: Lightbulb, description: 'Something else entirely' },
 ];
@@ -50,6 +54,18 @@ export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentP
   });
   const [status, setStatus] = React.useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = React.useState('');
+
+  // Pre-select a category when arriving via ?category=marketing (or resource, etc.).
+  // Lets cross-link CTAs from Marketing / Resources land the user in the right
+  // slot of the form without forcing them to scroll and pick again.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('category');
+    if (requested && categories.some((c) => c.id === requested)) {
+      setFormData((prev) => (prev.category ? prev : { ...prev, category: requested }));
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

@@ -247,7 +247,7 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
               <PenTool className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-rose-400' : 'text-rose-600'}`} />
               <h3 className={`font-semibold mb-2 ${isDark ? 'text-rose-300' : 'text-rose-900'}`}>Custom Request?</h3>
               <p className={`text-sm mb-4 ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>Need something custom designed?</p>
-              <a href="/jewett-junction/submit-idea" className="w-full">
+              <a href="/jewett-junction/submit-idea?category=marketing" className="w-full">
                 <Button className="w-full bg-rose-600 hover:bg-rose-700">Submit Request</Button>
               </a>
             </CardContent>
