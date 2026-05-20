@@ -32,7 +32,7 @@ const VALID_FIELDS: Record<string, string[]> = {
   ],
   employees: [
     'name', 'slug', 'photo', 'role', 'dept', 'office-location', 'email',
-    'phone', 'extension', 'linkedin-url', 'portal-url', 'portal-message',
+    'phone', 'extension', 'linkedin-url', 'support-portal-url', 'support-portal-message',
     'start-date', 'bio', 'skills',
     'certifications', 'is-featured', 'leadership-team', 'page-contact-for',
   ],

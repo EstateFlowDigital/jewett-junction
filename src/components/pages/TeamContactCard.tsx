@@ -18,9 +18,9 @@ interface Employee {
   'page-contact-for'?: string;
   /** When set, the contact card shows this portal link in place of the email
    *  row — used for outsourced vendor contacts (e.g. managed IT). */
-  'portal-url'?: string;
+  'support-portal-url'?: string;
   /** Optional instruction shown above the portal link. */
-  'portal-message'?: string;
+  'support-portal-message'?: string;
 }
 
 interface TeamContactCardProps {
@@ -102,8 +102,8 @@ export function TeamContactCard({
   }, [department, tag]);
 
   const email = contact?.email || fallbackEmail;
-  const portalUrl = contact?.['portal-url']?.trim() || '';
-  const portalMessage = contact?.['portal-message']?.trim() || 'For support, please log in to the portal:';
+  const portalUrl = contact?.['support-portal-url']?.trim() || '';
+  const portalMessage = contact?.['support-portal-message']?.trim() || 'For support, please log in to the portal:';
   const hasPortal = portalUrl.length > 0;
   const accentBg = isDark ? `bg-${accent}-900/40` : `bg-${accent}-100`;
   const accentText = `text-${accent}-600`;
