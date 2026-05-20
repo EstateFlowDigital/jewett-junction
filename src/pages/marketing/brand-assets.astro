@@ -11,7 +11,7 @@ import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 initCMS(Astro.locals);
 
 // Fetch brand assets from CMS
-const brandResult = await getMarketingAssets({ type: 'Brand Asset', limit: 50 });
+const brandResult = await getMarketingAssets({ type: ['Logo', 'Brand Guide'], limit: 50 });
 const brandAssets = brandResult.items;
 
 // Helper to get image URL

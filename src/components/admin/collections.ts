@@ -120,7 +120,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: 'Users' },
       { key: 'photo', label: 'Profile Photo', type: 'image', placeholder: 'https://example.com/photo.jpg', helpText: 'Square photo recommended (400x400px)', icon: 'Image' },
       { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase' },
-      { key: 'team-department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: 'Building' },
+      { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'HR', 'Marketing', 'Office Operations'], icon: 'Building' },
       { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: 'MapPin' },
       { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail' },
       { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: '(555) 123-4567', icon: 'Phone' },
@@ -235,7 +235,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Brand assets, templates, and marketing materials',
     fields: [
       { key: 'name', label: 'Asset Name', type: 'text', required: true, placeholder: 'e.g., Company Logo - Primary', icon: 'FileText' },
-      { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], icon: 'Tag' },
+      { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], helpText: 'Brand Assets page shows: Logo, Brand Guide. Letterhead & Forms shows: Letterhead, Template. Presentations shows: Presentation. Photo Library shows: Photo, Video.', icon: 'Tag' },
       { key: 'thumbnail', label: 'Thumbnail', type: 'image', placeholder: 'https://example.com/thumb.jpg', helpText: 'Small preview image', icon: 'Image' },
       { key: 'preview-image', label: 'Full Preview', type: 'image', placeholder: 'https://example.com/preview.jpg', helpText: 'Larger preview image', icon: 'Image' },
       { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this asset for?' },

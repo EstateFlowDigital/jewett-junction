@@ -166,8 +166,12 @@ function applyFieldAliases(collectionId: string, fieldData: Record<string, unkno
   const aliases = COLLECTION_FIELD_ALIASES[collectionId];
   if (!aliases) return resolved;
   const out = { ...resolved };
+  // Always prefer the new (canonical) key when it has a value — the new field is
+  // the source of truth, the old key is preserved only as a display alias.
+  // This also rescues records where the old field still holds an unresolved
+  // option id from a placeholder Option field that resolveOptionIds couldn't map.
   for (const [oldKey, newKey] of Object.entries(aliases)) {
-    if (out[newKey] !== undefined && out[newKey] !== null && out[newKey] !== '' && (out[oldKey] === undefined || out[oldKey] === null || out[oldKey] === '')) {
+    if (out[newKey] !== undefined && out[newKey] !== null && out[newKey] !== '') {
       out[oldKey] = out[newKey];
     }
   }
@@ -494,7 +498,7 @@ export const COLLECTIONS = {
 // new fields with distinct slugs. This map lets fetched items expose BOTH keys
 // so downstream display code can keep reading the older human-friendly name.
 Object.assign(COLLECTION_FIELD_ALIASES, {
-  [COLLECTIONS.employees]: { department: 'team-department' },
+  [COLLECTIONS.employees]: { department: 'dept', 'team-department': 'dept' },
   [COLLECTIONS.announcements]: { priority: 'priority-level' },
   [COLLECTIONS.events]: { category: 'event-category' },
   [COLLECTIONS.jobPostings]: { department: 'job-department' },
@@ -852,13 +856,14 @@ export async function getITKnowledgeBase(options?: { limit?: number; type?: stri
   return { ...result, items };
 }
 
-export async function getMarketingAssets(options?: { limit?: number; type?: string; featured?: boolean }) {
+export async function getMarketingAssets(options?: { limit?: number; type?: string | string[]; featured?: boolean }) {
   if (!COLLECTIONS.marketingAssets) return { items: [], total: 0 };
   const result = await getCollection<MarketingAsset>(COLLECTIONS.marketingAssets, options);
   let items = result.items.filter(item => item['is-active'] !== false);
 
   if (options?.type) {
-    items = items.filter(item => item['asset-type'] === options.type);
+    const allowed = Array.isArray(options.type) ? options.type : [options.type];
+    items = items.filter(item => allowed.includes(item['asset-type'] || ''));
   }
   if (options?.featured) {
     items = items.filter(item => item.featured === true);

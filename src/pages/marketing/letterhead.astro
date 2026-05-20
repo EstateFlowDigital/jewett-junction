@@ -11,7 +11,7 @@ import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 initCMS(Astro.locals);
 
 // Fetch letterhead/form assets from CMS
-const formsResult = await getMarketingAssets({ type: 'Form', limit: 50 });
+const formsResult = await getMarketingAssets({ type: ['Letterhead', 'Template'], limit: 50 });
 const forms = formsResult.items;
 
 // Helper to get download URL

@@ -11,7 +11,7 @@ import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
 initCMS(Astro.locals);
 
 // Fetch photo assets from CMS
-const photosResult = await getMarketingAssets({ type: 'Photo', limit: 50 });
+const photosResult = await getMarketingAssets({ type: ['Photo', 'Video'], limit: 50 });
 const photos = photosResult.items;
 
 // Helper to get image URL
