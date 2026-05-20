@@ -32,7 +32,36 @@ interface ITSettings {
   'it-hours-weekday'?: string;
   'it-hours-saturday'?: string;
   'it-emergency-hours'?: string;
+  'it-system-status-message'?: string;
+  'it-system-status-level'?: string;
 }
+
+const STATUS_THEME: Record<string, { card: string; header: string; title: string; text: string }> = {
+  Operational: {
+    card: 'bg-green-900/30 border-green-800',
+    header: '',
+    title: 'text-green-300',
+    text: 'text-green-300',
+  },
+  Degraded: {
+    card: 'bg-amber-900/30 border-amber-800',
+    header: '',
+    title: 'text-amber-300',
+    text: 'text-amber-200',
+  },
+  Outage: {
+    card: 'bg-red-900/30 border-red-800',
+    header: '',
+    title: 'text-red-300',
+    text: 'text-red-200',
+  },
+  Maintenance: {
+    card: 'bg-blue-900/30 border-blue-800',
+    header: '',
+    title: 'text-blue-300',
+    text: 'text-blue-200',
+  },
+};
 
 interface ITHelpdeskContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
@@ -44,6 +73,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
+  const statusMessage = settings['it-system-status-message'] || '';
+  const statusTheme = STATUS_THEME[settings['it-system-status-level'] || 'Operational'] || STATUS_THEME.Operational;
   const itHoursWeekday = settings['it-hours-weekday'] || '7:00 AM - 6:00 PM';
   const itHoursSaturday = settings['it-hours-saturday'] || '8:00 AM - 12:00 PM';
   const itEmergencyHours = settings['it-emergency-hours'] || '24/7 On-Call';
@@ -246,20 +277,17 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
             accent="sky"
           />
 
-          {/* System Status */}
-          <Card className={isDark ? 'bg-green-900/30 border-green-800' : 'bg-green-50 border-green-200'}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-green-300' : 'text-green-900'}`}>System Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {['Email', 'VPN', 'Network', 'Cloud Services'].map((system) => (
-                <div key={system} className="flex items-center justify-between">
-                  <span className={`text-sm ${isDark ? 'text-green-300' : 'text-green-800'}`}>{system}</span>
-                  <Badge className="bg-green-200 text-green-700">Operational</Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          {/* System Status — only shows when admin has set a message */}
+          {statusMessage && (
+            <Card className={statusTheme.card}>
+              <CardHeader>
+                <CardTitle className={`text-base ${statusTheme.title}`}>System Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className={`text-sm ${statusTheme.text}`}>{statusMessage}</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Hours */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>

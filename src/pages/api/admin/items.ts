@@ -153,6 +153,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'safety-training-compliance', 'safety-active-sites',
     'culture-volunteer-hours', 'culture-donations',
     'signage-review-days', 'signage-production-days', 'signage-delivery-days',
+    'it-system-status-message', 'it-system-status-level',
     'social-facebook-url', 'social-instagram-url',
     'social-linkedin-url', 'social-youtube-url',
   ],

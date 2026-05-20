@@ -545,6 +545,8 @@ export interface SiteSettings {
   'signage-review-days'?: string;
   'signage-production-days'?: string;
   'signage-delivery-days'?: string;
+  'it-system-status-message'?: string;
+  'it-system-status-level'?: string;
   'social-facebook-url'?: string;
   'social-instagram-url'?: string;
   'social-linkedin-url'?: string;

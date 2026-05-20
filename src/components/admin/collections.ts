@@ -560,10 +560,23 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'signage-review-days', label: 'Signage: Review Time', type: 'text', placeholder: '1-2 business days', helpText: 'Shown in the Signage Request page processing timeline (step 1)', icon: 'Clock' },
       { key: 'signage-production-days', label: 'Signage: Production Time', type: 'text', placeholder: '3-5 business days', helpText: 'Shown in the Signage Request page processing timeline (step 2)', icon: 'Clock' },
       { key: 'signage-delivery-days', label: 'Signage: Delivery Time', type: 'text', placeholder: '1-3 business days', helpText: 'Shown in the Signage Request page processing timeline (step 3)', icon: 'Clock' },
+      { key: 'it-system-status-message', label: 'IT: System Status Message', type: 'text', placeholder: 'All systems operational', helpText: 'Shown on the IT Helpdesk sidebar. Leave blank to hide the panel entirely.', icon: 'AlertCircle' },
+      { key: 'it-system-status-level', label: 'IT: System Status Level', type: 'select', options: ['Operational', 'Degraded', 'Outage', 'Maintenance'], helpText: 'Drives the color of the IT status panel', icon: 'Tag' },
       { key: 'social-facebook-url', label: 'Social: Facebook URL', type: 'url', placeholder: 'https://www.facebook.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
       { key: 'social-instagram-url', label: 'Social: Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
       { key: 'social-linkedin-url', label: 'Social: LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin' },
       { key: 'social-youtube-url', label: 'Social: YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
+      // Brand identity — drives the Brand Assets page swatches + typography card.
+      // Leave any field blank to fall back to the built-in Jewett defaults
+      // (#D22630 / #78787F / #2A2A2A, Politica / Lato).
+      { key: 'brand-heading-font', label: 'Brand: Heading Font', type: 'text', placeholder: 'Politica', helpText: 'Font family name used for headings on the Brand Assets page', icon: 'FileType' },
+      { key: 'brand-body-font', label: 'Brand: Body Font', type: 'text', placeholder: 'Lato', helpText: 'Font family name used for body copy on the Brand Assets page', icon: 'FileType' },
+      { key: 'brand-color-1-name', label: 'Brand: Color 1 Name', type: 'text', placeholder: 'Jewett Red', icon: 'Palette' },
+      { key: 'brand-color-1-hex', label: 'Brand: Color 1 Hex', type: 'color', helpText: 'Primary brand color shown first on the Brand Assets page' },
+      { key: 'brand-color-2-name', label: 'Brand: Color 2 Name', type: 'text', placeholder: 'Jewett Grey', icon: 'Palette' },
+      { key: 'brand-color-2-hex', label: 'Brand: Color 2 Hex', type: 'color' },
+      { key: 'brand-color-3-name', label: 'Brand: Color 3 Name', type: 'text', placeholder: 'Jewett Dark', icon: 'Palette' },
+      { key: 'brand-color-3-hex', label: 'Brand: Color 3 Hex', type: 'color' },
     ],
   },
   coreValues: {
