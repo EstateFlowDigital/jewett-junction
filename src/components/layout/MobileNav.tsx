@@ -31,7 +31,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: "Dashboard", href: "/jewett-junction/dashboard", icon: LayoutDashboard },
+  { title: "Dashboard", href: "/jewett-junction", icon: LayoutDashboard },
   { title: "Safety", href: "/jewett-junction/safety", icon: Shield },
   { title: "HR", href: "/jewett-junction/hr", icon: Users },
   { title: "IT Helpdesk", href: "/jewett-junction/it-helpdesk", icon: Monitor },
@@ -79,7 +79,7 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
           {/* Header */}
           <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
             <a
-              href="/jewett-junction/dashboard"
+              href="/jewett-junction"
               className="flex items-center gap-3"
               onClick={() => setIsOpen(false)}
             >
@@ -95,7 +95,12 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             <ul className="space-y-0.5">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentPath.startsWith(item.href);
+                // Dashboard lives at the bare mount root, so startsWith would
+                // match every other nav item (they all begin with the mount).
+                // Use strict equality for the root and prefix-match for the rest.
+                const isActive = item.href === "/jewett-junction"
+                  ? currentPath === "/jewett-junction" || currentPath === "/jewett-junction/"
+                  : currentPath.startsWith(item.href);
 
                 return (
                   <li key={item.href}>

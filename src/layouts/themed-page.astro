@@ -14,7 +14,7 @@ interface Props {
 const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
 
 // Map section to full path for MobileNav
-const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/jewett-junction/dashboard';
+const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/jewett-junction';
 ---
 
 <html lang="en" class="dark">
@@ -43,7 +43,7 @@ const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/je
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </a>
       <nav class="flex-1 flex flex-col items-center gap-2 overflow-y-auto py-1">
-        <a href="/jewett-junction/dashboard" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'dashboard' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} title="Dashboard">
+        <a href="/jewett-junction" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'dashboard' || !currentSection ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} title="Dashboard">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
         </a>
         <a href="/jewett-junction/safety" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'safety' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} title="Safety">

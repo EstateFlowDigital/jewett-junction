@@ -223,7 +223,7 @@ export function NotificationsContent() {
             Preferences
           </a>
           <a
-            href="/jewett-junction/dashboard"
+            href="/jewett-junction"
             className="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors"
           >
             <ChevronRight className="w-4 h-4 rotate-180" aria-hidden="true" />

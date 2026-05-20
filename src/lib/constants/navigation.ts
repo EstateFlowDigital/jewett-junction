@@ -23,7 +23,7 @@ export interface NavItem {
 export const mainNavItems: NavItem[] = [
   {
     title: "Dashboard",
-    href: "/jewett-junction/dashboard",
+    href: "/jewett-junction",
     icon: LayoutDashboard,
     description: "Your command center",
   },
