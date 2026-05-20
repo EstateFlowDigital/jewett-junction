@@ -2,7 +2,6 @@ import { defineMiddleware } from 'astro:middleware';
 import { parseAllowlist, isAllowedIp } from './lib/ip-allowlist';
 
 const GATED_PREFIXES = [
-  '/dashboard',
   '/jewett-junction',
   '/admin',
   '/announcements',

@@ -180,9 +180,11 @@ const VALID_FIELDS: Record<string, string[]> = {
 };
 
 // Filter fields to only include valid ones for the collection.
-// Two-source allowlist: live Webflow schema (preferred — picks up newly added
-// fields automatically) PLUS the hardcoded VALID_FIELDS map (fallback when
-// the schema fetch fails so existing behaviour never regresses).
+// Source of truth = the live Webflow schema. When the schema fetch succeeds,
+// we ONLY send fields that exist on the CMS — sending an unknown field makes
+// Webflow reject the whole PATCH with a validation error, so dropping
+// out-of-schema fields silently is the only way the rest of the save can land.
+// VALID_FIELDS is the fallback used only when the schema fetch fails.
 async function filterValidFields(
   collection: string,
   fields: Record<string, any>,
@@ -195,11 +197,22 @@ async function filterValidFields(
   }
 
   const hardcoded = VALID_FIELDS[collection];
-  // Union the two lists — anything in either source is allowed. If both are
-  // missing, fall back to "pass through any non-empty value" (legacy behaviour).
-  const merged = new Set<string>([...(liveSlugs || []), ...(hardcoded || [])]);
+  // Prefer live schema when available; otherwise fall back to hardcoded list.
+  const allowed = liveSlugs && liveSlugs.length > 0
+    ? new Set<string>(liveSlugs)
+    : new Set<string>(hardcoded || []);
 
-  if (merged.size === 0) {
+  // Developer hint: hardcoded entries we've added but the CMS schema doesn't
+  // know about yet. Logged once per save so we notice when our code is ahead
+  // of Webflow Designer.
+  if (liveSlugs && hardcoded) {
+    const missing = hardcoded.filter((s) => !allowed.has(s));
+    if (missing.length > 0) {
+      console.warn(`[items] collection "${collection}" — fields in code but not in Webflow schema:`, missing);
+    }
+  }
+
+  if (allowed.size === 0) {
     return Object.fromEntries(
       Object.entries(fields).filter(([_, value]) => value !== undefined && value !== null && value !== ''),
     );
@@ -208,7 +221,7 @@ async function filterValidFields(
   return Object.fromEntries(
     Object.entries(fields).filter(([key, value]) => {
       const hasValue = value !== undefined && value !== null && value !== '';
-      return merged.has(key) && hasValue;
+      return allowed.has(key) && hasValue;
     }),
   );
 }
