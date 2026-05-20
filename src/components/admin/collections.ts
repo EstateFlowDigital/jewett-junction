@@ -37,17 +37,24 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-blue-500 to-cyan-500',
     description: 'Company-wide announcements and news updates',
     fields: [
-      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter announcement title', icon: 'FileText' },
-      { key: 'content', label: 'Content', type: 'richtext', required: true, placeholder: 'Write your announcement content...', helpText: 'Supports basic HTML formatting' },
-      { key: 'image', label: 'Social Sharing Image', type: 'image', placeholder: 'https://example.com/image.jpg', helpText: 'Open Graph image used when the announcement is shared on social (recommended: 1200x630px). Used as a card fallback only when no Blog Body Image is set.', icon: 'Image' },
-      { key: 'blog-body-image', label: 'Thumbnail / Body Image', type: 'image', helpText: 'Landscape image (16:9). Used as the card thumbnail and the hero at the top of the detail page.', icon: 'Image' },
-      { key: 'author', label: 'Author', type: 'text', placeholder: 'e.g., HR Team, CEO Office', icon: 'Users' },
-      { key: 'news-category', label: 'News Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: 'Tag' },
-      { key: 'priority-level', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: 'Bell' },
-      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional: When should this announcement expire?', icon: 'Clock' },
-      { key: 'cta-text', label: 'Button Text', type: 'text', placeholder: 'e.g., Learn More, Register Now', icon: 'Zap' },
-      { key: 'cta-link', label: 'Button Link', type: 'url', placeholder: 'https://...', icon: 'Link' },
-      { key: 'is-pinned', label: 'Pin to Top', type: 'boolean', helpText: 'Pinned announcements appear first' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter announcement title', icon: 'FileText', group: 'Basics' },
+      { key: 'content', label: 'Content', type: 'richtext', required: true, placeholder: 'Write your announcement content...', helpText: 'Supports basic HTML formatting', group: 'Basics' },
+      { key: 'author', label: 'Author', type: 'text', placeholder: 'e.g., HR Team, CEO Office', icon: 'Users', group: 'Basics' },
+
+      // Images
+      { key: 'blog-body-image', label: 'Thumbnail / Body Image', type: 'image', helpText: 'Recommended: 1600×900px (16:9 landscape). Used as the card thumbnail and the hero at the top of the detail page.', icon: 'Image', group: 'Images' },
+      { key: 'image', label: 'Social Sharing Image', type: 'image', helpText: 'Recommended: 1200×630px. Open Graph image used when shared on social. Used as a card fallback only when no Body Image is set.', icon: 'Image', group: 'Images' },
+
+      // Categorization
+      { key: 'news-category', label: 'News Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: 'Tag', group: 'Categorization' },
+      { key: 'priority-level', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: 'Bell', group: 'Categorization' },
+      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'Optional — when should this announcement auto-hide?', icon: 'Clock', group: 'Categorization' },
+      { key: 'is-pinned', label: 'Pin to Top', type: 'boolean', helpText: 'Pinned announcements appear first', group: 'Categorization' },
+
+      // Call to Action
+      { key: 'cta-text', label: 'Button Text', type: 'text', placeholder: 'e.g., Learn More, Register Now', icon: 'Zap', group: 'Call to Action' },
+      { key: 'cta-link', label: 'Button Link', type: 'url', placeholder: 'https://...', icon: 'Link', group: 'Call to Action' },
     ]
   },
   events: {
@@ -57,18 +64,23 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-indigo-500 to-purple-500',
     description: 'Company events, meetings, and training sessions',
     fields: [
-      { key: 'name', label: 'Event Title', type: 'text', required: true, placeholder: 'Enter event name', icon: 'Calendar' },
-      { key: 'event-date', label: 'Start Date & Time', type: 'datetime', required: true, icon: 'Clock' },
-      { key: 'end-date', label: 'End Date & Time', type: 'datetime', helpText: 'Optional for multi-day events', icon: 'Clock' },
-      { key: 'banner-image', label: 'Event Banner', type: 'image', placeholder: 'https://example.com/banner.jpg', helpText: 'Recommended: 1920x600px', icon: 'Image' },
-      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Main Conference Room, Building A', icon: 'MapPin' },
-      { key: 'virtual-meeting-link', label: 'Virtual Meeting Link', type: 'url', placeholder: 'Teams/Zoom link', helpText: 'For virtual or hybrid events', icon: 'Video' },
-      { key: 'event-category', label: 'Event Type', type: 'select', options: ['All-Hands Meeting', 'Training', 'HR Session', 'Safety Meeting', 'Social Event', 'Workshop', 'Webinar', 'Holiday'], icon: 'Tag' },
-      { key: 'description', label: 'Description', type: 'richtext', placeholder: 'Describe the event...', helpText: 'Include agenda, what to bring, etc.' },
-      { key: 'max-capacity', label: 'Max Capacity', type: 'number', placeholder: 'Leave empty for unlimited', icon: 'Users' },
-      { key: 'registration-link', label: 'Registration Link', type: 'url', placeholder: 'https://...', icon: 'Link' },
-      { key: 'mandatory-attendance', label: 'Mandatory Attendance', type: 'boolean', helpText: 'Mark if attendance is required' },
-      { key: 'virtual-event', label: 'Virtual Event', type: 'boolean', helpText: 'Is this a virtual/online event?' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter event name', icon: 'Calendar', group: 'Basics' },
+      { key: 'event-category', label: 'Event Type', type: 'select', options: ['All-Hands Meeting', 'Training', 'HR Session', 'Safety Meeting', 'Social Event', 'Workshop', 'Webinar', 'Holiday'], icon: 'Tag', group: 'Basics' },
+      { key: 'description', label: 'Description', type: 'richtext', placeholder: 'Describe the event...', helpText: 'Include agenda, what to bring, etc.', group: 'Basics' },
+      { key: 'banner-image', label: 'Event Banner', type: 'image', helpText: 'Recommended: 1920×600px (wide banner). Shown at the top of the event page.', icon: 'Image', group: 'Basics' },
+
+      // When & Where
+      { key: 'event-date', label: 'Start Date & Time', type: 'datetime', required: true, icon: 'Clock', group: 'When & Where' },
+      { key: 'end-date', label: 'End Date & Time', type: 'datetime', helpText: 'Optional — fill in for multi-day events', icon: 'Clock', group: 'When & Where' },
+      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Main Conference Room, Building A', icon: 'MapPin', group: 'When & Where' },
+      { key: 'virtual-event', label: 'Virtual Event', type: 'boolean', helpText: 'Is this a virtual or online event?', group: 'When & Where' },
+      { key: 'virtual-meeting-link', label: 'Virtual Meeting Link', type: 'url', placeholder: 'Teams/Zoom link', helpText: 'Fill in if this is a virtual or hybrid event', icon: 'Video', group: 'When & Where' },
+
+      // Registration
+      { key: 'max-capacity', label: 'Max Capacity', type: 'number', placeholder: 'Leave empty for unlimited', icon: 'Users', group: 'Registration' },
+      { key: 'registration-link', label: 'Registration Link', type: 'url', placeholder: 'https://...', icon: 'Link', group: 'Registration' },
+      { key: 'mandatory-attendance', label: 'Mandatory Attendance', type: 'boolean', helpText: 'Mark if attendance is required', group: 'Registration' },
     ]
   },
   jobPostings: {
@@ -78,22 +90,29 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-emerald-500 to-teal-500',
     description: 'Open positions and career opportunities',
     fields: [
-      { key: 'name', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Project Manager', icon: 'Briefcase' },
-      { key: 'job-department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: 'Building' },
-      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Columbus, OH', icon: 'MapPin' },
-      { key: 'employment-type', label: 'Employment Type', type: 'select', options: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'], icon: 'Clock' },
-      { key: 'experience-level', label: 'Experience Level', type: 'select', options: ['Entry Level', 'Mid Level', 'Senior', 'Lead', 'Manager', 'Director', 'Executive'], icon: 'Award' },
-      { key: 'salary-min', label: 'Salary Range Min ($)', type: 'number', placeholder: '50000', icon: 'DollarSign' },
-      { key: 'salary-max', label: 'Salary Range Max ($)', type: 'number', placeholder: '75000', icon: 'DollarSign' },
-      { key: 'description', label: 'Job Description', type: 'richtext', required: true, placeholder: 'Describe the role and responsibilities...', helpText: 'Be specific about day-to-day duties' },
-      { key: 'requirements', label: 'Requirements', type: 'richtext', placeholder: 'List qualifications, skills, certifications...', helpText: 'Include must-haves and nice-to-haves' },
-      { key: 'benefits', label: 'Benefits Summary', type: 'textarea', placeholder: '401k, health insurance, PTO...', helpText: 'Highlight key benefits', icon: 'Star' },
-      { key: 'referral-bonus', label: 'Referral Bonus ($)', type: 'number', placeholder: '500', icon: 'DollarSign' },
-      { key: 'apply-link', label: 'Application Link', type: 'url', placeholder: 'JotForm or external link', icon: 'Link' },
-      { key: 'urgency', label: 'Hiring Urgency', type: 'select', options: ['Normal', 'Priority', 'Urgent'], icon: 'Zap' },
-      { key: 'job-is-active', label: 'Active Posting', type: 'boolean', helpText: 'Deactivate to hide from listings' },
-      { key: 'is-remote', label: 'Remote Eligible', type: 'boolean', helpText: 'Can this role be done remotely?' },
-      { key: 'featured', label: 'Featured Position', type: 'boolean', helpText: 'Show prominently on careers page' },
+      // Basics
+      { key: 'name', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Project Manager', icon: 'Briefcase', group: 'Basics' },
+      { key: 'job-department', label: 'Department', type: 'select', options: ['Commercial', 'Safety', 'Engineering', 'Operations', 'Admin', 'HR', 'IT', 'Finance', 'Marketing', 'Executive'], icon: 'Building', group: 'Basics' },
+      { key: 'location', label: 'Location', type: 'text', placeholder: 'e.g., Columbus, OH', icon: 'MapPin', group: 'Basics' },
+      { key: 'employment-type', label: 'Employment Type', type: 'select', options: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Temporary'], icon: 'Clock', group: 'Basics' },
+      { key: 'experience-level', label: 'Experience Level', type: 'select', options: ['Entry Level', 'Mid Level', 'Senior', 'Lead', 'Manager', 'Director', 'Executive'], icon: 'Award', group: 'Basics' },
+
+      // Compensation
+      { key: 'salary-min', label: 'Salary Range — Min ($)', type: 'number', placeholder: '50000', icon: 'DollarSign', group: 'Compensation' },
+      { key: 'salary-max', label: 'Salary Range — Max ($)', type: 'number', placeholder: '75000', icon: 'DollarSign', group: 'Compensation' },
+      { key: 'referral-bonus', label: 'Referral Bonus ($)', type: 'number', placeholder: '500', helpText: 'Leaves blank to use the default from Site Settings', icon: 'DollarSign', group: 'Compensation' },
+      { key: 'benefits', label: 'Benefits Summary', type: 'textarea', placeholder: '401k, health insurance, PTO...', helpText: 'Highlight key benefits', icon: 'Star', group: 'Compensation' },
+
+      // Description
+      { key: 'description', label: 'Job Description', type: 'richtext', required: true, placeholder: 'Describe the role and responsibilities...', helpText: 'Be specific about day-to-day duties', group: 'Description' },
+      { key: 'requirements', label: 'Requirements', type: 'richtext', placeholder: 'List qualifications, skills, certifications...', helpText: 'Include must-haves and nice-to-haves', group: 'Description' },
+
+      // Display & Status
+      { key: 'apply-link', label: 'Application Link', type: 'url', placeholder: 'JotForm or external link', icon: 'Link', group: 'Display & Status' },
+      { key: 'urgency', label: 'Hiring Urgency', type: 'select', options: ['Normal', 'Priority', 'Urgent'], icon: 'Zap', group: 'Display & Status' },
+      { key: 'job-is-active', label: 'Active Posting', type: 'boolean', helpText: 'Deactivate to hide from listings without deleting', group: 'Display & Status' },
+      { key: 'is-remote', label: 'Remote Eligible', type: 'boolean', helpText: 'Can this role be done remotely?', group: 'Display & Status' },
+      { key: 'featured', label: 'Featured Position', type: 'boolean', helpText: 'Show prominently on the Careers page', group: 'Display & Status' },
     ]
   },
   cultureStories: {
@@ -103,18 +122,25 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-pink-500 to-rose-500',
     description: 'Employee spotlights, team wins, and company culture',
     fields: [
-      { key: 'name', label: 'Story Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: 'Star' },
-      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], icon: 'Tag' },
-      { key: 'featured-image', label: 'Featured Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Photo of employee or team.', icon: 'Image' },
-      { key: 'video-url', label: 'Video URL', type: 'url', placeholder: 'YouTube or Vimeo link', helpText: 'Optional video content', icon: 'Video' },
-      { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', helpText: 'Write the full story content' },
-      { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards' },
-      { key: 'person-name', label: 'Featured Person', type: 'text', placeholder: 'Name of employee being featured', icon: 'Users' },
-      { key: 'person-role', label: 'Their Role', type: 'text', placeholder: 'Job title', icon: 'Briefcase' },
-      { key: 'person-tenure', label: 'Years at Company', type: 'text', placeholder: 'e.g., 5 years', icon: 'Clock' },
-      { key: 'quote', label: 'Featured Quote', type: 'textarea', placeholder: 'A memorable quote from the person', icon: 'FileText' },
-      { key: 'author', label: 'Written By', type: 'text', placeholder: 'Author name', icon: 'Users' },
-      { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on dashboard' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: 'Star', group: 'Basics' },
+      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], icon: 'Tag', group: 'Basics' },
+      { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards', group: 'Basics' },
+      { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', group: 'Basics' },
+
+      // Media
+      { key: 'featured-image', label: 'Featured Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Photo of employee or team.', icon: 'Image', group: 'Media' },
+      { key: 'video-url', label: 'Video URL', type: 'url', placeholder: 'YouTube or Vimeo link', helpText: 'Optional video content', icon: 'Video', group: 'Media' },
+
+      // Featured Person
+      { key: 'person-name', label: 'Featured Person', type: 'text', placeholder: 'Name of employee being featured', icon: 'Users', group: 'Featured Person' },
+      { key: 'person-role', label: 'Their Role', type: 'text', placeholder: 'Job title', icon: 'Briefcase', group: 'Featured Person' },
+      { key: 'person-tenure', label: 'Years at Company', type: 'text', placeholder: 'e.g., 5 years', icon: 'Clock', group: 'Featured Person' },
+      { key: 'quote', label: 'Featured Quote', type: 'textarea', placeholder: 'A memorable quote from the person', icon: 'FileText', group: 'Featured Person' },
+
+      // Publishing
+      { key: 'author', label: 'Written By', type: 'text', placeholder: 'Author name', icon: 'Users', group: 'Publishing' },
+      { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on the dashboard Culture Corner', group: 'Publishing' },
     ]
   },
   employees: {
@@ -124,22 +150,29 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-cyan-500 to-blue-500',
     description: 'Employee directory and profiles',
     fields: [
-      { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: 'Users' },
-      { key: 'photo', label: 'Profile Photo', type: 'image', helpText: 'Recommended: 400×400px (square). Used on the employee directory.', icon: 'Image' },
-      { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase' },
-      { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'HR', 'Marketing', 'Office Operations'], icon: 'Building' },
-      { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: 'MapPin' },
-      { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail' },
-      { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: 'e.g., 614-555-0100', icon: 'Phone' },
-      { key: 'extension', label: 'Phone Extension', type: 'text', placeholder: 'ext. 123', icon: 'Phone' },
-      { key: 'linkedin-url', label: 'LinkedIn Profile', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin' },
-      { key: 'start-date', label: 'Start Date', type: 'datetime', helpText: 'When did they join the company?', icon: 'Calendar' },
-      { key: 'bio', label: 'Bio / About', type: 'textarea', placeholder: 'Brief bio or description...', helpText: 'Professional background, interests, etc.' },
-      { key: 'skills', label: 'Skills & Expertise', type: 'text', placeholder: 'e.g., Project Management, OSHA, AutoCAD', helpText: 'Comma-separated list', icon: 'Award' },
-      { key: 'certifications', label: 'Certifications', type: 'text', placeholder: 'e.g., PMP, LEED AP, CPA', icon: 'Award' },
-      { key: 'is-featured', label: 'Featured Employee', type: 'boolean', helpText: 'Show on homepage spotlight' },
-      { key: 'leadership-team', label: 'Leadership Team', type: 'boolean', helpText: 'Part of leadership/management' },
-      { key: 'page-contact-for', label: 'Page Contact For', type: 'text', placeholder: 'HR, Safety, IT, Marketing', helpText: 'Comma-separated list — this person becomes the primary contact card on each listed page. Valid values: HR, Safety, IT, Marketing. Case-insensitive. Leave blank if not a page lead.', icon: 'Star' },
+      // Basics
+      { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: 'Users', group: 'Basics' },
+      { key: 'photo', label: 'Profile Photo', type: 'image', helpText: 'Recommended: 400×400px (square). Used on the employee directory.', icon: 'Image', group: 'Basics' },
+      { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase', group: 'Basics' },
+      { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'HR', 'Marketing', 'Office Operations'], icon: 'Building', group: 'Basics' },
+
+      // Contact
+      { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail', group: 'Contact' },
+      { key: 'phone', label: 'Work Phone', type: 'tel', placeholder: 'e.g., 614-555-0100', icon: 'Phone', group: 'Contact' },
+      { key: 'extension', label: 'Phone Extension', type: 'text', placeholder: 'ext. 123', icon: 'Phone', group: 'Contact' },
+      { key: 'office-location', label: 'Office Location', type: 'text', placeholder: 'e.g., Columbus HQ', icon: 'MapPin', group: 'Contact' },
+      { key: 'linkedin-url', label: 'LinkedIn Profile', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin', group: 'Contact' },
+
+      // Background
+      { key: 'start-date', label: 'Start Date', type: 'datetime', helpText: 'When did they join the company?', icon: 'Calendar', group: 'Background' },
+      { key: 'bio', label: 'Bio / About', type: 'textarea', placeholder: 'Brief bio or description...', helpText: 'Professional background, interests, etc.', group: 'Background' },
+      { key: 'skills', label: 'Skills & Expertise', type: 'text', placeholder: 'e.g., Project Management, OSHA, AutoCAD', helpText: 'Comma-separated list', icon: 'Award', group: 'Background' },
+      { key: 'certifications', label: 'Certifications', type: 'text', placeholder: 'e.g., PMP, LEED AP, CPA', icon: 'Award', group: 'Background' },
+
+      // Display & Roles
+      { key: 'is-featured', label: 'Featured Employee', type: 'boolean', helpText: 'Show on homepage spotlight', group: 'Display & Roles' },
+      { key: 'leadership-team', label: 'Leadership Team', type: 'boolean', helpText: 'Part of leadership/management', group: 'Display & Roles' },
+      { key: 'page-contact-for', label: 'Page Contact For', type: 'text', placeholder: 'HR, Safety, IT, Marketing', helpText: 'Comma-separated list — this person becomes the primary contact card on each listed page. Valid values: HR, Safety, IT, Marketing. Case-insensitive. Leave blank if not a page lead.', icon: 'Star', group: 'Display & Roles' },
     ]
   },
   resources: {
@@ -149,19 +182,24 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     gradient: 'from-amber-500 to-orange-500',
     description: 'Documents, links, and helpful resources',
     fields: [
-      { key: 'name', label: 'Resource Name', type: 'text', required: true, placeholder: 'e.g., Employee Handbook', icon: 'FileText' },
-      { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', helpText: 'Recommended: 600×600px (square). Used as the resource card preview.', icon: 'Image' },
-      { key: 'resource-category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: 'Tag' },
-      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content' },
-      { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: 'FileText' },
-      { key: 'file', label: 'Document File (PDF)', type: 'file', helpText: 'Upload a PDF — employees can preview in-browser and download', icon: 'FileText' },
-      { key: 'external-link', label: 'External Link', type: 'url', placeholder: 'https://...', helpText: 'Use instead of file upload for third-party resources', icon: 'Link' },
-      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText' },
-      { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock' },
-      { key: 'version', label: 'Version', type: 'text', placeholder: 'e.g., v2.1', icon: 'Tag' },
-      { key: 'audience', label: 'Target Audience', type: 'select', options: ['All Employees', 'Field Staff', 'Office Staff', 'Management', 'New Hires', 'HR Only'], icon: 'Users' },
-      { key: 'is-required', label: 'Required Reading', type: 'boolean', helpText: 'Is this required for all employees?' },
-      { key: 'is-new', label: 'Mark as New', type: 'boolean', helpText: 'Show "New" badge' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Employee Handbook', icon: 'FileText', group: 'Basics' },
+      { key: 'resource-category', label: 'Category', type: 'select', options: ['Safety', 'HR Policies', 'Benefits', 'IT Support', 'Training', 'Forms', 'Templates', 'Procedures', 'Other'], icon: 'Tag', group: 'Basics' },
+      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this resource for?', helpText: 'Brief description of the content', group: 'Basics' },
+      { key: 'thumbnail', label: 'Thumbnail Image', type: 'image', helpText: 'Recommended: 600×600px (square). Used as the resource card preview.', icon: 'Image', group: 'Basics' },
+
+      // File / Link
+      { key: 'file-type', label: 'File Type', type: 'select', options: ['PDF', 'Word Doc', 'Excel', 'PowerPoint', 'Video', 'Web Link', 'Form', 'Other'], icon: 'FileText', group: 'File / Link' },
+      { key: 'file', label: 'Document File (PDF)', type: 'file', helpText: 'Upload a PDF — employees can preview in-browser and download', icon: 'FileText', group: 'File / Link' },
+      { key: 'external-link', label: 'External Link', type: 'url', placeholder: 'https://...', helpText: 'Use instead of file upload for third-party resources', icon: 'Link', group: 'File / Link' },
+      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText', group: 'File / Link' },
+
+      // Metadata
+      { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock', group: 'Metadata' },
+      { key: 'version', label: 'Version', type: 'text', placeholder: 'e.g., v2.1', icon: 'Tag', group: 'Metadata' },
+      { key: 'audience', label: 'Target Audience', type: 'select', options: ['All Employees', 'Field Staff', 'Office Staff', 'Management', 'New Hires', 'HR Only'], icon: 'Users', group: 'Metadata' },
+      { key: 'is-required', label: 'Required Reading', type: 'boolean', helpText: 'Required for all employees in the target audience', group: 'Metadata' },
+      { key: 'is-new', label: 'Mark as New', type: 'boolean', helpText: 'Show "New" badge on the resource card', group: 'Metadata' },
     ]
   },
   hrContent: {
@@ -172,18 +210,23 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'hr-content',
     description: 'HR policies, benefits, and employee resources',
     fields: [
-      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., PTO Policy', icon: 'FileText' },
-      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Policy', 'Benefit', 'Form', 'FAQ', 'Announcement', 'Training', 'Procedure'], icon: 'Tag' },
-      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Upload an SVG, PNG, or WebP. For dashboard tiles, prefer a single-color SVG and pair it with the Icon Color field below.', icon: 'Image' },
-      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
-      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...', helpText: 'Shows in card preview' },
-      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full policy or content text...' },
-      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', helpText: 'Link to PDF or external document', icon: 'Link' },
-      { key: 'effective-date', label: 'Effective Date', type: 'datetime', helpText: 'When does this take effect?', icon: 'Calendar' },
-      { key: 'applies-to', label: 'Applies To', type: 'select', options: ['All Employees', 'Full-time', 'Part-time', 'Management', 'Field Staff', 'Office Staff'], icon: 'Users' },
-      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
-      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on HR page' },
-      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., PTO Policy', icon: 'FileText', group: 'Basics' },
+      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Policy', 'Benefit', 'Form', 'FAQ', 'Announcement', 'Training', 'Procedure'], icon: 'Tag', group: 'Basics' },
+      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...', helpText: 'Shows in card preview', group: 'Basics' },
+      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full policy or content text...', group: 'Basics' },
+      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', helpText: 'Link to PDF or external document', icon: 'Link', group: 'Basics' },
+
+      // Icon & Appearance
+      { key: 'icon', label: 'Icon Image', type: 'image', helpText: 'Recommended: 64×64px (square SVG/PNG). For dashboard tiles, prefer a single-color SVG and pair with the Icon Color field below.', icon: 'Image', group: 'Icon & Appearance' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard. Leave blank to use the default theme color.', group: 'Icon & Appearance' },
+
+      // Metadata
+      { key: 'effective-date', label: 'Effective Date', type: 'datetime', helpText: 'When does this take effect?', icon: 'Calendar', group: 'Metadata' },
+      { key: 'applies-to', label: 'Applies To', type: 'select', options: ['All Employees', 'Full-time', 'Part-time', 'Management', 'Field Staff', 'Office Staff'], icon: 'Users', group: 'Metadata' },
+      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Metadata' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on the HR page', group: 'Metadata' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site', group: 'Metadata' },
     ]
   },
   safetyContent: {
@@ -194,20 +237,25 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'safety-content',
     description: 'Safety protocols, training, and alerts',
     fields: [
-      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Fall Protection Protocol', icon: 'FileText' },
-      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Alert', 'Training', 'Protocol', 'Certification', 'Incident Report', 'Best Practice', 'Equipment'], icon: 'Tag' },
-      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
-      { key: 'image', label: 'Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Used on safety cards.', icon: 'Image' },
-      { key: 'severity', label: 'Severity Level', type: 'select', options: ['Info', 'Warning', 'Critical', 'Emergency'], icon: 'AlertCircle' },
-      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...' },
-      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full safety content...' },
-      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', icon: 'Link' },
-      { key: 'video-link', label: 'Training Video', type: 'url', placeholder: 'YouTube or Vimeo link', icon: 'Video' },
-      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'When does this expire?', icon: 'Clock' },
-      { key: 'required-for', label: 'Required For', type: 'select', options: ['All Employees', 'Field Workers', 'Supervisors', 'New Hires', 'Specific Trades'], icon: 'Users' },
-      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1' },
-      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently' },
-      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Fall Protection Protocol', icon: 'FileText', group: 'Basics' },
+      { key: 'content-type', label: 'Content Type', type: 'select', options: ['Alert', 'Training', 'Protocol', 'Certification', 'Incident Report', 'Best Practice', 'Equipment'], icon: 'Tag', group: 'Basics' },
+      { key: 'severity', label: 'Severity Level', type: 'select', options: ['Info', 'Warning', 'Critical', 'Emergency'], icon: 'AlertCircle', group: 'Basics' },
+      { key: 'description', label: 'Short Description', type: 'textarea', placeholder: 'Brief summary...', group: 'Basics' },
+      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Full safety content...', group: 'Basics' },
+
+      // Media & Links
+      { key: 'image', label: 'Image', type: 'image', helpText: 'Recommended: 1200×800px (3:2 landscape). Used on safety cards.', icon: 'Image', group: 'Media & Links' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard. Leave blank to use the default theme color.', group: 'Media & Links' },
+      { key: 'document-link', label: 'Document Link', type: 'url', placeholder: 'https://...', icon: 'Link', group: 'Media & Links' },
+      { key: 'video-link', label: 'Training Video', type: 'url', placeholder: 'YouTube or Vimeo link', icon: 'Video', group: 'Media & Links' },
+
+      // Metadata
+      { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'When does this expire?', icon: 'Clock', group: 'Metadata' },
+      { key: 'required-for', label: 'Required For', type: 'select', options: ['All Employees', 'Field Workers', 'Supervisors', 'New Hires', 'Specific Trades'], icon: 'Users', group: 'Metadata' },
+      { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Metadata' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on the Safety page', group: 'Metadata' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site', group: 'Metadata' },
     ]
   },
   itKnowledgeBase: {
@@ -218,20 +266,27 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'it-knowledge-base',
     description: 'IT help articles, guides, and FAQs',
     fields: [
-      { key: 'name', label: 'Article Title', type: 'text', required: true, placeholder: 'e.g., How to Reset Your Password', icon: 'FileText' },
-      { key: 'article-type', label: 'Article Type', type: 'select', options: ['FAQ', 'How-To Guide', 'Troubleshooting', 'Software', 'Hardware', 'Security', 'Policy'], icon: 'Tag' },
-      { key: 'icon', label: 'Icon Image', type: 'image', placeholder: 'https://example.com/icon.png', helpText: 'Upload an SVG, PNG, or WebP. Pair with the Icon Color field for tinted dashboard tiles.', icon: 'Image' },
-      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard (hex). Leave blank to use the default theme color.' },
-      { key: 'summary', label: 'Summary', type: 'textarea', placeholder: 'Brief description of this article...' },
-      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Step-by-step instructions...' },
-      { key: 'video-tutorial', label: 'Video Tutorial', type: 'url', placeholder: 'YouTube or Loom link', icon: 'Video' },
-      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'Link to software or file', icon: 'Link' },
-      { key: 'platform', label: 'Platform', type: 'select', options: ['Windows', 'Mac', 'Mobile', 'Web', 'All'], icon: 'Monitor' },
-      { key: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Intermediate', 'Advanced'], icon: 'Award' },
-      { key: 'views', label: 'View Count', type: 'number', placeholder: '0', helpText: 'Tracks article popularity' },
-      { key: 'helpful-votes', label: 'Helpful Votes', type: 'number', placeholder: '0' },
-      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show on IT Helpdesk homepage' },
-      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., How to Reset Your Password', icon: 'FileText', group: 'Basics' },
+      { key: 'article-type', label: 'Article Type', type: 'select', options: ['FAQ', 'How-To Guide', 'Troubleshooting', 'Software', 'Hardware', 'Security', 'Policy'], icon: 'Tag', group: 'Basics' },
+      { key: 'summary', label: 'Summary', type: 'textarea', placeholder: 'Brief description of this article...', helpText: 'Shows in card preview', group: 'Basics' },
+      { key: 'full-content', label: 'Full Content', type: 'richtext', placeholder: 'Step-by-step instructions...', group: 'Basics' },
+
+      // Media & Links
+      { key: 'icon', label: 'Icon Image', type: 'image', helpText: 'Recommended: 64×64px (square SVG/PNG). Pair with the Icon Color field for tinted dashboard tiles.', icon: 'Image', group: 'Media & Links' },
+      { key: 'icon-color', label: 'Icon Tile Color', type: 'color', helpText: 'Background color of the icon tile on the dashboard. Leave blank to use the default theme color.', group: 'Media & Links' },
+      { key: 'video-tutorial', label: 'Video Tutorial', type: 'url', placeholder: 'YouTube or Loom link', icon: 'Video', group: 'Media & Links' },
+      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'Link to software or file', icon: 'Link', group: 'Media & Links' },
+
+      // Metadata
+      { key: 'platform', label: 'Platform', type: 'select', options: ['Windows', 'Mac', 'Mobile', 'Web', 'All'], icon: 'Monitor', group: 'Metadata' },
+      { key: 'difficulty', label: 'Difficulty', type: 'select', options: ['Easy', 'Intermediate', 'Advanced'], icon: 'Award', group: 'Metadata' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show on the IT Helpdesk homepage', group: 'Metadata' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Visible on the site', group: 'Metadata' },
+
+      // Stats (auto-tracked)
+      { key: 'views', label: 'View Count', type: 'number', placeholder: '0', helpText: 'Tracks article popularity — usually auto-incremented', group: 'Stats' },
+      { key: 'helpful-votes', label: 'Helpful Votes', type: 'number', placeholder: '0', helpText: 'Employee upvotes on this article', group: 'Stats' },
     ]
   },
   marketingAssets: {
@@ -242,19 +297,26 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'marketing-assets',
     description: 'Brand assets, templates, and marketing materials',
     fields: [
-      { key: 'name', label: 'Asset Name', type: 'text', required: true, placeholder: 'e.g., Company Logo - Primary', icon: 'FileText' },
-      { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], helpText: 'Brand Assets page shows: Logo, Brand Guide. Letterhead & Forms shows: Letterhead, Template. Presentations shows: Presentation. Photo Library shows: Photo, Video.', icon: 'Tag' },
-      { key: 'thumbnail', label: 'Thumbnail', type: 'image', helpText: 'Recommended: 600×600px (square). Small preview on the asset grid.', icon: 'Image' },
-      { key: 'preview-image', label: 'Full Preview', type: 'image', helpText: 'Recommended: 1600×1067px. Shown when expanding an asset.', icon: 'Image' },
-      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this asset for?' },
-      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'https://...', icon: 'Link' },
-      { key: 'file-format', label: 'File Format', type: 'select', options: ['PNG', 'JPG', 'SVG', 'PDF', 'PPTX', 'DOCX', 'AI', 'PSD', 'MP4'], icon: 'FileText' },
-      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB' },
-      { key: 'usage-guidelines', label: 'Usage Guidelines', type: 'richtext', placeholder: 'How and when to use this asset...' },
-      { key: 'tags', label: 'Tags', type: 'text', placeholder: 'logo, primary, blue', helpText: 'Comma-separated keywords' },
-      { key: 'version', label: 'Version', type: 'text', placeholder: 'v1.0' },
-      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently' },
-      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Available for download' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Company Logo - Primary', icon: 'FileText', group: 'Basics' },
+      { key: 'asset-type', label: 'Asset Type', type: 'select', options: ['Logo', 'Template', 'Photo', 'Video', 'Presentation', 'Letterhead', 'Signage', 'Brand Guide'], helpText: 'Brand Assets page shows: Logo, Brand Guide. Letterhead & Forms shows: Letterhead, Template. Presentations shows: Presentation. Photo Library shows: Photo, Video.', icon: 'Tag', group: 'Basics' },
+      { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What is this asset for?', group: 'Basics' },
+
+      // Preview Images
+      { key: 'thumbnail', label: 'Thumbnail', type: 'image', helpText: 'Recommended: 600×600px (square). Small preview on the asset grid.', icon: 'Image', group: 'Preview Images' },
+      { key: 'preview-image', label: 'Full Preview', type: 'image', helpText: 'Recommended: 1600×1067px. Shown when expanding an asset.', icon: 'Image', group: 'Preview Images' },
+
+      // File
+      { key: 'download-link', label: 'Download Link', type: 'url', placeholder: 'https://...', helpText: 'Where employees can download this asset', icon: 'Link', group: 'File' },
+      { key: 'file-format', label: 'File Format', type: 'select', options: ['PNG', 'JPG', 'SVG', 'PDF', 'PPTX', 'DOCX', 'AI', 'PSD', 'MP4'], icon: 'FileText', group: 'File' },
+      { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', group: 'File' },
+      { key: 'version', label: 'Version', type: 'text', placeholder: 'v1.0', group: 'File' },
+
+      // Usage
+      { key: 'usage-guidelines', label: 'Usage Guidelines', type: 'richtext', placeholder: 'How and when to use this asset...', group: 'Usage' },
+      { key: 'tags', label: 'Tags', type: 'text', placeholder: 'logo, primary, blue', helpText: 'Comma-separated keywords for search', group: 'Usage' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on the Marketing Hub', group: 'Usage' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Available for download', group: 'Usage' },
     ]
   },
   submittedIdeas: {
@@ -265,17 +327,22 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'submitted-ideas',
     description: 'Employee suggestions and improvement ideas',
     fields: [
-      { key: 'name', label: 'Idea Title', type: 'text', required: true, placeholder: 'Brief title for the idea', icon: 'Lightbulb' },
-      { key: 'category', label: 'Category', type: 'select', options: ['Process Improvement', 'Safety', 'Cost Savings', 'Culture', 'Technology', 'Training', 'Other'], icon: 'Tag' },
-      { key: 'description', label: 'Full Description', type: 'richtext', placeholder: 'Detailed description of the idea...' },
-      { key: 'submitted-by', label: 'Submitted By', type: 'text', placeholder: 'Employee name', icon: 'Users' },
-      { key: 'email', label: 'Submitter Email', type: 'email', placeholder: 'email@company.com', icon: 'Mail' },
-      { key: 'department', label: 'Department', type: 'text', placeholder: 'Which department?', icon: 'Building' },
-      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Approved', 'In Progress', 'Implemented', 'Declined'], icon: 'Tag' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['Low', 'Medium', 'High'], icon: 'Zap' },
-      { key: 'admin-notes', label: 'Admin Notes', type: 'richtext', placeholder: 'Internal notes about this idea...', helpText: 'Not visible to submitter' },
-      { key: 'votes', label: 'Votes', type: 'number', placeholder: '0', helpText: 'Employee upvotes' },
-      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Highlight this idea' },
+      // Submission
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Brief title for the idea', icon: 'Lightbulb', group: 'Submission' },
+      { key: 'category', label: 'Category', type: 'select', options: ['Process Improvement', 'Safety', 'Cost Savings', 'Culture', 'Technology', 'Training', 'Other'], helpText: 'Marketing/Resource requests come in under "Other" — check the description for the real category', icon: 'Tag', group: 'Submission' },
+      { key: 'description', label: 'Full Description', type: 'richtext', placeholder: 'Detailed description of the idea...', group: 'Submission' },
+
+      // Submitter
+      { key: 'submitted-by', label: 'Submitted By', type: 'text', placeholder: 'Employee name', icon: 'Users', group: 'Submitter' },
+      { key: 'email', label: 'Submitter Email', type: 'email', placeholder: 'email@company.com', icon: 'Mail', group: 'Submitter' },
+      { key: 'department', label: 'Department', type: 'text', placeholder: 'Which department?', icon: 'Building', group: 'Submitter' },
+
+      // Triage
+      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Approved', 'In Progress', 'Implemented', 'Declined'], icon: 'Tag', group: 'Triage' },
+      { key: 'priority', label: 'Priority', type: 'select', options: ['Low', 'Medium', 'High'], icon: 'Zap', group: 'Triage' },
+      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', placeholder: 'Internal notes about this idea...', helpText: 'Not visible to submitter', group: 'Triage' },
+      { key: 'votes', label: 'Votes', type: 'number', placeholder: '0', helpText: 'Employee upvotes', group: 'Triage' },
+      { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Highlight this idea in admin views', group: 'Triage' },
     ]
   },
   blogPosts: {
@@ -331,17 +398,26 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'blog-categories',
     description: 'Categories for organizing blog posts',
     fields: [
-      { key: 'name', label: 'Category Name', type: 'text', required: true, placeholder: 'Enter category name', icon: 'Tag' },
-      { key: 'main-image', label: 'Category Image', type: 'image', helpText: 'Image for this category', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'category-name-eyebrow-text', label: 'Eyebrow Text', type: 'text', placeholder: 'Small text above heading', icon: 'FileText' },
-      { key: 'category-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main category page heading...' },
-      { key: 'category-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for category card...' },
-      { key: 'category-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'category-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full category description...' },
-      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
-      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set by the Airtable integration', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter category name', icon: 'Tag', group: 'Basics' },
+      { key: 'category-name-eyebrow-text', label: 'Eyebrow Text', type: 'text', placeholder: 'Small text above heading', helpText: 'Small label shown above the page heading', icon: 'FileText', group: 'Basics' },
+
+      // Image
+      { key: 'main-image', label: 'Category Image', type: 'image', helpText: 'Recommended: 1600\u00d71067px (3:2 landscape). Used as the category hero.', icon: 'Image', group: 'Image' },
+      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Image' },
+
+      // Page Content
+      { key: 'category-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main category page heading...', group: 'Page Content' },
+      { key: 'category-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full category description...', group: 'Page Content' },
+
+      // Card Display
+      { key: 'category-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for category card...', group: 'Card Display' },
+      { key: 'category-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...', group: 'Card Display' },
+
+      // SEO & Sync
+      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50\u201360 chars)', icon: 'Tag', group: 'SEO & Sync' },
+      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150\u2013160 characters for search results', icon: 'Tag', group: 'SEO & Sync' },
+      { key: 'airtable-id', label: 'Airtable ID', type: 'text', helpText: 'Sync key \u2014 set automatically by the Airtable integration', icon: 'Tag', group: 'SEO & Sync' },
     ]
   },
   faqs: {
@@ -352,19 +428,28 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'frequently-asked-questions',
     description: 'Frequently asked questions',
     fields: [
-      { key: 'name', label: 'Question', type: 'text', required: true, placeholder: 'Enter the FAQ question', icon: 'CircleHelp' },
-      { key: 'main-image', label: 'Image', type: 'image', helpText: 'Optional image for this FAQ', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'faqs-card-title-h1', label: 'Card Title (H1)', type: 'richtext', placeholder: 'Title for FAQ card...' },
-      { key: 'faqs-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Subtitle for FAQ card...' },
-      { key: 'faqs-card-title-h3', label: 'Card Title (H3)', type: 'richtext', placeholder: 'Additional title for FAQ card...' },
-      { key: 'faq-short-answer', label: 'Short Answer', type: 'richtext', placeholder: 'Brief answer to the question...' },
-      { key: 'faq-long-answer', label: 'Long Answer', type: 'richtext', placeholder: 'Detailed answer with full explanation...' },
-      { key: 'faq-category', label: 'Category', type: 'select', options: ['General Construction Process', 'Regulatory Compliance & Site Preparation', 'Budget, Cost & Financing', 'Sustainability & Innovation', 'Construction Methodologies & Specialized Builds', 'Project Execution & Risk Management', 'Post-Construction & Maintenance'], icon: 'Tag' },
-      { key: 'faq-related-to-service', label: 'Related Service (ID)', type: 'text', helpText: 'Webflow item ID from the Services collection', icon: 'Link' },
-      { key: 'faq-related-to-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link' },
-      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Question & Answer
+      { key: 'name', label: 'Question', type: 'text', required: true, placeholder: 'Enter the FAQ question', icon: 'CircleHelp', group: 'Question & Answer' },
+      { key: 'faq-short-answer', label: 'Short Answer', type: 'richtext', placeholder: 'Brief answer to the question...', helpText: 'Shown on listing/accordion views', group: 'Question & Answer' },
+      { key: 'faq-long-answer', label: 'Long Answer', type: 'richtext', placeholder: 'Detailed answer with full explanation...', group: 'Question & Answer' },
+      { key: 'faq-category', label: 'Category', type: 'select', options: ['General Construction Process', 'Regulatory Compliance & Site Preparation', 'Budget, Cost & Financing', 'Sustainability & Innovation', 'Construction Methodologies & Specialized Builds', 'Project Execution & Risk Management', 'Post-Construction & Maintenance'], icon: 'Tag', group: 'Question & Answer' },
+
+      // Image
+      { key: 'main-image', label: 'Image', type: 'image', helpText: 'Optional. Recommended: 1200×800px (3:2 landscape).', icon: 'Image', group: 'Image' },
+      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Image' },
+
+      // Card Display
+      { key: 'faqs-card-title-h1', label: 'Card Title (H1)', type: 'richtext', placeholder: 'Title for FAQ card...', group: 'Card Display' },
+      { key: 'faqs-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Subtitle for FAQ card...', group: 'Card Display' },
+      { key: 'faqs-card-title-h3', label: 'Card Title (H3)', type: 'richtext', placeholder: 'Additional title for FAQ card...', group: 'Card Display' },
+
+      // Relationships
+      { key: 'faq-related-to-service', label: 'Related Service (ID)', type: 'text', helpText: 'Webflow item ID from the Services collection', icon: 'Link', group: 'Relationships' },
+      { key: 'faq-related-to-service-area', label: 'Related Service Area (ID)', type: 'text', helpText: 'Webflow item ID from the Service Areas collection', icon: 'Link', group: 'Relationships' },
+
+      // SEO
+      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50–60 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150–160 characters for search results', icon: 'Tag', group: 'SEO' },
     ]
   },
   services: {
@@ -375,21 +460,32 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'services',
     description: 'Company services offered',
     fields: [
-      { key: 'name', label: 'Service Name', type: 'text', required: true, placeholder: 'Enter service name', icon: 'FileText' },
-      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Image for this service', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'service-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main service page heading...' },
-      { key: 'service-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief description for the service page...' },
-      { key: 'service-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for service card...' },
-      { key: 'service-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for service card...' },
-      { key: 'service-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'service-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full service description...' },
-      { key: 'icon-svg-path-1', label: 'Icon SVG Path', type: 'text', placeholder: 'SVG path data for icon', icon: 'Star' },
-      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
-      { key: 'is-reversed', label: 'Is First', type: 'text', placeholder: 'Layout ordering flag' },
-      { key: 'line-visibility', label: 'Show Line', type: 'boolean', helpText: 'Toggle decorative line visibility' },
-      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter service name', icon: 'FileText', group: 'Basics' },
+      { key: 'sort-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Basics' },
+      { key: 'icon-svg-path-1', label: 'Icon SVG Path', type: 'text', placeholder: 'SVG path data for icon', helpText: 'Custom inline SVG path. Advanced — leave blank for default icon.', icon: 'Star', group: 'Basics' },
+
+      // Image
+      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Recommended: 1600×1067px (3:2 landscape). Hero image on the service page.', icon: 'Image', group: 'Image' },
+      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Image' },
+
+      // Page Content
+      { key: 'service-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main service page heading...', group: 'Page Content' },
+      { key: 'service-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief description for the service page...', group: 'Page Content' },
+      { key: 'service-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full service description...', group: 'Page Content' },
+
+      // Card Display
+      { key: 'service-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for service card...', group: 'Card Display' },
+      { key: 'service-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for service card...', group: 'Card Display' },
+      { key: 'service-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...', group: 'Card Display' },
+
+      // Layout (advanced)
+      { key: 'is-reversed', label: 'Layout — Is First', type: 'text', placeholder: 'Layout ordering flag', helpText: 'Advanced layout flag — leave as-is unless instructed', group: 'Layout' },
+      { key: 'line-visibility', label: 'Show Decorative Line', type: 'boolean', helpText: 'Toggle the decorative divider line', group: 'Layout' },
+
+      // SEO
+      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50–60 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150–160 characters for search results', icon: 'Tag', group: 'SEO' },
     ]
   },
   industries: {
@@ -400,20 +496,31 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'industries',
     description: 'Industries served',
     fields: [
-      { key: 'name', label: 'Industry Name', type: 'text', required: true, placeholder: 'Enter industry name', icon: 'Building' },
-      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Image for this industry', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'industries-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main industry page heading...' },
-      { key: 'industries-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief description for the industry page...' },
-      { key: 'industries-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for industry card...' },
-      { key: 'industries-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for industry card...' },
-      { key: 'industries-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'industries-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full industry description...' },
-      { key: 'svg-icon-path-1', label: 'SVG Icon Path', type: 'text', placeholder: 'SVG path data for icon', icon: 'Star' },
-      { key: 'industry-button', label: 'Button Text', type: 'text', placeholder: 'Button label', icon: 'Zap' },
-      { key: 'is-reversed', label: 'Is First', type: 'text', placeholder: 'Layout ordering flag' },
-      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter industry name', icon: 'Building', group: 'Basics' },
+      { key: 'industry-button', label: 'Button Text', type: 'text', placeholder: 'Button label', icon: 'Zap', group: 'Basics' },
+      { key: 'svg-icon-path-1', label: 'Icon SVG Path', type: 'text', placeholder: 'SVG path data for icon', helpText: 'Custom inline SVG path. Advanced — leave blank for default icon.', icon: 'Star', group: 'Basics' },
+
+      // Image
+      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Recommended: 1600×1067px (3:2 landscape). Hero image on the industry page.', icon: 'Image', group: 'Image' },
+      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Image' },
+
+      // Page Content
+      { key: 'industries-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main industry page heading...', group: 'Page Content' },
+      { key: 'industries-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief description for the industry page...', group: 'Page Content' },
+      { key: 'industries-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full industry description...', group: 'Page Content' },
+
+      // Card Display
+      { key: 'industries-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for industry card...', group: 'Card Display' },
+      { key: 'industries-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for industry card...', group: 'Card Display' },
+      { key: 'industries-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...', group: 'Card Display' },
+
+      // Layout (advanced)
+      { key: 'is-reversed', label: 'Layout — Is First', type: 'text', placeholder: 'Layout ordering flag', helpText: 'Advanced layout flag — leave as-is unless instructed', group: 'Layout' },
+
+      // SEO
+      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50–60 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150–160 characters for search results', icon: 'Tag', group: 'SEO' },
     ]
   },
   serviceAreas: {
@@ -424,18 +531,29 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'service-areas',
     description: 'Geographic service areas',
     fields: [
-      { key: 'name', label: 'Service Area Name', type: 'text', required: true, placeholder: 'Enter service area name', icon: 'MapPin' },
-      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Image for this area', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', icon: 'FileText' },
-      { key: 'service-area-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main service area page heading...' },
-      { key: 'service-area-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief description for the service area...' },
-      { key: 'service-area-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for area card...' },
-      { key: 'service-area-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for area card...' },
-      { key: 'service-area-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'service-area-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full service area description...' },
-      { key: 'is-reversed', label: 'Is First', type: 'text', placeholder: 'Layout ordering flag' },
-      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Enter service area name', icon: 'MapPin', group: 'Basics' },
+
+      // Image
+      { key: 'main-image', label: 'Main Image', type: 'image', helpText: 'Recommended: 1600×1067px (3:2 landscape). Hero image on the service area page.', icon: 'Image', group: 'Image' },
+      { key: 'main-image-alt-text', label: 'Image Alt Text', type: 'text', placeholder: 'Describe the image...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Image' },
+
+      // Page Content
+      { key: 'service-area-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Main service area page heading...', group: 'Page Content' },
+      { key: 'service-area-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief description for the service area...', group: 'Page Content' },
+      { key: 'service-area-long-description', label: 'Full Description', type: 'richtext', placeholder: 'Full service area description...', group: 'Page Content' },
+
+      // Card Display
+      { key: 'service-area-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for area card...', group: 'Card Display' },
+      { key: 'service-area-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for area card...', group: 'Card Display' },
+      { key: 'service-area-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...', group: 'Card Display' },
+
+      // Layout (advanced)
+      { key: 'is-reversed', label: 'Layout — Is First', type: 'text', placeholder: 'Layout ordering flag', helpText: 'Advanced layout flag — leave as-is unless instructed', group: 'Layout' },
+
+      // SEO
+      { key: 'seo-title-tag-2', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50–60 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description-2', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150–160 characters for search results', icon: 'Tag', group: 'SEO' },
     ]
   },
   teamMembers: {
@@ -446,20 +564,29 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'team-members',
     description: 'Company team members and staff',
     fields: [
-      { key: 'name', label: 'Member Name', type: 'text', required: true, placeholder: 'Full name', icon: 'Users' },
-      { key: 'title', label: 'Job Title', type: 'text', placeholder: 'e.g., Project Manager', icon: 'Briefcase' },
-      { key: 'main-image', label: 'Photo', type: 'image', helpText: 'Team member photo', icon: 'Image' },
-      { key: 'main-image-alt-text', label: 'Photo Alt Text', type: 'text', placeholder: 'Describe the photo...', icon: 'FileText' },
-      { key: 'team-members-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Member page heading...' },
-      { key: 'team-members-page-short-description', label: 'Short Description', type: 'richtext', placeholder: 'Brief description...' },
-      { key: 'team-members-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for member card...' },
-      { key: 'team-members-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for member card...' },
-      { key: 'team-members-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...' },
-      { key: 'team-members-long-description', label: 'Full Bio', type: 'richtext', placeholder: 'Full team member biography...' },
-      { key: 'linkedin-url', label: 'LinkedIn URL', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin' },
-      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
-      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', icon: 'Tag' },
-      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', icon: 'Tag' },
+      // Basics
+      { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'Full name', icon: 'Users', group: 'Basics' },
+      { key: 'title', label: 'Job Title', type: 'text', placeholder: 'e.g., Project Manager', icon: 'Briefcase', group: 'Basics' },
+      { key: 'linkedin-url', label: 'LinkedIn URL', type: 'url', placeholder: 'https://linkedin.com/in/...', icon: 'Linkedin', group: 'Basics' },
+      { key: 'sort-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Basics' },
+
+      // Photo
+      { key: 'main-image', label: 'Photo', type: 'image', helpText: 'Recommended: 800×800px (square). Team member headshot.', icon: 'Image', group: 'Photo' },
+      { key: 'main-image-alt-text', label: 'Photo Alt Text', type: 'text', placeholder: 'Describe the photo...', helpText: 'For accessibility and SEO', icon: 'FileText', group: 'Photo' },
+
+      // Page Content
+      { key: 'team-members-page-heading-h1', label: 'Page Heading (H1)', type: 'richtext', placeholder: 'Member page heading...', group: 'Page Content' },
+      { key: 'team-members-page-short-description', label: 'Page Description', type: 'richtext', placeholder: 'Brief description...', group: 'Page Content' },
+      { key: 'team-members-long-description', label: 'Full Bio', type: 'richtext', placeholder: 'Full team member biography...', group: 'Page Content' },
+
+      // Card Display
+      { key: 'team-members-card-title-h2', label: 'Card Title (H2)', type: 'richtext', placeholder: 'Title for member card...', group: 'Card Display' },
+      { key: 'team-members-card-title-h3', label: 'Card Subtitle (H3)', type: 'richtext', placeholder: 'Subtitle for member card...', group: 'Card Display' },
+      { key: 'team-members-card-short-description', label: 'Card Description', type: 'richtext', placeholder: 'Short description for card view...', group: 'Card Display' },
+
+      // SEO
+      { key: 'seo-title-tag', label: 'SEO Title', type: 'text', placeholder: 'SEO title tag', helpText: 'Used in the browser tab and search results (50–60 chars)', icon: 'Tag', group: 'SEO' },
+      { key: 'seo-meta-description', label: 'SEO Description', type: 'text', placeholder: 'SEO meta description', helpText: '150–160 characters for search results', icon: 'Tag', group: 'SEO' },
     ]
   },
   ourWork: {
@@ -544,20 +671,25 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     slug: 'job-applications',
     description: 'Inbound applications from the careers page',
     fields: [
-      { key: 'name', label: 'Display Name', type: 'text', required: true, placeholder: 'First Last \u2014 Position', helpText: 'Auto-populated on submit; edit to re-identify', icon: 'FileText' },
-      { key: 'first-name', label: 'First Name', type: 'text', required: true, icon: 'Users' },
-      { key: 'last-name', label: 'Last Name', type: 'text', required: true, icon: 'Users' },
-      { key: 'email', label: 'Email', type: 'email', required: true, icon: 'Mail' },
-      { key: 'phone', label: 'Phone', type: 'tel', icon: 'Phone' },
-      { key: 'position', label: 'Position Applied For', type: 'text', required: true, icon: 'Briefcase' },
-      { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'], icon: 'Clock' },
-      { key: 'referral-source', label: 'Referral Source', type: 'select', options: ['Employee Referral', 'LinkedIn', 'Indeed', 'Company Website', 'Career Fair', 'Other'], icon: 'Tag' },
-      { key: 'cover-letter', label: 'Cover Letter', type: 'richtext', placeholder: 'Applicant\u2019s message\u2026' },
-      { key: 'resume-file-name', label: 'Resume File Name', type: 'text', helpText: 'Filename only \u2014 file storage not yet wired', icon: 'FileText' },
-      { key: 'is-veteran', label: 'Military Veteran', type: 'boolean' },
-      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Contacted', 'Interviewing', 'Rejected', 'Hired'], icon: 'Zap' },
-      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', placeholder: 'Private reviewer notes\u2026', helpText: 'Not visible to applicant' },
-      { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock' },
+      // Applicant
+      { key: 'name', label: 'Display Name', type: 'text', required: true, placeholder: 'First Last \u2014 Position', helpText: 'Auto-populated on submit; edit to re-identify', icon: 'FileText', group: 'Applicant' },
+      { key: 'first-name', label: 'First Name', type: 'text', required: true, icon: 'Users', group: 'Applicant' },
+      { key: 'last-name', label: 'Last Name', type: 'text', required: true, icon: 'Users', group: 'Applicant' },
+      { key: 'email', label: 'Email', type: 'email', required: true, icon: 'Mail', group: 'Applicant' },
+      { key: 'phone', label: 'Phone', type: 'tel', icon: 'Phone', group: 'Applicant' },
+      { key: 'is-veteran', label: 'Military Veteran', type: 'boolean', group: 'Applicant' },
+
+      // Application
+      { key: 'position', label: 'Position Applied For', type: 'text', required: true, icon: 'Briefcase', group: 'Application' },
+      { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'], icon: 'Clock', group: 'Application' },
+      { key: 'referral-source', label: 'Referral Source', type: 'select', options: ['Employee Referral', 'LinkedIn', 'Indeed', 'Company Website', 'Career Fair', 'Other'], icon: 'Tag', group: 'Application' },
+      { key: 'cover-letter', label: 'Cover Letter', type: 'richtext', placeholder: 'Applicant\u2019s message\u2026', group: 'Application' },
+      { key: 'resume-file-name', label: 'Resume File Name', type: 'text', helpText: 'Filename only \u2014 file storage not yet wired', icon: 'FileText', group: 'Application' },
+      { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock', group: 'Application' },
+
+      // Triage
+      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Contacted', 'Interviewing', 'Rejected', 'Hired'], icon: 'Zap', group: 'Triage' },
+      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', placeholder: 'Private reviewer notes\u2026', helpText: 'Not visible to applicant', group: 'Triage' },
     ],
   },
   settings: {

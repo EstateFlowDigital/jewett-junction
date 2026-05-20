@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award, FileText } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award, FileText, ChevronRight, Home } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -69,6 +69,39 @@ interface AdminLayoutProps {
   children: React.ReactNode;
   currentPage: string;
   title: string;
+}
+
+// Renders "Admin / Intranet / Announcements" so admins always know where they
+// are, even after deep-linking. Dashboard pages skip the breadcrumb (it'd just
+// be "Admin").
+function Breadcrumb({ currentPage, title }: { currentPage: string; title: string }) {
+  if (currentPage === OVERVIEW_ITEM.key) return null;
+
+  const group = NAV_GROUPS.find((g) => g.items.some((i) => i.key === currentPage));
+  const groupLabel = group?.label;
+  const navItem = group?.items.find((i) => i.key === currentPage);
+  const pageName = navItem?.name || title;
+
+  return (
+    <nav aria-label="Breadcrumb" className="mb-3 text-xs text-slate-400">
+      <ol className="flex items-center gap-1 flex-wrap">
+        <li>
+          <a href={OVERVIEW_ITEM.href} className="inline-flex items-center gap-1 hover:text-white transition-colors">
+            <Home className="h-3 w-3" aria-hidden="true" />
+            Admin
+          </a>
+        </li>
+        {groupLabel && (
+          <>
+            <li aria-hidden="true"><ChevronRight className="h-3 w-3 text-slate-600" /></li>
+            <li className="text-slate-500">{groupLabel}</li>
+          </>
+        )}
+        <li aria-hidden="true"><ChevronRight className="h-3 w-3 text-slate-600" /></li>
+        <li className="text-slate-200 font-medium" aria-current="page">{pageName}</li>
+      </ol>
+    </nav>
+  );
 }
 
 export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) {
@@ -390,6 +423,7 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
 
       {/* Main Content */}
       <main className="flex-1 p-4 lg:p-6 overflow-auto pt-16 lg:pt-6" role="main">
+        <Breadcrumb currentPage={currentPage} title={title} />
         <h1 className="text-xl lg:text-2xl font-bold text-white mb-6">{title}</h1>
         {children}
       </main>

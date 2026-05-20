@@ -1588,7 +1588,10 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-white">{config.name}</h2>
-                  <p className="text-sm text-slate-400">{items.length} items in collection</p>
+                  <p className="text-sm text-slate-400">
+                    {items.length === 0 ? 'No items yet' : `${items.length} item${items.length === 1 ? '' : 's'}`}
+                    {config.description && <span className="hidden lg:inline"> · {config.description}</span>}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1699,13 +1702,15 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 <Icon className="h-10 w-10 text-slate-500" />
               </div>
               <h3 className="text-lg font-medium text-white mb-2">No {config.name.toLowerCase()} yet</h3>
-              <p className="text-slate-400 mb-6">Get started by creating your first item</p>
+              {config.description && (
+                <p className="text-slate-400 mb-6 max-w-md mx-auto">{config.description}</p>
+              )}
               <button
                 onClick={handleCreate}
                 className={`px-6 py-3 bg-gradient-to-r ${config.gradient} text-white rounded-xl font-medium inline-flex items-center gap-2 shadow-lg`}
               >
                 <Sparkles className="h-4 w-4" />
-                Create First {config.name.slice(0, -1)}
+                Create the first one
               </button>
             </div>
           ) : (
