@@ -1,6 +1,7 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getMarketingAssetBySlug, getMarketingAssets, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssetBySlug, getMarketingAssets, getCollectionItem, COLLECTIONS, decodeHtmlEntities } from '../../lib/webflow-cms';
+import type { MarketingAsset } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
@@ -9,17 +10,20 @@ initCMS(Astro.locals);
 
 const { slug } = Astro.params;
 
-// Fetch the marketing asset by slug
+// Fetch the marketing asset by slug, then by id as a fallback so links from
+// listings that fell back to `asset.id` (no slug set) still resolve.
 let item: any = null;
 let relatedItems: any[] = [];
 
 try {
   if (slug) {
     item = await getMarketingAssetBySlug(slug);
+    if (!item && /^[a-f0-9]{24}$/.test(slug)) {
+      item = await getCollectionItem<MarketingAsset>(COLLECTIONS.marketingAssets, slug);
+    }
 
-    // Also fetch other marketing assets
     const result = await getMarketingAssets({ limit: 4 });
-    relatedItems = result.items.filter(r => r.slug !== slug).slice(0, 3);
+    relatedItems = result.items.filter(r => r.slug !== slug && r.id !== slug).slice(0, 3);
   }
 } catch (error) {
   console.error('Error fetching marketing asset:', error);

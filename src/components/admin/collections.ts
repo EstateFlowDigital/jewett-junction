@@ -555,6 +555,10 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'safety-training-compliance', label: 'Safety: Training Compliance %', type: 'number', placeholder: '98', helpText: 'Percentage 0-100 — rendered as N%', icon: 'Award' },
       { key: 'safety-active-sites', label: 'Safety: Active Sites', type: 'number', placeholder: '42', helpText: 'Number of active job sites', icon: 'Building' },
       { key: 'culture-volunteer-hours', label: 'Culture: Volunteer Hours', type: 'text', placeholder: '450+', helpText: 'Annual volunteer hours — accepts string suffixes like "450+"', icon: 'Star' },
+      { key: 'social-facebook-url', label: 'Social: Facebook URL', type: 'url', placeholder: 'https://www.facebook.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
+      { key: 'social-instagram-url', label: 'Social: Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
+      { key: 'social-linkedin-url', label: 'Social: LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin' },
+      { key: 'social-youtube-url', label: 'Social: YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link' },
     ],
   },
   coreValues: {

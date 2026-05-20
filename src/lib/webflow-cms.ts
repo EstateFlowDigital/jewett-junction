@@ -537,6 +537,10 @@ export interface SiteSettings {
   'safety-training-compliance'?: number;
   'safety-active-sites'?: number;
   'culture-volunteer-hours'?: string;
+  'social-facebook-url'?: string;
+  'social-instagram-url'?: string;
+  'social-linkedin-url'?: string;
+  'social-youtube-url'?: string;
 }
 
 /**

@@ -152,6 +152,8 @@ const VALID_FIELDS: Record<string, string[]> = {
     'safety-days-without-incident', 'safety-company-record-days',
     'safety-training-compliance', 'safety-active-sites',
     'culture-volunteer-hours',
+    'social-facebook-url', 'social-instagram-url',
+    'social-linkedin-url', 'social-youtube-url',
   ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',
