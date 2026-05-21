@@ -166,23 +166,11 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         border-radius: 0.75rem;
       }
 
-      /* Styled sidebar tooltips — replace the slow native `title` tooltip.
-         Each sidebar anchor carries `data-tooltip="<label>"`; pseudo-elements
-         render the chip + arrow to the right of the icon and appear on
-         hover/focus. Themed to match the app's dark slate + blue accent. */
-      aside a[data-tooltip] { position: relative; }
-      aside a[data-tooltip]::before,
-      aside a[data-tooltip]::after {
-        position: absolute;
-        top: 50%;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 120ms ease, transform 120ms ease;
-        z-index: 60;
-      }
-      aside a[data-tooltip]::before {
-        content: attr(data-tooltip);
-        left: calc(100% + 0.625rem);
+      /* Styled sidebar tooltips. Pseudo-element approach got clipped by the
+         nav's overflow-y; we portal a single tooltip onto <body> via the
+         inline script below so it can't be clipped from outside the aside. */
+      .sidebar-tooltip-portal {
+        position: fixed;
         background: rgba(15, 23, 42, 0.95);
         color: rgb(241 245 249);
         font-size: 12px;
@@ -194,26 +182,28 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         border: 1px solid rgba(59, 130, 246, 0.35);
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
         backdrop-filter: blur(10px);
+        opacity: 0;
+        pointer-events: none;
         transform: translate(-4px, -50%);
+        transition: opacity 120ms ease, transform 120ms ease;
+        z-index: 1000;
       }
-      aside a[data-tooltip]::after {
-        content: '';
-        left: calc(100% + 0.125rem);
-        width: 0; height: 0;
-        border: 5px solid transparent;
-        border-right-color: rgba(15, 23, 42, 0.95);
-        transform: translate(-4px, -50%);
-      }
-      aside a[data-tooltip]:hover::before,
-      aside a[data-tooltip]:hover::after,
-      aside a[data-tooltip]:focus-visible::before,
-      aside a[data-tooltip]:focus-visible::after {
+      .sidebar-tooltip-portal.visible {
         opacity: 1;
         transform: translate(0, -50%);
       }
+      .sidebar-tooltip-portal::before {
+        content: '';
+        position: absolute;
+        left: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0; height: 0;
+        border: 5px solid transparent;
+        border-right-color: rgba(15, 23, 42, 0.95);
+      }
       @media (max-width: 767px) {
-        aside a[data-tooltip]::before,
-        aside a[data-tooltip]::after { display: none; }
+        .sidebar-tooltip-portal { display: none; }
       }
     </style>
   </head>
@@ -742,5 +732,46 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         </div>
       </div>
     </main>
+
+    <!-- Sidebar tooltip script — same pattern as themed-page.astro.
+         Portals a single tooltip onto <body> so the sidebar's overflow
+         context can't clip it. -->
+    <script is:inline>
+      (() => {
+        if (typeof window === 'undefined') return;
+        const init = () => {
+          const links = document.querySelectorAll('aside a[data-tooltip]');
+          if (!links.length) return;
+          const tip = document.createElement('div');
+          tip.className = 'sidebar-tooltip-portal';
+          tip.setAttribute('role', 'tooltip');
+          document.body.appendChild(tip);
+          let raf = 0;
+          const show = (e) => {
+            const a = e.currentTarget;
+            const label = a.getAttribute('data-tooltip');
+            if (!label) return;
+            const rect = a.getBoundingClientRect();
+            tip.textContent = label;
+            tip.style.left = (rect.right + 10) + 'px';
+            tip.style.top = (rect.top + rect.height / 2) + 'px';
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => tip.classList.add('visible'));
+          };
+          const hide = () => tip.classList.remove('visible');
+          links.forEach((a) => {
+            a.addEventListener('mouseenter', show);
+            a.addEventListener('mouseleave', hide);
+            a.addEventListener('focus', show);
+            a.addEventListener('blur', hide);
+          });
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+      })();
+    </script>
   </body>
 </html>
