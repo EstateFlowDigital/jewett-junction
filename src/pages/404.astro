@@ -1,56 +1,170 @@
 ---
-import DashboardLayout from '../layouts/dashboard.astro';
-import { Card, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Home, Search, ArrowLeft, HelpCircle } from 'lucide-react';
+import ThemedPage from '../layouts/themed-page.astro';
+export const prerender = false;
+
+// "You Lost?" navigation hub — rendered whenever someone hits a path that
+// doesn't match any route. Treats the 404 as a wayfinding moment rather than
+// a dead end. Each card targets a section's landing page so users can
+// reorient and continue.
+const sections = [
+  {
+    name: 'Dashboard',
+    href: '/jewett-junction/dashboard',
+    description: 'Company news, announcements, and your day at a glance',
+    gradient: 'from-blue-500 to-cyan-500',
+    accent: 'blue',
+    icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+  },
+  {
+    name: 'Safety',
+    href: '/jewett-junction/safety',
+    description: 'Protocols, training, alerts, and incident reporting',
+    gradient: 'from-orange-500 to-red-500',
+    accent: 'orange',
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  },
+  {
+    name: 'HR',
+    href: '/jewett-junction/hr',
+    description: 'Benefits, policies, forms, and the HR team',
+    gradient: 'from-purple-500 to-violet-500',
+    accent: 'purple',
+    icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+  },
+  {
+    name: 'IT Helpdesk',
+    href: '/jewett-junction/it-helpdesk',
+    description: 'Tech support, guides, and tickets',
+    gradient: 'from-cyan-500 to-blue-500',
+    accent: 'cyan',
+    icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  },
+  {
+    name: 'Marketing',
+    href: '/jewett-junction/marketing',
+    description: 'Brand assets, photos, presentations, signage',
+    gradient: 'from-pink-500 to-rose-500',
+    accent: 'rose',
+    icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
+  },
+  {
+    name: 'Events',
+    href: '/jewett-junction/events',
+    description: 'Company events, trainings, and gatherings',
+    gradient: 'from-indigo-500 to-purple-500',
+    accent: 'indigo',
+    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+  },
+  {
+    name: 'Culture',
+    href: '/jewett-junction/culture',
+    description: 'Team spotlights, recognitions, and core values',
+    gradient: 'from-rose-500 to-pink-500',
+    accent: 'pink',
+    icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+  },
+  {
+    name: 'Careers',
+    href: '/jewett-junction/careers',
+    description: 'Open positions and referral program',
+    gradient: 'from-emerald-500 to-teal-500',
+    accent: 'emerald',
+    icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  },
+  {
+    name: 'Directory',
+    href: '/jewett-junction/directory',
+    description: 'Find people by name, role, or department',
+    gradient: 'from-cyan-500 to-teal-500',
+    accent: 'cyan',
+    icon: 'M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+  },
+  {
+    name: 'Resources',
+    href: '/jewett-junction/resources',
+    description: 'Documents, forms, and helpful files',
+    gradient: 'from-amber-500 to-orange-500',
+    accent: 'amber',
+    icon: 'M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z',
+  },
+  {
+    name: 'Submit an Idea',
+    href: '/jewett-junction/submit-idea',
+    description: 'Share suggestions, feedback, and improvements',
+    gradient: 'from-amber-400 to-yellow-500',
+    accent: 'amber',
+    icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+  },
+  {
+    name: 'Notifications',
+    href: '/jewett-junction/notifications',
+    description: 'Recent alerts and what needs your attention',
+    gradient: 'from-slate-500 to-slate-600',
+    accent: 'slate',
+    icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
+  },
+];
 ---
 
-<DashboardLayout title="Page Not Found | Jewett Junction">
-  <div class="flex items-center justify-center min-h-[60vh]">
-    <Card className="max-w-lg w-full text-center">
-      <CardContent className="pt-12 pb-8 px-8">
-        <div class="w-24 h-24 bg-primary/10 rounded-full mx-auto mb-6 flex items-center justify-center">
-          <span class="text-5xl font-bold text-primary">404</span>
-        </div>
+<ThemedPage title="You Lost? | Jewett Junction" theme="dark" currentSection="">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-6">
+        <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.5M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">You Lost?</h1>
+      <p class="text-lg text-slate-400 max-w-xl mx-auto">
+        The page you were looking for doesn't exist — but everything else does. Pick a destination below to get back on track.
+      </p>
+    </div>
 
-        <h1 class="text-2xl font-bold mb-2">Page Not Found</h1>
-        <p class="text-muted-foreground mb-8">
-          Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.
-        </p>
-
-        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-          <a href="/jewett-junction/dashboard">
-            <Button className="w-full sm:w-auto">
-              <Home className="mr-2 h-4 w-4" />
-              Go to Dashboard
-            </Button>
-          </a>
-          <a href="/jewett-junction/resources">
-            <Button variant="outline" className="w-full sm:w-auto">
-              <Search className="mr-2 h-4 w-4" />
-              Browse Resources
-            </Button>
-          </a>
-        </div>
-
-        <div class="mt-8 pt-6 border-t">
-          <p class="text-sm text-muted-foreground mb-4">
-            Need help? Try one of these:
-          </p>
-          <div class="flex flex-wrap justify-center gap-4 text-sm">
-            <a href="/jewett-junction/it-helpdesk" class="text-primary hover:underline flex items-center gap-1">
-              <HelpCircle className="h-4 w-4" />
-              IT Helpdesk
-            </a>
-            <a href="/jewett-junction/directory" class="text-primary hover:underline">
-              Employee Directory
-            </a>
-            <a href="/jewett-junction/hr" class="text-primary hover:underline">
-              HR Resources
-            </a>
+    <!-- Section grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
+      {sections.map((s) => (
+        <a
+          href={s.href}
+          class="group glass rounded-2xl p-5 border border-slate-800/50 hover:border-slate-700 hover:bg-slate-800/60 transition-all min-h-[44px]"
+          aria-label={`Go to ${s.name}`}
+        >
+          <div class={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-4 shadow-lg shadow-${s.accent}-500/20 group-hover:scale-105 transition-transform`}>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={s.icon} />
+            </svg>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+          <h3 class="text-base font-semibold text-white mb-1 group-hover:text-blue-300 transition-colors">{s.name}</h3>
+          <p class="text-sm text-slate-400 leading-snug">{s.description}</p>
+        </a>
+      ))}
+    </div>
+
+    <!-- Quick links footer -->
+    <div class="glass rounded-2xl border border-slate-800/50 p-6 text-center">
+      <p class="text-sm text-slate-400 mb-4">
+        Still can't find it? Try one of these:
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 text-sm">
+        <a href="/jewett-junction/it-helpdesk" class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 rounded-xl border border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Ask IT
+        </a>
+        <a href="/jewett-junction/submit-idea" class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 rounded-xl border border-amber-500/20 hover:border-amber-500/40 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+          </svg>
+          Report a missing page
+        </a>
+        <a href="/jewett-junction/dashboard" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Go home
+        </a>
+      </div>
+    </div>
   </div>
-</DashboardLayout>
+</ThemedPage>
