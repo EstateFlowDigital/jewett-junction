@@ -873,6 +873,19 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide this card without deleting it' },
     ],
   },
+  uiStrings: {
+    name: 'UI Strings',
+    icon: 'Type',
+    color: 'slate',
+    gradient: 'from-slate-500 to-zinc-500',
+    slug: 'ui-strings',
+    description: 'Editable badge labels, empty-state messages, and button text across the dashboard. Each entry has a fixed Slug (key) — change the Value to update the text.',
+    fields: [
+      { key: 'name', label: 'Name', type: 'text', required: true, placeholder: 'e.g., HR Update Badge', helpText: 'Admin-only label so you can find this string later', icon: 'Tag' },
+      { key: 'slug', label: 'Slug (Key)', type: 'text', required: true, placeholder: 'badge-hr-update', helpText: 'The lookup key used in code. Do not change unless you know what depends on it.', icon: 'Link' },
+      { key: 'value', label: 'Value', type: 'text', required: true, placeholder: 'HR Update', helpText: 'The text that actually displays on the site.', icon: 'Type' },
+    ],
+  },
   intranetSections: {
     name: 'Intranet Sections',
     icon: 'Compass',

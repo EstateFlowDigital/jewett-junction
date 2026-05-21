@@ -6,7 +6,7 @@ import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings, getPageCopy, getIntranetSections } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings, getPageCopy, getIntranetSections, getUIStrings } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -24,9 +24,10 @@ let bannerMessages: any[] = [];
 let siteSettings: any = {};
 let pageCopy: any = null;
 let sectionMap = new Map<string, string>();
+let uiStrings = new Map<string, string>();
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes, copyRes, sectionsRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes, copyRes, sectionsRes, uiRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
@@ -39,6 +40,7 @@ try {
     getSiteSettings(),
     getPageCopy('dashboard'),
     getIntranetSections(),
+    getUIStrings(),
   ]);
   siteSettings = settingsRes;
   announcements = announcementsRes.items;
@@ -52,6 +54,7 @@ try {
   bannerMessages = bannerRes.items;
   pageCopy = copyRes;
   sectionMap = new Map(sectionsRes.items.map((s) => [s.slug, s.name]));
+  uiStrings = uiRes;
 } catch (error) {
   console.error('Error fetching CMS data:', error);
 }
@@ -59,6 +62,8 @@ try {
 // Sidebar tooltip labels — fall through to hardcoded fallback when the
 // matching intranet-section is missing or inactive.
 const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallback;
+// UI Strings lookup — admin-editable badges, empty-state copy, etc.
+const ui = (key: string, fallback: string) => uiStrings.get(key) || fallback;
 
 // CMS-driven labels (fall back to empty so the section/heading hides if CMS empty)
 const heroHeadline = pageCopy?.['hero-headline'] || '';
@@ -282,10 +287,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         <a href="/jewett-junction/help" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" aria-label={label('help', 'Help')} data-tooltip={label('help', 'Help')}>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </a>
-        <a href="/jewett-junction/settings" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" aria-label={label('settings', 'Settings')} data-tooltip={label('settings', 'Settings')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        </a>
-        <a href="/jewett-junction/profile" class="w-11 h-11 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center text-sm font-medium border border-slate-600 hover:from-slate-500 hover:to-slate-600 transition-all" aria-label={label('profile', 'My Profile')} data-tooltip={label('profile', 'My Profile')}>JC</a>
       </div>
     </aside>
 
@@ -336,11 +337,11 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 <div class="p-6 md:w-2/3 relative">
                   <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                   <div class="relative">
-                    <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                    <span class="text-xs text-blue-200 uppercase tracking-wider">{ui('badge-featured-announcement', 'Featured Announcement')}</span>
                     <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
                     <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{stripHtml(featuredAnnouncement.content)?.substring(0, 200)}{stripHtml(featuredAnnouncement.content)?.length > 200 ? '...' : ''}</p>
                     <div class="flex items-center gap-4">
-                      <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                      <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">{ui('button-read-more', 'Read More')}</span>
                       <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
                     </div>
                   </div>
@@ -350,11 +351,11 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               <div class="p-6 relative">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                 <div class="relative">
-                  <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                  <span class="text-xs text-blue-200 uppercase tracking-wider">{ui('badge-featured-announcement', 'Featured Announcement')}</span>
                   <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
                   <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{stripHtml(featuredAnnouncement.content)?.substring(0, 200)}{stripHtml(featuredAnnouncement.content)?.length > 200 ? '...' : ''}</p>
                   <div class="flex items-center gap-4">
-                    <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                    <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">{ui('button-read-more', 'Read More')}</span>
                     <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
                   </div>
                 </div>
@@ -401,7 +402,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                   })}
                 </div>
               ) : (
-                <p class="text-slate-500">No upcoming events</p>
+                <p class="text-slate-500">{ui('empty-events', 'No upcoming events')}</p>
               )}
             </div>
           </div>
@@ -486,7 +487,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                           style={`color: ${featuredHR['icon-color'] || '#a855f7'}`}
                         ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       </div>
-                      <span class="text-xs text-purple-400 font-medium uppercase">HR Update</span>
+                      <span class="text-xs text-purple-400 font-medium uppercase">{ui('badge-hr-update', 'HR Update')}</span>
                     </div>
                     <h3 class="font-medium text-white group-hover:text-purple-300 transition-colors truncate">{featuredHR.name}</h3>
                     <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredHR.description || featuredHR.content)?.substring(0, 80)}...</p>
@@ -516,7 +517,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                           style={`color: ${featuredSafety['icon-color'] || ((featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '#f87171' : '#34d399')}`}
                         ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                       </div>
-                      <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Safety Alert' : 'Safety Update'}</span>
+                      <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? `⚠️ ${ui('badge-safety-alert', 'Safety Alert')}` : ui('badge-safety-update', 'Safety Update')}</span>
                     </div>
                     <h3 class={`font-medium transition-colors truncate ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
                     <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredSafety.description || featuredSafety.content)?.substring(0, 80)}...</p>
@@ -546,7 +547,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                           style={`color: ${featuredIT['icon-color'] || '#60a5fa'}`}
                         ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                       </div>
-                      <span class="text-xs text-blue-400 font-medium uppercase">IT Tip</span>
+                      <span class="text-xs text-blue-400 font-medium uppercase">{ui('badge-it-tip', 'IT Tip')}</span>
                     </div>
                     <h3 class="font-medium text-white group-hover:text-blue-300 transition-colors truncate">{featuredIT.name}</h3>
                     <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredIT.summary || featuredIT.content)?.substring(0, 80)}...</p>
@@ -666,7 +667,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 ))
               ) : (
                 <div class="p-8 text-center text-slate-500">
-                  <p>No recent announcements</p>
+                  <p>{ui('empty-announcements', 'No recent announcements')}</p>
                 </div>
               )}
             </div>
@@ -710,16 +711,16 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                     JC
                   </div>
                   <div>
-                    <h3 class="text-base sm:text-lg font-bold text-white">Share Your Story</h3>
-                    <p class="text-slate-400 text-xs sm:text-sm mb-3">Culture Corner</p>
+                    <h3 class="text-base sm:text-lg font-bold text-white">{ui('culture-empty-title', 'Share Your Story')}</h3>
+                    {cultureCornerTitle && <p class="text-slate-400 text-xs sm:text-sm mb-3">{cultureCornerTitle}</p>}
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                      We're looking for stories to feature! Share what makes Jewett special to you.
+                      {ui('culture-empty-body', "We're looking for stories to feature! Share what makes Jewett special to you.")}
                     </p>
                   </div>
                 </div>
               )}
               <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
-                <span class="text-sm text-slate-400">Have a story to share?</span>
+                <span class="text-sm text-slate-400">{ui('culture-submit-prompt', 'Have a story to share?')}</span>
                 <a href="/jewett-junction/submit-idea" class="text-sm text-pink-400 hover:text-pink-300 font-medium">Submit →</a>
               </div>
             </div>
@@ -744,7 +745,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 ))
               ) : (
                 <div class="p-8 text-center text-slate-500">
-                  <p>No open positions at this time</p>
+                  <p>{ui('empty-jobs', 'No open positions at this time')}</p>
                 </div>
               )}
             </div>

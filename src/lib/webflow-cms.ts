@@ -501,6 +501,7 @@ export const COLLECTIONS = {
   companyAwards: '69fcc53c891ff14c73b151de',
   intranetSections: '6a0f2f504c6e8c76850bda42',
   quickActions: '6a0f33dde0546a1a2e4afc24',
+  uiStrings: '6a0f46a8a691254e6e83d8fd',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -985,6 +986,39 @@ export async function getIntranetSections(options?: { limit?: number }) {
   const data = { items, total: result.total };
   _intranetSectionsCache = { data, ts: now };
   return data;
+}
+
+// UI Strings — a flat key/value store of editable UI strings (badges,
+// empty-state messages, button labels, etc.). The collection is fetched
+// once per render and cached in-memory; helpers expose a synchronous
+// .get(slug, fallback) lookup over the resulting map.
+export interface UIString {
+  id?: string;
+  name?: string;
+  slug: string;
+  value?: string;
+}
+
+let _uiStringsCache: { data: Map<string, string>; ts: number } | null = null;
+const UI_STRINGS_CACHE_MS = 60 * 1000;
+
+export async function getUIStrings(): Promise<Map<string, string>> {
+  if (!COLLECTIONS.uiStrings) return new Map();
+  const now = Date.now();
+  if (_uiStringsCache && now - _uiStringsCache.ts < UI_STRINGS_CACHE_MS) {
+    return _uiStringsCache.data;
+  }
+  try {
+    const result = await getCollection<UIString>(COLLECTIONS.uiStrings);
+    const map = new Map<string, string>();
+    for (const item of result.items) {
+      if (item.slug && item.value != null) map.set(item.slug, item.value);
+    }
+    _uiStringsCache = { data: map, ts: now };
+    return map;
+  } catch {
+    return new Map();
+  }
 }
 
 // Quick action cards for HR, Safety, IT, etc. — one collection holds every

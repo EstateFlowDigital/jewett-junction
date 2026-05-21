@@ -232,13 +232,6 @@ export function NotificationsContent() {
         </div>
         <div className="flex items-center gap-2">
           <a
-            href="/jewett-junction/settings"
-            className="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            <Settings className="w-4 h-4" aria-hidden="true" />
-            Preferences
-          </a>
-          <a
             href="/jewett-junction/dashboard"
             className="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors"
           >
@@ -392,21 +385,6 @@ export function NotificationsContent() {
         </div>
       )}
 
-      {/* Quick Info */}
-      <div className="mt-8 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <div>
-            <p className="text-sm text-slate-300">
-              Notification preferences can be customized in{' '}
-              <a href="/jewett-junction/settings" className="text-blue-400 hover:text-blue-300">
-                Settings
-              </a>
-              . You can choose which types of notifications you want to receive.
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

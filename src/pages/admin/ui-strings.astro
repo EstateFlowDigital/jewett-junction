@@ -1,0 +1,12 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="UI Strings | Admin">
+  <AdminLayout client:load currentPage="ui-strings" title="UI Strings">
+    <CollectionEditor client:load collectionKey="uiStrings" config={COLLECTIONS.uiStrings} />
+  </AdminLayout>
+</AdminBase>

@@ -192,6 +192,9 @@ const VALID_FIELDS: Record<string, string[]> = {
     'name', 'slug', 'page-slug', 'title', 'subtitle', 'destination-url',
     'icon-name', 'accent-color', 'sort-order', 'is-active',
   ],
+  uiStrings: [
+    'name', 'slug', 'value',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection.

@@ -16,12 +16,10 @@ import {
   Briefcase,
   BookUser,
   FolderOpen,
-  Settings,
   HardHat,
   Lightbulb,
   HelpCircle,
   Bell,
-  User,
 } from "lucide-react";
 
 interface NavItem {
