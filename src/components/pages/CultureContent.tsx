@@ -390,9 +390,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Trophy className="h-5 w-5 text-emerald-400" />
-              Team Wins
+              {teamWinsHeadline}
             </CardTitle>
-            <CardDescription className="text-slate-400">Celebrating our victories</CardDescription>
+            {teamWinsDescription && (
+              <CardDescription className="text-slate-400">{teamWinsDescription}</CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             {(winStories.length > 0 ? winStories : allStories.filter(s => s.type?.toLowerCase().includes('win'))).slice(0, 3).map((story) => {
@@ -437,9 +439,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Award className="h-5 w-5 text-blue-400" />
-              Recent Recognitions
+              {recognitionsHeadline}
             </CardTitle>
-            <CardDescription className="text-slate-400">Kudos from the team</CardDescription>
+            {recognitionsDescription && (
+              <CardDescription className="text-slate-400">{recognitionsDescription}</CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             {([...recognitionStories, ...otherStories].slice(0, 3)).map((story) => {

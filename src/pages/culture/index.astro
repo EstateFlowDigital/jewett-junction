@@ -2,7 +2,7 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CultureContent } from '../../components/pages/CultureContent';
-import { initCMS, getCultureStories, getSiteSettings, getCoreValues } from '../../lib/webflow-cms';
+import { initCMS, getCultureStories, getSiteSettings, getCoreValues, getPageCopy } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -10,20 +10,23 @@ initCMS(Astro.locals);
 let stories: any[] = [];
 let settings: any = {};
 let coreValues: any[] = [];
+let pageCopy: any = null;
 try {
-  const [storiesResult, siteSettings, coreValuesResult] = await Promise.all([
+  const [storiesResult, siteSettings, coreValuesResult, copy] = await Promise.all([
     getCultureStories(),
     getSiteSettings(),
     getCoreValues(),
+    getPageCopy('culture'),
   ]);
   stories = storiesResult.items;
   settings = siteSettings;
   coreValues = coreValuesResult.items;
+  pageCopy = copy;
 } catch (error) {
   console.error('Error fetching culture data:', error);
 }
 ---
 
 <ThemedPage title="Culture | Jewett Junction" theme="dark" currentSection="culture">
-  <CultureContent client:load theme="dark" stories={stories} settings={settings} coreValues={coreValues} />
+  <CultureContent client:load theme="dark" stories={stories} settings={settings} coreValues={coreValues} pageCopy={pageCopy} />
 </ThemedPage>
