@@ -1,66 +1,111 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
-import { initCMS, getIntranetSections } from '../../lib/webflow-cms';
+import { initCMS, getIntranetSections, getPageCopy } from '../../lib/webflow-cms';
 
 export const prerender = false;
 
-// Sections Guide cards come from the Intranet Sections CMS collection — admin
-// can add/rename/reorder modules without touching code. Quick Start /
-// Navigation / Search Tips / Getting Help below describe how to use the app
-// itself and stay as instructional copy.
+// The Help page is fully CMS-driven:
+//   - Hero headline + subtitle come from pageCopy(help)
+//   - Sections Guide cards come from the Intranet Sections collection
+//   - Quick Start / Navigation / Search Tips / Getting Help bodies come from
+//     pageCopy(help)'s content-block-N-title/body fields (rich text)
+//   - Footer note from pageCopy(help).footer-note
+// Anything left as static markup is only icons / layout — no copy.
 initCMS(Astro.locals);
 
 let sections: any[] = [];
+let copy: any = null;
 try {
-  const result = await getIntranetSections();
-  sections = result.items;
+  const [sectionsResult, pageCopy] = await Promise.all([
+    getIntranetSections(),
+    getPageCopy('help'),
+  ]);
+  sections = sectionsResult.items;
+  copy = pageCopy;
 } catch (error) {
-  console.error('help: failed to fetch intranet sections', error);
+  console.error('help: failed to fetch CMS data', error);
 }
+
+const heroHeadline = copy?.['hero-headline'] || 'Help & User Guide';
+const heroSubtitle = copy?.['hero-subtitle'] || 'Learn how to use Jewett Junction, your company intranet portal.';
+const footerNote = copy?.['footer-note'] || '';
+const blocks = [
+  {
+    title: copy?.['content-block-1-title'] || '',
+    body: copy?.['content-block-1-body'] || '',
+    iconPath: 'M13 10V3L4 14h7v7l9-11h-7z',
+    iconColor: 'text-blue-400',
+    featured: true,
+  },
+  {
+    title: copy?.['content-block-2-title'] || '',
+    body: copy?.['content-block-2-body'] || '',
+    iconPath: 'M4 6h16M4 12h16M4 18h16',
+    iconColor: 'text-slate-400',
+    featured: false,
+  },
+  {
+    title: copy?.['content-block-3-title'] || '',
+    body: copy?.['content-block-3-body'] || '',
+    iconPath: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+    iconColor: 'text-slate-400',
+    featured: false,
+  },
+  {
+    title: copy?.['content-block-4-title'] || '',
+    body: copy?.['content-block-4-body'] || '',
+    iconPath: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
+    iconColor: 'text-slate-400',
+    featured: false,
+  },
+];
+const visibleBlocks = blocks.filter((b) => b.title || b.body);
 ---
 
-<ThemedPage title="Help & User Guide - Jewett Junction" currentSection="help">
+<ThemedPage title={`${heroHeadline} - Jewett Junction`} currentSection="help">
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-white mb-2">Help & User Guide</h1>
-      <p class="text-slate-400">Learn how to use Jewett Junction, your company intranet portal.</p>
+      <h1 class="text-3xl font-bold text-white mb-2">{heroHeadline}</h1>
+      <p class="text-slate-400">{heroSubtitle}</p>
     </div>
 
-    <!-- Quick Start -->
-    <section class="mb-10">
-      <div class="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-2xl p-6 mb-6">
-        <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
-          <svg aria-hidden="true" class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-          Quick Start
-        </h2>
-        <p class="text-slate-300 mb-4">Welcome to Jewett Junction! Here's how to get started:</p>
-        <ol class="list-decimal list-inside space-y-2 text-slate-300">
-          <li>Use the <strong class="text-white">sidebar</strong> (desktop) or <strong class="text-white">menu icon</strong> (mobile) to navigate between sections</li>
-          <li>Check the <strong class="text-white">Dashboard</strong> for company announcements and quick links</li>
-          <li>Visit your <strong class="text-white">Profile</strong> to view your badges and points</li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- Navigation -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-        Navigation
-      </h2>
-      <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-        <h3 class="font-medium text-white mb-3">Desktop</h3>
-        <p class="text-slate-400 mb-4">On desktop, use the sidebar on the left side of the screen. Hover over icons to see tooltips with section names.</p>
-
-        <h3 class="font-medium text-white mb-3">Mobile</h3>
-        <p class="text-slate-400">On mobile devices, tap the menu icon (☰) in the top-left corner to open the navigation drawer. Tap any item to navigate, and the drawer will close automatically.</p>
-      </div>
-    </section>
+    <!-- CMS-driven content blocks -->
+    {visibleBlocks.map((block) => (
+      <section class="mb-10">
+        {block.featured ? (
+          <div class="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-2xl p-6">
+            {block.title && (
+              <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                <svg aria-hidden="true" class={`w-5 h-5 ${block.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={block.iconPath}/>
+                </svg>
+                {block.title}
+              </h2>
+            )}
+            {block.body && (
+              <div class="text-slate-300 prose prose-invert prose-sm max-w-none [&_ol]:list-decimal [&_ol]:list-inside [&_ul]:list-disc [&_ul]:list-inside [&_strong]:text-white" set:html={block.body} />
+            )}
+          </div>
+        ) : (
+          <>
+            {block.title && (
+              <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <svg aria-hidden="true" class={`w-5 h-5 ${block.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={block.iconPath}/>
+                </svg>
+                {block.title}
+              </h2>
+            )}
+            {block.body && (
+              <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
+                <div class="text-slate-400 prose prose-invert prose-sm max-w-none [&_ol]:list-decimal [&_ol]:list-inside [&_ul]:list-disc [&_ul]:list-inside [&_strong]:text-white [&_a]:text-blue-400 [&_a:hover]:text-blue-300" set:html={block.body} />
+              </div>
+            )}
+          </>
+        )}
+      </section>
+    ))}
 
     <!-- Sections Guide — CMS-driven via Intranet Sections collection -->
     {sections.length > 0 && (
@@ -100,67 +145,11 @@ try {
       </section>
     )}
 
-    <!-- Search Tips -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        Search Tips
-      </h2>
-      <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-        <ul class="space-y-3 text-slate-400">
-          <li class="flex items-start gap-2">
-            <span class="text-blue-400 mt-0.5">•</span>
-            <span>In the <strong class="text-white">Directory</strong>, search by name, department, location, or role</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-blue-400 mt-0.5">•</span>
-            <span>Search is <strong class="text-white">fuzzy</strong> — it will find close matches even with typos</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-blue-400 mt-0.5">•</span>
-            <span>Use <strong class="text-white">filters</strong> on section pages to narrow down results by category or department</span>
-          </li>
-        </ul>
+    <!-- Footer note (CMS-editable) -->
+    {footerNote && (
+      <div class="text-center text-slate-500 text-sm pt-6 border-t border-slate-800">
+        <p>{footerNote}</p>
       </div>
-    </section>
-
-    <!-- Getting Help -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-        </svg>
-        Getting Help
-      </h2>
-      <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-        <p class="text-slate-400 mb-4">Need assistance? Here's how to get help:</p>
-        <ul class="space-y-3 text-slate-400">
-          <li class="flex items-start gap-2">
-            <span class="text-green-400 mt-0.5">•</span>
-            <span><strong class="text-white">IT Issues:</strong> Visit the <a href="/jewett-junction/it-helpdesk" class="text-blue-400 hover:text-blue-300">IT Helpdesk</a> to submit a support ticket</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-purple-400 mt-0.5">•</span>
-            <span><strong class="text-white">HR Questions:</strong> Contact <a href="/jewett-junction/hr" class="text-blue-400 hover:text-blue-300">Human Resources</a> for policies and benefits</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-amber-400 mt-0.5">•</span>
-            <span><strong class="text-white">Suggestions:</strong> Use <a href="/jewett-junction/submit-idea" class="text-blue-400 hover:text-blue-300">Submit an Idea</a> for improvements</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-blue-400 mt-0.5">•</span>
-            <span><strong class="text-white">Find Someone:</strong> Search the <a href="/jewett-junction/directory" class="text-blue-400 hover:text-blue-300">Employee Directory</a></span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <div class="text-center text-slate-500 text-sm pt-6 border-t border-slate-800">
-      <p>Jewett Junction • Your Company Intranet</p>
-      <p class="mt-1">Have feedback about this help guide? <a href="/jewett-junction/submit-idea" class="text-blue-400 hover:text-blue-300">Let us know</a>.</p>
-    </div>
+    )}
   </div>
 </ThemedPage>

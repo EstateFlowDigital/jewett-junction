@@ -795,6 +795,18 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'subsection-1-description', label: 'Subsection 1 Description', type: 'text', placeholder: 'Your comprehensive benefits package', helpText: 'One-line description under the first subsection headline. Leave blank to hide.' },
       { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Required Safety Training · IT: My Recent Tickets · Culture: Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
       { key: 'subsection-2-description', label: 'Subsection 2 Description', type: 'text', placeholder: 'Commonly used HR forms', helpText: 'One-line description under the second subsection headline. Leave blank to hide.' },
+      // Generic content blocks — used by the Help page for Quick Start /
+      // Navigation / Search Tips / Getting Help. Available for any page that
+      // needs rich-text content sections.
+      { key: 'content-block-1-title', label: 'Content Block 1 Title', type: 'text', placeholder: 'e.g., Quick Start', helpText: 'Title for the first content block (Help page uses this for "Quick Start").', icon: 'Type' },
+      { key: 'content-block-1-body', label: 'Content Block 1 Body', type: 'richtext', helpText: 'Rich-text body for the first content block.' },
+      { key: 'content-block-2-title', label: 'Content Block 2 Title', type: 'text', placeholder: 'e.g., Navigation', helpText: 'Title for the second content block (Help page: "Navigation").', icon: 'Type' },
+      { key: 'content-block-2-body', label: 'Content Block 2 Body', type: 'richtext', helpText: 'Rich-text body for the second content block.' },
+      { key: 'content-block-3-title', label: 'Content Block 3 Title', type: 'text', placeholder: 'e.g., Search Tips', helpText: 'Title for the third content block (Help page: "Search Tips").', icon: 'Type' },
+      { key: 'content-block-3-body', label: 'Content Block 3 Body', type: 'richtext', helpText: 'Rich-text body for the third content block.' },
+      { key: 'content-block-4-title', label: 'Content Block 4 Title', type: 'text', placeholder: 'e.g., Getting Help', helpText: 'Title for the fourth content block (Help page: "Getting Help").', icon: 'Type' },
+      { key: 'content-block-4-body', label: 'Content Block 4 Body', type: 'richtext', helpText: 'Rich-text body for the fourth content block.' },
+      { key: 'footer-note', label: 'Footer Note', type: 'text', placeholder: 'Jewett Junction • Your Company Intranet', helpText: 'Small text at the bottom of the page.' },
     ],
   },
   coreValues: {
