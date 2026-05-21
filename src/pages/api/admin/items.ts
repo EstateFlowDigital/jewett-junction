@@ -167,6 +167,8 @@ const VALID_FIELDS: Record<string, string[]> = {
     'hero-headline', 'hero-subtitle',
     'section-headline', 'section-body',
     'application-description',
+    'subsection-1-headline', 'subsection-1-description',
+    'subsection-2-headline', 'subsection-2-description',
   ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',

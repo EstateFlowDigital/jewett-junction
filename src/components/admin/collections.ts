@@ -791,6 +791,10 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'section-headline', label: 'Section Headline', type: 'text', placeholder: 'Why Jewett Construction?', helpText: 'Optional second headline lower on the page', icon: 'Type' },
       { key: 'section-body', label: 'Section Body', type: 'richtext', placeholder: 'Body copy for the secondary section...', helpText: 'Rich-text body for the second content block' },
       { key: 'application-description', label: 'Form / Application Description', type: 'textarea', placeholder: 'Fill out the form below to get started...', helpText: 'Optional callout shown above forms on pages like Careers or Signage' },
+      { key: 'subsection-1-headline', label: 'Subsection 1 Headline', type: 'text', placeholder: 'e.g., Benefits Overview', helpText: 'First main subsection title on the page (HR: Benefits Overview · Safety: Safety Alerts & Updates · IT: Common Issues & Quick Fixes · Culture: Team Wins). Leave blank to use the page default.', icon: 'Type' },
+      { key: 'subsection-1-description', label: 'Subsection 1 Description', type: 'text', placeholder: 'Your comprehensive benefits package', helpText: 'One-line description under the first subsection headline. Leave blank to hide.' },
+      { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Required Safety Training · IT: My Recent Tickets · Culture: Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
+      { key: 'subsection-2-description', label: 'Subsection 2 Description', type: 'text', placeholder: 'Commonly used HR forms', helpText: 'One-line description under the second subsection headline. Leave blank to hide.' },
     ],
   },
   coreValues: {

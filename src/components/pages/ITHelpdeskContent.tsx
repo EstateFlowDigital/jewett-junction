@@ -66,6 +66,12 @@ const STATUS_THEME: Record<string, { card: string; header: string; title: string
 interface ITPageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
+  /** Title for the Common Issues & Quick Fixes block. */
+  'subsection-1-headline'?: string;
+  'subsection-1-description'?: string;
+  /** Title for the My Recent Tickets block. */
+  'subsection-2-headline'?: string;
+  'subsection-2-description'?: string;
 }
 
 interface ITHelpdeskContentProps {
@@ -139,6 +145,10 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
 
   const heroHeadline = pageCopy?.['hero-headline'] || IT_DEFAULT_HEADLINE;
   const heroSubtitle = pageCopy?.['hero-subtitle'] || IT_DEFAULT_SUBTITLE;
+  const issuesHeadline = pageCopy?.['subsection-1-headline'] || 'Common Issues & Quick Fixes';
+  const issuesDescription = pageCopy?.['subsection-1-description'] || 'Resolve issues yourself with these guides';
+  const ticketsHeadline = pageCopy?.['subsection-2-headline'] || 'My Recent Tickets';
+  const ticketsDescription = pageCopy?.['subsection-2-description'] || 'Track your support requests';
 
   return (
     <div className="space-y-6">
@@ -210,8 +220,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
           {/* Common Issues */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>Common Issues & Quick Fixes</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>Resolve issues yourself with these guides</CardDescription>
+              <CardTitle className={isDark ? 'text-white' : ''}>{issuesHeadline}</CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : ''}>{issuesDescription}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {isLoading ? (
@@ -265,8 +275,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>My Recent Tickets</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>Track your support requests</CardDescription>
+                <CardTitle className={isDark ? 'text-white' : ''}>{ticketsHeadline}</CardTitle>
+                <CardDescription className={isDark ? 'text-slate-400' : ''}>{ticketsDescription}</CardDescription>
               </div>
               <a href="/jewett-junction/it-ticket">
                 <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>Submit Ticket</Button>

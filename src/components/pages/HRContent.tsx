@@ -36,6 +36,12 @@ const getContent = (item: { 'full-content'?: string; content?: string }) => item
 interface HRPageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
+  /** Title for the Benefits Overview block. */
+  'subsection-1-headline'?: string;
+  'subsection-1-description'?: string;
+  /** Title for the Forms & Documents block. */
+  'subsection-2-headline'?: string;
+  'subsection-2-description'?: string;
 }
 
 interface HRContentProps {
@@ -123,6 +129,10 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
 
   const heroHeadline = pageCopy?.['hero-headline'] || HR_DEFAULT_HEADLINE;
   const heroSubtitle = pageCopy?.['hero-subtitle'] || HR_DEFAULT_SUBTITLE;
+  const benefitsHeadline = pageCopy?.['subsection-1-headline'] || 'Benefits Overview';
+  const benefitsDescription = pageCopy?.['subsection-1-description'] || 'Your comprehensive benefits package';
+  const formsHeadline = pageCopy?.['subsection-2-headline'] || 'Forms & Documents';
+  const formsDescription = pageCopy?.['subsection-2-description'] || 'Commonly used HR forms';
 
   return (
     <div className="space-y-6">
@@ -281,8 +291,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
           {/* Benefits Overview */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>Benefits Overview</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>Your comprehensive benefits package</CardDescription>
+              <CardTitle className={isDark ? 'text-white' : ''}>{benefitsHeadline}</CardTitle>
+              <CardDescription className={isDark ? 'text-slate-400' : ''}>{benefitsDescription}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -344,8 +354,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>Forms & Documents</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>Commonly used HR forms</CardDescription>
+                <CardTitle className={isDark ? 'text-white' : ''}>{formsHeadline}</CardTitle>
+                <CardDescription className={isDark ? 'text-slate-400' : ''}>{formsDescription}</CardDescription>
               </div>
               <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
                 View All <ChevronRight className="ml-2 h-4 w-4" />

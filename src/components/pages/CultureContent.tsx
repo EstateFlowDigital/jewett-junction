@@ -60,11 +60,23 @@ interface CMSCoreValue {
   'sort-order'?: number;
 }
 
+interface CulturePageCopy {
+  'hero-headline'?: string;
+  'hero-subtitle'?: string;
+  /** Title for the Team Wins block. */
+  'subsection-1-headline'?: string;
+  'subsection-1-description'?: string;
+  /** Title for the Recent Recognitions block. */
+  'subsection-2-headline'?: string;
+  'subsection-2-description'?: string;
+}
+
 interface CultureContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   stories?: CMSCultureStory[];
   settings?: CultureSettings;
   coreValues?: CMSCoreValue[];
+  pageCopy?: CulturePageCopy | null;
 }
 
 function stripHtml(html: string | undefined) {
@@ -112,7 +124,11 @@ function getTypeConfig(type: string | undefined) {
   return typeConfig[normalized] || typeConfig['default'];
 }
 
-export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [] }: CultureContentProps) {
+export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null }: CultureContentProps) {
+  const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || 'Team Wins';
+  const teamWinsDescription = pageCopy?.['subsection-1-description'] || 'Celebrating our victories';
+  const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || 'Recent Recognitions';
+  const recognitionsDescription = pageCopy?.['subsection-2-description'] || 'Kudos from the team';
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
   const volunteerHours = settings['culture-volunteer-hours'] || '450+';

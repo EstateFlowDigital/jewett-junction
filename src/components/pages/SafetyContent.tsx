@@ -38,6 +38,12 @@ interface SafetySettings {
 interface SafetyPageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
+  /** Title for the Safety Alerts & Updates block. */
+  'subsection-1-headline'?: string;
+  'subsection-1-description'?: string;
+  /** Title for the Required Safety Training block. */
+  'subsection-2-headline'?: string;
+  'subsection-2-description'?: string;
 }
 
 interface SafetyContentProps {
@@ -130,6 +136,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
 
   const heroHeadline = pageCopy?.['hero-headline'] || SAFETY_DEFAULT_HEADLINE;
   const heroSubtitle = pageCopy?.['hero-subtitle'] || SAFETY_DEFAULT_SUBTITLE;
+  const alertsHeadline = pageCopy?.['subsection-1-headline'] || 'Safety Alerts & Updates';
+  const alertsDescription = pageCopy?.['subsection-1-description'] || '';
+  const trainingHeadline = pageCopy?.['subsection-2-headline'] || 'Required Safety Training';
+  const trainingDescription = pageCopy?.['subsection-2-description'] || 'Complete your certifications';
 
   return (
     <div className="space-y-6">
@@ -220,7 +230,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           {/* Safety Alerts */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>Safety Alerts & Updates</CardTitle>
+              <CardTitle className={isDark ? 'text-white' : ''}>{alertsHeadline}</CardTitle>
+              {alertsDescription && (
+                <CardDescription className={isDark ? 'text-slate-400' : ''}>{alertsDescription}</CardDescription>
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
               {isLoading ? (
@@ -333,8 +346,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>Required Safety Training</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>Complete your certifications</CardDescription>
+                <CardTitle className={isDark ? 'text-white' : ''}>{trainingHeadline}</CardTitle>
+                {trainingDescription && (
+                  <CardDescription className={isDark ? 'text-slate-400' : ''}>{trainingDescription}</CardDescription>
+                )}
               </div>
               <a href={resourcesLink}>
                 <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>

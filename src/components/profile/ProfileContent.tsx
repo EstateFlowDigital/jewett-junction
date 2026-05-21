@@ -159,10 +159,12 @@ export function ProfileContent() {
                     </button>
                   </div>
                   <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <MapPin className="w-4 h-4" aria-hidden="true" />
-                      {user.location}
-                    </div>
+                    {user.location && (
+                      <div className="flex items-center gap-2 text-sm text-slate-400">
+                        <MapPin className="w-4 h-4" aria-hidden="true" />
+                        {user.location}
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Calendar className="w-4 h-4" aria-hidden="true" />
                       {yearsAtCompany}+ years

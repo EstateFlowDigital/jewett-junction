@@ -234,12 +234,12 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats — Locations stat hidden until at least one employee has an office set */}
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: 'Total Employees', value: allEmployees.length, icon: Users },
               { label: 'Departments', value: Object.keys(deptCounts).length, icon: Building },
-              { label: 'Locations', value: locations.length, icon: MapPin },
+              ...(locations.length > 0 ? [{ label: 'Locations', value: locations.length, icon: MapPin }] : []),
               { label: 'Key Contacts', value: featuredEmployees.length, icon: Star },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
