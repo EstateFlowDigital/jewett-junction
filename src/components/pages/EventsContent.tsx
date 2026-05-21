@@ -694,7 +694,10 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {Object.entries(categoryConfig)
-              .filter(([key]) => key !== 'default')
+              .filter(([key], i, arr) =>
+                key !== 'default' &&
+                arr.findIndex(([_, c]) => c.label === arr[i][1].label) === i
+              )
               .slice(0, 8)
               .map(([key, config]) => (
                 <button

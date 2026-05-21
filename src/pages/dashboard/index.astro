@@ -6,7 +6,7 @@ import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -22,9 +22,10 @@ let itArticles: any[] = [];
 let marketingAssets: any[] = [];
 let bannerMessages: any[] = [];
 let siteSettings: any = {};
+let pageCopy: any = null;
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes, copyRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
@@ -35,6 +36,7 @@ try {
     getMarketingAssets({ limit: 6, featured: true }),
     getBannerMessages({ limit: 20 }),
     getSiteSettings(),
+    getPageCopy('dashboard'),
   ]);
   siteSettings = settingsRes;
   announcements = announcementsRes.items;
@@ -46,9 +48,27 @@ try {
   itArticles = itRes.items;
   marketingAssets = marketingRes.items;
   bannerMessages = bannerRes.items;
+  pageCopy = copyRes;
 } catch (error) {
   console.error('Error fetching CMS data:', error);
 }
+
+// CMS-driven labels (fall back to empty so the section/heading hides if CMS empty)
+const heroHeadline = pageCopy?.['hero-headline'] || '';
+const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
+const importantUpdatesTitle = pageCopy?.['content-block-1-title'] || '';
+const photoGalleryTitle = pageCopy?.['content-block-2-title'] || '';
+const quickLinksTitle = pageCopy?.['content-block-3-title'] || '';
+const newsTitle = pageCopy?.['content-block-4-title'] || '';
+const cultureCornerTitle = pageCopy?.['subsection-1-headline'] || '';
+const openPositionsTitle = pageCopy?.['subsection-2-headline'] || '';
+const referralTitle = pageCopy?.['section-headline'] || '';
+// Strip outer <p> wrapping from RichText so it inlines cleanly
+function stripParaTag(s: string | undefined) {
+  if (!s) return '';
+  return s.replace(/^<p>/, '').replace(/<\/p>\s*$/, '').trim();
+}
+const heroSubtitleClean = stripParaTag(heroSubtitle);
 
 // Get featured items from new collections
 const featuredHR = hrContent[0];
@@ -58,14 +78,6 @@ const featuredIT = itArticles[0];
 // Default referral bonus from Site Settings (CMS-driven)
 const defaultReferralBonus = Number(siteSettings['default-referral-bonus']) || 500;
 const referralBonusDisplay = `$${defaultReferralBonus.toLocaleString()}`;
-
-// Format date helper - safely handles invalid dates
-function formatDate(dateStr: string) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-}
 
 function formatTime(dateStr: string) {
   if (!dateStr) return '';
@@ -292,8 +304,15 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         <!-- Header Row -->
         <div class="flex items-start justify-between mb-10">
           <div>
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Welcome to Jewett Junction</h1>
-            <p class="text-slate-400 text-sm sm:text-base md:text-lg">Your central hub for company news, resources, and updates. {dateString}.</p>
+            {heroHeadline && (
+              <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{heroHeadline}</h1>
+            )}
+            <p class="text-slate-400 text-sm sm:text-base md:text-lg">
+              {heroSubtitleClean ? (
+                <span set:html={heroSubtitleClean} />
+              ) : null}
+              {heroSubtitleClean ? ' ' : ''}{dateString}.
+            </p>
           </div>
         </div>
 
@@ -433,9 +452,9 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         </div>
 
         <!-- Important Updates from HR, Safety, IT -->
-        {(featuredHR || featuredSafety || featuredIT) && (
+        {(featuredHR || featuredSafety || featuredIT) && importantUpdatesTitle && (
           <div class="mb-10">
-            <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Important Updates</h2>
+            <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">{importantUpdatesTitle}</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               {featuredHR && (
                 <a href="/jewett-junction/hr" class="glass rounded-2xl overflow-hidden border border-purple-500/30 hover:border-purple-500/50 transition-all group">
@@ -532,10 +551,10 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         )}
 
         <!-- Photo Gallery -->
-        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && (
+        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && photoGalleryTitle && (
           <div class="mb-10">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">Photo Gallery</h2>
+              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">{photoGalleryTitle}</h2>
               <a href="/jewett-junction/marketing" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -556,8 +575,9 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         )}
 
         <!-- Quick Links -->
+        {quickLinksTitle && (
         <div class="mb-10">
-          <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Links</h2>
+          <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">{quickLinksTitle}</h2>
           <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
             <a href="/jewett-junction/safety" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-emerald-500/30 transition-all card-hover text-center group">
               <div class="w-10 h-10 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
@@ -597,6 +617,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             </a>
           </div>
         </div>
+        )}
 
         <!-- News & Updates -->
         <div class="mb-10">
@@ -607,7 +628,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
                   <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                 </div>
-                <h2 class="font-semibold text-white text-sm sm:text-base">News & Updates</h2>
+                {newsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{newsTitle}</h2>}
               </div>
               <a href="/jewett-junction/announcements" class="text-sm text-blue-400 hover:text-blue-300">View All</a>
             </div>
@@ -650,7 +671,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           <!-- Culture Spotlight -->
           <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
             <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
-              <h2 class="font-semibold text-white text-sm sm:text-base">Culture Corner</h2>
+              {cultureCornerTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{cultureCornerTitle}</h2>}
               <a href="/jewett-junction/culture" class="text-sm text-pink-400 hover:text-pink-300">View All</a>
             </div>
             <div class="p-4">
@@ -700,7 +721,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           <!-- Open Positions -->
           <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
             <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
-              <h2 class="font-semibold text-white text-sm sm:text-base">Open Positions</h2>
+              {openPositionsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{openPositionsTitle}</h2>}
               <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">{jobs.length} openings</span>
             </div>
             <div class="divide-y divide-slate-800/50 flex-1">
@@ -720,15 +741,17 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 </div>
               )}
             </div>
+            {referralTitle && (
             <div class="p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-t border-slate-700/50 mt-auto">
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="font-medium text-white">Refer a Friend</div>
+                  <div class="font-medium text-white">{referralTitle}</div>
                   <div class="text-sm text-slate-400">Earn {referralBonusDisplay} for each successful hire</div>
                 </div>
                 <a href="/jewett-junction/careers#apply" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors">Submit Referral</a>
               </div>
             </div>
+            )}
           </div>
         </div>
       </div>

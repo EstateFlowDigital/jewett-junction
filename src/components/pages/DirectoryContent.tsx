@@ -84,7 +84,15 @@ function getDeptConfig(dept: string | undefined) {
 }
 
 function getInitials(name: string) {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = name
+    .replace(/[^\p{L}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  return initials || '·';
 }
 
 function formatTenure(startDate: string | undefined) {
@@ -237,10 +245,10 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
           {/* Quick Stats — Locations stat hidden until at least one employee has an office set */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: 'Total Employees', value: allEmployees.length, icon: Users },
-              { label: 'Departments', value: Object.keys(deptCounts).length, icon: Building },
-              ...(locations.length > 0 ? [{ label: 'Locations', value: locations.length, icon: MapPin }] : []),
-              { label: 'Key Contacts', value: featuredEmployees.length, icon: Star },
+              { label: allEmployees.length === 1 ? 'Total Employee' : 'Total Employees', value: allEmployees.length, icon: Users },
+              { label: Object.keys(deptCounts).length === 1 ? 'Department' : 'Departments', value: Object.keys(deptCounts).length, icon: Building },
+              ...(locations.length > 0 ? [{ label: locations.length === 1 ? 'Location' : 'Locations', value: locations.length, icon: MapPin }] : []),
+              { label: featuredEmployees.length === 1 ? 'Key Contact' : 'Key Contacts', value: featuredEmployees.length, icon: Star },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <stat.icon className="h-5 w-5 text-cyan-200 mb-2" />

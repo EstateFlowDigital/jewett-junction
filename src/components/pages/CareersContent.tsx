@@ -595,7 +595,7 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
 const DEFAULT_HERO_HEADLINE = 'Build Your Career with a Team That Puts People First.';
 const DEFAULT_HERO_SUBTITLE = `<p>At Jewett Construction, people matter more than anything. For over 50 years, we've built an award-winning culture rooted in safety, integrity, and opportunity. Whether you're in the field or the office, you'll find a place where your work makes a real impact.</p>`;
 const DEFAULT_SECTION_HEADLINE = 'Why Jewett Construction?';
-const DEFAULT_SECTION_BODY = `<p>For more than half a century, Jewett Construction has set the standard in commercial construction across Ohio. We've grown from a local builder into a regional leader — not by cutting corners, but by investing in the people who make it all happen.</p><p>Our culture is built on four values: <strong>Safety, Excellence, Teamwork, and Integrity</strong>. We live by the principle that <strong>people matter more than anything</strong> — and that means providing real career growth, industry-leading benefits, and a workplace where every voice is heard.</p><p>Whether you're an experienced project manager or just starting out in the trades, you'll find a team that has your back and a company that's committed to your success.</p>`;
+const DEFAULT_SECTION_BODY = `<p>For more than half a century, Jewett Construction has set the standard in commercial construction across New England. We've grown from a local builder into a regional leader — not by cutting corners, but by investing in the people who make it all happen.</p><p>Our culture is built on four values: <strong>Safety, Excellence, Teamwork, and Integrity</strong>. We live by the principle that <strong>people matter more than anything</strong> — and that means providing real career growth, industry-leading benefits, and a workplace where every voice is heard.</p><p>Whether you're an experienced project manager or just starting out in the trades, you'll find a team that has your back and a company that's committed to your success.</p>`;
 const DEFAULT_APPLICATION_DESCRIPTION = 'Fill out the form below to get started. Our recruiting team reviews every application and will follow up within 24 hours. We proudly welcome veterans and military talent.';
 
 export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [], pageCopy = null }: CareersContentProps) {
@@ -856,7 +856,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
                       onClick={() => setExpandedJob(expandedJob === job.id ? null : job.id)}
                       className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
                     >
-                      {expandedJob === job.id ? 'Hide Details' : 'View Details'}
+                      {expandedJob === job.id ? 'Hide description' : 'Show description'}
                       <ChevronDown className={`h-3 w-3 transition-transform ${expandedJob === job.id ? 'rotate-180' : ''}`} />
                     </button>
                     {expandedJob === job.id && (

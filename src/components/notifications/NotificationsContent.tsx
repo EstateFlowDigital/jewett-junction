@@ -29,7 +29,23 @@ interface Notification {
 // Notifications are derived from real CMS data: announcements, events, and
 // urgent safety items. Read state is persisted in localStorage by id.
 const READ_STORAGE_KEY = 'jewett_notifications_read';
-const stripHtml = (html?: string) => (html || '').replace(/<[^>]*>/g, '').trim();
+// Decode common HTML entities (Webflow returns `&nbsp;` etc.) before
+// stripping tags so the rendered notification body doesn't leak raw escapes.
+const ENTITIES: Record<string, string> = {
+  '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>',
+  '&quot;': '"', '&#39;': "'", '&apos;': "'",
+};
+const stripHtml = (html?: string) => {
+  if (!html) return '';
+  let decoded = html;
+  for (const [entity, char] of Object.entries(ENTITIES)) {
+    decoded = decoded.split(entity).join(char);
+  }
+  decoded = decoded
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
+  return decoded.replace(/<[^>]*>/g, '').trim();
+};
 const truncate = (s: string, n: number) => (s.length <= n ? s : s.slice(0, n - 1).trimEnd() + '…');
 
 function loadReadIds(): Set<string> {
