@@ -94,14 +94,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Local-dev convenience: typing /jewett-junction in the dev server should hit
-  // the dashboard (the root index.astro). In production Webflow Cloud strips
-  // /jewett-junction at the edge, so this branch never fires there.
-  // The previous rewrite target was /dashboard, which now permanently redirects
-  // back to /jewett-junction — that caused an infinite loop. Send to / instead.
-  if (pathname === '/jewett-junction' || pathname === '/jewett-junction/') {
-    return context.rewrite('/');
-  }
+  // No /jewett-junction rewrite here. In production Webflow Cloud strips the
+  // mount path at the edge so the worker only ever sees post-mount paths
+  // (/, /hr, /safety, …); a worker-side rewrite of /jewett-junction would
+  // either be dead code OR risk a redirect loop with the edge layer. In local
+  // dev the dashboard lives at /, so just visit http://localhost:4321/.
 
   const response = await next();
 
