@@ -119,7 +119,7 @@ export function PageErrorBoundary({ children }: { children: React.ReactNode }) {
                 Reload Page
               </button>
               <a
-                href="/jewett-junction"
+                href="/jewett-junction/dashboard"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-medium transition-colors"
               >
                 Go to Dashboard

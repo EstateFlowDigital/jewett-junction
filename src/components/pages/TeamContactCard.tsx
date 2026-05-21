@@ -101,7 +101,13 @@ export function TeamContactCard({
       .finally(() => setIsLoading(false));
   }, [department, tag]);
 
-  const email = contact?.email || fallbackEmail;
+  // Email-fallback logic:
+  // - If we matched an employee record (contact != null), respect what's on
+  //   that record. If they have no email saved, show NOTHING (don't fall
+  //   back to the team alias — the admin deliberately left it blank).
+  // - Only fall back to the team alias when no employee record matched at all.
+  const email = contact ? (contact.email?.trim() || '') : (fallbackEmail || '');
+  const hasEmail = email.length > 0;
   const portalUrl = contact?.['support-portal-url']?.trim() || '';
   const portalMessage = contact?.['support-portal-message']?.trim() || 'For support, please log in to the portal:';
   const hasPortal = portalUrl.length > 0;
@@ -162,7 +168,7 @@ export function TeamContactCard({
                 <span className="truncate">{portalUrl.replace(/^https?:\/\//, '')}</span>
               </a>
             </div>
-          ) : (
+          ) : hasEmail ? (
             <a
               href={`mailto:${email}`}
               className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
@@ -172,7 +178,7 @@ export function TeamContactCard({
               <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
               <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>{email}</span>
             </a>
-          )}
+          ) : null}
           {contact?.phone && (
             <a
               href={`tel:${contact.phone}`}

@@ -56,7 +56,7 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
     >
       {/* Logo */}
       <div className="flex h-14 items-center justify-center">
-        <a href="/jewett-junction" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <a href="/jewett-junction/dashboard" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <HardHat className="h-5 w-5" aria-hidden="true" />
         </a>
       </div>
@@ -135,7 +135,7 @@ function MobileSidebarContent({ currentPath, currentTheme }: { currentPath: stri
     <div className="flex h-full flex-col bg-white" role="navigation" aria-label="Mobile navigation">
       {/* Header */}
       <div className="flex h-14 items-center gap-3 border-b border-gray-100 px-4">
-        <a href="/jewett-junction" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <a href="/jewett-junction/dashboard" aria-label="Jewett Junction Home" className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <HardHat className="h-5 w-5" aria-hidden="true" />
         </a>
         <span className="font-semibold text-gray-900">Jewett Junction</span>

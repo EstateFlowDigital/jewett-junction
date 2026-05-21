@@ -1,0 +1,699 @@
+---
+export const prerender = false;
+import '../../../generated/fonts.css';
+import '../../../generated/webflow.css';
+import '../../site-components/global.css';
+import '../../styles/global.css';
+import { MobileNav } from '../../components/layout/MobileNav';
+import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings } from '../../lib/webflow-cms';
+
+// Initialize CMS with Cloudflare runtime context
+initCMS(Astro.locals);
+
+// Fetch CMS data
+let announcements: any[] = [];
+let events: any[] = [];
+let jobs: any[] = [];
+let cultureStories: any[] = [];
+let hrContent: any[] = [];
+let safetyContent: any[] = [];
+let itArticles: any[] = [];
+let marketingAssets: any[] = [];
+let bannerMessages: any[] = [];
+let siteSettings: any = {};
+
+try {
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes] = await Promise.all([
+    getAnnouncements({ limit: 10 }),
+    getEvents({ limit: 6, upcoming: true }),
+    getJobPostings({ limit: 5 }),
+    getCultureStories({ limit: 4 }),
+    getHRContent({ limit: 3, featured: true }),
+    getSafetyContent({ limit: 3, featured: true }),
+    getITKnowledgeBase({ limit: 3, featured: true }),
+    getMarketingAssets({ limit: 6, featured: true }),
+    getBannerMessages({ limit: 20 }),
+    getSiteSettings(),
+  ]);
+  siteSettings = settingsRes;
+  announcements = announcementsRes.items;
+  events = eventsRes.items;
+  jobs = jobsRes.items;
+  cultureStories = cultureRes.items;
+  hrContent = hrRes.items;
+  safetyContent = safetyRes.items;
+  itArticles = itRes.items;
+  marketingAssets = marketingRes.items;
+  bannerMessages = bannerRes.items;
+} catch (error) {
+  console.error('Error fetching CMS data:', error);
+}
+
+// Get featured items from new collections
+const featuredHR = hrContent[0];
+const featuredSafety = safetyContent.find(s => s.severity === 'Critical' || s.severity === 'Emergency') || safetyContent[0];
+const featuredIT = itArticles[0];
+
+// Default referral bonus from Site Settings (CMS-driven)
+const defaultReferralBonus = Number(siteSettings['default-referral-bonus']) || 500;
+const referralBonusDisplay = `$${defaultReferralBonus.toLocaleString()}`;
+
+// Format date helper - safely handles invalid dates
+function formatDate(dateStr: string) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function formatTime(dateStr: string) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function getRelativeTime(dateStr: string) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffHours < 1) return 'Just now';
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  return `${diffDays} days ago`;
+}
+
+function getDayInfo(dateStr: string) {
+  if (!dateStr) return { weekday: '', day: '' };
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return { weekday: '', day: '' };
+  return {
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
+    day: date.getDate(),
+  };
+}
+
+// Strip HTML tags from content
+function stripHtml(html: string | undefined) {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+// Get current date
+const today = new Date();
+const dateString = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+
+// Get pinned announcements for carousel (max 6)
+const pinnedAnnouncements = announcements.filter(a => a['is-pinned']).slice(0, 6);
+// Fallback for single hero if 0-1 pinned items
+const featuredAnnouncement = pinnedAnnouncements.length > 0 ? pinnedAnnouncements[0] : announcements[0];
+// Other announcements excludes pinned items used in carousel
+const pinnedIds = new Set(pinnedAnnouncements.map(a => a.id));
+const otherAnnouncements = announcements.filter(a => !pinnedIds.has(a.id)).slice(0, 4);
+
+// Pre-process carousel data (strip HTML server-side to avoid client bundle bloat)
+const carouselData = pinnedAnnouncements.map(a => ({
+  id: a.id,
+  name: a.name,
+  slug: a.slug,
+  excerpt: stripHtml(a.content)?.substring(0, 120) + ((stripHtml(a.content)?.length || 0) > 120 ? '...' : ''),
+  imageUrl: a['blog-body-image']?.url || a.image?.url || '',
+  author: a.author || '',
+  priority: a.priority || '',
+  category: a.category || '',
+}));
+
+// Banner messages — CMS-driven with fallback to static company values
+const BANNER_FALLBACK = [
+  { message: 'Building Excellence. Delivering Results. Creating Futures.', 'icon-color': 'amber' },
+  { message: 'Safety First - 4EverSafe', 'icon-color': 'emerald' },
+  { message: 'People. Integrity. Excellence. Teamwork.', 'icon-color': 'pink' },
+  { message: 'Building New England Since 1972', 'icon-color': 'cyan' },
+];
+const bannerDisplay = bannerMessages.length > 0 ? bannerMessages : BANNER_FALLBACK;
+const bannerColorClass: Record<string, string> = {
+  amber: 'text-amber-300', emerald: 'text-emerald-300', pink: 'text-pink-300',
+  cyan: 'text-cyan-300', blue: 'text-blue-300', purple: 'text-purple-300',
+};
+const bannerLoop = [...bannerDisplay, ...bannerDisplay];
+---
+
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard | Jewett Junction</title>
+    <style>
+      .glow-blue { box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
+      .glow-green { box-shadow: 0 0 60px rgba(34, 197, 94, 0.15); }
+      .glow-purple { box-shadow: 0 0 60px rgba(168, 85, 247, 0.15); }
+      .card-hover:hover { transform: translateY(-2px); }
+      .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
+      @media (max-width: 767px) { .mobile-safe-area { padding-top: max(4.5rem, env(safe-area-inset-top, 0px)); } }
+      @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-marquee { animation: marquee 30s linear infinite; }
+      .animate-marquee:hover { animation-play-state: paused; }
+      /* Keyboard-only focus ring for sidebar icon links */
+      aside a:focus-visible {
+        outline: 2px solid rgb(59, 130, 246);
+        outline-offset: 2px;
+        border-radius: 0.75rem;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-950 text-gray-100 min-h-screen">
+    <MobileNav client:load currentTheme="dark" currentPath="/jewett-junction/dashboard" />
+    <!-- Gradient Background -->
+    <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 -z-10"></div>
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
+
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 bottom-0 w-20 glass border-r border-slate-800/50 z-40 hidden md:flex flex-col items-center py-6">
+      <a href="/jewett-junction/dashboard" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-blue-500/30">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </a>
+      <nav class="flex-1 flex flex-col items-center gap-2 overflow-y-auto py-1">
+        <a href="/jewett-junction/dashboard" class="w-11 h-11 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-400 transition-all" title="Dashboard">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        </a>
+        <a href="/jewett-junction/safety" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Safety">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </a>
+        <a href="/jewett-junction/hr" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="HR">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/it-helpdesk" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="IT Helpdesk">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+        <a href="/jewett-junction/marketing" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Marketing">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        </a>
+        <a href="/jewett-junction/events" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Events">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </a>
+        <a href="/jewett-junction/culture" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Culture">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/careers" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Careers">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+        <a href="/jewett-junction/directory" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Directory">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/resources" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Resources">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
+        </a>
+        <div class="w-8 border-t border-slate-700/50 my-1"></div>
+        <a href="/jewett-junction/submit-idea" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-amber-400/70 hover:text-amber-400 transition-all" title="Submit Idea">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        </a>
+      </nav>
+      <div class="flex flex-col items-center gap-2 pb-2">
+        <a href="/jewett-junction/notifications" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Notifications">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </a>
+        <a href="/jewett-junction/help" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Help">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/settings" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" title="Settings">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </a>
+        <a href="/jewett-junction/profile" class="w-11 h-11 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center text-sm font-medium border border-slate-600 hover:from-slate-500 hover:to-slate-600 transition-all" title="My Profile">JC</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="md:pl-20 min-h-screen">
+      <!-- Rotating Banner Messages -->
+      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 overflow-hidden relative" role="marquee" aria-label="Company messages">
+        <div class="py-3 overflow-hidden whitespace-nowrap">
+          <div class="animate-marquee inline-flex">
+            {bannerLoop.map((m) => (
+              <span class="mx-8 text-white font-medium flex items-center gap-2">
+                <svg class={`w-5 h-5 ${bannerColorClass[m['icon-color']] || 'text-amber-300'}`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                {m.message}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
+        <!-- Header Row -->
+        <div class="flex items-start justify-between mb-10">
+          <div>
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Welcome to Jewett Junction</h1>
+            <p class="text-slate-400 text-sm sm:text-base md:text-lg">Your central hub for company news, resources, and updates. {dateString}.</p>
+          </div>
+        </div>
+
+        <!-- Featured Announcements Carousel -->
+        {carouselData.length > 1 ? (
+          <FeaturedCarousel client:load announcements={carouselData} />
+        ) : featuredAnnouncement ? (
+          <a href={`/jewett-junction/announcements/${featuredAnnouncement.slug || featuredAnnouncement.id}`} class="block bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-3xl mb-10 border border-blue-500/30 glow-blue relative overflow-hidden hover:from-blue-600 hover:to-purple-600 transition-all">
+            {(featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url) ? (
+              <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
+                  <img src={featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url} alt={featuredAnnouncement.name} class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="p-6 md:w-2/3 relative">
+                  <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                  <div class="relative">
+                    <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
+                    <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{stripHtml(featuredAnnouncement.content)?.substring(0, 200)}{stripHtml(featuredAnnouncement.content)?.length > 200 ? '...' : ''}</p>
+                    <div class="flex items-center gap-4">
+                      <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                      <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div class="p-6 relative">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                <div class="relative">
+                  <span class="text-xs text-blue-200 uppercase tracking-wider">Featured Announcement</span>
+                  <h2 class="text-xl sm:text-2xl font-bold text-white mt-2 mb-3">{featuredAnnouncement.name}</h2>
+                  <p class="text-blue-100 text-sm sm:text-base mb-4 max-w-2xl">{stripHtml(featuredAnnouncement.content)?.substring(0, 200)}{stripHtml(featuredAnnouncement.content)?.length > 200 ? '...' : ''}</p>
+                  <div class="flex items-center gap-4">
+                    <span class="px-5 py-2.5 bg-white text-blue-600 rounded-xl text-sm font-semibold">Read More</span>
+                    <span class="text-sm text-blue-200">{featuredAnnouncement.author || 'Company'} • {getRelativeTime(featuredAnnouncement['published-date'])}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </a>
+        ) : null}
+
+        <!-- Bento Grid Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-10">
+          <!-- Upcoming Events Card - Large -->
+          <div class="col-span-12 md:col-span-5 glass rounded-3xl p-6 border border-purple-500/20 glow-purple relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+            <div class="relative">
+              <div class="flex items-center justify-between mb-4">
+                <div class="w-14 h-14 bg-purple-500/20 border border-purple-500/30 rounded-2xl flex items-center justify-center">
+                  <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <a href="/jewett-junction/events" class="text-sm text-purple-400 hover:text-purple-300">View All →</a>
+              </div>
+              <div class="text-sm text-slate-400 mb-2">Upcoming Events</div>
+              {events.length > 0 ? (
+                <div class="space-y-3">
+                  {events.slice(0, 2).map((event) => {
+                    const dayInfo = getDayInfo(event['event-date']);
+                    return (
+                      <a href={`/jewett-junction/events/${event.slug || event.id}`} class="flex gap-3 p-2 -mx-2 rounded-xl hover:bg-slate-800/50 transition-colors group">
+                        {event['banner-image']?.url ? (
+                          <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                            <img src={event['banner-image'].url} alt={event.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" />
+                          </div>
+                        ) : (
+                          <div class="w-12 h-12 bg-purple-500 rounded-xl flex flex-col items-center justify-center text-white flex-shrink-0">
+                            <span class="text-xs font-medium">{dayInfo.weekday}</span>
+                            <span class="text-lg font-bold">{dayInfo.day}</span>
+                          </div>
+                        )}
+                        <div class="min-w-0">
+                          <div class="font-medium text-white truncate">{event.name}</div>
+                          <div class="text-sm text-slate-400">{formatTime(event['event-date'])} • {event.location || 'TBD'}</div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p class="text-slate-500">No upcoming events</p>
+              )}
+            </div>
+          </div>
+
+          <!-- Right Column Stats -->
+          <div class="col-span-12 md:col-span-7 grid grid-cols-2 gap-4">
+            <a href="/jewett-junction/safety" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-emerald-500/30">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm text-slate-400">Safety Hub</span>
+                <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+              </div>
+              {featuredSafety ? (
+                <>
+                  <div class="text-lg font-bold text-white truncate">{featuredSafety.name}</div>
+                  <div class="text-sm text-emerald-400 mt-1">{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Alert' : 'View Resources →'}</div>
+                </>
+              ) : (
+                <>
+                  <div class="text-2xl font-bold text-white">4EverSafe</div>
+                  <div class="text-sm text-emerald-400 mt-1">View Resources →</div>
+                </>
+              )}
+            </a>
+            <a href="/jewett-junction/culture" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-pink-500/30">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm text-slate-400">Culture Corner</span>
+                <div class="w-10 h-10 bg-pink-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+              </div>
+              <div class="text-2xl font-bold text-white">Stories</div>
+              <div class="text-sm text-pink-400 mt-1">Read More →</div>
+            </a>
+            <a href="/jewett-junction/careers" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-amber-500/30">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm text-slate-400">Open Positions</span>
+                <div class="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+              </div>
+              <div class="text-4xl font-bold text-white">{jobs.length || 0}</div>
+              <div class="text-sm text-amber-400 mt-1">View Openings →</div>
+            </a>
+            <a href="/jewett-junction/careers#apply" class="bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-2xl p-5 border border-blue-500/30 card-hover transition-all glow-blue hover:from-blue-600 hover:to-purple-600">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-sm text-blue-200">Referral Bonus</span>
+                <svg class="w-6 h-6 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div class="text-4xl font-bold text-white">{referralBonusDisplay}</div>
+              <div class="text-sm text-blue-200 mt-1">Per successful hire</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Important Updates from HR, Safety, IT -->
+        {(featuredHR || featuredSafety || featuredIT) && (
+          <div class="mb-10">
+            <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Important Updates</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featuredHR && (
+                <a href="/jewett-junction/hr" class="glass rounded-2xl overflow-hidden border border-purple-500/30 hover:border-purple-500/50 transition-all group">
+                  {featuredHR.icon?.url && (
+                    <div class="h-32 w-full overflow-hidden">
+                      <img src={featuredHR.icon.url} alt={featuredHR.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    </div>
+                  )}
+                  <div class="p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div
+                        class="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={featuredHR['icon-color']
+                          ? `background-color: ${featuredHR['icon-color']}33`
+                          : 'background-color: rgba(168, 85, 247, 0.2)'}
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          style={`color: ${featuredHR['icon-color'] || '#a855f7'}`}
+                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </div>
+                      <span class="text-xs text-purple-400 font-medium uppercase">HR Update</span>
+                    </div>
+                    <h3 class="font-medium text-white group-hover:text-purple-300 transition-colors truncate">{featuredHR.name}</h3>
+                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredHR.description || featuredHR.content)?.substring(0, 80)}...</p>
+                  </div>
+                </a>
+              )}
+              {featuredSafety && (
+                <a href="/jewett-junction/safety" class={`glass rounded-2xl overflow-hidden border transition-all group ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'border-red-500/50 bg-red-500/10 hover:border-red-500/70' : 'border-emerald-500/30 hover:border-emerald-500/50'}`}>
+                  {featuredSafety.image?.url && (
+                    <div class="h-32 w-full overflow-hidden">
+                      <img src={featuredSafety.image?.url} alt={featuredSafety.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    </div>
+                  )}
+                  <div class="p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div
+                        class="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={featuredSafety['icon-color']
+                          ? `background-color: ${featuredSafety['icon-color']}33`
+                          : `background-color: ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`}
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          style={`color: ${featuredSafety['icon-color'] || ((featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '#f87171' : '#34d399')}`}
+                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                      </div>
+                      <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Safety Alert' : 'Safety Update'}</span>
+                    </div>
+                    <h3 class={`font-medium transition-colors truncate ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
+                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredSafety.description || featuredSafety.content)?.substring(0, 80)}...</p>
+                  </div>
+                </a>
+              )}
+              {featuredIT && (
+                <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl overflow-hidden border border-blue-500/30 hover:border-blue-500/50 transition-all group">
+                  {featuredIT.icon?.url && (
+                    <div class="h-32 w-full overflow-hidden">
+                      <img src={featuredIT.icon.url} alt={featuredIT.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    </div>
+                  )}
+                  <div class="p-4">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div
+                        class="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={featuredIT['icon-color']
+                          ? `background-color: ${featuredIT['icon-color']}33`
+                          : 'background-color: rgba(59, 130, 246, 0.2)'}
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          style={`color: ${featuredIT['icon-color'] || '#60a5fa'}`}
+                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                      </div>
+                      <span class="text-xs text-blue-400 font-medium uppercase">IT Tip</span>
+                    </div>
+                    <h3 class="font-medium text-white group-hover:text-blue-300 transition-colors truncate">{featuredIT.name}</h3>
+                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredIT.summary || featuredIT.content)?.substring(0, 80)}...</p>
+                  </div>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        <!-- Photo Gallery -->
+        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && (
+          <div class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">Photo Gallery</h2>
+              <a href="/jewett-junction/marketing" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {marketingAssets.filter(asset => asset['preview-image']?.url || asset.image?.url).slice(0, 6).map((asset) => (
+                <a href={`/jewett-junction/marketing/${asset.slug || asset.id}`} class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all">
+                  <img
+                    src={asset['preview-image']?.url || asset.image?.url}
+                    alt={asset.name || 'Company photo'}
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <span class="text-white text-xs font-medium truncate">{asset.name}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Quick Links -->
+        <div class="mb-10">
+          <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Links</h2>
+          <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <a href="/jewett-junction/safety" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-emerald-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">Safety</div>
+            </a>
+            <a href="/jewett-junction/hr" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-blue-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">HR</div>
+            </a>
+            <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-green-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">IT Help</div>
+            </a>
+            <a href="/jewett-junction/resources" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-purple-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">Resources</div>
+            </a>
+            <a href="/jewett-junction/events" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-amber-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">Calendar</div>
+            </a>
+            <a href="/jewett-junction/submit-idea" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-orange-500/30 transition-all card-hover text-center group">
+              <div class="w-10 h-10 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+                <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              </div>
+              <div class="font-medium text-white text-sm">Submit Idea</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- News & Updates -->
+        <div class="mb-10">
+          <!-- News Feed -->
+          <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
+            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                </div>
+                <h2 class="font-semibold text-white text-sm sm:text-base">News & Updates</h2>
+              </div>
+              <a href="/jewett-junction/announcements" class="text-sm text-blue-400 hover:text-blue-300">View All</a>
+            </div>
+            <div class="divide-y divide-slate-800/50">
+              {otherAnnouncements.length > 0 ? (
+                otherAnnouncements.map((announcement) => (
+                  <a href={`/jewett-junction/announcements/${announcement.slug || announcement.id}`} class="p-4 flex items-center gap-4 hover:bg-slate-800/30 transition-colors block group">
+                    {(announcement['blog-body-image']?.url || announcement.image?.url) ? (
+                      <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                        <img src={announcement['blog-body-image']?.url || announcement.image?.url} alt={announcement.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" />
+                      </div>
+                    ) : (
+                      <div class={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        (announcement.priority === 'high' || announcement.priority === 'High' || announcement.priority === 'Urgent') ? 'bg-rose-500/20' : 'bg-blue-500/20'
+                      }`}>
+                        <svg class={`w-5 h-5 ${(announcement.priority === 'high' || announcement.priority === 'High' || announcement.priority === 'Urgent') ? 'text-rose-400' : 'text-blue-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                      </div>
+                    )}
+                    <div class="flex-1 min-w-0">
+                      <span class={`text-xs font-medium ${(announcement.priority === 'high' || announcement.priority === 'High' || announcement.priority === 'Urgent') ? 'text-rose-400' : 'text-blue-400'}`}>
+                        {(announcement.priority === 'high' || announcement.priority === 'High' || announcement.priority === 'Urgent') ? 'Important' : 'Update'}
+                      </span>
+                      <div class="text-sm text-white">{announcement.name}</div>
+                      <div class="text-xs text-slate-500 truncate">{stripHtml(announcement.content)?.substring(0, 60)}...</div>
+                    </div>
+                    <span class="text-xs text-slate-500 flex-shrink-0">{getRelativeTime(announcement['published-date'])}</span>
+                  </a>
+                ))
+              ) : (
+                <div class="p-8 text-center text-slate-500">
+                  <p>No recent announcements</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee Spotlight & Careers -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Culture Spotlight -->
+          <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
+            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+              <h2 class="font-semibold text-white text-sm sm:text-base">Culture Corner</h2>
+              <a href="/jewett-junction/culture" class="text-sm text-pink-400 hover:text-pink-300">View All</a>
+            </div>
+            <div class="p-4">
+              {cultureStories.length > 0 ? (
+                <div class="grid grid-cols-2 gap-3">
+                  {cultureStories.slice(0, 4).map((story, index) => (
+                    <a href={`/jewett-junction/culture/${story.slug || story.id}`} class={`block group ${index === 0 ? 'col-span-2' : ''}`}>
+                      <div class={`relative rounded-xl overflow-hidden ${index === 0 ? 'h-32' : 'h-24'}`}>
+                        {story['featured-image']?.url ? (
+                          <img src={story['featured-image'].url} alt={story.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        ) : (
+                          <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                            <span class="text-white text-2xl font-bold">{story.name?.substring(0, 2).toUpperCase() || 'JC'}</span>
+                          </div>
+                        )}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
+                          <div>
+                            <h3 class="text-white font-medium text-sm truncate group-hover:text-pink-300 transition-colors">{story.name}</h3>
+                            <p class="text-slate-300 text-xs">{story.category || 'Story'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <div class="flex items-start gap-5 p-2">
+                  <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                    JC
+                  </div>
+                  <div>
+                    <h3 class="text-base sm:text-lg font-bold text-white">Share Your Story</h3>
+                    <p class="text-slate-400 text-xs sm:text-sm mb-3">Culture Corner</p>
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                      We're looking for stories to feature! Share what makes Jewett special to you.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+                <span class="text-sm text-slate-400">Have a story to share?</span>
+                <a href="/jewett-junction/submit-idea" class="text-sm text-pink-400 hover:text-pink-300 font-medium">Submit →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Positions -->
+          <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
+            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+              <h2 class="font-semibold text-white text-sm sm:text-base">Open Positions</h2>
+              <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">{jobs.length} openings</span>
+            </div>
+            <div class="divide-y divide-slate-800/50 flex-1">
+              {jobs.length > 0 ? (
+                jobs.slice(0, 3).map((job) => (
+                  <a href={`/jewett-junction/careers/${job.slug || job.id}`} class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
+                    <div>
+                      <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>
+                      <div class="text-sm text-slate-500">{job.department || 'General'} • {job.location || 'Remote'}</div>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+                ))
+              ) : (
+                <div class="p-8 text-center text-slate-500">
+                  <p>No open positions at this time</p>
+                </div>
+              )}
+            </div>
+            <div class="p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-t border-slate-700/50 mt-auto">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-medium text-white">Refer a Friend</div>
+                  <div class="text-sm text-slate-400">Earn {referralBonusDisplay} for each successful hire</div>
+                </div>
+                <a href="/jewett-junction/careers#apply" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors">Submit Referral</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
