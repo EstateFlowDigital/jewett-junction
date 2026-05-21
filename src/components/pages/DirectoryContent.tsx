@@ -150,6 +150,22 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
   // Get unique departments for filter
   const departments = ['All', ...new Set(allEmployees.map(e => getDeptConfig(e.department).label))];
 
+  // Honour ?department=X from the URL so TeamContactCard's "View Directory"
+  // link lands on the correct filtered view. Falls back to "All" when the
+  // requested value isn't a valid department for the current employee set.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('department');
+    if (!requested) return;
+    // Match either the dropdown label (e.g. "IT") or any case/whitespace
+    // variant of the raw query — fuzzily resolves "it" / "Information Technology" too.
+    const match = departments.find(
+      (d) => d.toLowerCase() === requested.toLowerCase() || getDeptConfig(requested).label === d,
+    );
+    if (match) setSelectedDept(match);
+  }, [departments.length]);
+
   // Get featured employees
   const featuredEmployees = allEmployees.filter(e => e['is-featured']);
 
