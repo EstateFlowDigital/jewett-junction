@@ -57,9 +57,6 @@ interface ResourcesContentProps {
   pageCopy?: ResourcesPageCopy | null;
 }
 
-const RESOURCES_DEFAULT_HEADLINE = 'Resource\nLibrary';
-const RESOURCES_DEFAULT_SUBTITLE = 'Access all the documents, templates, and guides you need to get your work done. Everything organized and searchable in one place.';
-
 const categoryConfig: Record<string, { icon: any; color: string; gradient: string; label: string }> = {
   'safety': { icon: Shield, color: 'orange', gradient: 'from-orange-500 to-red-500', label: 'Safety Documents' },
   'safety documents': { icon: Shield, color: 'orange', gradient: 'from-orange-500 to-red-500', label: 'Safety Documents' },
@@ -100,8 +97,8 @@ function stripHtml(html: string | undefined) {
 export function ResourcesContent({ theme = 'dark', resources: cmsResources = [], pageCopy = null }: ResourcesContentProps) {
   // Hero copy is CMS-editable via the Page Copy collection (slug: 'resources').
   // Headline can include a literal "\n" or "<br>" — the renderer splits on either.
-  const heroHeadlineRaw = pageCopy?.['hero-headline']?.trim() || RESOURCES_DEFAULT_HEADLINE;
-  const heroSubtitleRaw = pageCopy?.['hero-subtitle']?.trim() || RESOURCES_DEFAULT_SUBTITLE;
+  const heroHeadlineRaw = pageCopy?.['hero-headline']?.trim() || '';
+  const heroSubtitleRaw = pageCopy?.['hero-subtitle']?.trim() || '';
   const heroHeadlineLines = heroHeadlineRaw.split(/\\n|<br\s*\/?>/i);
   const heroSubtitleIsHtml = /^\s*<\w/.test(heroSubtitleRaw);
   // Use CMS resources directly - no hardcoded fallback
@@ -162,18 +159,22 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                 {allResources.length} Resources
               </Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-              {heroHeadlineLines.map((line, i) => (
-                <React.Fragment key={i}>
-                  {line}
-                  {i < heroHeadlineLines.length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </h1>
-            {heroSubtitleIsHtml ? (
-              <div className="text-lg text-amber-100 mb-6 max-w-xl [&>p]:m-0" dangerouslySetInnerHTML={{ __html: heroSubtitleRaw }} />
-            ) : (
-              <p className="text-lg text-amber-100 mb-6 max-w-xl">{heroSubtitleRaw}</p>
+            {heroHeadlineRaw && (
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+                {heroHeadlineLines.map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < heroHeadlineLines.length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </h1>
+            )}
+            {heroSubtitleRaw && (
+              heroSubtitleIsHtml ? (
+                <div className="text-lg text-amber-100 mb-6 max-w-xl [&>p]:m-0" dangerouslySetInnerHTML={{ __html: heroSubtitleRaw }} />
+              ) : (
+                <p className="text-lg text-amber-100 mb-6 max-w-xl">{heroSubtitleRaw}</p>
+              )
             )}
             <div className="flex flex-wrap gap-3">
               <Button
@@ -200,8 +201,8 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
           {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: 'Total Documents', value: allResources.length, icon: FileText },
-              { label: 'Categories', value: Object.keys(categoryCounts).length, icon: FolderOpen },
+              { label: allResources.length === 1 ? 'Total Document' : 'Total Documents', value: allResources.length, icon: FileText },
+              { label: Object.keys(categoryCounts).length === 1 ? 'Category' : 'Categories', value: Object.keys(categoryCounts).length, icon: FolderOpen },
               { label: 'Featured', value: featuredResources.length, icon: Star },
               { label: 'Recently Updated', value: sortedResources.filter(r => {
                 const updated = r['last-updated'] ? new Date(r['last-updated']) : null;

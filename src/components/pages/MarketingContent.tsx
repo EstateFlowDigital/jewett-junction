@@ -40,9 +40,6 @@ interface MarketingContentProps {
   pageCopy?: MarketingPageCopy | null;
 }
 
-const MARKETING_DEFAULT_HEADLINE = 'Marketing Hub';
-const MARKETING_DEFAULT_SUBTITLE = 'Brand assets, templates, and marketing resources';
-
 export function MarketingContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: MarketingContentProps) {
   const isDark = theme === 'dark';
   const marketingEmail = settings['marketing-email'] || 'marketing@jewettconstruction.com';
@@ -103,23 +100,27 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
     { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink' },
   ];
 
-  const heroHeadline = pageCopy?.['hero-headline'] || MARKETING_DEFAULT_HEADLINE;
-  const heroSubtitle = pageCopy?.['hero-subtitle'] || MARKETING_DEFAULT_SUBTITLE;
+  const heroHeadline = pageCopy?.['hero-headline'] || '';
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
-          <Megaphone className="h-7 w-7 text-rose-600" />
-          {heroHeadline}
-        </h1>
-        {/^\s*<\w/.test(heroSubtitle) ? (
-          <div
-            className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
-            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-          />
-        ) : (
-          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+        {heroHeadline && (
+          <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
+            <Megaphone className="h-7 w-7 text-rose-600" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && (
+          /^\s*<\w/.test(heroSubtitle) ? (
+            <div
+              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+            />
+          ) : (
+            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          )
         )}
       </div>
 

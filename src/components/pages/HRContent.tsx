@@ -55,9 +55,6 @@ interface HRContentProps {
   pageCopy?: HRPageCopy | null;
 }
 
-const HR_DEFAULT_HEADLINE = 'HR Resources';
-const HR_DEFAULT_SUBTITLE = 'Benefits, policies, forms, and employee support';
-
 export function HRContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null, quickActions = [] }: HRContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
@@ -131,8 +128,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
   const timeOffLink = findHRLink(['time off', 'pto', 'vacation', 'leave', 'holiday']);
   const benefitsLink = findHRLink(['benefits guide', 'benefits package', 'open enrollment', 'benefit', 'health', 'insurance', '401k']);
 
-  const heroHeadline = pageCopy?.['hero-headline'] || HR_DEFAULT_HEADLINE;
-  const heroSubtitle = pageCopy?.['hero-subtitle'] || HR_DEFAULT_SUBTITLE;
+  const heroHeadline = pageCopy?.['hero-headline'] || '';
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
   const benefitsHeadline = pageCopy?.['subsection-1-headline'] || 'Benefits Overview';
   const benefitsDescription = pageCopy?.['subsection-1-description'] || 'Your comprehensive benefits package';
   const formsHeadline = pageCopy?.['subsection-2-headline'] || 'Forms & Documents';
@@ -142,19 +139,21 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
-            <Users className="h-7 w-7 text-purple-600" />
-            {heroHeadline}
-          </h1>
-          {/* Subtitle may be richtext (from CMS) or plain text fallback. Render
-              richtext via dangerouslySetInnerHTML when it looks like HTML. */}
-          {/^\s*<\w/.test(heroSubtitle) ? (
-            <div
-              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
-              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-            />
-          ) : (
-            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          {heroHeadline && (
+            <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
+              <Users className="h-7 w-7 text-purple-600" />
+              {heroHeadline}
+            </h1>
+          )}
+          {heroSubtitle && (
+            /^\s*<\w/.test(heroSubtitle) ? (
+              <div
+                className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+                dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+              />
+            ) : (
+              <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+            )
           )}
         </div>
       </div>

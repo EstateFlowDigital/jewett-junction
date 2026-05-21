@@ -85,9 +85,6 @@ interface ITHelpdeskContentProps {
   quickActions?: QuickAction[];
 }
 
-const IT_DEFAULT_HEADLINE = 'IT Help Desk';
-const IT_DEFAULT_SUBTITLE = 'Technical support, resources, and self-service tools';
-
 export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null, quickActions = [] }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
@@ -147,8 +144,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
     return HelpCircle;
   };
 
-  const heroHeadline = pageCopy?.['hero-headline'] || IT_DEFAULT_HEADLINE;
-  const heroSubtitle = pageCopy?.['hero-subtitle'] || IT_DEFAULT_SUBTITLE;
+  const heroHeadline = pageCopy?.['hero-headline'] || '';
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
   const issuesHeadline = pageCopy?.['subsection-1-headline'] || 'Common Issues & Quick Fixes';
   const issuesDescription = pageCopy?.['subsection-1-description'] || 'Resolve issues yourself with these guides';
   const ticketsHeadline = pageCopy?.['subsection-2-headline'] || 'My Recent Tickets';
@@ -157,17 +154,21 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
   return (
     <div className="space-y-6">
       <div>
-        <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
-          <Headphones className="h-7 w-7 text-blue-600" />
-          {heroHeadline}
-        </h1>
-        {/^\s*<\w/.test(heroSubtitle) ? (
-          <div
-            className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
-            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-          />
-        ) : (
-          <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+        {heroHeadline && (
+          <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
+            <Headphones className="h-7 w-7 text-blue-600" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && (
+          /^\s*<\w/.test(heroSubtitle) ? (
+            <div
+              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+            />
+          ) : (
+            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          )
         )}
       </div>
 

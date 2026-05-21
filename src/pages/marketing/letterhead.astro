@@ -23,8 +23,11 @@ const letterheadAssets = assets.filter((a: any) =>
   matchesAny(a['asset-type'], ['letterhead']) || matchesAny(a.name, ['letterhead']),
 );
 const formAssets = assets.filter((a: any) => {
+  // Logos can be miscategorized here because 'logo' contains the keyword 'log'.
+  // Exclude anything explicitly tagged as a logo before keyword matching.
+  if (matchesAny(a['asset-type'], ['logo'])) return false;
   if (matchesAny(a['asset-type'], ['form'])) return true;
-  if (matchesAny(a.name, ['form', 'request', 'log', 'expense', 'time off', 'mileage'])) return true;
+  if (matchesAny(a.name, ['form', 'request', 'expense', 'time off', 'mileage', 'timesheet'])) return true;
   return false;
 });
 
@@ -53,7 +56,7 @@ const getDownloadUrl = (item: any): string | null => item['download-link'] || nu
         <CardDescription className="text-slate-400">
           {letterheadAssets.length > 0
             ? `${letterheadAssets.length} ${letterheadAssets.length === 1 ? 'template' : 'templates'} available`
-            : 'Upload letterhead in the admin under Marketing Assets to populate this section.'}
+            : 'No letterhead templates uploaded yet — check back soon.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -91,10 +94,7 @@ const getDownloadUrl = (item: any): string | null => item['download-link'] || nu
         ) : (
           <div class="rounded-lg border border-dashed border-slate-600 bg-slate-900/40 p-8 text-center">
             <FileText className="h-10 w-10 mx-auto text-slate-500 mb-3" />
-            <p class="text-sm text-slate-400">No letterhead templates uploaded yet.</p>
-            <a href="/jewett-junction/admin/marketing" class="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block">
-              Upload a template →
-            </a>
+            <p class="text-sm text-slate-400">No letterhead templates uploaded yet — check back soon.</p>
           </div>
         )}
       </CardContent>
@@ -107,7 +107,7 @@ const getDownloadUrl = (item: any): string | null => item['download-link'] || nu
         <CardDescription className="text-slate-400">
           {formAssets.length > 0
             ? `${formAssets.length} ${formAssets.length === 1 ? 'form' : 'forms'} available`
-            : 'Upload forms in the admin under Marketing Assets.'}
+            : 'No forms uploaded yet — check back soon.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -142,10 +142,7 @@ const getDownloadUrl = (item: any): string | null => item['download-link'] || nu
         ) : (
           <div class="rounded-lg border border-dashed border-slate-600 bg-slate-900/40 p-8 text-center">
             <File className="h-10 w-10 mx-auto text-slate-500 mb-3" />
-            <p class="text-sm text-slate-400">No forms uploaded yet.</p>
-            <a href="/jewett-junction/admin/marketing" class="text-sm text-blue-400 hover:text-blue-300 mt-2 inline-block">
-              Upload a form →
-            </a>
+            <p class="text-sm text-slate-400">No forms uploaded yet — check back soon.</p>
           </div>
         )}
       </CardContent>

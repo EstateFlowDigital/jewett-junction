@@ -57,9 +57,6 @@ interface SafetyContentProps {
   quickActions?: QuickAction[];
 }
 
-const SAFETY_DEFAULT_HEADLINE = 'Safety Hub';
-const SAFETY_DEFAULT_SUBTITLE = '4EverSafe — Our commitment to bringing everyone home safely';
-
 export function SafetyContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null, quickActions = [] }: SafetyContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
@@ -138,8 +135,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
     return date.toLocaleDateString();
   };
 
-  const heroHeadline = pageCopy?.['hero-headline'] || SAFETY_DEFAULT_HEADLINE;
-  const heroSubtitle = pageCopy?.['hero-subtitle'] || SAFETY_DEFAULT_SUBTITLE;
+  const heroHeadline = pageCopy?.['hero-headline'] || '';
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
   const alertsHeadline = pageCopy?.['subsection-1-headline'] || 'Safety Alerts & Updates';
   const alertsDescription = pageCopy?.['subsection-1-description'] || '';
   const trainingHeadline = pageCopy?.['subsection-2-headline'] || 'Required Safety Training';
@@ -149,17 +146,21 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
-            <Shield className="h-7 w-7 text-green-600" />
-            {heroHeadline}
-          </h1>
-          {/^\s*<\w/.test(heroSubtitle) ? (
-            <div
-              className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
-              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-            />
-          ) : (
-            <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+          {heroHeadline && (
+            <h1 className={`text-2xl font-bold tracking-tight flex items-center gap-3 ${isDark ? 'text-white' : ''}`}>
+              <Shield className="h-7 w-7 text-green-600" />
+              {heroHeadline}
+            </h1>
+          )}
+          {heroSubtitle && (
+            /^\s*<\w/.test(heroSubtitle) ? (
+              <div
+                className={`mt-1 prose prose-sm max-w-none [&>p]:m-0 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}
+                dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+              />
+            ) : (
+              <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{heroSubtitle}</p>
+            )
           )}
         </div>
       </div>
