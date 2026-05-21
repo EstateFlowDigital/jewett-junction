@@ -15,6 +15,7 @@ interface MarketingAsset {
   'download-link'?: string;
   'preview-image'?: { url: string };
   thumbnail?: { url: string };
+  file?: { url: string };
   'file-format'?: string;
   'file-size'?: string;
   featured?: boolean;
@@ -217,11 +218,19 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
                   ))}
                 </div>
               ) : recentAssets.length > 0 ? (
-                recentAssets.map((asset) => (
+                recentAssets.map((asset) => {
+                  // Prefer preview / thumbnail; fall back to the primary file URL
+                  // when it's an image extension so logo records render properly.
+                  const fileUrl: string | undefined = asset.file?.url || asset['download-link'];
+                  const thumb =
+                    asset['preview-image']?.url ||
+                    asset.thumbnail?.url ||
+                    (fileUrl && /\.(jpe?g|png|svg|webp|gif)(?:\?|$)/i.test(fileUrl) ? fileUrl : null);
+                  return (
                   <a key={asset.id} href={`/jewett-junction/marketing/${asset.slug || asset.id}`} className={`flex items-center justify-between p-4 rounded-lg border ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'} transition-colors cursor-pointer`}>
                     <div className="flex items-center gap-3">
-                      {(asset['preview-image']?.url || asset.thumbnail?.url) ? (
-                        <img src={asset['preview-image']?.url || asset.thumbnail?.url} alt={asset.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
+                      {thumb ? (
+                        <img src={thumb} alt={asset.name} className="w-12 h-12 rounded-lg object-cover shrink-0 bg-white" loading="lazy" />
                       ) : (
                         <div className={`w-12 h-12 ${isDark ? 'bg-rose-900' : 'bg-rose-100'} rounded-lg flex items-center justify-center shrink-0`}>
                           <FileText className="h-6 w-6 text-rose-600" />
@@ -234,15 +243,13 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
                     </div>
                     <ChevronRight className={`h-5 w-5 shrink-0 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`} />
                   </a>
-                ))
+                  );
+                })
               ) : (
                 /* Empty state when no assets */
                 <div className={`text-center py-6 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
                   <FileText className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                  <p>No marketing assets available.</p>
-                  <a href="/jewett-junction/admin" className="text-rose-600 hover:underline text-sm mt-1 inline-block">
-                    Add content in the admin panel
-                  </a>
+                  <p>No marketing assets available yet — check back soon.</p>
                 </div>
               )}
             </CardContent>

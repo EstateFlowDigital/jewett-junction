@@ -232,10 +232,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
         <Card className={`border ${isDark ? 'bg-slate-800 border-slate-700' : ''}`}>
           <CardContent className="py-8 text-center">
             <Users className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-slate-600' : 'text-muted-foreground'} opacity-50`} />
-            <p className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>No HR announcements at this time.</p>
-            <a href="/jewett-junction/admin" className="text-purple-600 hover:underline text-sm mt-2 inline-block">
-              Add content in the admin panel
-            </a>
+            <p className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>No HR announcements posted yet — check back soon.</p>
           </CardContent>
         </Card>
       )}

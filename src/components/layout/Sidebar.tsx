@@ -9,7 +9,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { mainNavItems, type NavItem } from "@/lib/constants/navigation"
-import { Menu, HardHat, Settings } from "lucide-react"
+import { Menu, HardHat } from "lucide-react"
 
 interface SidebarProps {
   currentPath?: string
@@ -72,23 +72,6 @@ export function Sidebar({ currentPath = "", currentTheme = "modern" }: SidebarPr
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="py-3 px-2 space-y-2" role="group" aria-label="Utility navigation">
-        <TooltipProvider>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <a
-                href="/jewett-junction/settings"
-                className="flex h-10 w-10 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors mx-auto"
-                aria-label="Settings"
-              >
-                <Settings className="h-5 w-5" aria-hidden="true" />
-              </a>
-            </TooltipTrigger>
-            <TooltipContent side="right">Settings</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
     </aside>
   )
 }
@@ -166,16 +149,6 @@ function MobileSidebarContent({ currentPath, currentTheme }: { currentPath: stri
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="border-t border-gray-100 p-2 space-y-1" role="group" aria-label="Utility navigation">
-        <a
-          href="/jewett-junction/settings"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-        >
-          <Settings className="h-5 w-5" aria-hidden="true" />
-          <span>Settings</span>
-        </a>
-      </div>
     </div>
   )
 }

@@ -294,9 +294,6 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                 <div className={`text-center py-8 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
                   <Shield className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No safety alerts at this time.</p>
-                  <a href="/jewett-junction/admin" className="text-green-600 hover:underline text-sm mt-2 inline-block">
-                    Add content in the admin panel
-                  </a>
                 </div>
               )}
             </CardContent>

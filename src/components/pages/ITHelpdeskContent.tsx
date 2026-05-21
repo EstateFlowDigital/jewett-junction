@@ -91,8 +91,14 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
   const statusMessage = settings['it-system-status-message'] || '';
   const statusTheme = STATUS_THEME[settings['it-system-status-level'] || 'Operational'] || STATUS_THEME.Operational;
-  const itHoursWeekday = settings['it-hours-weekday'] || '7:00 AM - 6:00 PM';
-  const itHoursSaturday = settings['it-hours-saturday'] || '8:00 AM - 12:00 PM';
+  // Some CMS records prefix the day range into the hours value
+  // (e.g. "Mon–Fri 7:00 AM – 6:00 PM"). The row already has its own
+  // left-label, so strip any leading day-range from the value to avoid
+  // rendering "Mon - Fri | Mon–Fri 7:00 AM – 6:00 PM".
+  const stripDayPrefix = (s: string) =>
+    s.replace(/^\s*(mon|tue|wed|thu|fri|sat|sun)[a-z]*\s*[-–—\/to]+\s*(mon|tue|wed|thu|fri|sat|sun)[a-z]*\s*/i, '').trim();
+  const itHoursWeekday = stripDayPrefix(settings['it-hours-weekday'] || '7:00 AM - 6:00 PM');
+  const itHoursSaturday = stripDayPrefix(settings['it-hours-saturday'] || '8:00 AM - 12:00 PM');
   const itEmergencyHours = settings['it-emergency-hours'] || '24/7 On-Call';
 
   // CMS state - use initialItems if provided (server-side fetched)
@@ -222,10 +228,7 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
                 /* Empty state when no articles */
                 <div className={`text-center py-6 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
                   <HelpCircle className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                  <p>No articles available.</p>
-                  <a href="/jewett-junction/admin" className="text-blue-600 hover:underline text-sm mt-1 inline-block">
-                    Add content in the admin panel
-                  </a>
+                  <p>No how-to articles available yet — check back soon.</p>
                 </div>
               )}
             </CardContent>

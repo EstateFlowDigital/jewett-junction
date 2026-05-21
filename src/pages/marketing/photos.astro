@@ -40,7 +40,7 @@ const getImageUrl = (img: any) => {
         <CardDescription className="text-slate-400">
           {photos.length > 0
             ? `${photos.length} item${photos.length > 1 ? 's' : ''} available`
-            : 'Upload photos in the admin under Marketing Assets → Asset Type: Photo / Video.'}
+            : 'No photos uploaded yet — check back soon.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,10 +81,7 @@ const getImageUrl = (img: any) => {
         ) : (
           <div class="text-center py-12 text-slate-400">
             <Image className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p class="text-sm">No photos uploaded yet.</p>
-            <a href="/jewett-junction/admin/marketing" class="text-purple-400 hover:underline text-sm mt-1 inline-block">
-              Add photos in the admin panel →
-            </a>
+            <p class="text-sm">No photos uploaded yet — check back soon.</p>
           </div>
         )}
       </CardContent>

@@ -969,14 +969,22 @@ export interface IntranetSection {
   'is-active'?: boolean;
 }
 
+let _intranetSectionsCache: { data: { items: IntranetSection[]; total: number }; ts: number } | null = null;
+const INTRANET_SECTIONS_CACHE_MS = 60 * 1000;
 export async function getIntranetSections(options?: { limit?: number }) {
   if (!COLLECTIONS.intranetSections) return { items: [], total: 0 };
+  const now = Date.now();
+  if (_intranetSectionsCache && now - _intranetSectionsCache.ts < INTRANET_SECTIONS_CACHE_MS) {
+    return _intranetSectionsCache.data;
+  }
   const result = await getCollection<IntranetSection>(COLLECTIONS.intranetSections, options);
   // Active only, sorted by sort-order asc.
   const items = result.items
     .filter((s) => s['is-active'] !== false)
     .sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
-  return { ...result, items };
+  const data = { items, total: result.total };
+  _intranetSectionsCache = { data, ts: now };
+  return data;
 }
 
 // Quick action cards for HR, Safety, IT, etc. — one collection holds every

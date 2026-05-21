@@ -41,7 +41,7 @@ const getImageUrl = (img: any) => {
         <CardDescription className="text-slate-400">
           {presentations.length > 0
             ? `${presentations.length} template${presentations.length > 1 ? 's' : ''} available`
-            : 'Upload templates in the admin under Marketing Assets → Asset Type: Presentation.'}
+            : 'No presentation templates uploaded yet — check back soon.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -101,10 +101,7 @@ const getImageUrl = (img: any) => {
         ) : (
           <div class="text-center py-8 text-slate-400">
             <Presentation className="h-10 w-10 mx-auto mb-2 opacity-50" />
-            <p>No presentation templates uploaded yet.</p>
-            <a href="/jewett-junction/admin/marketing" class="text-green-400 hover:underline text-sm mt-1 inline-block">
-              Add one in the admin panel →
-            </a>
+            <p>No presentation templates uploaded yet — check back soon.</p>
           </div>
         )}
       </CardContent>

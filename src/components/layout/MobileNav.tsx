@@ -153,19 +153,6 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
               <span>Notifications</span>
             </a>
             <a
-              href="/jewett-junction/profile"
-              onClick={() => setIsOpen(false)}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                currentPath.startsWith("/jewett-junction/profile")
-                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
-              )}
-            >
-              <User className="h-5 w-5" aria-hidden="true" />
-              <span>My Profile</span>
-            </a>
-            <a
               href="/jewett-junction/help"
               onClick={() => setIsOpen(false)}
               className={cn(
@@ -177,19 +164,6 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             >
               <HelpCircle className="h-5 w-5" aria-hidden="true" />
               <span>Help</span>
-            </a>
-            <a
-              href="/jewett-junction/settings"
-              onClick={() => setIsOpen(false)}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
-                currentPath.startsWith("/jewett-junction/settings")
-                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                  : "text-slate-300 hover:bg-slate-800/70 hover:text-white"
-              )}
-            >
-              <Settings className="h-5 w-5" aria-hidden="true" />
-              <span>Settings</span>
             </a>
           </div>
         </div>
