@@ -1,0 +1,12 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Intranet Sections | Admin">
+  <AdminLayout client:load currentPage="intranet-sections" title="Intranet Sections">
+    <CollectionEditor client:load collectionKey="intranetSections" config={COLLECTIONS.intranetSections} />
+  </AdminLayout>
+</AdminBase>

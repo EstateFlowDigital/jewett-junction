@@ -499,6 +499,7 @@ export const COLLECTIONS = {
   coreValues: '69fcc5395999a5288927fdea',
   employeeBenefits: '69fcc53b891ff14c73b15107',
   companyAwards: '69fcc53c891ff14c73b151de',
+  intranetSections: '6a0f2f504c6e8c76850bda42',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -949,6 +950,31 @@ export async function getSubmittedIdeas(options?: { limit?: number; status?: str
   if (options?.featured) {
     items = items.filter(item => item.featured === true);
   }
+  return { ...result, items };
+}
+
+// Intranet section records — drive the 404 "You Lost?" hub and the Help page
+// section guide. Add/remove/rename from the admin without code changes.
+export interface IntranetSection {
+  id?: string;
+  name: string;
+  slug: string;
+  'destination-url'?: string;
+  description?: string;
+  'icon-svg-path'?: string;
+  gradient?: string;
+  'accent-color'?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+export async function getIntranetSections(options?: { limit?: number }) {
+  if (!COLLECTIONS.intranetSections) return { items: [], total: 0 };
+  const result = await getCollection<IntranetSection>(COLLECTIONS.intranetSections, options);
+  // Active only, sorted by sort-order asc.
+  const items = result.items
+    .filter((s) => s['is-active'] !== false)
+    .sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
   return { ...result, items };
 }
 

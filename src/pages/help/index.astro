@@ -1,5 +1,22 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
+import { initCMS, getIntranetSections } from '../../lib/webflow-cms';
+
+export const prerender = false;
+
+// Sections Guide cards come from the Intranet Sections CMS collection — admin
+// can add/rename/reorder modules without touching code. Quick Start /
+// Navigation / Search Tips / Getting Help below describe how to use the app
+// itself and stay as instructional copy.
+initCMS(Astro.locals);
+
+let sections: any[] = [];
+try {
+  const result = await getIntranetSections();
+  sections = result.items;
+} catch (error) {
+  console.error('help: failed to fetch intranet sections', error);
+}
 ---
 
 <ThemedPage title="Help & User Guide - Jewett Junction" currentSection="help">
@@ -45,207 +62,43 @@ import ThemedPage from '../../layouts/themed-page.astro';
       </div>
     </section>
 
-    <!-- Sections Guide -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-        </svg>
-        Sections Guide
-      </h2>
+    <!-- Sections Guide — CMS-driven via Intranet Sections collection -->
+    {sections.length > 0 && (
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+          <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          Sections Guide
+        </h2>
 
-      <div class="space-y-4">
-        <!-- Dashboard -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Dashboard</h3>
-              <p class="text-slate-400 text-sm">Your home base. View company announcements, upcoming events, quick stats, and important updates at a glance.</p>
-            </div>
-          </div>
+        <div class="space-y-4">
+          {sections.map((s) => (
+            <a
+              href={s['destination-url'] || '#'}
+              class={`block bg-slate-800/50 border border-slate-700 hover:border-${s['accent-color'] || 'slate'}-500/50 rounded-xl p-5 transition-colors group min-h-[44px]`}
+              aria-label={`Open ${s.name}`}
+            >
+              <div class="flex items-start gap-3">
+                <div class={`w-10 h-10 rounded-lg bg-gradient-to-br ${s.gradient || 'from-slate-500 to-slate-600'} flex items-center justify-center flex-shrink-0`}>
+                  {s['icon-svg-path'] && (
+                    <svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={s['icon-svg-path']} />
+                    </svg>
+                  )}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class={`font-medium text-white mb-1 group-hover:text-${s['accent-color'] || 'blue'}-300 transition-colors`}>{s.name}</h3>
+                  {s.description && (
+                    <p class="text-slate-400 text-sm">{s.description}</p>
+                  )}
+                </div>
+              </div>
+            </a>
+          ))}
         </div>
-
-        <!-- Safety -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Safety</h3>
-              <p class="text-slate-400 text-sm">Access safety resources, training materials, incident reporting forms, and safety guidelines. Track the company's safety metrics and days without incidents.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- HR -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">HR (Human Resources)</h3>
-              <p class="text-slate-400 text-sm">Find HR policies, benefits information, time-off requests, employee handbook, and contact HR for assistance.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- IT Helpdesk -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">IT Helpdesk</h3>
-              <p class="text-slate-400 text-sm">Submit IT support tickets, view FAQs, access software guides, and find troubleshooting resources for common issues.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Marketing -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Marketing</h3>
-              <p class="text-slate-400 text-sm">Access brand guidelines, marketing materials, request signage, download templates, and view marketing campaigns.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Events -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Events</h3>
-              <p class="text-slate-400 text-sm">Browse upcoming company events, team activities, training sessions, and social gatherings. RSVP and add events to your calendar.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Culture -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Culture</h3>
-              <p class="text-slate-400 text-sm">Explore company values, culture initiatives, employee spotlights, and community involvement programs.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Careers -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Careers</h3>
-              <p class="text-slate-400 text-sm">View internal job postings, apply for positions, refer candidates, and explore career development opportunities.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Directory -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-teal-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Directory</h3>
-              <p class="text-slate-400 text-sm">Search for employees by name, department, or location. View contact information, org charts, and team structures.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resources -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg aria-hidden="true" class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="font-medium text-white mb-1">Resources</h3>
-              <p class="text-slate-400 text-sm">Access company documents, forms, policies, templates, and other shared resources. Download files and reference materials.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features -->
-    <section class="mb-10">
-      <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-        <svg aria-hidden="true" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-        </svg>
-        Features
-      </h2>
-
-      <div class="grid gap-4 sm:grid-cols-2">
-        <!-- Profile -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 class="font-medium text-white mb-2">Your Profile</h3>
-          <p class="text-slate-400 text-sm mb-3">View your employee information, earned badges, and points history. Track your engagement and achievements.</p>
-          <a href="/jewett-junction/profile" class="text-blue-400 hover:text-blue-300 text-sm font-medium">View Profile →</a>
-        </div>
-
-        <!-- Notifications -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 class="font-medium text-white mb-2">Notifications</h3>
-          <p class="text-slate-400 text-sm mb-3">Stay updated with personalized notifications about announcements, events, and mentions.</p>
-          <a href="/jewett-junction/notifications" class="text-blue-400 hover:text-blue-300 text-sm font-medium">View Notifications →</a>
-        </div>
-
-        <!-- Submit Idea -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 class="font-medium text-white mb-2">Submit an Idea</h3>
-          <p class="text-slate-400 text-sm mb-3">Have a suggestion to improve our workplace? Submit your ideas and help shape our company's future.</p>
-          <a href="/jewett-junction/submit-idea" class="text-amber-400 hover:text-amber-300 text-sm font-medium">Submit Idea →</a>
-        </div>
-
-        <!-- Settings -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-5">
-          <h3 class="font-medium text-white mb-2">Settings</h3>
-          <p class="text-slate-400 text-sm mb-3">Customize your experience, manage notification preferences, and update your account settings.</p>
-          <a href="/jewett-junction/settings" class="text-blue-400 hover:text-blue-300 text-sm font-medium">Open Settings →</a>
-        </div>
-      </div>
-    </section>
+      </section>
+    )}
 
     <!-- Search Tips -->
     <section class="mb-10">

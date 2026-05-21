@@ -177,6 +177,10 @@ const VALID_FIELDS: Record<string, string[]> = {
   companyAwards: [
     'name', 'slug', 'year', 'sort-order', 'is-active',
   ],
+  intranetSections: [
+    'name', 'slug', 'destination-url', 'description', 'icon-svg-path',
+    'gradient', 'accent-color', 'sort-order', 'is-active',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection.
