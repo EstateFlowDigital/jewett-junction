@@ -94,14 +94,6 @@ const COLOR_GRADIENTS: Record<string, string> = {
   green: 'from-green-500 to-emerald-500',
 };
 
-// Hardcoded fallback used if CMS returns no Core Values.
-const FALLBACK_CORE_VALUES: CMSCoreValue[] = [
-  { id: 'fallback-1', name: 'Safety First', tagline: '4EverSafe', description: 'Nothing is more important than everyone going home safe. We never compromise on safety.', 'icon-name': 'Shield', color: 'orange' },
-  { id: 'fallback-2', name: 'Excellence', tagline: 'Quality in all we do', description: 'We take pride in our work and strive for excellence in every project we undertake.', 'icon-name': 'Star', color: 'amber' },
-  { id: 'fallback-3', name: 'Teamwork', tagline: 'Better together', description: 'Our greatest strength is our people working together toward shared goals.', 'icon-name': 'Users', color: 'blue' },
-  { id: 'fallback-4', name: 'Integrity', tagline: 'Do the right thing', description: 'We act with honesty and transparency, earning trust through our actions.', 'icon-name': 'Target', color: 'emerald' },
-];
-
 const typeConfig: Record<string, { icon: any; color: string; gradient: string; label: string }> = {
   'employee-spotlight': { icon: Star, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Employee Spotlight' },
   'spotlight': { icon: Star, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Spotlight' },
@@ -125,7 +117,10 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   const allStories = cmsStories;
   const volunteerHours = settings['culture-volunteer-hours'] || '450+';
   const donations = settings['culture-donations'] || '$125K';
-  const coreValues = (cmsCoreValues.length > 0 ? cmsCoreValues : FALLBACK_CORE_VALUES).map((v) => ({
+  // Core values come from the Core Values CMS collection. No hardcoded
+  // fallback — when the collection is empty the Values section hides
+  // entirely (see render guard further down).
+  const coreValues = cmsCoreValues.map((v) => ({
     icon: VALUE_ICONS[v['icon-name'] || ''] || Sparkles,
     name: v.name || '',
     tagline: v.tagline || '',
@@ -133,6 +128,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
     color: v.color || 'slate',
     gradient: COLOR_GRADIENTS[v.color || ''] || 'from-slate-500 to-slate-600',
   }));
+  const hasCoreValues = coreValues.length > 0;
   const [activeValueIndex, setActiveValueIndex] = React.useState(0);
   const [spotlightIndex, setSpotlightIndex] = React.useState(0);
 
@@ -161,13 +157,14 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   // Get current month for spotlight badge
   const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  // Auto-rotate values
+  // Auto-rotate values — only runs when there are values to rotate through.
   React.useEffect(() => {
+    if (!hasCoreValues) return;
     const interval = setInterval(() => {
       setActiveValueIndex((prev) => (prev + 1) % coreValues.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [hasCoreValues, coreValues.length]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -215,36 +212,38 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         <div className="absolute -top-10 -left-10 w-48 h-48 bg-rose-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Core Values Section */}
-      <div>
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Our Core Values</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            These principles guide everything we do—from the projects we build to the relationships we nurture.
-          </p>
-        </div>
+      {/* Core Values Section — hidden when the Core Values CMS collection is empty */}
+      {hasCoreValues && (
+        <div>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Our Core Values</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              These principles guide everything we do—from the projects we build to the relationships we nurture.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {coreValues.map((value, index) => (
-            <Card
-              key={value.name}
-              className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer ${
-                activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
-              }`}
-              onClick={() => setActiveValueIndex(index)}
-            >
-              <CardContent className="p-6">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                  <value.icon className="h-7 w-7 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
-                <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
-                <p className="text-sm text-slate-400">{value.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {coreValues.map((value, index) => (
+              <Card
+                key={value.name}
+                className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer ${
+                  activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
+                }`}
+                onClick={() => setActiveValueIndex(index)}
+              >
+                <CardContent className="p-6">
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <value.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
+                  <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
+                  <p className="text-sm text-slate-400">{value.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Stats — counts come from real Culture Stories; volunteer hours from Site Settings. */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

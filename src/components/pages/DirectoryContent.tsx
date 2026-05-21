@@ -191,8 +191,8 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     return searchResults.map(result => result.item);
   }, [allEmployees, debouncedSearch, selectedDept]);
 
-  // Get unique locations
-  const locations = [...new Set(allEmployees.map(e => e.location || 'Unknown'))];
+  // Get unique locations (skip empties so the stats card doesn't inflate count with "Unknown")
+  const locations = [...new Set(allEmployees.map(e => e.location).filter((l): l is string => !!l))];
 
   // Department counts
   const deptCounts = allEmployees.reduce((acc, emp) => {
@@ -587,10 +587,12 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                         </Badge>
                       </div>
 
-                      <div className="text-sm text-slate-400 flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {emp.location || 'Unknown'}
-                      </div>
+                      {emp.location && (
+                        <div className="text-sm text-slate-400 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {emp.location}
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-2 justify-end">
                         {emp.phone && (

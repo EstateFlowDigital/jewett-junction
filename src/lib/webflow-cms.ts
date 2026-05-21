@@ -107,7 +107,8 @@ interface WebflowCollectionResponse {
 // When Webflow's placeholder Option fields couldn't be updated via API we created
 // new Option fields with different slugs. Display code still references the old keys,
 // so aliasCollectionItem mirrors the new-slug values back onto the old keys.
-const COLLECTION_FIELD_ALIASES: Record<string, Record<string, string>> = {
+// Value may be a single source key or an array (priority chain — first non-empty wins).
+const COLLECTION_FIELD_ALIASES: Record<string, Record<string, string | string[]>> = {
   // Maps oldKey → newKey per collection. Populated lazily because COLLECTIONS is defined below.
 };
 
@@ -168,11 +169,16 @@ function applyFieldAliases(collectionId: string, fieldData: Record<string, unkno
   const out = { ...resolved };
   // Always prefer the new (canonical) key when it has a value — the new field is
   // the source of truth, the old key is preserved only as a display alias.
-  // This also rescues records where the old field still holds an unresolved
-  // option id from a placeholder Option field that resolveOptionIds couldn't map.
-  for (const [oldKey, newKey] of Object.entries(aliases)) {
-    if (out[newKey] !== undefined && out[newKey] !== null && out[newKey] !== '') {
-      out[oldKey] = out[newKey];
+  // When the alias value is an array, the first source with a non-empty value
+  // wins (priority chain for staged field renames, e.g. dept → team-department).
+  for (const [oldKey, source] of Object.entries(aliases)) {
+    const sources = Array.isArray(source) ? source : [source];
+    for (const newKey of sources) {
+      const value = out[newKey];
+      if (value !== undefined && value !== null && value !== '') {
+        out[oldKey] = value;
+        break;
+      }
     }
   }
   return out;
@@ -502,7 +508,13 @@ Object.assign(COLLECTION_FIELD_ALIASES, {
   // `dept` is the canonical employee department field; alias mirrors to
   // legacy `department` key so display code that hasn't been migrated still reads it.
   // The retired `team-department` field is no longer mirrored or written to.
-  [COLLECTIONS.employees]: { department: 'dept' },
+  [COLLECTIONS.employees]: {
+    // Display code reads `department` and `location`; chain through the
+    // canonical-then-legacy fields so the first non-empty value wins.
+    department: ['dept', 'team-department'],
+    'team-department': 'dept',
+    location: 'office-location',
+  },
   [COLLECTIONS.announcements]: { priority: 'priority-level', category: 'news-category' },
   [COLLECTIONS.events]: { category: 'event-category' },
   [COLLECTIONS.jobPostings]: { department: 'job-department' },
