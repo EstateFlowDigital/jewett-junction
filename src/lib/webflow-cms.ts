@@ -500,6 +500,7 @@ export const COLLECTIONS = {
   employeeBenefits: '69fcc53b891ff14c73b15107',
   companyAwards: '69fcc53c891ff14c73b151de',
   intranetSections: '6a0f2f504c6e8c76850bda42',
+  quickActions: '6a0f33dde0546a1a2e4afc24',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -975,6 +976,35 @@ export async function getIntranetSections(options?: { limit?: number }) {
   const items = result.items
     .filter((s) => s['is-active'] !== false)
     .sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
+  return { ...result, items };
+}
+
+// Quick action cards for HR, Safety, IT, etc. — one collection holds every
+// card across every page. Filtered by `page-slug` per landing page so each
+// page renders only its own cards. Sorted by `sort-order` ascending.
+export interface QuickAction {
+  id?: string;
+  name: string;
+  slug: string;
+  'page-slug'?: string;
+  title?: string;
+  subtitle?: string;
+  'destination-url'?: string;
+  'icon-name'?: string;
+  'accent-color'?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+export async function getQuickActions(options?: { pageSlug?: string; limit?: number }) {
+  if (!COLLECTIONS.quickActions) return { items: [], total: 0 };
+  const result = await getCollection<QuickAction>(COLLECTIONS.quickActions, { limit: options?.limit });
+  let items = result.items.filter((a) => a['is-active'] !== false);
+  if (options?.pageSlug) {
+    const needle = options.pageSlug.toLowerCase();
+    items = items.filter((a) => (a['page-slug'] || '').toLowerCase() === needle);
+  }
+  items = items.sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
   return { ...result, items };
 }
 

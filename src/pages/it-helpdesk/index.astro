@@ -1,18 +1,20 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { ITHelpdeskContent } from '../../components/pages/ITHelpdeskContent';
-import { initCMS, getITKnowledgeBase, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
+import { initCMS, getITKnowledgeBase, getSiteSettings, getPageCopy, getQuickActions } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
-const [itResult, settings, pageCopy] = await Promise.all([
+const [itResult, settings, pageCopy, quickActionsResult] = await Promise.all([
   getITKnowledgeBase({ limit: 50 }),
   getSiteSettings(),
   getPageCopy('it-helpdesk'),
+  getQuickActions({ pageSlug: 'it' }),
 ]);
 const itArticles = itResult.items;
+const quickActions = quickActionsResult.items;
 ---
 
 <ThemedPage title="IT Help Desk | Jewett Junction" theme="dark" currentSection="it-helpdesk">
-  <ITHelpdeskContent client:load theme="dark" initialItems={itArticles} settings={settings} pageCopy={pageCopy} />
+  <ITHelpdeskContent client:load theme="dark" initialItems={itArticles} settings={settings} pageCopy={pageCopy} quickActions={quickActions} />
 </ThemedPage>

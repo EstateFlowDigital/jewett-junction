@@ -2,18 +2,20 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { HRContent } from '../../components/pages/HRContent';
-import { initCMS, getHRContent, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
+import { initCMS, getHRContent, getSiteSettings, getPageCopy, getQuickActions } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
-const [hrResult, settings, pageCopy] = await Promise.all([
+const [hrResult, settings, pageCopy, quickActionsResult] = await Promise.all([
   getHRContent({ limit: 50 }),
   getSiteSettings(),
   getPageCopy('hr'),
+  getQuickActions({ pageSlug: 'hr' }),
 ]);
 const hrItems = hrResult.items;
+const quickActions = quickActionsResult.items;
 ---
 
 <ThemedPage title="HR Resources | Jewett Junction" theme="dark" currentSection="hr">
-  <HRContent client:load theme="dark" initialItems={hrItems} settings={settings} pageCopy={pageCopy} />
+  <HRContent client:load theme="dark" initialItems={hrItems} settings={settings} pageCopy={pageCopy} quickActions={quickActions} />
 </ThemedPage>

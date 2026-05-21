@@ -2,18 +2,20 @@
 export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { SafetyContent } from '../../components/pages/SafetyContent';
-import { initCMS, getSafetyContent, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
+import { initCMS, getSafetyContent, getSiteSettings, getPageCopy, getQuickActions } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
-const [safetyResult, settings, pageCopy] = await Promise.all([
+const [safetyResult, settings, pageCopy, quickActionsResult] = await Promise.all([
   getSafetyContent({ limit: 50 }),
   getSiteSettings(),
   getPageCopy('safety'),
+  getQuickActions({ pageSlug: 'safety' }),
 ]);
 const safetyItems = safetyResult.items;
+const quickActions = quickActionsResult.items;
 ---
 
 <ThemedPage title="Safety Hub | Jewett Junction" theme="dark" currentSection="safety">
-  <SafetyContent client:load theme="dark" initialItems={safetyItems} settings={settings} pageCopy={pageCopy} />
+  <SafetyContent client:load theme="dark" initialItems={safetyItems} settings={settings} pageCopy={pageCopy} quickActions={quickActions} />
 </ThemedPage>

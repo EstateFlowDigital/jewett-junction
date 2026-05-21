@@ -183,6 +183,10 @@ const VALID_FIELDS: Record<string, string[]> = {
     'name', 'slug', 'destination-url', 'description', 'icon-svg-path',
     'gradient', 'accent-color', 'sort-order', 'is-active',
   ],
+  quickActions: [
+    'name', 'slug', 'page-slug', 'title', 'subtitle', 'destination-url',
+    'icon-name', 'accent-color', 'sort-order', 'is-active',
+  ],
 };
 
 // Filter fields to only include valid ones for the collection.

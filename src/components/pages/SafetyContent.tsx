@@ -5,6 +5,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { TeamContactCard } from './TeamContactCard';
+import { QuickActionCards, type QuickAction } from './QuickActionCards';
 
 interface SafetyItem {
   id: string;
@@ -51,12 +52,15 @@ interface SafetyContentProps {
   initialItems?: SafetyItem[];
   settings?: SafetySettings;
   pageCopy?: SafetyPageCopy | null;
+  /** Quick-action cards for this page, pre-filtered server-side from the
+   *  Quick Actions CMS collection. */
+  quickActions?: QuickAction[];
 }
 
 const SAFETY_DEFAULT_HEADLINE = 'Safety Hub';
 const SAFETY_DEFAULT_SUBTITLE = '4EverSafe — Our commitment to bringing everyone home safely';
 
-export function SafetyContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: SafetyContentProps) {
+export function SafetyContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null, quickActions = [] }: SafetyContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const safetyEmail = settings['safety-email'] || 'safety@jewettconstruction.com';
@@ -176,53 +180,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
         </Card>
       )}
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/jewett-junction/safety-incident">
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-red-800 hover:border-red-600' : 'border-red-200 bg-red-50/50 hover:border-red-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-red-900' : 'bg-red-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <AlertTriangle className="h-6 w-6 text-red-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-red-400' : 'text-red-900'}`}>Report Incident</div>
-              <div className={`text-sm ${isDark ? 'text-red-500' : 'text-red-700'}`}>Submit safety report</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href="/jewett-junction/safety-incident">
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-yellow-800 hover:border-yellow-600' : 'border-yellow-200 bg-yellow-50/50 hover:border-yellow-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-yellow-900' : 'bg-yellow-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <Eye className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-yellow-400' : 'text-yellow-900'}`}>Report Hazard</div>
-              <div className={`text-sm ${isDark ? 'text-yellow-500' : 'text-yellow-700'}`}>Identify unsafe conditions</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href={resourcesLink}>
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-blue-800 hover:border-blue-600' : 'border-blue-200 bg-blue-50/50 hover:border-blue-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <BookOpen className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-blue-400' : 'text-blue-900'}`}>Safety Training</div>
-              <div className={`text-sm ${isDark ? 'text-blue-500' : 'text-blue-700'}`}>View available courses</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href={resourcesLink}>
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-green-800 hover:border-green-600' : 'border-green-200 bg-green-50/50 hover:border-green-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <FileText className="h-6 w-6 text-green-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-green-400' : 'text-green-900'}`}>Safety Docs</div>
-              <div className={`text-sm ${isDark ? 'text-green-500' : 'text-green-700'}`}>Policies & procedures</div>
-            </CardContent>
-          </Card>
-        </a>
-      </div>
+      {/* Quick Actions — fully CMS-driven via the Quick Actions collection */}
+      <QuickActionCards actions={quickActions} theme={theme} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}

@@ -5,6 +5,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { TeamContactCard } from './TeamContactCard';
+import { QuickActionCards, type QuickAction } from './QuickActionCards';
 
 interface ITArticle {
   id: string;
@@ -79,12 +80,15 @@ interface ITHelpdeskContentProps {
   initialItems?: ITArticle[];
   settings?: ITSettings;
   pageCopy?: ITPageCopy | null;
+  /** Quick-action cards for this page, pre-filtered server-side from the
+   *  Quick Actions CMS collection. */
+  quickActions?: QuickAction[];
 }
 
 const IT_DEFAULT_HEADLINE = 'IT Help Desk';
 const IT_DEFAULT_SUBTITLE = 'Technical support, resources, and self-service tools';
 
-export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null }: ITHelpdeskContentProps) {
+export function ITHelpdeskContent({ theme = 'modern', initialItems = [], settings = {}, pageCopy = null, quickActions = [] }: ITHelpdeskContentProps) {
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
@@ -167,53 +171,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/jewett-junction/it-ticket">
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-blue-800 hover:border-blue-600' : 'border-blue-200 bg-blue-50/50 hover:border-blue-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <Ticket className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-blue-400' : 'text-blue-900'}`}>Submit Ticket</div>
-              <div className={`text-sm ${isDark ? 'text-blue-500' : 'text-blue-700'}`}>Get help now</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href={resourcesLink}>
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-purple-800 hover:border-purple-600' : 'border-purple-200 bg-purple-50/50 hover:border-purple-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-purple-900' : 'bg-purple-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <BookOpen className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-purple-400' : 'text-purple-900'}`}>Knowledge Base</div>
-              <div className={`text-sm ${isDark ? 'text-purple-500' : 'text-purple-700'}`}>Self-service help</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href={resourcesLink}>
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-green-800 hover:border-green-600' : 'border-green-200 bg-green-50/50 hover:border-green-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-green-900' : 'bg-green-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <Monitor className="h-6 w-6 text-green-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-green-400' : 'text-green-900'}`}>Software</div>
-              <div className={`text-sm ${isDark ? 'text-green-500' : 'text-green-700'}`}>Request access</div>
-            </CardContent>
-          </Card>
-        </a>
-        <a href={resourcesLink}>
-          <Card className={`hover:shadow-lg transition-all cursor-pointer h-full ${isDark ? 'bg-slate-800 border-orange-800 hover:border-orange-600' : 'border-orange-200 bg-orange-50/50 hover:border-orange-400'}`}>
-            <CardContent className="py-4 text-center">
-              <div className={`w-12 h-12 ${isDark ? 'bg-orange-900' : 'bg-orange-100'} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                <Settings className="h-6 w-6 text-orange-600" />
-              </div>
-              <div className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-900'}`}>My Devices</div>
-              <div className={`text-sm ${isDark ? 'text-orange-500' : 'text-orange-700'}`}>Manage equipment</div>
-            </CardContent>
-          </Card>
-        </a>
-      </div>
+      {/* Quick Actions — fully CMS-driven via the Quick Actions collection */}
+      <QuickActionCards actions={quickActions} theme={theme} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

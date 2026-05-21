@@ -1,0 +1,12 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Quick Actions | Admin">
+  <AdminLayout client:load currentPage="quick-actions" title="Quick Actions">
+    <CollectionEditor client:load collectionKey="quickActions" config={COLLECTIONS.quickActions} />
+  </AdminLayout>
+</AdminBase>
