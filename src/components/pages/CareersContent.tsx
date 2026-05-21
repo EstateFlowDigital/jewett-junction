@@ -99,23 +99,6 @@ const BENEFIT_ICONS: Record<string, any> = {
 type BenefitDisplay = { icon: any; title: string; description: string };
 type AwardDisplay = { year: string; title: string };
 
-const FALLBACK_BENEFITS: BenefitDisplay[] = [
-  { icon: Heart, title: 'Medical, Dental & Vision', description: 'Comprehensive health coverage with multiple plan options and 4-tier coverage to protect you and your family.' },
-  { icon: PiggyBank, title: '401(k) with Company Match', description: '100% company match on your contributions up to 4%, with no vesting schedule. Your future starts day one.' },
-  { icon: GraduationCap, title: 'Tuition Reimbursement', description: 'Up to $3,000 annually toward accredited degree programs. We invest in your growth because your development matters.' },
-  { icon: Calendar, title: 'Paid Time Off', description: 'Generous PTO accrual for vacation, sick time, and personal days — because balance builds better teams.' },
-  { icon: Shield, title: 'Insurance & Protection', description: 'Company-sponsored short and long-term disability insurance plus life insurance coverage at no cost to you.' },
-  { icon: Home, title: 'Flexible Work Options', description: 'Remote and hybrid arrangements available for qualifying roles, with the tools and support to work from anywhere.' },
-  { icon: Users, title: 'Wellness & Community', description: 'Team outings, wellness challenges, cooking classes, book clubs, and volunteer events to stay connected.' },
-  { icon: Gift, title: 'Employee Referral Bonuses', description: 'Know someone who belongs on this team? Earn cash bonuses for every successful referral you make.' },
-];
-
-const FALLBACK_AWARDS: AwardDisplay[] = [
-  { year: '2024', title: 'Best Company to Work For' },
-  { year: '2023', title: 'Best Companies to Work For' },
-  { year: '2023', title: 'Verified Employer Silver' },
-];
-
 function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   const [formData, setFormData] = React.useState({
     firstName: '',
@@ -624,16 +607,20 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
   const sectionBody = pageCopy?.['section-body'] || DEFAULT_SECTION_BODY;
   const applicationDescription = pageCopy?.['application-description'] || DEFAULT_APPLICATION_DESCRIPTION;
   const careersEmail = settings['careers-email'] || 'careers@jewett.com';
-  const benefits: BenefitDisplay[] = cmsBenefits.length > 0
-    ? cmsBenefits.map((b) => ({
-        icon: BENEFIT_ICONS[b['icon-name'] || ''] || Star,
-        title: b.name || '',
-        description: b.description || '',
-      }))
-    : FALLBACK_BENEFITS;
-  const awards: AwardDisplay[] = cmsAwards.length > 0
-    ? cmsAwards.map((a) => ({ year: a.year || '', title: a.name || '' }))
-    : FALLBACK_AWARDS;
+  // Benefits + awards come from CMS only. No hardcoded fallbacks — when
+  // either collection is empty, the corresponding section hides entirely
+  // (see render guards below).
+  const benefits: BenefitDisplay[] = cmsBenefits.map((b) => ({
+    icon: BENEFIT_ICONS[b['icon-name'] || ''] || Star,
+    title: b.name || '',
+    description: b.description || '',
+  }));
+  const awards: AwardDisplay[] = cmsAwards.map((a) => ({
+    year: a.year || '',
+    title: a.name || '',
+  }));
+  const hasBenefits = benefits.length > 0;
+  const hasAwards = awards.length > 0;
   // Use CMS jobs only - no hardcoded fallback
   const allJobs = jobs;
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -723,60 +710,65 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Award className="h-5 w-5 text-amber-400" />
-              Recognition & Awards
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {awards.map((award, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 p-3 rounded-lg bg-slate-900/50 border border-slate-700"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                    <Award className="h-6 w-6 text-amber-400" />
+        {/* Awards card — hidden when the Company Awards CMS collection is empty */}
+        {hasAwards && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Award className="h-5 w-5 text-amber-400" />
+                Recognition & Awards
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {awards.map((award, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 p-3 rounded-lg bg-slate-900/50 border border-slate-700"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                      <Award className="h-6 w-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">{award.title}</p>
+                      <p className="text-sm text-slate-400">{award.year}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-white">{award.title}</p>
-                    <p className="text-sm text-slate-400">{award.year}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Benefits Section */}
-      <div>
-        <div className="text-center mb-8">
-          <p className="text-sm text-blue-400 uppercase tracking-wider font-semibold mb-2">Total Rewards</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Benefits That Build With You</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            From day one, you're backed by a benefits package designed to support your health, your family, and your future. Because when our people thrive, great things get built.
-          </p>
+      {/* Benefits Section — hidden when the Employee Benefits CMS collection is empty */}
+      {hasBenefits && (
+        <div>
+          <div className="text-center mb-8">
+            <p className="text-sm text-blue-400 uppercase tracking-wider font-semibold mb-2">Total Rewards</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Benefits That Build With You</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              From day one, you're backed by a benefits package designed to support your health, your family, and your future. Because when our people thrive, great things get built.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {benefits.map((benefit) => (
+              <Card
+                key={benefit.title}
+                className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-colors"
+              >
+                <CardContent className="p-5">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-4">
+                    <benefit.icon className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">{benefit.title}</h3>
+                  <p className="text-sm text-slate-400">{benefit.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {benefits.map((benefit) => (
-            <Card
-              key={benefit.title}
-              className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-colors"
-            >
-              <CardContent className="p-5">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mb-4">
-                  <benefit.icon className="h-5 w-5 text-blue-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">{benefit.title}</h3>
-                <p className="text-sm text-slate-400">{benefit.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Open Positions */}
       <div id="positions" className="scroll-mt-8">
