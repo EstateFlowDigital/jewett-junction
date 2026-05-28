@@ -154,7 +154,12 @@ const typeColors: Record<Notification['type'], string> = {
   system: 'text-slate-400 bg-slate-500/20'
 };
 
-export function NotificationsContent() {
+interface NotificationsContentProps {
+  heroHeadline?: string;
+  heroSubtitle?: string;
+}
+
+export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: NotificationsContentProps = {}) {
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [filter, setFilter] = React.useState<'all' | 'unread'>('all');
@@ -219,16 +224,18 @@ export function NotificationsContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 flex items-center gap-3">
-            <Bell className="w-7 h-7 text-amber-400" aria-hidden="true" />
-            Notifications
-            {unreadCount > 0 && (
-              <span className="px-2 py-1 bg-red-500 text-white text-sm font-medium rounded-full">
-                {unreadCount}
-              </span>
-            )}
-          </h1>
-          <p className="text-slate-400">Stay updated with the latest news and alerts</p>
+          {heroHeadline && (
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <Bell className="w-7 h-7 text-amber-400" aria-hidden="true" />
+              {heroHeadline}
+              {unreadCount > 0 && (
+                <span className="px-2 py-1 bg-red-500 text-white text-sm font-medium rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </h1>
+          )}
+          {heroSubtitle && <p className="text-slate-400">{heroSubtitle}</p>}
         </div>
         <div className="flex items-center gap-2">
           <a

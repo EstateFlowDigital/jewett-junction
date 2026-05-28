@@ -1,8 +1,21 @@
 ---
+export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { NotificationsContent } from '../../components/notifications/NotificationsContent';
+import { initCMS, getPageCopy } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+
+let pageCopy: any = null;
+try {
+  pageCopy = await getPageCopy('notifications');
+} catch (error) {
+  console.error('Error fetching notifications page copy:', error);
+}
+const heroHeadline = pageCopy?.['hero-headline'] || '';
+const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
 ---
 
-<ThemedPage title="Notifications | Jewett Junction" theme="dark" currentSection="notifications">
-  <NotificationsContent client:load />
+<ThemedPage title={`${heroHeadline || 'Notifications'} | Jewett Junction`} theme="dark" currentSection="notifications">
+  <NotificationsContent client:load heroHeadline={heroHeadline} heroSubtitle={heroSubtitle} />
 </ThemedPage>

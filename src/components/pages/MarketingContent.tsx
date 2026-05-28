@@ -32,6 +32,9 @@ interface MarketingSettings {
 interface MarketingPageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
+  /** Brand Banner title + body (content-block-1). */
+  'content-block-1-title'?: string;
+  'content-block-1-body'?: string;
 }
 
 interface MarketingContentProps {
@@ -103,6 +106,8 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
 
   const heroHeadline = pageCopy?.['hero-headline'] || '';
   const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
+  const brandBannerTitle = pageCopy?.['content-block-1-title'] || '';
+  const brandBannerBody = (pageCopy?.['content-block-1-body'] || '').replace(/<[^>]*>/g, '').trim();
 
   return (
     <div className="space-y-6">
@@ -125,22 +130,24 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
         )}
       </div>
 
-      {/* Brand Banner */}
-      <Card className="bg-gradient-to-r from-rose-600 to-pink-600 text-white border-0">
-        <CardContent className="py-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold">Jewett Construction Brand Guidelines</h2>
-              <p className="text-rose-100">Ensure brand consistency across all materials</p>
+      {/* Brand Banner — hidden when CMS title is blank */}
+      {brandBannerTitle && (
+        <Card className="bg-gradient-to-r from-rose-600 to-pink-600 text-white border-0">
+          <CardContent className="py-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold">{brandBannerTitle}</h2>
+                {brandBannerBody && <p className="text-rose-100">{brandBannerBody}</p>}
+              </div>
+              <a href={brandGuidelinesLink}>
+                <Button className="bg-white text-rose-700 hover:bg-rose-50">
+                  View Brand Guide
+                </Button>
+              </a>
             </div>
-            <a href={brandGuidelinesLink}>
-              <Button className="bg-white text-rose-700 hover:bg-rose-50">
-                View Brand Guide
-              </Button>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Follow Us — social links */}
       {socialLinks.length > 0 && (

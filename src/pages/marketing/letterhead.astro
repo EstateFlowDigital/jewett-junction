@@ -5,13 +5,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { FileText, Download, ArrowLeft, File } from 'lucide-react';
-import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssets, getPageCopy } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
 // Single source: Marketing Assets in the admin. Bucket by asset-type / name.
-const result = await getMarketingAssets({ limit: 100 });
+const [result, copy] = await Promise.all([
+  getMarketingAssets({ limit: 100 }),
+  getPageCopy('marketing-letterhead'),
+]);
 const assets = result.items;
+const heroHeadline = copy?.['hero-headline'] || '';
+const heroSubtitle = copy?.['hero-subtitle'] || '';
 
 function matchesAny(value: string | undefined, needles: string[]): boolean {
   if (!value) return false;
@@ -34,18 +39,20 @@ const formAssets = assets.filter((a: any) => {
 const getDownloadUrl = (item: any): string | null => item['download-link'] || null;
 ---
 
-<ThemedPage title="Letterhead & Forms | Jewett Junction" theme="dark" currentSection="marketing">
+<ThemedPage title={`${heroHeadline || 'Marketing'} | Jewett Junction`} theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
       <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors" aria-label="Back to Marketing">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
-        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
-          <FileText className="h-7 w-7 text-blue-500" />
-          Letterhead & Forms
-        </h1>
-        <p class="text-slate-400 mt-1">Official document templates and forms</p>
+        {heroHeadline && (
+          <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+            <FileText className="h-7 w-7 text-blue-500" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
       </div>
     </div>
 

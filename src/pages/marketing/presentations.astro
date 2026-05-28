@@ -4,13 +4,18 @@ import ThemedPage from '../../layouts/themed-page.astro';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Presentation, Download, ArrowLeft } from 'lucide-react';
-import { initCMS, getMarketingAssets } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssets, getPageCopy } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
 // Presentations are CMS-driven (Marketing Assets, asset-type: Presentation).
-const result = await getMarketingAssets({ type: 'Presentation', limit: 50 });
+const [result, copy] = await Promise.all([
+  getMarketingAssets({ type: 'Presentation', limit: 50 }),
+  getPageCopy('marketing-presentations'),
+]);
 const presentations = result.items;
+const heroHeadline = copy?.['hero-headline'] || '';
+const heroSubtitle = copy?.['hero-subtitle'] || '';
 
 const getImageUrl = (img: any) => {
   if (!img) return null;
@@ -20,18 +25,20 @@ const getImageUrl = (img: any) => {
 };
 ---
 
-<ThemedPage title="Presentations | Jewett Junction" theme="dark" currentSection="marketing">
+<ThemedPage title={`${heroHeadline || 'Marketing'} | Jewett Junction`} theme="dark" currentSection="marketing">
   <div class="space-y-6">
     <div class="flex items-center gap-4">
       <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label="Back to Marketing Hub">
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
-        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
-          <Presentation className="h-7 w-7 text-green-500" />
-          Presentation Templates
-        </h1>
-        <p class="text-slate-400 mt-1">PowerPoint templates and pitch decks</p>
+        {heroHeadline && (
+          <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+            <Presentation className="h-7 w-7 text-green-500" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
       </div>
     </div>
 
