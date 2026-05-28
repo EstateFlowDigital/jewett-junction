@@ -1,10 +1,19 @@
 ---
+export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { IdeaSubmissionContent } from '../../components/pages/IdeaSubmissionContent';
-// Notification recipient is now driven by IDEAS_INBOX_EMAIL on the server
-// (see src/lib/notify.ts). No per-page email config required.
+import { initCMS, getUIStrings } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+let uiStrings: Record<string, string> = {};
+try {
+  const ui = await getUIStrings();
+  uiStrings = Object.fromEntries(ui);
+} catch (error) {
+  console.error('Error fetching ui strings:', error);
+}
 ---
 
 <ThemedPage title="Submit an Idea | Jewett Junction" theme="dark" currentSection="submit-idea">
-  <IdeaSubmissionContent client:load theme="dark" />
+  <IdeaSubmissionContent client:load theme="dark" uiStrings={uiStrings} />
 </ThemedPage>

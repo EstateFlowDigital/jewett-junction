@@ -53,6 +53,7 @@ interface CMSEvent {
 interface EventsContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   events?: CMSEvent[];
+  uiStrings?: Record<string, string>;
 }
 
 const categoryConfig: Record<string, { color: string; gradient: string; icon: any; label: string }> = {
@@ -117,7 +118,8 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
-export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: EventsContentProps) {
+export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiStrings = {} }: EventsContentProps) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   // Use CMS events only - no hardcoded fallback
   const allEvents = cmsEvents;
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -413,7 +415,7 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [] }: Events
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Search events..."
+                  placeholder={ui('events-search-placeholder', 'Search events...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"

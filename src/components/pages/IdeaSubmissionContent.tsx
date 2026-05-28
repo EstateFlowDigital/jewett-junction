@@ -20,6 +20,7 @@ import {
 
 interface IdeaSubmissionContentProps {
   theme?: 'dark';
+  uiStrings?: Record<string, string>;
 }
 
 const categories = [
@@ -40,7 +41,8 @@ const impactLevels = [
   { id: 'critical', label: 'Game Changer', description: 'Could transform how we work' },
 ];
 
-export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentProps) {
+export function IdeaSubmissionContent({ theme = 'dark', uiStrings = {} }: IdeaSubmissionContentProps) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
@@ -147,7 +149,7 @@ export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentP
               onClick={() => setStatus('idle')}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              Submit Another Idea
+              {ui('form-submit-another-idea', 'Submit Another Idea')}
             </Button>
           </CardContent>
         </Card>
@@ -221,7 +223,7 @@ export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentP
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-amber-400" />
-            Submit Your Idea
+            {ui('form-submit-idea-title', 'Submit Your Idea')}
           </CardTitle>
           <CardDescription className="text-slate-400">
             Fill out the form below to share your idea with us.
@@ -424,7 +426,7 @@ export function IdeaSubmissionContent({ theme = 'dark' }: IdeaSubmissionContentP
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Submit Idea
+                    {ui('form-submit-idea', 'Submit Idea')}
                   </>
                 )}
               </Button>

@@ -26,9 +26,11 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 interface SafetyIncidentContentProps {
   safetyEmail?: string;
   safetyPhone?: string;
+  uiStrings?: Record<string, string>;
 }
 
-export function SafetyIncidentContent({ safetyEmail, safetyPhone }: SafetyIncidentContentProps = {}) {
+export function SafetyIncidentContent({ safetyEmail, safetyPhone, uiStrings = {} }: SafetyIncidentContentProps = {}) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const [status, setStatus] = React.useState<Status>('idle');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [formData, setFormData] = React.useState({
@@ -79,11 +81,11 @@ export function SafetyIncidentContent({ safetyEmail, safetyPhone }: SafetyIncide
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button onClick={() => setStatus('idle')} className="bg-rose-600 hover:bg-rose-700">
-                Submit another report
+                {ui('form-submit-another-report', 'Submit another report')}
               </Button>
               <a href="/jewett-junction/safety">
                 <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                  Back to Safety Hub
+                  {ui('form-back-to-safety', 'Back to Safety Hub')}
                 </Button>
               </a>
             </div>

@@ -55,6 +55,7 @@ interface ResourcesContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   resources?: CMSResource[];
   pageCopy?: ResourcesPageCopy | null;
+  uiStrings?: Record<string, string>;
 }
 
 const categoryConfig: Record<string, { icon: any; color: string; gradient: string; label: string }> = {
@@ -94,7 +95,8 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
-export function ResourcesContent({ theme = 'dark', resources: cmsResources = [], pageCopy = null }: ResourcesContentProps) {
+export function ResourcesContent({ theme = 'dark', resources: cmsResources = [], pageCopy = null, uiStrings = {} }: ResourcesContentProps) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   // Hero copy is CMS-editable via the Page Copy collection (slug: 'resources').
   // Headline can include a literal "\n" or "<br>" — the renderer splits on either.
   const heroHeadlineRaw = pageCopy?.['hero-headline']?.trim() || '';
@@ -320,7 +322,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 type="text"
-                placeholder="Search documents by name, description, or category..."
+                placeholder={ui('resources-search-placeholder', 'Search documents by name, description, or category...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors"

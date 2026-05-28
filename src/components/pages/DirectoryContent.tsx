@@ -53,6 +53,7 @@ interface DirectoryContentProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   employees?: CMSEmployee[];
   settings?: DirectorySettings;
+  uiStrings?: Record<string, string>;
 }
 
 const departmentConfig: Record<string, { color: string; gradient: string; icon: any; label: string }> = {
@@ -132,7 +133,8 @@ function directorySortOrder(name: string | undefined): number {
   return idx === undefined ? LEADERSHIP_ORDER.length : idx;
 }
 
-export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [], settings = {} }: DirectoryContentProps) {
+export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [], settings = {}, uiStrings = {} }: DirectoryContentProps) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   // Apply the leadership-first-then-alphabetical sort once up front. Search
   // and department filtering downstream preserve this order automatically
   // because Array.filter is stable; fuzzySearch is the only step that re-ranks
@@ -358,7 +360,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
               <input
                 type="text"
-                placeholder="Search by name, role, department, or location..."
+                placeholder={ui('directory-search-placeholder', 'Search by name, role, department, or location...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-colors"

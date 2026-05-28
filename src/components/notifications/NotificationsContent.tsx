@@ -157,9 +157,11 @@ const typeColors: Record<Notification['type'], string> = {
 interface NotificationsContentProps {
   heroHeadline?: string;
   heroSubtitle?: string;
+  uiStrings?: Record<string, string>;
 }
 
-export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: NotificationsContentProps = {}) {
+export function NotificationsContent({ heroHeadline = '', heroSubtitle = '', uiStrings = {} }: NotificationsContentProps = {}) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const [notifications, setNotifications] = React.useState<Notification[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [filter, setFilter] = React.useState<'all' | 'unread'>('all');
@@ -243,7 +245,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
             className="inline-flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-colors"
           >
             <ChevronRight className="w-4 h-4 rotate-180" aria-hidden="true" />
-            Dashboard
+            {ui('notifications-dashboard-link', 'Dashboard')}
           </a>
         </div>
       </div>
@@ -262,7 +264,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
-              All
+              {ui('notifications-filter-all', 'All')}
             </button>
             <button
               onClick={() => setFilter('unread')}
@@ -272,7 +274,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
-              Unread ({unreadCount})
+              {ui('notifications-filter-unread', 'Unread')} ({unreadCount})
             </button>
             <div className="w-px h-6 bg-slate-700 mx-2" />
             {['all', 'announcement', 'event', 'badge', 'safety', 'system'].map((type) => (
@@ -285,7 +287,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
                     : 'bg-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
-                {type === 'all' ? 'All Types' : type}
+                {type === 'all' ? ui('notifications-filter-all-types', 'All Types') : type}
               </button>
             ))}
           </div>
@@ -298,7 +300,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <CheckCheck className="w-4 h-4" aria-hidden="true" />
-              Mark all read
+              {ui('notifications-mark-all-read', 'Mark all read')}
             </button>
             <button
               onClick={clearAll}
@@ -306,7 +308,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Trash2 className="w-4 h-4" aria-hidden="true" />
-              Clear all
+              {ui('notifications-clear-all', 'Clear all')}
             </button>
           </div>
         </div>
@@ -316,7 +318,7 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
       {isLoading ? (
         <div className="glass rounded-2xl border border-slate-800/50 p-12 text-center">
           <Bell className="w-12 h-12 text-slate-600 mx-auto mb-4 animate-pulse" aria-hidden="true" />
-          <p className="text-slate-400">Loading notifications…</p>
+          <p className="text-slate-400">{ui('notifications-loading', 'Loading notifications…')}</p>
         </div>
       ) : filteredNotifications.length > 0 ? (
         <div className="glass rounded-2xl border border-slate-800/50 overflow-hidden divide-y divide-slate-700/50">
@@ -386,8 +388,8 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '' }: N
           <h3 className="text-lg font-medium text-white mb-2">No notifications</h3>
           <p className="text-slate-400">
             {filter === 'unread'
-              ? "You're all caught up! No unread notifications."
-              : 'No notifications to display.'}
+              ? ui('notifications-empty-caught-up', "You're all caught up! No unread notifications.")
+              : ui('notifications-empty-none', 'No notifications to display.')}
           </p>
         </div>
       )}

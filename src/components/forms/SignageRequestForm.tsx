@@ -36,7 +36,12 @@ const SIGNAGE_TYPES = [
   { id: 'event', label: 'Event Materials', description: 'Banners, displays, and promotional items' },
 ];
 
-export function SignageRequestForm() {
+interface SignageRequestFormProps {
+  uiStrings?: Record<string, string>;
+}
+
+export function SignageRequestForm({ uiStrings = {} }: SignageRequestFormProps = {}) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const [formData, setFormData] = React.useState<FormData>({
     requesterName: '',
     department: '',
@@ -178,7 +183,7 @@ export function SignageRequestForm() {
           onClick={() => setStatus('idle')}
           className="px-6 py-3 min-h-[44px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
         >
-          Submit Another Request
+          {ui('form-submit-another-request', 'Submit Another Request')}
         </button>
       </div>
     );
@@ -430,7 +435,7 @@ export function SignageRequestForm() {
           ) : (
             <>
               <Send className="h-5 w-5" aria-hidden="true" />
-              Submit Request
+              {ui('form-submit-request', 'Submit Request')}
             </>
           )}
         </button>

@@ -28,9 +28,11 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 interface ITTicketContentProps {
   itEmail?: string;
   itPhone?: string;
+  uiStrings?: Record<string, string>;
 }
 
-export function ITTicketContent({ itEmail, itPhone }: ITTicketContentProps = {}) {
+export function ITTicketContent({ itEmail, itPhone, uiStrings = {} }: ITTicketContentProps = {}) {
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const [status, setStatus] = React.useState<Status>('idle');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [formData, setFormData] = React.useState({
@@ -76,11 +78,11 @@ export function ITTicketContent({ itEmail, itPhone }: ITTicketContentProps = {})
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button onClick={() => setStatus('idle')} className="bg-blue-600 hover:bg-blue-700">
-                Submit another ticket
+                {ui('form-submit-another-ticket', 'Submit another ticket')}
               </Button>
               <a href="/jewett-junction/it-helpdesk">
                 <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-                  Back to IT Helpdesk
+                  {ui('form-back-to-it-helpdesk', 'Back to IT Helpdesk')}
                 </Button>
               </a>
             </div>
@@ -104,7 +106,7 @@ export function ITTicketContent({ itEmail, itPhone }: ITTicketContentProps = {})
             </Badge>
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Submit an IT Ticket
+            {ui('form-submit-it-ticket', 'Submit an IT Ticket')}
           </h1>
           <p className="text-lg text-blue-100 max-w-2xl">
             Hardware, software, access, or anything tech-related. Urgent issues get prioritized — our IT team
