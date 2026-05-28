@@ -152,10 +152,10 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
 
   const heroHeadline = pageCopy?.['hero-headline'] || '';
   const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
-  const issuesHeadline = pageCopy?.['subsection-1-headline'] || 'Common Issues & Quick Fixes';
-  const issuesDescription = pageCopy?.['subsection-1-description'] || 'Resolve issues yourself with these guides';
-  const ticketsHeadline = pageCopy?.['subsection-2-headline'] || 'My Recent Tickets';
-  const ticketsDescription = pageCopy?.['subsection-2-description'] || 'Track your support requests';
+  const issuesHeadline = pageCopy?.['subsection-1-headline'] || '';
+  const issuesDescription = pageCopy?.['subsection-1-description'] || '';
+  const ticketsHeadline = pageCopy?.['subsection-2-headline'] || '';
+  const ticketsDescription = pageCopy?.['subsection-2-description'] || '';
 
   return (
     <div className="space-y-6">
@@ -186,8 +186,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
           {/* Common Issues */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>{issuesHeadline}</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>{issuesDescription}</CardDescription>
+              {issuesHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{issuesHeadline}</CardTitle>}
+              {issuesDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{issuesDescription}</CardDescription>}
             </CardHeader>
             <CardContent className="space-y-3">
               {isLoading ? (
@@ -238,8 +238,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>{ticketsHeadline}</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>{ticketsDescription}</CardDescription>
+                {ticketsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{ticketsHeadline}</CardTitle>}
+                {ticketsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{ticketsDescription}</CardDescription>}
               </div>
               <a href="/jewett-junction/it-ticket">
                 <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>Submit Ticket</Button>

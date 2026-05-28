@@ -130,10 +130,10 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
 
   const heroHeadline = pageCopy?.['hero-headline'] || '';
   const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
-  const benefitsHeadline = pageCopy?.['subsection-1-headline'] || 'Benefits Overview';
-  const benefitsDescription = pageCopy?.['subsection-1-description'] || 'Your comprehensive benefits package';
-  const formsHeadline = pageCopy?.['subsection-2-headline'] || 'Forms & Documents';
-  const formsDescription = pageCopy?.['subsection-2-description'] || 'Commonly used HR forms';
+  const benefitsHeadline = pageCopy?.['subsection-1-headline'] || '';
+  const benefitsDescription = pageCopy?.['subsection-1-description'] || '';
+  const formsHeadline = pageCopy?.['subsection-2-headline'] || '';
+  const formsDescription = pageCopy?.['subsection-2-description'] || '';
 
   return (
     <div className="space-y-6">
@@ -246,8 +246,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
           {/* Benefits Overview */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>{benefitsHeadline}</CardTitle>
-              <CardDescription className={isDark ? 'text-slate-400' : ''}>{benefitsDescription}</CardDescription>
+              {benefitsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{benefitsHeadline}</CardTitle>}
+              {benefitsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{benefitsDescription}</CardDescription>}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -309,8 +309,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>{formsHeadline}</CardTitle>
-                <CardDescription className={isDark ? 'text-slate-400' : ''}>{formsDescription}</CardDescription>
+                {formsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{formsHeadline}</CardTitle>}
+                {formsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{formsDescription}</CardDescription>}
               </div>
               <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
                 View All <ChevronRight className="ml-2 h-4 w-4" />

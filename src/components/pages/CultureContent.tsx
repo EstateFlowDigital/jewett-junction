@@ -69,6 +69,9 @@ interface CulturePageCopy {
   /** Title for the Recent Recognitions block. */
   'subsection-2-headline'?: string;
   'subsection-2-description'?: string;
+  /** Page-section headings (Our Core Values, Community Impact). */
+  'content-block-1-title'?: string;
+  'content-block-2-title'?: string;
 }
 
 interface CultureContentProps {
@@ -125,10 +128,13 @@ function getTypeConfig(type: string | undefined) {
 }
 
 export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null }: CultureContentProps) {
-  const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || 'Team Wins';
-  const teamWinsDescription = pageCopy?.['subsection-1-description'] || 'Celebrating our victories';
-  const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || 'Recent Recognitions';
-  const recognitionsDescription = pageCopy?.['subsection-2-description'] || 'Kudos from the team';
+  const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || '';
+  const teamWinsDescription = pageCopy?.['subsection-1-description'] || '';
+  const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || '';
+  const recognitionsDescription = pageCopy?.['subsection-2-description'] || '';
+  // Section headings (Our Core Values, Community Impact) are CMS-editable too.
+  const coreValuesHeadline = pageCopy?.['content-block-1-title'] || '';
+  const communityImpactHeadline = pageCopy?.['content-block-2-title'] || '';
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
   const volunteerHours = settings['culture-volunteer-hours'] || '450+';
@@ -232,7 +238,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
       {hasCoreValues && (
         <div>
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Our Core Values</h2>
+            {coreValuesHeadline && <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{coreValuesHeadline}</h2>}
             <p className="text-slate-400 max-w-2xl mx-auto">
               These principles guide everything we do—from the projects we build to the relationships we nurture.
             </p>
@@ -495,7 +501,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                   <HandHeart className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">Community Impact</h2>
+                  {communityImpactHeadline && <h2 className="text-xl md:text-2xl font-bold text-white">{communityImpactHeadline}</h2>}
                   <p className="text-cyan-100">Making a difference together</p>
                 </div>
               </div>

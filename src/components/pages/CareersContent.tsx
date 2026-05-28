@@ -88,6 +88,8 @@ interface CareersContentProps {
   awards?: CMSCompanyAward[];
   /** Optional editable copy from the Page Copy CMS (slug='careers'). */
   pageCopy?: CareersPageCopy | null;
+  /** Map of slug → value from the UI Strings CMS collection. */
+  uiStrings?: Record<string, string>;
 }
 
 // Maps lucide icon-name strings (from CMS) to actual components.
@@ -591,21 +593,16 @@ function ApplicationForm({ jobs }: { jobs: JobPosting[] }) {
   );
 }
 
-// Default hero/section copy when the Page Copy CMS record isn't set.
-const DEFAULT_HERO_HEADLINE = 'Build Your Career with a Team That Puts People First.';
-const DEFAULT_HERO_SUBTITLE = `<p>At Jewett Construction, people matter more than anything. For over 50 years, we've built an award-winning culture rooted in safety, integrity, and opportunity. Whether you're in the field or the office, you'll find a place where your work makes a real impact.</p>`;
-const DEFAULT_SECTION_HEADLINE = 'Why Jewett Construction?';
-const DEFAULT_SECTION_BODY = `<p>For more than half a century, Jewett Construction has set the standard in commercial construction across New England. We've grown from a local builder into a regional leader — not by cutting corners, but by investing in the people who make it all happen.</p><p>Our culture is built on four values: <strong>Safety, Excellence, Teamwork, and Integrity</strong>. We live by the principle that <strong>people matter more than anything</strong> — and that means providing real career growth, industry-leading benefits, and a workplace where every voice is heard.</p><p>Whether you're an experienced project manager or just starting out in the trades, you'll find a team that has your back and a company that's committed to your success.</p>`;
-const DEFAULT_APPLICATION_DESCRIPTION = 'Fill out the form below to get started. Our recruiting team reviews every application and will follow up within 24 hours. We proudly welcome veterans and military talent.';
 
-export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [], pageCopy = null }: CareersContentProps) {
-  // Editable hero/section copy — falls back to baked-in defaults when the
-  // Page Copy CMS record (slug='careers') is empty or any field is blank.
-  const heroHeadline = pageCopy?.['hero-headline'] || DEFAULT_HERO_HEADLINE;
-  const heroSubtitle = pageCopy?.['hero-subtitle'] || DEFAULT_HERO_SUBTITLE;
-  const sectionHeadline = pageCopy?.['section-headline'] || DEFAULT_SECTION_HEADLINE;
-  const sectionBody = pageCopy?.['section-body'] || DEFAULT_SECTION_BODY;
-  const applicationDescription = pageCopy?.['application-description'] || DEFAULT_APPLICATION_DESCRIPTION;
+export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benefits: cmsBenefits = [], awards: cmsAwards = [], pageCopy = null, uiStrings = {} }: CareersContentProps) {
+  // Editable hero/section copy — CMS-driven. Each section hides when blank.
+  const heroHeadline = pageCopy?.['hero-headline'] || '';
+  const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
+  const sectionHeadline = pageCopy?.['section-headline'] || '';
+  const sectionBody = pageCopy?.['section-body'] || '';
+  const applicationDescription = pageCopy?.['application-description'] || '';
+  // UI Strings lookup — admin-editable banner/button labels.
+  const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
   const careersEmail = settings['careers-email'] || 'careers@jewett.com';
   // Benefits + awards come from CMS only. No hardcoded fallbacks — when
   // either collection is empty, the corresponding section hides entirely
@@ -657,13 +654,17 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
               </Badge>
             )}
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            {heroHeadline}
-          </h1>
-          <div
-            className="text-lg text-blue-100 mb-6 max-w-2xl prose prose-invert prose-p:my-0 prose-p:text-blue-100"
-            dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-          />
+          {heroHeadline && (
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+              {heroHeadline}
+            </h1>
+          )}
+          {heroSubtitle && (
+            <div
+              className="text-lg text-blue-100 mb-6 max-w-2xl prose prose-invert prose-p:my-0 prose-p:text-blue-100"
+              dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+            />
+          )}
           <div className="flex flex-wrap gap-3">
             <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50" asChild>
               <a href="#positions">
@@ -672,7 +673,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
               </a>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <a href="#apply">Submit Your Application</a>
+              <a href="#apply">{ui('careers-apply-cta', 'Submit Your Application')}</a>
             </Button>
           </div>
         </div>
@@ -685,30 +686,38 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
         <CardHeader className="border-b border-slate-700">
           <CardTitle className="text-white flex items-center gap-2">
             <Briefcase className="h-5 w-5 text-blue-400" />
-            Apply to Join Our Team
+            {ui('careers-apply-title', 'Apply to Join Our Team')}
           </CardTitle>
-          <CardDescription className="text-slate-400">
-            {applicationDescription}
-          </CardDescription>
+          {applicationDescription && (
+            <CardDescription className="text-slate-400">
+              {applicationDescription}
+            </CardDescription>
+          )}
         </CardHeader>
         <CardContent className="p-6">
           <ApplicationForm jobs={displayJobs} />
         </CardContent>
       </Card>
 
-      {/* About Section */}
+      {/* About Section — hides entirely when CMS copy is blank */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">{sectionHeadline}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className="text-slate-300 prose prose-invert max-w-none prose-p:text-slate-300 prose-strong:text-white"
-              dangerouslySetInnerHTML={{ __html: sectionBody }}
-            />
-          </CardContent>
-        </Card>
+        {(sectionHeadline || sectionBody) && (
+          <Card className="bg-slate-800/50 border-slate-700">
+            {sectionHeadline && (
+              <CardHeader>
+                <CardTitle className="text-white">{sectionHeadline}</CardTitle>
+              </CardHeader>
+            )}
+            {sectionBody && (
+              <CardContent>
+                <div
+                  className="text-slate-300 prose prose-invert max-w-none prose-p:text-slate-300 prose-strong:text-white"
+                  dangerouslySetInnerHTML={{ __html: sectionBody }}
+                />
+              </CardContent>
+            )}
+          </Card>
+        )}
 
         {/* Awards card — hidden when the Company Awards CMS collection is empty */}
         {hasAwards && (
@@ -793,7 +802,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <input
                   type="text"
-                  placeholder="Search positions..."
+                  placeholder={ui('careers-search-placeholder', 'Search positions...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border rounded-md text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
@@ -943,10 +952,10 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  Know Someone Who Belongs Here?
+                  {ui('careers-referral-headline', 'Know Someone Who Belongs Here?')}
                 </h2>
                 <p className="text-emerald-100">
-                  Our best hires come from our own people. Refer a friend or former colleague and earn a cash bonus when they join the team.
+                  {ui('careers-referral-body', 'Our best hires come from our own people. Refer a friend or former colleague and earn a cash bonus when they join the team.')}
                 </p>
               </div>
             </div>
@@ -955,7 +964,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
               className="bg-white text-emerald-700 hover:bg-emerald-50 flex-shrink-0"
               asChild
             >
-              <a href="#apply">Submit a Referral</a>
+              <a href="#apply">{ui('careers-referral-cta', 'Submit a Referral')}</a>
             </Button>
           </div>
         </CardContent>
@@ -972,7 +981,7 @@ export function CareersContent({ theme = 'dark', jobs = [], settings = {}, benef
               </p>
             </div>
             <Button className="bg-blue-600 hover:bg-blue-700 flex-shrink-0" asChild>
-              <a href={`mailto:${careersEmail}`}>Email Our Recruiting Team</a>
+              <a href={`mailto:${careersEmail}`}>{ui('careers-recruiting-cta', 'Email Our Recruiting Team')}</a>
             </Button>
           </div>
         </CardContent>

@@ -137,10 +137,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
 
   const heroHeadline = pageCopy?.['hero-headline'] || '';
   const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
-  const alertsHeadline = pageCopy?.['subsection-1-headline'] || 'Safety Alerts & Updates';
+  const alertsHeadline = pageCopy?.['subsection-1-headline'] || '';
   const alertsDescription = pageCopy?.['subsection-1-description'] || '';
-  const trainingHeadline = pageCopy?.['subsection-2-headline'] || 'Required Safety Training';
-  const trainingDescription = pageCopy?.['subsection-2-description'] || 'Complete your certifications';
+  const trainingHeadline = pageCopy?.['subsection-2-headline'] || '';
+  const trainingDescription = pageCopy?.['subsection-2-description'] || '';
 
   return (
     <div className="space-y-6">
@@ -190,7 +190,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           {/* Safety Alerts */}
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
-              <CardTitle className={isDark ? 'text-white' : ''}>{alertsHeadline}</CardTitle>
+              {alertsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{alertsHeadline}</CardTitle>}
               {alertsDescription && (
                 <CardDescription className={isDark ? 'text-slate-400' : ''}>{alertsDescription}</CardDescription>
               )}
@@ -303,7 +303,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className={isDark ? 'text-white' : ''}>{trainingHeadline}</CardTitle>
+                {trainingHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{trainingHeadline}</CardTitle>}
                 {trainingDescription && (
                   <CardDescription className={isDark ? 'text-slate-400' : ''}>{trainingDescription}</CardDescription>
                 )}
