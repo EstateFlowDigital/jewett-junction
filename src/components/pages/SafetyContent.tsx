@@ -299,7 +299,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             </CardContent>
           </Card>
 
-          {/* Required Training */}
+          {/* Required Training — hides entirely when there's no content. */}
+          {(() => {
+            const trainingSource = training.length > 0
+              ? training.slice(0, 2)
+              : safetyItems.filter((item) => item['video-link']).slice(0, 2);
+            if (trainingSource.length === 0) return null;
+            return (
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -317,11 +323,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Show training items if they have content-type, otherwise show items with video-link as training */}
-                {(training.length > 0 ? training.slice(0, 2) : safetyItems.filter(item => item['video-link']).slice(0, 2)).map((item, i) => ({
+                {trainingSource.map((item, i) => ({
                   name: item.name,
                   href: `/jewett-junction/safety/${item.slug || item.id}`,
-                  desc: stripHtml(item.description || getContent(item))?.substring(0, 80),
+                  desc: stripHtml(item.description || getContent(item))?.trim().substring(0, 80) || '',
                   color: i === 0 ? 'green' : 'blue',
                   icon: i === 0 ? Shield : HardHat,
                 })).map((course) => (
@@ -340,7 +345,9 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                           <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
                         </div>
                         <h3 className={`font-semibold mb-1 group-hover:text-${course.color}-500 transition-colors ${isDark ? 'text-white' : ''}`}>{course.name}</h3>
-                        <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
+                        {course.desc && (
+                          <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
+                        )}
                         <div className="flex items-center justify-between">
                           <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Required</span>
                           <span className={`inline-flex items-center gap-1 text-sm font-medium text-${course.color}-500 group-hover:gap-2 transition-all`}>
@@ -355,6 +362,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
               </div>
             </CardContent>
           </Card>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}

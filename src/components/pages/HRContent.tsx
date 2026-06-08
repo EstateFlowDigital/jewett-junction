@@ -255,6 +255,10 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Benefits Overview */}
+          {(() => {
+            const benefitSource = (benefits.length > 0 ? benefits : displayItems).slice(0, 4);
+            if (benefitSource.length === 0) return null;
+            return (
           <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
             <CardHeader>
               {benefitsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{benefitsHeadline}</CardTitle>}
@@ -265,7 +269,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                 {/* Up to 4 benefit-like items. Honors CMS-provided icon image
                     and `icon-color` hex for the tile, falling back to a
                     pleasant default rotation when not set. */}
-                {(benefits.length > 0 ? benefits : displayItems).slice(0, 4).map((benefit, i) => {
+                {benefitSource.map((benefit, i) => {
                   const FALLBACK_ICONS = [Heart, DollarSign, Calendar, Shield];
                   const FALLBACK_COLORS = ['red', 'green', 'blue', 'purple'];
                   const FallbackIcon = FALLBACK_ICONS[i % FALLBACK_ICONS.length];
@@ -309,9 +313,14 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                             <h3 className={`font-semibold group-hover:text-purple-500 transition-colors ${isDark ? 'text-white' : ''}`}>{benefit.name}</h3>
                             <ChevronRight className={`h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
                           </div>
-                          <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
-                            {stripHtml(benefit.description || getContent(benefit))?.substring(0, 100)}
-                          </p>
+                          {(() => {
+                            const text = stripHtml(benefit.description || getContent(benefit))?.trim();
+                            return text ? (
+                              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
+                                {text.substring(0, 100)}
+                              </p>
+                            ) : null;
+                          })()}
                         </CardContent>
                       </Card>
                     </a>
@@ -320,39 +329,51 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
               </div>
             </CardContent>
           </Card>
+            );
+          })()}
 
-          {/* HR Forms */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                {formsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{formsHeadline}</CardTitle>}
-                {formsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{formsDescription}</CardDescription>}
-              </div>
-              <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
-                View All <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Show forms from CMS, or display items without content-type */}
-                {(forms.length > 0 ? forms.slice(0, 4) : displayItems.filter(item => item['document-link']).slice(0, 4)).map((form) => ({
-                  name: form.name,
-                  desc: stripHtml(form.description) || 'HR Document',
-                  link: form['document-link'] || resourcesLink
-                })).map((form) => (
-                  <a key={form.name} href={form.link} target={form.link.startsWith('http') ? '_blank' : undefined} rel={form.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
-                    <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                      <FileText className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`font-medium truncate group-hover:text-primary ${isDark ? 'text-white' : ''}`}>{form.name}</div>
-                      <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{form.desc}</div>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* HR Forms — only renders when there's at least one form-like item
+              with a document link. Empty CMS = no empty card. */}
+          {(() => {
+            const formSource = forms.length > 0
+              ? forms.slice(0, 4)
+              : displayItems.filter((item) => item['document-link']).slice(0, 4);
+            if (formSource.length === 0) return null;
+            return (
+              <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    {formsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{formsHeadline}</CardTitle>}
+                    {formsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{formsDescription}</CardDescription>}
+                  </div>
+                  <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>
+                    View All <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {formSource.map((form) => ({
+                      name: form.name,
+                      desc: stripHtml(form.description)?.trim() || '',
+                      link: form['document-link'] || resourcesLink,
+                    })).map((form) => (
+                      <a key={form.name} href={form.link} target={form.link.startsWith('http') ? '_blank' : undefined} rel={form.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                        <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
+                          <FileText className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-medium truncate group-hover:text-primary ${isDark ? 'text-white' : ''}`}>{form.name}</div>
+                          {form.desc && (
+                            <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{form.desc}</div>
+                          )}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}
