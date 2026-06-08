@@ -4,6 +4,7 @@ import { Headphones, Ticket, BookOpen, Monitor, Wifi, Shield, Phone, Mail, Clock
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { CmsIcon } from '../ui/cms-icon';
 import { TeamContactCard } from './TeamContactCard';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 
@@ -25,6 +26,7 @@ interface ITArticle {
   difficulty?: string;
   featured?: boolean;
   icon?: { url: string };
+  'icon-color'?: string;
 }
 
 interface ITSettings {
@@ -207,16 +209,24 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
                 /* Show how-to articles, or all articles if no type is set - link to detail pages */
                 (howToArticles.length > 0 ? howToArticles.slice(0, 4) : displayArticles.slice(0, 4)).map((article) => (
                   <a key={article.id} href={`/jewett-junction/it-helpdesk/${article.slug || article.id}`} className={`flex items-center gap-4 p-4 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 border border-slate-700' : 'hover:bg-muted/50 border border-muted'}`}>
-                    {article.icon?.url ? (
-                      <img src={article.icon.url} alt={article.name} className="w-12 h-12 rounded-lg object-cover shrink-0" loading="lazy" />
-                    ) : (
-                      <div className={`w-12 h-12 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
-                        {(() => {
+                    <div
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${article.icon?.url ? '' : (isDark ? 'bg-blue-900' : 'bg-blue-100')}`}
+                      style={article.icon?.url && /^#[0-9a-fA-F]{6}$/.test(article['icon-color'] || '') ? { backgroundColor: `${article['icon-color']}33` } : undefined}
+                    >
+                      {article.icon?.url ? (
+                        <CmsIcon
+                          url={article.icon.url}
+                          color={article['icon-color']}
+                          size={24}
+                          ariaLabel={article.name}
+                        />
+                      ) : (
+                        (() => {
                           const Icon = getCategoryIcon(article.name);
                           return <Icon className="h-6 w-6 text-blue-600" />;
-                        })()}
-                      </div>
-                    )}
+                        })()
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className={`font-medium ${isDark ? 'text-white' : ''}`}>{article.name}</div>
                       <div className={`text-sm truncate ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{stripHtml(article.description || article.summary)?.substring(0, 80) || 'IT Resource'}</div>

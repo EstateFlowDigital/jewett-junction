@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Users, Clock, Heart, DollarSign, Calendar, FileText, Shield, Phone, Mail, ExternalLink, ChevronRight, BookOpen, CreditCard, Globe, AlertCircle } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
+import { CmsIcon } from '../ui/cms-icon';
 import { TeamContactCard } from './TeamContactCard';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 
@@ -180,13 +181,18 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
             <CardContent className="py-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  {featuredItem.icon?.url ? (
-                    <img src={featuredItem.icon.url} alt={featuredItem.name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
-                  ) : (
-                    <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                    {featuredItem.icon?.url ? (
+                      <CmsIcon
+                        url={featuredItem.icon.url}
+                        color={featuredItem['icon-color']}
+                        size={28}
+                        ariaLabel={featuredItem.name}
+                      />
+                    ) : (
                       <AlertCircle className="h-7 w-7" />
-                    </div>
-                  )}
+                    )}
+                  </div>
                   <div>
                     <h2 className="text-xl font-bold">{featuredItem.name}</h2>
                     <p className="text-purple-100">{stripHtml(featuredItem.description || getContent(featuredItem))?.substring(0, 150)}</p>
@@ -207,13 +213,18 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
             <CardContent className="py-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  {displayItems[0].icon?.url ? (
-                    <img src={displayItems[0].icon.url} alt={displayItems[0].name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
-                  ) : (
-                    <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
+                    {displayItems[0].icon?.url ? (
+                      <CmsIcon
+                        url={displayItems[0].icon.url}
+                        color={displayItems[0]['icon-color']}
+                        size={28}
+                        ariaLabel={displayItems[0].name}
+                      />
+                    ) : (
                       <Users className="h-7 w-7" />
-                    </div>
-                  )}
+                    )}
+                  </div>
                   <div>
                     <h2 className="text-xl font-bold">{displayItems[0].name}</h2>
                     <p className="text-purple-100">{stripHtml(displayItems[0].description || getContent(displayItems[0]))?.substring(0, 150)}</p>
@@ -282,7 +293,12 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                               style={customHex ? { backgroundColor: `${customHex}33` } : undefined}
                             >
                               {iconUrl ? (
-                                <img src={iconUrl} alt="" className="h-5 w-5 object-contain" loading="lazy" />
+                                <CmsIcon
+                                  url={iconUrl}
+                                  color={customHex || undefined}
+                                  size={20}
+                                  ariaLabel={benefit.name}
+                                />
                               ) : (
                                 <FallbackIcon
                                   className={customHex ? 'h-5 w-5' : `h-5 w-5 text-${fallbackColor}-600`}
