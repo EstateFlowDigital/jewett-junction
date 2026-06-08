@@ -25,6 +25,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
+import { CmsIcon } from '../ui/cms-icon';
 import type { FieldConfig, CollectionConfig } from './collections';
 import { ICON_MAP, getIcon } from './icon-map';
 
@@ -735,14 +736,29 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             {getImageUrl(formData[field.key]) ? (
               <div className="relative rounded-xl overflow-hidden border border-slate-700/50 bg-slate-900/50">
                 <div className="bg-slate-800/50 p-4 flex items-center justify-center min-h-[200px]">
-                  <img
-                    src={getImageUrl(formData[field.key])}
-                    alt="Preview"
-                    className="max-w-full max-h-[300px] object-contain rounded-lg"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
-                    }}
-                  />
+                  {field.key === 'icon' ? (
+                    /* Match the user-facing render: tint by icon-color via mask. */
+                    (() => {
+                      const iconHex = typeof formData['icon-color'] === 'string' && /^#[0-9a-fA-F]{6}$/.test(formData['icon-color']) ? formData['icon-color'] : undefined;
+                      return (
+                        <CmsIcon
+                          url={getImageUrl(formData[field.key])!}
+                          color={iconHex}
+                          size={160}
+                          ariaLabel="Icon preview"
+                        />
+                      );
+                    })()
+                  ) : (
+                    <img
+                      src={getImageUrl(formData[field.key])}
+                      alt="Preview"
+                      className="max-w-full max-h-[300px] object-contain rounded-lg"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="1"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
+                      }}
+                    />
+                  )}
                 </div>
                 <div className="p-3 bg-slate-900/80 border-t border-slate-700/50 flex items-center justify-between">
                   <span className="text-slate-400 text-xs truncate max-w-[60%]">{getImageUrl(formData[field.key]).split('/').pop()}</span>
@@ -1285,11 +1301,16 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                 const label = <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">{field.label}</div>;
 
                 if (field.type === 'image') {
+                  const iconHex = field.key === 'icon' && typeof formData['icon-color'] === 'string' && /^#[0-9a-fA-F]{6}$/.test(formData['icon-color']) ? formData['icon-color'] : undefined;
                   return (
                     <div key={field.key}>
                       {label}
-                      <div className="rounded-xl overflow-hidden bg-slate-800/50 border border-slate-700/50 p-3">
-                        <img src={String(value)} alt={field.label} className="max-w-full max-h-[400px] object-contain mx-auto rounded-lg" />
+                      <div className="rounded-xl overflow-hidden bg-slate-800/50 border border-slate-700/50 p-3 flex items-center justify-center min-h-[200px]">
+                        {field.key === 'icon' ? (
+                          <CmsIcon url={String(value)} color={iconHex} size={160} ariaLabel={field.label} />
+                        ) : (
+                          <img src={String(value)} alt={field.label} className="max-w-full max-h-[400px] object-contain mx-auto rounded-lg" />
+                        )}
                       </div>
                     </div>
                   );
@@ -1800,7 +1821,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             <div className="divide-y divide-slate-700/50">
               {filteredItems.map((item) => {
                 const f = item.fieldData || {};
-                const imageUrl = getImageUrl(f.image)
+                const photoUrl = getImageUrl(f.image)
                   || getImageUrl(f['blog-body-image'])
                   || getImageUrl(f['main-image'])
                   || getImageUrl(f['main-image-file'])
@@ -1808,8 +1829,10 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   || getImageUrl(f['featured-image'])
                   || getImageUrl(f.photo)
                   || getImageUrl(f.thumbnail)
-                  || getImageUrl(f['preview-image'])
-                  || getImageUrl(f.icon);
+                  || getImageUrl(f['preview-image']);
+                const iconOnlyUrl = !photoUrl ? getImageUrl(f.icon) : null;
+                const imageUrl = photoUrl || iconOnlyUrl;
+                const iconHex = typeof f['icon-color'] === 'string' && /^#[0-9a-fA-F]{6}$/.test(f['icon-color']) ? f['icon-color'] : null;
                 const subtitle = item.fieldData?.department || item.fieldData?.category || item.fieldData?.type || item.fieldData?.role;
                 const location = item.fieldData?.location || item.fieldData?.['office-location'];
                 const isSelected = selectedItems.includes(item.id);
@@ -1830,7 +1853,14 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                           className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-violet-500 focus:ring-violet-500/20 cursor-pointer flex-shrink-0"
                         />
                       )}
-                      {imageUrl ? (
+                      {iconOnlyUrl ? (
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border border-slate-700/50"
+                          style={{ backgroundColor: iconHex ? `${iconHex}33` : 'rgba(148,163,184,0.15)' }}
+                        >
+                          <CmsIcon url={iconOnlyUrl} color={iconHex || undefined} size={24} />
+                        </div>
+                      ) : imageUrl ? (
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-slate-700/50">
                           <img
                             src={imageUrl}

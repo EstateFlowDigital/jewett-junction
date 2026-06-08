@@ -1,0 +1,31 @@
+---
+/**
+ * Renders a CMS-uploaded icon as a CSS mask so the admin-picked color
+ * actually tints it. <img src={svg}> ignores CSS color — it treats the
+ * source as opaque pixels, so the color picker on HR/Safety/IT items
+ * was decorative. Mask-image keeps the silhouette and paints the
+ * requested hex on top.
+ *
+ * Astro twin of the React `CmsIcon` (src/components/ui/cms-icon.tsx).
+ */
+interface Props {
+  url: string;
+  color?: string;
+  size?: number;
+  class?: string;
+  ariaLabel?: string;
+}
+
+const { url, color, size = 24, class: extraClass = '', ariaLabel } = Astro.props;
+
+const isValidHex = color && /^#[0-9a-fA-F]{6}$/.test(color);
+const backgroundColor = isValidHex ? color : 'currentColor';
+---
+
+<span
+  role={ariaLabel ? 'img' : undefined}
+  aria-label={ariaLabel}
+  aria-hidden={ariaLabel ? undefined : 'true'}
+  class={`inline-block shrink-0 ${extraClass}`}
+  style={`width:${size}px;height:${size}px;background-color:${backgroundColor};-webkit-mask-image:url(${url});mask-image:url(${url});-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;`}
+/>

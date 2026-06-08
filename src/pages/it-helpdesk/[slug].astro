@@ -1,6 +1,7 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import FilePreview from '../../components/shared/FilePreview.astro';
+import CmsIcon from '../../components/shared/CmsIcon.astro';
 import { initCMS, getITArticleBySlug, getITKnowledgeBase, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 export const prerender = false;
@@ -32,7 +33,12 @@ if (!item) {
 }
 
 // Get header image
-const headerImage = item.image?.url || item.icon?.url || item['preview-image']?.url;
+// Hero image — explicit photos only. Uploaded icons are small glyphs and
+// look broken scaled to a full-bleed hero; they're surfaced next to the
+// title instead.
+const headerImage = item.image?.url || item['preview-image']?.url;
+const titleIcon = !headerImage ? item.icon?.url : null;
+const iconHex = typeof item['icon-color'] === 'string' && /^#[0-9a-fA-F]{6}$/.test(item['icon-color']) ? item['icon-color'] : null;
 
 // Article type badge colors — keys MUST match the article-type dropdown options
 // in collections.ts (FAQ, How-To Guide, Troubleshooting, Software, Hardware, Security, Policy).
@@ -84,7 +90,15 @@ const difficultyColors: Record<string, string> = {
     <!-- Content Card -->
     <div class="glass rounded-2xl p-8 mb-8 border border-slate-800/50">
       <div class="flex items-start gap-6 mb-6">
-        {!headerImage && (
+        {!headerImage && titleIcon && (
+          <div
+            class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={iconHex ? `background-color: ${iconHex}33` : 'background-color: rgba(148,163,184,0.15)'}
+          >
+            <CmsIcon url={titleIcon} color={iconHex || undefined} size={32} ariaLabel={item.name} />
+          </div>
+        )}
+        {!headerImage && !titleIcon && (
           <div class={`w-16 h-16 bg-gradient-to-br ${typeStyle.gradient} rounded-2xl flex items-center justify-center flex-shrink-0`}>
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
