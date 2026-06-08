@@ -6,6 +6,7 @@ import '../../site-components/global.css';
 import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
+import CmsIcon from '../../components/shared/CmsIcon.astro';
 import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings, getPageCopy, getIntranetSections, getUIStrings } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
@@ -86,6 +87,28 @@ const heroSubtitleClean = stripParaTag(heroSubtitle);
 const featuredHR = hrContent[0];
 const featuredSafety = safetyContent.find(s => s.severity === 'Critical' || s.severity === 'Emergency') || safetyContent[0];
 const featuredIT = itArticles[0];
+
+// Pre-compute Important Updates card style strings up here — Astro's
+// parser chokes on multi-line template literals nested inside JSX
+// `style={...}` attribute expressions, so we keep the template clean.
+const isHex = (c: any) => typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c);
+
+const featuredHRHex: string | null = featuredHR && isHex(featuredHR['icon-color']) ? featuredHR['icon-color'] : null;
+const featuredHRTileBg = 'background-color: ' + (featuredHRHex ? featuredHRHex + '1a' : 'rgba(168, 85, 247, 0.1)');
+const featuredHRBadgeBg = 'background-color: ' + (featuredHRHex ? featuredHRHex + '33' : 'rgba(168, 85, 247, 0.2)');
+const featuredHRBadgeFg = 'color: ' + (featuredHRHex || '#a855f7');
+
+const featuredSafetyCritical = featuredSafety && (featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency');
+const featuredSafetyHex: string | null = featuredSafety && isHex(featuredSafety['icon-color']) ? featuredSafety['icon-color'] : null;
+const featuredSafetyDefaultBg = featuredSafetyCritical ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)';
+const featuredSafetyDefaultFg = featuredSafetyCritical ? '#f87171' : '#34d399';
+const featuredSafetyBadgeBg = 'background-color: ' + (featuredSafetyHex ? featuredSafetyHex + '33' : featuredSafetyDefaultBg);
+const featuredSafetyBadgeFg = 'color: ' + (featuredSafetyHex || featuredSafetyDefaultFg);
+
+const featuredITHex: string | null = featuredIT && isHex(featuredIT['icon-color']) ? featuredIT['icon-color'] : null;
+const featuredITTileBg = 'background-color: ' + (featuredITHex ? featuredITHex + '1a' : 'rgba(59, 130, 246, 0.1)');
+const featuredITBadgeBg = 'background-color: ' + (featuredITHex ? featuredITHex + '33' : 'rgba(59, 130, 246, 0.2)');
+const featuredITBadgeFg = 'color: ' + (featuredITHex || '#60a5fa');
 
 // Default referral bonus from Site Settings (CMS-driven)
 const defaultReferralBonus = Number(siteSettings['default-referral-bonus']) || 500;
@@ -467,25 +490,14 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               {featuredHR && (
                 <a href="/jewett-junction/hr" class="glass rounded-2xl overflow-hidden border border-purple-500/30 hover:border-purple-500/50 transition-all group">
                   {featuredHR.icon?.url && (
-                    <div class="h-32 w-full overflow-hidden">
-                      <img src={featuredHR.icon.url} alt={featuredHR.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <div class="h-32 w-full flex items-center justify-center" style={featuredHRTileBg}>
+                      <CmsIcon url={featuredHR.icon.url} color={featuredHR['icon-color']} size={64} ariaLabel={featuredHR.name} />
                     </div>
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div
-                        class="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={featuredHR['icon-color']
-                          ? `background-color: ${featuredHR['icon-color']}33`
-                          : 'background-color: rgba(168, 85, 247, 0.2)'}
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          style={`color: ${featuredHR['icon-color'] || '#a855f7'}`}
-                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredHRBadgeBg}>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredHRBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       </div>
                       <span class="text-xs text-purple-400 font-medium uppercase">{ui('badge-hr-update', 'HR Update')}</span>
                     </div>
@@ -503,19 +515,8 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div
-                        class="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={featuredSafety['icon-color']
-                          ? `background-color: ${featuredSafety['icon-color']}33`
-                          : `background-color: ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`}
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          style={`color: ${featuredSafety['icon-color'] || ((featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '#f87171' : '#34d399')}`}
-                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredSafetyBadgeBg}>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredSafetyBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                       </div>
                       <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? `⚠️ ${ui('badge-safety-alert', 'Safety Alert')}` : ui('badge-safety-update', 'Safety Update')}</span>
                     </div>
@@ -527,25 +528,14 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               {featuredIT && (
                 <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl overflow-hidden border border-blue-500/30 hover:border-blue-500/50 transition-all group">
                   {featuredIT.icon?.url && (
-                    <div class="h-32 w-full overflow-hidden">
-                      <img src={featuredIT.icon.url} alt={featuredIT.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <div class="h-32 w-full flex items-center justify-center" style={featuredITTileBg}>
+                      <CmsIcon url={featuredIT.icon.url} color={featuredIT['icon-color']} size={64} ariaLabel={featuredIT.name} />
                     </div>
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div
-                        class="w-8 h-8 rounded-lg flex items-center justify-center"
-                        style={featuredIT['icon-color']
-                          ? `background-color: ${featuredIT['icon-color']}33`
-                          : 'background-color: rgba(59, 130, 246, 0.2)'}
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          style={`color: ${featuredIT['icon-color'] || '#60a5fa'}`}
-                        ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredITBadgeBg}>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredITBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                       </div>
                       <span class="text-xs text-blue-400 font-medium uppercase">{ui('badge-it-tip', 'IT Tip')}</span>
                     </div>
