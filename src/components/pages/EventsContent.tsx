@@ -230,8 +230,11 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
   return (
     <div className="space-y-8 pb-12">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-12">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
+      {/* NOTE: no overflow-hidden here — the Add to Calendar dropdown must be
+          able to extend past the hero's bottom edge. The pattern layer carries
+          its own border-radius so the gradient corners still render rounded. */}
+      <div className="relative rounded-3xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 md:p-12">
+        <div className="absolute inset-0 rounded-3xl bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left side - intro */}
@@ -353,7 +356,15 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
                 </div>
                 <div className="flex items-center gap-3 text-white/90">
                   <Clock className="h-4 w-4 text-purple-200" />
-                  <span className="text-sm">{formatEventDate(featuredEvent['event-date']).time}</span>
+                  <span className="text-sm">
+                    {(() => {
+                      const start = formatEventDate(featuredEvent['event-date']).time;
+                      const end = featuredEvent['end-date'] ? formatEventDate(featuredEvent['end-date']).time : '';
+                      const sameDay = featuredEvent['end-date'] &&
+                        easternYMD(new Date(featuredEvent['event-date'])) === easternYMD(new Date(featuredEvent['end-date']));
+                      return sameDay ? `${start} – ${end}` : start;
+                    })()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-3 text-white/90">
                   {featuredEvent['is-virtual'] ? (
