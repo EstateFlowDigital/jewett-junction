@@ -352,7 +352,9 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                   {currentSpotlight['person-tenure'] && (
                     <Badge className="bg-white/20 text-white border-white/30 mt-3">
                       <Clock className="h-3 w-3 mr-1" />
-                      {currentSpotlight['person-tenure']}
+                      {/^\d+$/.test(currentSpotlight['person-tenure'].trim())
+                        ? `${currentSpotlight['person-tenure'].trim()} year${currentSpotlight['person-tenure'].trim() === '1' ? '' : 's'}`
+                        : currentSpotlight['person-tenure']}
                     </Badge>
                   )}
                 </div>
