@@ -104,9 +104,10 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
     { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/jewett-junction/marketing/presentations`, color: 'purple', external: false },
     { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange', external: false },
     { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink', external: false },
-    // Apparel Store — external shop; URL managed in Site Settings. Hidden until set.
+    // Apparel Store — URL managed in Site Settings (internal asset page or
+    // external shop). Hidden until set; opens a new tab only for external URLs.
     ...(apparelStoreUrl
-      ? [{ name: 'Apparel Store', desc: 'Jewett-branded gear', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: true }]
+      ? [{ name: 'Apparel Store', desc: 'Jewett-branded gear', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: apparelStoreUrl.startsWith('http') }]
       : []),
   ];
 
