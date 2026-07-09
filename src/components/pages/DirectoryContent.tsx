@@ -194,7 +194,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     // Use fuzzy search for better matching
     const searchResults = fuzzySearch(deptFiltered, debouncedSearch, {
       keys: ['name', 'role', 'department', 'location', 'email'],
-      threshold: 0.3,
+      threshold: 0.75,
       exactFirst: true,
     });
 

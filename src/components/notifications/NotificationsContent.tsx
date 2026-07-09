@@ -209,12 +209,25 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '', uiS
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
+
+    // Future dates (upcoming events) read as "in Xd", never "-62999m ago".
+    if (diffMs < 0) {
+      const aheadMins = Math.ceil(-diffMs / 60000);
+      const aheadHours = Math.ceil(-diffMs / 3600000);
+      const aheadDays = Math.ceil(-diffMs / 86400000);
+      if (aheadMins < 60) return `in ${aheadMins}m`;
+      if (aheadHours < 24) return `in ${aheadHours}h`;
+      if (aheadDays < 7) return `in ${aheadDays}d`;
+      return date.toLocaleDateString(undefined, { timeZone: 'America/New_York' });
+    }
+
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
-
+    if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;

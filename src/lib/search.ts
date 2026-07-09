@@ -126,7 +126,7 @@ export function startsWithString(text: string, query: string): boolean {
 }
 
 interface FuzzyMatchOptions {
-  /** Minimum similarity score to consider a match (0-1, default: 0.3) */
+  /** Minimum per-word similarity score to consider a match (0-1, default: 0.75) */
   threshold?: number;
   /** Search keys for objects */
   keys?: string[];
@@ -152,7 +152,7 @@ export function fuzzySearch<T extends Record<string, any>>(
   query: string,
   options: FuzzyMatchOptions = {}
 ): FuzzyMatchResult<T>[] {
-  const { threshold = 0.3, keys = [], exactFirst = true } = options;
+  const { threshold = 0.75, keys = [], exactFirst = true } = options;
 
   if (!query || query.trim() === '') {
     return items.map((item) => ({ item, score: 1, matches: [] }));
@@ -184,19 +184,22 @@ export function fuzzySearch<T extends Record<string, any>>(
         matches.push({ key, value, score });
         bestScore = Math.max(bestScore, score);
       } else {
-        // Fuzzy match using similarity
-        const similarity = stringSimilarity(normalizedValue, normalizedQuery);
-        if (similarity >= threshold) {
-          matches.push({ key, value, score: similarity });
-          bestScore = Math.max(bestScore, similarity);
-        }
-
-        // Also check word-level matching
+        // Typo tolerance: compare the query against each WORD of the value,
+        // not the whole field. Whole-field Levenshtein made "Palmer" match
+        // "Laborer" (0.57 similar) and flooded results with noise; word-level
+        // similarity keeps "Palmr" → "Palmer" working while rejecting
+        // unrelated words. The threshold applies to the best word score.
         const words = normalizedValue.split(/\s+/);
         for (const word of words) {
           if (word.startsWith(normalizedQuery)) {
             matches.push({ key, value, score: 0.85 });
             bestScore = Math.max(bestScore, 0.85);
+            continue;
+          }
+          const similarity = stringSimilarity(word, normalizedQuery);
+          if (similarity >= threshold) {
+            matches.push({ key, value, score: similarity });
+            bestScore = Math.max(bestScore, similarity);
           }
         }
       }
