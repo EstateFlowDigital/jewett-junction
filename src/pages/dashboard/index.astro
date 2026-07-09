@@ -7,7 +7,7 @@ import '../../styles/global.css';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
 import CmsIcon from '../../components/shared/CmsIcon.astro';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getSiteSettings, getPageCopy, getIntranetSections, getUIStrings } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getIntranetSections, getUIStrings } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -22,13 +22,12 @@ let safetyContent: any[] = [];
 let itArticles: any[] = [];
 let marketingAssets: any[] = [];
 let bannerMessages: any[] = [];
-let siteSettings: any = {};
 let pageCopy: any = null;
 let sectionMap = new Map<string, string>();
 let uiStrings = new Map<string, string>();
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, settingsRes, copyRes, sectionsRes, uiRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, sectionsRes, uiRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 5 }),
@@ -38,12 +37,10 @@ try {
     getITKnowledgeBase({ limit: 3, featured: true }),
     getMarketingAssets({ limit: 6, featured: true }),
     getBannerMessages({ limit: 20 }),
-    getSiteSettings(),
     getPageCopy('dashboard'),
     getIntranetSections(),
     getUIStrings(),
   ]);
-  siteSettings = settingsRes;
   announcements = announcementsRes.items;
   events = eventsRes.items;
   jobs = jobsRes.items;
@@ -75,7 +72,6 @@ const quickLinksTitle = pageCopy?.['content-block-3-title'] || '';
 const newsTitle = pageCopy?.['content-block-4-title'] || '';
 const cultureCornerTitle = pageCopy?.['subsection-1-headline'] || '';
 const openPositionsTitle = pageCopy?.['subsection-2-headline'] || '';
-const referralTitle = pageCopy?.['section-headline'] || '';
 // Strip outer <p> wrapping from RichText so it inlines cleanly
 function stripParaTag(s: string | undefined) {
   if (!s) return '';
@@ -110,15 +106,11 @@ const featuredITTileBg = 'background-color: ' + (featuredITHex ? featuredITHex +
 const featuredITBadgeBg = 'background-color: ' + (featuredITHex ? featuredITHex + '33' : 'rgba(59, 130, 246, 0.2)');
 const featuredITBadgeFg = 'color: ' + (featuredITHex || '#60a5fa');
 
-// Default referral bonus from Site Settings (CMS-driven)
-const defaultReferralBonus = Number(siteSettings['default-referral-bonus']) || 500;
-const referralBonusDisplay = `$${defaultReferralBonus.toLocaleString()}`;
-
 function formatTime(dateStr: string) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return '';
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
 }
 
 function getRelativeTime(dateStr: string) {
@@ -141,8 +133,8 @@ function getDayInfo(dateStr: string) {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return { weekday: '', day: '' };
   return {
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
-    day: date.getDate(),
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'America/New_York' }),
+    day: date.toLocaleDateString('en-US', { day: 'numeric', timeZone: 'America/New_York' }),
   };
 }
 
@@ -288,9 +280,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
         </a>
         <a href="/jewett-junction/culture" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" aria-label={label('culture', 'Culture')} data-tooltip={label('culture', 'Culture')}>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        </a>
-        <a href="/jewett-junction/careers" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" aria-label={label('careers', 'Careers')} data-tooltip={label('careers', 'Careers')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </a>
         <a href="/jewett-junction/directory" class="w-11 h-11 hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-200 transition-all" aria-label={label('directory', 'Directory')} data-tooltip={label('directory', 'Directory')}>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -461,7 +450,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               <div class="text-2xl font-bold text-white">Stories</div>
               <div class="text-sm text-pink-400 mt-1">Read More →</div>
             </a>
-            <a href="/jewett-junction/careers" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-amber-500/30">
+            <a href="#open-positions" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-amber-500/30">
               <div class="flex items-center justify-between mb-3">
                 <span class="text-sm text-slate-400">Open Positions</span>
                 <div class="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
@@ -470,14 +459,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               </div>
               <div class="text-4xl font-bold text-white">{jobs.length || 0}</div>
               <div class="text-sm text-amber-400 mt-1">View Openings →</div>
-            </a>
-            <a href="/jewett-junction/careers#apply" class="bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-2xl p-5 border border-blue-500/30 card-hover transition-all glow-blue hover:from-blue-600 hover:to-purple-600">
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-blue-200">Referral Bonus</span>
-                <svg class="w-6 h-6 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <div class="text-4xl font-bold text-white">{referralBonusDisplay}</div>
-              <div class="text-sm text-blue-200 mt-1">Per successful hire</div>
             </a>
           </div>
         </div>
@@ -664,7 +645,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
         </div>
 
-        <!-- Employee Spotlight & Careers -->
+        <!-- Employee Spotlight & Open Positions -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Culture Spotlight -->
           <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
@@ -717,7 +698,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
 
           <!-- Open Positions -->
-          <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
+          <div id="open-positions" class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
             <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
               {openPositionsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{openPositionsTitle}</h2>}
               <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">{jobs.length} openings</span>
@@ -725,7 +706,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             <div class="divide-y divide-slate-800/50 flex-1">
               {jobs.length > 0 ? (
                 jobs.slice(0, 3).map((job) => (
-                  <a href={`/jewett-junction/careers/${job.slug || job.id}`} class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
+                  <a href={job['apply-link'] || 'https://www.jewettconstruction.com/careers/'} target="_blank" rel="noopener noreferrer" class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
                     <div>
                       <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>
                       <div class="text-sm text-slate-500">{job.department || 'General'} • {job.location || 'Remote'}</div>
@@ -739,17 +720,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                 </div>
               )}
             </div>
-            {referralTitle && (
-            <div class="p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-t border-slate-700/50 mt-auto">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium text-white">{referralTitle}</div>
-                  <div class="text-sm text-slate-400">Earn {referralBonusDisplay} for each successful hire</div>
-                </div>
-                <a href="/jewett-junction/careers#apply" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors">Submit Referral</a>
-              </div>
-            </div>
-            )}
           </div>
         </div>
       </div>

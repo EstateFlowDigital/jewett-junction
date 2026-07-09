@@ -607,6 +607,7 @@ export interface SiteSettings {
   'social-instagram-url'?: string;
   'social-linkedin-url'?: string;
   'social-youtube-url'?: string;
+  'marketing-apparel-store-url'?: string;
   'brand-heading-font'?: string;
   'brand-body-font'?: string;
   'brand-color-1-name'?: string;
@@ -649,6 +650,8 @@ export interface CoreValue {
   'icon-name'?: string;
   color?: string;
   'sort-order'?: number;
+  /** Optional destination — makes the Culture tile a link. */
+  'link-url'?: string;
 }
 
 export async function getCoreValues(): Promise<{ items: CoreValue[]; total: number }> {

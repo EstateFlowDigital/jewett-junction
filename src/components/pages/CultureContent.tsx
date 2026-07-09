@@ -58,6 +58,8 @@ interface CMSCoreValue {
   'icon-name'?: string;
   color?: string;
   'sort-order'?: number;
+  /** Optional destination — makes the tile a link (e.g. /jewett-junction/safety). */
+  'link-url'?: string;
 }
 
 interface CulturePageCopy {
@@ -138,7 +140,6 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
   const volunteerHours = settings['culture-volunteer-hours'] || '450+';
-  const donations = settings['culture-donations'] || '$125K';
   // Core values come from the Core Values CMS collection. No hardcoded
   // fallback — when the collection is empty the Values section hides
   // entirely (see render guard further down).
@@ -149,6 +150,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
     description: v.description || '',
     color: v.color || 'slate',
     gradient: COLOR_GRADIENTS[v.color || ''] || 'from-slate-500 to-slate-600',
+    linkUrl: v['link-url'] || '',
   }));
   const hasCoreValues = coreValues.length > 0;
   const [activeValueIndex, setActiveValueIndex] = React.useState(0);
@@ -245,24 +247,42 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {coreValues.map((value, index) => (
-              <Card
-                key={value.name}
-                className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer ${
-                  activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
-                }`}
-                onClick={() => setActiveValueIndex(index)}
-              >
-                <CardContent className="p-6">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                    <value.icon className="h-7 w-7 text-white" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
-                  <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
-                  <p className="text-sm text-slate-400">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {coreValues.map((value, index) => {
+              const card = (
+                <Card
+                  className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer h-full ${
+                    activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
+                  }`}
+                  onClick={() => setActiveValueIndex(index)}
+                >
+                  <CardContent className="p-6">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                      <value.icon className="h-7 w-7 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
+                    <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
+                    <p className="text-sm text-slate-400">{value.description}</p>
+                  </CardContent>
+                </Card>
+              );
+              // A value with a Link URL set in the admin becomes a real link
+              // (e.g. Safety First → the Safety page); others keep the
+              // highlight-on-click behavior only.
+              return value.linkUrl ? (
+                <a
+                  key={value.name}
+                  href={value.linkUrl}
+                  className="block"
+                  aria-label={`${value.name} — learn more`}
+                  target={value.linkUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={value.linkUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                >
+                  {card}
+                </a>
+              ) : (
+                <div key={value.name}>{card}</div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -506,11 +526,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="bg-white/10 rounded-xl p-4">
-                <p className="text-3xl font-bold text-white">{donations}</p>
-                <p className="text-sm text-cyan-100">Donated annually</p>
-              </div>
+            <div className="grid grid-cols-1 gap-4 text-center">
               <div className="bg-white/10 rounded-xl p-4">
                 <p className="text-3xl font-bold text-white">{volunteerHours}</p>
                 <p className="text-sm text-cyan-100">Volunteer Hours</p>

@@ -12,6 +12,63 @@ export interface CalendarEvent {
 }
 
 /**
+ * Company timezone — all event wall times are Eastern.
+ */
+export const COMPANY_TZ = 'America/New_York';
+
+/**
+ * Convert a UTC ISO string to a `YYYY-MM-DDTHH:mm` string representing
+ * Eastern wall time (for datetime-local inputs).
+ */
+export function isoToEasternInput(iso: string): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return '';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: COMPANY_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => parts.find(p => p.type === type)?.value || '';
+  let hour = get('hour');
+  if (hour === '24') hour = '00';
+  return `${get('year')}-${get('month')}-${get('day')}T${hour}:${get('minute')}`;
+}
+
+/**
+ * Get the offset (ms) of a timezone relative to UTC at a given instant.
+ */
+function getTimeZoneOffsetMs(date: Date, timeZone: string): number {
+  const tzDate = new Date(date.toLocaleString('en-US', { timeZone }));
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+  return tzDate.getTime() - utcDate.getTime();
+}
+
+/**
+ * Interpret a `YYYY-MM-DDTHH:mm` string as Eastern wall time and return
+ * the equivalent UTC ISO string.
+ */
+export function easternInputToISO(input: string): string {
+  if (!input) return '';
+  const match = input.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return '';
+  const [, y, m, d, hh, mm] = match.map(Number);
+  // Start with the wall time interpreted as UTC, then correct by the zone offset.
+  let guess = new Date(Date.UTC(y, m - 1, d, hh, mm));
+  if (isNaN(guess.getTime())) return '';
+  let offset = getTimeZoneOffsetMs(guess, COMPANY_TZ);
+  guess = new Date(guess.getTime() - offset);
+  // Recompute once at the corrected instant (handles DST boundaries).
+  offset = getTimeZoneOffsetMs(guess, COMPANY_TZ);
+  guess = new Date(Date.UTC(y, m - 1, d, hh, mm) - offset);
+  return guess.toISOString();
+}
+
+/**
  * Format date to Google Calendar format (YYYYMMDDTHHmmssZ)
  */
 function formatDateForGoogle(date: Date): string {
@@ -19,16 +76,16 @@ function formatDateForGoogle(date: Date): string {
 }
 
 /**
- * Format date to ICS format (YYYYMMDDTHHmmss)
+ * Format date to ICS format in UTC (YYYYMMDDTHHmmssZ)
  */
 function formatDateForICS(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+  return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
 }
 
 /**

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight, Facebook, Instagram, Linkedin, Youtube, ShoppingBag } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { TeamContactCard } from './TeamContactCard';
@@ -27,6 +27,7 @@ interface MarketingSettings {
   'social-instagram-url'?: string;
   'social-linkedin-url'?: string;
   'social-youtube-url'?: string;
+  'marketing-apparel-store-url'?: string;
 }
 
 interface MarketingPageCopy {
@@ -96,12 +97,17 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
   };
   const brandGuidelinesLink = findAssetLink(['brand guideline', 'brand guide', 'guidelines', 'brand standard']);
 
+  const apparelStoreUrl = settings['marketing-apparel-store-url'] || '';
   const resources = [
-    { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/jewett-junction/marketing/brand-assets`, color: 'blue' },
-    { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/jewett-junction/marketing/letterhead`, color: 'green' },
-    { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/jewett-junction/marketing/presentations`, color: 'purple' },
-    { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange' },
-    { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink' },
+    { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/jewett-junction/marketing/brand-assets`, color: 'blue', external: false },
+    { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/jewett-junction/marketing/letterhead`, color: 'green', external: false },
+    { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/jewett-junction/marketing/presentations`, color: 'purple', external: false },
+    { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange', external: false },
+    { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink', external: false },
+    // Apparel Store — external shop; URL managed in Site Settings. Hidden until set.
+    ...(apparelStoreUrl
+      ? [{ name: 'Apparel Store', desc: 'Jewett-branded gear', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: true }]
+      : []),
   ];
 
   const heroHeadline = pageCopy?.['hero-headline'] || '';
@@ -186,7 +192,12 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
       {/* Resources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {resources.map((resource) => (
-          <a key={resource.name} href={resource.href}>
+          <a
+            key={resource.name}
+            href={resource.href}
+            target={resource.external ? '_blank' : undefined}
+            rel={resource.external ? 'noopener noreferrer' : undefined}
+          >
             <Card className={`h-full transition-all hover:shadow-lg cursor-pointer ${isDark ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'hover:border-slate-300'}`}>
               <CardContent className="pt-6">
                 <div className={`w-12 h-12 ${isDark ? `bg-${resource.color}-900` : `bg-${resource.color}-100`} rounded-xl mb-4 flex items-center justify-center`}>
@@ -273,17 +284,6 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
             theme={theme}
             accent="rose"
           />
-
-          <Card className={isDark ? 'bg-rose-900/30 border-rose-800' : 'bg-rose-50 border-rose-200'}>
-            <CardContent className="pt-6 text-center">
-              <PenTool className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-rose-400' : 'text-rose-600'}`} />
-              <h3 className={`font-semibold mb-2 ${isDark ? 'text-rose-300' : 'text-rose-900'}`}>Custom Request?</h3>
-              <p className={`text-sm mb-4 ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>Need something custom designed?</p>
-              <a href="/jewett-junction/submit-idea?category=marketing" className="w-full">
-                <Button className="w-full bg-rose-600 hover:bg-rose-700">Submit Request</Button>
-              </a>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

@@ -40,7 +40,8 @@ const formatDate = (dateStr: string) => {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'America/New_York'
   });
 };
 
@@ -52,7 +53,8 @@ const formatTime = (dateStr: string) => {
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
+    timeZone: 'America/New_York'
   });
 };
 ---
@@ -281,13 +283,13 @@ const formatTime = (dateStr: string) => {
           }
 
           function formatDateForICS(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+            return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
           }
 
           function stripHtml(html) {
@@ -403,9 +405,9 @@ const formatTime = (dateStr: string) => {
                 <img src={relatedEvent['banner-image'].url} alt="" class="w-16 h-16 rounded-xl object-cover flex-shrink-0" loading="lazy" />
               ) : (
                 <div class="w-16 h-16 bg-slate-800 rounded-xl flex flex-col items-center justify-center flex-shrink-0" aria-hidden="true">
-                  <span class="text-xs text-slate-400">{new Date(relatedEvent['event-date']).toLocaleDateString('en-US', { month: 'short' })}</span>
+                  <span class="text-xs text-slate-400">{new Date(relatedEvent['event-date']).toLocaleDateString('en-US', { month: 'short', timeZone: 'America/New_York' })}</span>
                   <span class="text-lg font-bold text-blue-400">
-                    {new Date(relatedEvent['event-date']).getDate()}
+                    {new Date(relatedEvent['event-date']).toLocaleDateString('en-US', { day: 'numeric', timeZone: 'America/New_York' })}
                   </span>
                 </div>
               )}

@@ -20,12 +20,9 @@ import {
   Clock,
   Eye,
   Bookmark,
-  Plus,
   Filter,
   Grid,
-  List,
-  HelpCircle,
-  FolderPlus
+  List
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -187,16 +184,6 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                 Browse Resources
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
-              <a href="/jewett-junction/submit-idea?category=resource">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Request Document
-                </Button>
-              </a>
             </div>
           </div>
 
@@ -530,36 +517,6 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
         </Card>
       )}
 
-      {/* Request Document CTA */}
-      <Card className="bg-gradient-to-r from-amber-500 to-orange-500 border-0 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
-        <CardContent className="py-8 px-6 md:px-8 relative">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <HelpCircle className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  Can't Find What You Need?
-                </h2>
-                <p className="text-amber-100">
-                  Submit a request and we'll help you find or create the document you're looking for.
-                </p>
-              </div>
-            </div>
-            <a href="/jewett-junction/submit-idea?category=resource">
-              <Button
-                size="lg"
-                className="bg-white text-amber-700 hover:bg-amber-50 flex-shrink-0"
-              >
-                <FolderPlus className="h-4 w-4 mr-2" />
-                Request Document
-              </Button>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

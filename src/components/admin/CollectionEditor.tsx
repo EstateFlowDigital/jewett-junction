@@ -28,6 +28,7 @@ import RichTextEditor from './RichTextEditor';
 import { CmsIcon } from '../ui/cms-icon';
 import type { FieldConfig, CollectionConfig } from './collections';
 import { ICON_MAP, getIcon } from './icon-map';
+import { isoToEasternInput, easternInputToISO } from '../../lib/calendar-utils';
 
 const API_BASE = '/jewett-junction';
 
@@ -1093,8 +1094,8 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           <input
             id={fieldId}
             type="datetime-local"
-            value={formData[field.key]?.slice(0, 16) || ''}
-            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value ? new Date(e.target.value).toISOString() : '' })}
+            value={isoToEasternInput(formData[field.key]) || ''}
+            onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value ? easternInputToISO(e.target.value) : '' })}
             aria-required={field.required}
             className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600/50 rounded-xl text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 focus-visible:outline-none transition-all"
           />

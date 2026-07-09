@@ -17,9 +17,19 @@ try {
   if (slug) {
     employee = await getEmployeeBySlug(slug);
 
-    // Also fetch other employees
-    const result = await getEmployees({ limit: 4 });
-    relatedEmployees = result.items.filter(e => e.slug !== slug).slice(0, 3);
+    // Team Members block shows colleagues from the SAME department. The old
+    // code fetched the first 4 employees globally, so every profile showed
+    // the same 3 people regardless of team.
+    if (employee) {
+      const result = await getEmployees();
+      const myDept = ((employee.dept || employee.department || '') as string).toLowerCase();
+      const sameDept = result.items.filter((e: any) => {
+        if (e.slug === slug) return false;
+        const theirDept = ((e.dept || e.department || '') as string).toLowerCase();
+        return myDept !== '' && theirDept === myDept;
+      });
+      relatedEmployees = sameDept.slice(0, 3);
+    }
   }
 } catch (error) {
   console.error('Error fetching employee:', error);

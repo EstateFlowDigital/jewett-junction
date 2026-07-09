@@ -39,33 +39,6 @@ interface ITSettings {
   'it-system-status-level'?: string;
 }
 
-const STATUS_THEME: Record<string, { card: string; header: string; title: string; text: string }> = {
-  Operational: {
-    card: 'bg-green-900/30 border-green-800',
-    header: '',
-    title: 'text-green-300',
-    text: 'text-green-300',
-  },
-  Degraded: {
-    card: 'bg-amber-900/30 border-amber-800',
-    header: '',
-    title: 'text-amber-300',
-    text: 'text-amber-200',
-  },
-  Outage: {
-    card: 'bg-red-900/30 border-red-800',
-    header: '',
-    title: 'text-red-300',
-    text: 'text-red-200',
-  },
-  Maintenance: {
-    card: 'bg-blue-900/30 border-blue-800',
-    header: '',
-    title: 'text-blue-300',
-    text: 'text-blue-200',
-  },
-};
-
 interface ITPageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
@@ -91,17 +64,6 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const itEmail = settings['it-email'] || 'it@jewettconstruction.com';
-  const statusMessage = settings['it-system-status-message'] || '';
-  const statusTheme = STATUS_THEME[settings['it-system-status-level'] || 'Operational'] || STATUS_THEME.Operational;
-  // Some CMS records prefix the day range into the hours value
-  // (e.g. "Mon–Fri 7:00 AM – 6:00 PM"). The row already has its own
-  // left-label, so strip any leading day-range from the value to avoid
-  // rendering "Mon - Fri | Mon–Fri 7:00 AM – 6:00 PM".
-  const stripDayPrefix = (s: string) =>
-    s.replace(/^\s*(mon|tue|wed|thu|fri|sat|sun)[a-z]*\s*[-–—\/to]+\s*(mon|tue|wed|thu|fri|sat|sun)[a-z]*\s*/i, '').trim();
-  const itHoursWeekday = stripDayPrefix(settings['it-hours-weekday'] || '7:00 AM - 6:00 PM');
-  const itHoursSaturday = stripDayPrefix(settings['it-hours-saturday'] || '8:00 AM - 12:00 PM');
-  const itEmergencyHours = settings['it-emergency-hours'] || '24/7 On-Call';
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [articles, setArticles] = React.useState<ITArticle[]>(initialItems);
@@ -156,8 +118,6 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
   const heroSubtitle = pageCopy?.['hero-subtitle'] || '';
   const issuesHeadline = pageCopy?.['subsection-1-headline'] || '';
   const issuesDescription = pageCopy?.['subsection-1-description'] || '';
-  const ticketsHeadline = pageCopy?.['subsection-2-headline'] || '';
-  const ticketsDescription = pageCopy?.['subsection-2-description'] || '';
 
   return (
     <div className="space-y-6">
@@ -244,25 +204,6 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
             </CardContent>
           </Card>
 
-          {/* My Tickets */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                {ticketsHeadline && <CardTitle className={isDark ? 'text-white' : ''}>{ticketsHeadline}</CardTitle>}
-                {ticketsDescription && <CardDescription className={isDark ? 'text-slate-400' : ''}>{ticketsDescription}</CardDescription>}
-              </div>
-              <a href="/jewett-junction/it-ticket">
-                <Button variant="outline" size="sm" className={isDark ? 'border-slate-600 text-slate-300' : ''}>Submit Ticket</Button>
-              </a>
-            </CardHeader>
-            <CardContent>
-              <div className={`p-6 rounded-lg border text-center ${isDark ? 'bg-slate-700/50 border-slate-600' : 'bg-muted/30'}`}>
-                <Monitor className={`h-10 w-10 mx-auto mb-3 ${isDark ? 'text-slate-500' : 'text-muted-foreground'} opacity-50`} />
-                <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>No active tickets</p>
-                <p className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Submit a request to get IT support</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Sidebar */}
@@ -275,40 +216,8 @@ export function ITHelpdeskContent({ theme = 'modern', initialItems = [], setting
             fallbackEmail={itEmail}
             theme={theme}
             accent="sky"
+            showDirectoryLink={false}
           />
-
-          {/* System Status — only shows when admin has set a message */}
-          {statusMessage && (
-            <Card className={statusTheme.card}>
-              <CardHeader>
-                <CardTitle className={`text-base ${statusTheme.title}`}>System Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className={`text-sm ${statusTheme.text}`}>{statusMessage}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Hours */}
-          <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
-            <CardHeader>
-              <CardTitle className={`text-base ${isDark ? 'text-white' : ''}`}>Support Hours</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Mon - Fri</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itHoursWeekday}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Saturday</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itHoursSaturday}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>Emergency</span>
-                <span className={`font-medium ${isDark ? 'text-white' : ''}`}>{itEmergencyHours}</span>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

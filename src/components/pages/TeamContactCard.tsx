@@ -41,6 +41,8 @@ interface TeamContactCardProps {
   theme?: 'modern' | 'classic' | 'minimal' | 'warm' | 'dark' | 'patriotic';
   /** Tailwind color name (purple/green/blue/rose) for the avatar accent. */
   accent?: string;
+  /** Show the "View {title} Directory" row. Off for teams of one. */
+  showDirectoryLink?: boolean;
 }
 
 const initials = (name = '') =>
@@ -59,6 +61,7 @@ export function TeamContactCard({
   fallbackEmail,
   theme = 'modern',
   accent = 'purple',
+  showDirectoryLink = true,
 }: TeamContactCardProps) {
   const isDark = theme === 'dark';
   const [contact, setContact] = React.useState<Employee | null>(null);
@@ -190,15 +193,17 @@ export function TeamContactCard({
               <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>{contact.phone}</span>
             </a>
           )}
-          <a
-            href={directoryHref}
-            className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-              isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'
-            }`}
-          >
-            <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-            <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View {title} Directory</span>
-          </a>
+          {showDirectoryLink && (
+            <a
+              href={directoryHref}
+              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-muted/50 hover:bg-muted'
+              }`}
+            >
+              <Users className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
+              <span className={`text-sm ${isDark ? 'text-slate-300' : ''}`}>View {title} Directory</span>
+            </a>
+          )}
         </div>
       </CardContent>
     </Card>

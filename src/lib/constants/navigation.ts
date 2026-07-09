@@ -6,7 +6,6 @@ import {
   Megaphone,
   Calendar,
   Heart,
-  Briefcase,
   BookUser,
   FolderOpen,
   Lightbulb,
@@ -62,12 +61,6 @@ export const mainNavItems: NavItem[] = [
     href: "/jewett-junction/culture",
     icon: Heart,
     description: "Stories & values",
-  },
-  {
-    title: "Careers",
-    href: "/jewett-junction/careers",
-    icon: Briefcase,
-    description: "Open positions & referrals",
   },
   {
     title: "Directory",

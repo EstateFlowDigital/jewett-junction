@@ -132,7 +132,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
           type: 'job',
           title: item.name,
           description: stripHtml(item.description)?.substring(0, 150) || '',
-          url: `${baseUrl}/careers/${item.slug}`,
+          url: `${baseUrl}/dashboard#open-positions`,
           meta: item.location
         });
       }

@@ -30,6 +30,7 @@ import {
   getGoogleCalendarUrl,
   getOutlookCalendarUrl,
   downloadICSFile,
+  COMPANY_TZ,
   type CalendarEvent
 } from '../../lib/calendar-utils';
 
@@ -91,18 +92,21 @@ function formatEventDate(dateStr: string) {
     };
   }
   return {
-    month: date.toLocaleDateString('en-US', { month: 'short' }),
-    day: date.getDate().toString(),
-    time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
-    full: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    month: date.toLocaleDateString('en-US', { month: 'short', timeZone: COMPANY_TZ }),
+    day: date.toLocaleDateString('en-US', { day: 'numeric', timeZone: COMPANY_TZ }),
+    time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: COMPANY_TZ }),
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short', timeZone: COMPANY_TZ }),
+    full: date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: COMPANY_TZ }),
   };
 }
+
+// Eastern Y-M-D key (en-CA gives YYYY-MM-DD) for day-level comparisons
+const easternYMD = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: COMPANY_TZ });
 
 function isToday(dateStr: string) {
   const eventDate = new Date(dateStr);
   const today = new Date();
-  return eventDate.toDateString() === today.toDateString();
+  return easternYMD(eventDate) === easternYMD(today);
 }
 
 function isThisWeek(dateStr: string) {
@@ -211,12 +215,8 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
   const { daysInMonth, firstDayOfMonth } = getDaysInMonth(currentMonth);
 
   const getEventsForDay = (day: number) => {
-    return sortedEvents.filter(event => {
-      const eventDate = new Date(event['event-date']);
-      return eventDate.getDate() === day &&
-             eventDate.getMonth() === currentMonth.getMonth() &&
-             eventDate.getFullYear() === currentMonth.getFullYear();
-    });
+    const dayKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return sortedEvents.filter(event => easternYMD(new Date(event['event-date'])) === dayKey);
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {

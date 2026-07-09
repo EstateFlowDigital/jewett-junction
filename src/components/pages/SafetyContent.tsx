@@ -61,13 +61,6 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const safetyEmail = settings['safety-email'] || 'safety@jewettconstruction.com';
-  const poisonControlPhone = settings['poison-control-phone'] || '1-800-222-1222';
-  const stats = [
-    { label: 'Days Without Incident', value: settings['safety-days-without-incident'] },
-    { label: 'Company Record', value: settings['safety-company-record-days'] },
-    { label: 'Training Compliance', value: settings['safety-training-compliance'] != null ? `${settings['safety-training-compliance']}%` : null },
-    { label: 'Active Sites', value: settings['safety-active-sites'] },
-  ].filter((s) => s.value != null && s.value !== '');
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>(initialItems);
@@ -164,22 +157,6 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           )}
         </div>
       </div>
-
-      {/* Safety Stats Banner — driven by Site Settings */}
-      {stats.length > 0 && (
-        <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white border-0">
-          <CardContent className="py-6">
-            <div className={`grid gap-6 text-center grid-cols-2 ${stats.length >= 4 ? 'md:grid-cols-4' : `md:grid-cols-${stats.length}`}`}>
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <div className="text-4xl md:text-5xl font-bold mb-1">{s.value}</div>
-                  <div className="text-green-100 text-sm">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Quick Actions — fully CMS-driven via the Quick Actions collection */}
       <QuickActionCards actions={quickActions} theme={theme} />
@@ -376,28 +353,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             fallbackEmail={safetyEmail}
             theme={theme}
             accent="green"
+            showDirectoryLink={false}
           />
-
-          {/* Emergency Numbers */}
-          <Card className={isDark ? 'bg-red-900/30 border-red-800' : 'bg-red-50 border-red-200'}>
-            <CardHeader className={isDark ? 'bg-red-900/50 border-b border-red-800' : 'bg-red-100 border-b border-red-200'}>
-              <CardTitle className={`text-base ${isDark ? 'text-red-300' : 'text-red-900'}`}>Emergency Numbers</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Emergency Services</span>
-                <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>911</span>
-              </div>
-              <a href={`tel:${poisonControlPhone.replace(/[^\d+]/g, '')}`} className="flex items-center justify-between hover:opacity-80 transition-opacity">
-                <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Poison Control</span>
-                <span className={`font-bold ${isDark ? 'text-red-200' : 'text-red-900'}`}>{poisonControlPhone}</span>
-              </a>
-              <a href={`mailto:${safetyEmail}`} className="flex items-center justify-between hover:opacity-80 transition-opacity">
-                <span className={`text-sm ${isDark ? 'text-red-300' : 'text-red-800'}`}>Safety Email (24/7)</span>
-                <span className={`font-bold text-xs ${isDark ? 'text-red-200' : 'text-red-900'}`}>{safetyEmail}</span>
-              </a>
-            </CardContent>
-          </Card>
 
           {/* Safety Newsletter — hidden when no newsletter exists in CMS */}
           {latestNewsletter && (

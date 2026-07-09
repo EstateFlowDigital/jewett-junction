@@ -13,7 +13,6 @@ import {
   Megaphone,
   Calendar,
   Heart,
-  Briefcase,
   BookUser,
   FolderOpen,
   HardHat,
@@ -36,7 +35,6 @@ const navItems: NavItem[] = [
   { title: "Marketing", href: "/jewett-junction/marketing", icon: Megaphone },
   { title: "Events", href: "/jewett-junction/events", icon: Calendar },
   { title: "Culture", href: "/jewett-junction/culture", icon: Heart },
-  { title: "Careers", href: "/jewett-junction/careers", icon: Briefcase },
   { title: "Directory", href: "/jewett-junction/directory", icon: BookUser },
   { title: "Resources", href: "/jewett-junction/resources", icon: FolderOpen },
 ];

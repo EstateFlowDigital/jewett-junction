@@ -62,6 +62,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
   const eapPhone = settings['eap-phone'] || '';
   const eapPortalUrl = settings['eap-portal-url'] || '';
   const hrEmail = settings['hr-email'] || 'hr@jewettconstruction.com';
+  const adpUrl = settings['hr-portal-adp'] || '';
   const portalLinks: { name: string; desc: string; href: string }[] = [
     { name: 'ADP Workforce Now', desc: 'Payroll & Time', href: settings['hr-portal-adp'] || '' },
     { name: 'Benefits Portal', desc: 'BCBS & Wellness', href: settings['hr-portal-bcbs'] || '' },
@@ -104,7 +105,6 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
       BENEFIT_NAME_HINTS.test(item.name || ''),
   );
   const forms = hrItems.filter(item => item['content-type'] === 'Form');
-  const featuredItem = announcements[0] || hrItems.find(item => item.featured);
 
   // If no items have content-type set, use all items as fallback for display
   const hasContentTypes = announcements.length > 0 || policies.length > 0 || benefits.length > 0 || forms.length > 0;
@@ -159,93 +159,31 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
         </div>
       </div>
 
-      {/* Featured Announcement - CMS or Static Fallback */}
-      {isLoading ? (
-        <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0">
-          <CardContent className="py-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Skeleton className="w-14 h-14 rounded-xl bg-white/20" />
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-48 bg-white/20" />
-                  <Skeleton className="h-4 w-72 bg-white/20" />
-                </div>
-              </div>
-              <Skeleton className="h-10 w-28 rounded-md bg-white/20" />
-            </div>
-          </CardContent>
-        </Card>
-      ) : featuredItem ? (
-        <a href={`/jewett-junction/hr/${featuredItem.slug || featuredItem.id}`} className="block">
+      {/* ADP Portal banner — Jewett handles most HR self-service through ADP,
+          so the hero is a permanent portal link (URL editable in Site
+          Settings → ADP Portal URL). Hidden entirely when the URL is unset. */}
+      {adpUrl && (
+        <a href={adpUrl} target="_blank" rel="noopener noreferrer" className="block" aria-label="Open the ADP Portal (opens in new tab)">
           <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 hover:from-purple-500 hover:to-purple-600 transition-all">
             <CardContent className="py-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                    {featuredItem.icon?.url ? (
-                      <CmsIcon
-                        url={featuredItem.icon.url}
-                        color={featuredItem['icon-color']}
-                        size={28}
-                        ariaLabel={featuredItem.name}
-                      />
-                    ) : (
-                      <AlertCircle className="h-7 w-7" />
-                    )}
+                    <ExternalLink className="h-7 w-7" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">{featuredItem.name}</h2>
-                    <p className="text-purple-100">{stripHtml(featuredItem.description || getContent(featuredItem))?.substring(0, 150)}</p>
+                    <h2 className="text-xl font-bold">ADP Portal</h2>
+                    <p className="text-purple-100">Pay, time off, benefits enrollment, and tax documents — all in ADP.</p>
                   </div>
                 </div>
                 <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
-                  Learn More
+                  Open ADP
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
           </Card>
         </a>
-      ) : displayItems.length > 0 ? (
-        /* Show first CMS item as featured when no content-type is set */
-        <a href={`/jewett-junction/hr/${displayItems[0].slug || displayItems[0].id}`} className="block">
-          <Card className="bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 hover:from-purple-500 hover:to-purple-600 transition-all">
-            <CardContent className="py-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center shrink-0">
-                    {displayItems[0].icon?.url ? (
-                      <CmsIcon
-                        url={displayItems[0].icon.url}
-                        color={displayItems[0]['icon-color']}
-                        size={28}
-                        ariaLabel={displayItems[0].name}
-                      />
-                    ) : (
-                      <Users className="h-7 w-7" />
-                    )}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">{displayItems[0].name}</h2>
-                    <p className="text-purple-100">{stripHtml(displayItems[0].description || getContent(displayItems[0]))?.substring(0, 150)}</p>
-                  </div>
-                </div>
-                <Button className="bg-white text-purple-700 hover:bg-purple-50 shrink-0">
-                  Learn More
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </a>
-      ) : (
-        /* Empty state when no CMS content */
-        <Card className={`border ${isDark ? 'bg-slate-800 border-slate-700' : ''}`}>
-          <CardContent className="py-8 text-center">
-            <Users className={`h-12 w-12 mx-auto mb-3 ${isDark ? 'text-slate-600' : 'text-muted-foreground'} opacity-50`} />
-            <p className={isDark ? 'text-slate-400' : 'text-muted-foreground'}>No HR announcements posted yet — check back soon.</p>
-          </CardContent>
-        </Card>
       )}
 
       {/* Quick Actions — fully CMS-driven via the Quick Actions collection */}
@@ -387,6 +325,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
               fallbackEmail={hrEmail}
               theme={theme}
               accent="purple"
+              showDirectoryLink={false}
             />
           </div>
 

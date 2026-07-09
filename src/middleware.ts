@@ -5,7 +5,6 @@ const GATED_PREFIXES = [
   '/jewett-junction',
   '/admin',
   '/announcements',
-  '/careers',
   '/culture',
   '/directory',
   '/events',

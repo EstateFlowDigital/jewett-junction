@@ -156,7 +156,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'signage-review-days', 'signage-production-days', 'signage-delivery-days',
     'it-system-status-message', 'it-system-status-level',
     'social-facebook-url', 'social-instagram-url',
-    'social-linkedin-url', 'social-youtube-url',
+    'social-linkedin-url', 'social-youtube-url', 'marketing-apparel-store-url',
     'brand-heading-font', 'brand-body-font',
     'brand-color-1-name', 'brand-color-1-hex',
     'brand-color-2-name', 'brand-color-2-hex',
@@ -176,7 +176,7 @@ const VALID_FIELDS: Record<string, string[]> = {
     'footer-note',
   ],
   coreValues: [
-    'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order',
+    'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order', 'link-url',
   ],
   employeeBenefits: [
     'name', 'slug', 'description', 'icon-name', 'sort-order', 'is-active',

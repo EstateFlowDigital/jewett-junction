@@ -125,7 +125,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       // Basics
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: 'Star', group: 'Basics' },
-      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], icon: 'Tag', group: 'Basics' },
+      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], helpText: 'Controls placement on the Culture page: Employee Spotlight → Spotlight carousel; Team Win → Team Wins; everything else (Recognition, Milestone, Community Impact, Core Value) → Recent Recognitions.', icon: 'Tag', group: 'Basics' },
       { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards', group: 'Basics' },
       { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', group: 'Basics' },
 
@@ -140,7 +140,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'quote', label: 'Featured Quote', type: 'textarea', placeholder: 'A memorable quote from the person', icon: 'FileText', group: 'Featured Person' },
 
       // Publishing
-      { key: 'author', label: 'Written By', type: 'text', placeholder: 'Author name', icon: 'Users', group: 'Publishing' },
+      { key: 'author', label: 'Nominated By / Written By', type: 'text', placeholder: 'e.g., Jane Smith', helpText: 'On Employee Spotlights this shows as "Nominated by <name>". On Team Wins and Recognitions it shows as the attribution line "— <name>".', icon: 'Users', group: 'Publishing' },
       { key: 'published-date', label: 'Published Date', type: 'datetime', helpText: 'Sort order on the Culture page is newest first by this date.', icon: 'Calendar', group: 'Publishing' },
       { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on the dashboard Culture Corner', group: 'Publishing' },
     ]
@@ -762,6 +762,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'social-instagram-url', label: 'Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
       { key: 'social-linkedin-url', label: 'LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin', group: 'Social Media' },
       { key: 'social-youtube-url', label: 'YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
+      { key: 'marketing-apparel-store-url', label: 'Apparel Store URL', type: 'url', placeholder: 'https://...', helpText: 'Link for the Apparel Store tile on the Marketing Hub. Leave blank to hide the tile.', icon: 'Link', group: 'Social Media' },
 
       // Brand identity — drives the Brand Assets page swatches + typography card.
       // Leave any field blank to fall back to the built-in Jewett defaults
@@ -822,6 +823,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'description', label: 'Description', type: 'textarea', placeholder: '1-2 sentence description', helpText: 'Body text describing the value' },
       { key: 'icon-name', label: 'Icon Name', type: 'text', placeholder: 'Shield', helpText: 'Lucide icon name (Shield, Star, Users, Target, Heart, Award, etc.)', icon: 'Sparkles' },
       { key: 'color', label: 'Accent Color', type: 'text', placeholder: 'orange', helpText: 'Tailwind color name (orange, amber, blue, emerald, pink, etc.)', icon: 'Palette' },
+      { key: 'link-url', label: 'Link URL', type: 'text', placeholder: '/jewett-junction/safety', helpText: 'Optional — makes this value tile clickable. Use a relative path like /jewett-junction/safety or a full https:// URL.', icon: 'Link' },
       { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
     ],
   },
