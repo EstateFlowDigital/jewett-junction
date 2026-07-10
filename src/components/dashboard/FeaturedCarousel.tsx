@@ -99,7 +99,10 @@ export function FeaturedCarousel({ announcements }: FeaturedCarouselProps) {
                 className="block h-full bg-gradient-to-br from-blue-600/60 to-purple-600/60 rounded-2xl border border-blue-500/20 overflow-hidden hover:from-blue-600/80 hover:to-purple-600/80 transition-all group"
               >
                 {announcement.imageUrl ? (
-                  <div className="h-36 w-full overflow-hidden">
+                  // Fixed 16:9 window so every card's image is the same shape
+                  // regardless of how wide the card is at a given breakpoint.
+                  // Pair with 1600×900px uploads for a pixel-perfect fit.
+                  <div className="aspect-[16/9] w-full overflow-hidden">
                     <img
                       src={announcement.imageUrl}
                       alt={announcement.name}
@@ -110,8 +113,9 @@ export function FeaturedCarousel({ announcements }: FeaturedCarouselProps) {
                 ) : (
                   // No image — show a branded megaphone motif over a dotted
                   // pattern instead of a bare initial letter, so image-less
-                  // cards still read as finished.
-                  <div className="relative h-36 w-full bg-gradient-to-br from-blue-500/25 via-indigo-500/20 to-purple-500/25 flex items-center justify-center overflow-hidden">
+                  // cards still read as finished. Same 16:9 window so heights
+                  // stay consistent whether or not an image is set.
+                  <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-blue-500/25 via-indigo-500/20 to-purple-500/25 flex items-center justify-center overflow-hidden">
                     <div
                       className="absolute inset-0 opacity-40"
                       style={{
