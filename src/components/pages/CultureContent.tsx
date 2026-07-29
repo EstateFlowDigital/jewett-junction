@@ -236,6 +236,107 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         <div className="absolute -top-10 -left-10 w-48 h-48 bg-rose-400/20 rounded-full blur-3xl"></div>
       </div>
 
+      {/* Stories Grid - Team Wins & Recognitions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Team Wins */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-emerald-400" />
+              {teamWinsHeadline}
+            </CardTitle>
+            {teamWinsDescription && (
+              <CardDescription className="text-slate-400">{teamWinsDescription}</CardDescription>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(winStories.length > 0 ? winStories : allStories.filter(s => s.type?.toLowerCase().includes('win'))).slice(0, 3).map((story) => {
+              const config = getTypeConfig(story.type);
+              return (
+                <a
+                  key={story.id}
+                  href={`/jewett-junction/culture/${story.slug || story.id}`}
+                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-emerald-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
+                  aria-label={`Read story: ${story.name}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
+                      <config.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
+                        {story.name}
+                      </h4>
+                      <p className="text-sm text-slate-400 line-clamp-2">
+                        {stripHtml(story.content) || story.excerpt}
+                      </p>
+                      {story.author && (
+                        <p className="text-xs text-slate-500 mt-2">— {story.author}</p>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+            {winStories.length === 0 && (
+              <div className="text-center py-6">
+                <Trophy className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500">No team wins to display yet</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recognitions */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Award className="h-5 w-5 text-blue-400" />
+              {recognitionsHeadline}
+            </CardTitle>
+            {recognitionsDescription && (
+              <CardDescription className="text-slate-400">{recognitionsDescription}</CardDescription>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {([...recognitionStories, ...otherStories].slice(0, 3)).map((story) => {
+              const config = getTypeConfig(story.type);
+              return (
+                <a
+                  key={story.id}
+                  href={`/jewett-junction/culture/${story.slug || story.id}`}
+                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-blue-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
+                  aria-label={`Read recognition: ${story.name}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
+                      <config.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
+                        {story.name}
+                      </h4>
+                      <p className="text-sm text-slate-400 line-clamp-2">
+                        {stripHtml(story.content) || story.excerpt}
+                      </p>
+                      {story.author && (
+                        <p className="text-xs text-slate-500 mt-2">— {story.author}</p>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
+            {recognitionStories.length === 0 && otherStories.length === 0 && (
+              <div className="text-center py-6">
+                <Award className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500">No recognitions to display yet</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Core Values Section — hidden when the Core Values CMS collection is empty */}
       {hasCoreValues && (
         <div>
@@ -287,27 +388,6 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         </div>
       )}
 
-      {/* Quick Stats — counts come from real Culture Stories; volunteer hours from Site Settings. */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Team Spotlights', count: spotlightStories.length, icon: Star, color: 'amber' },
-          { label: 'Team Wins', count: winStories.length, icon: Trophy, color: 'emerald' },
-          { label: 'Recognitions', count: recognitionStories.length + otherStories.length, icon: Award, color: 'blue' },
-          { label: 'Volunteer Hours', count: volunteerHours, icon: HandHeart, color: 'pink' },
-        ].map((stat) => (
-          <Card key={stat.label} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
-                <stat.icon className={`h-6 w-6 text-${stat.color}-400`} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{stat.count}</p>
-                <p className="text-sm text-slate-400">{stat.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
       {/* Employee Spotlight Section */}
       {spotlightStories.length > 0 && (
@@ -411,106 +491,6 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         </Card>
       )}
 
-      {/* Stories Grid - Team Wins & Recognitions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Team Wins */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-emerald-400" />
-              {teamWinsHeadline}
-            </CardTitle>
-            {teamWinsDescription && (
-              <CardDescription className="text-slate-400">{teamWinsDescription}</CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {(winStories.length > 0 ? winStories : allStories.filter(s => s.type?.toLowerCase().includes('win'))).slice(0, 3).map((story) => {
-              const config = getTypeConfig(story.type);
-              return (
-                <a
-                  key={story.id}
-                  href={`/jewett-junction/culture/${story.slug || story.id}`}
-                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-emerald-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
-                  aria-label={`Read story: ${story.name}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
-                      <config.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
-                        {story.name}
-                      </h4>
-                      <p className="text-sm text-slate-400 line-clamp-2">
-                        {stripHtml(story.content) || story.excerpt}
-                      </p>
-                      {story.author && (
-                        <p className="text-xs text-slate-500 mt-2">— {story.author}</p>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-            {winStories.length === 0 && (
-              <div className="text-center py-6">
-                <Trophy className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500">No team wins to display yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recognitions */}
-        <Card className="bg-slate-800/50 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Award className="h-5 w-5 text-blue-400" />
-              {recognitionsHeadline}
-            </CardTitle>
-            {recognitionsDescription && (
-              <CardDescription className="text-slate-400">{recognitionsDescription}</CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {([...recognitionStories, ...otherStories].slice(0, 3)).map((story) => {
-              const config = getTypeConfig(story.type);
-              return (
-                <a
-                  key={story.id}
-                  href={`/jewett-junction/culture/${story.slug || story.id}`}
-                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-blue-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
-                  aria-label={`Read recognition: ${story.name}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
-                      <config.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
-                        {story.name}
-                      </h4>
-                      <p className="text-sm text-slate-400 line-clamp-2">
-                        {stripHtml(story.content) || story.excerpt}
-                      </p>
-                      {story.author && (
-                        <p className="text-xs text-slate-500 mt-2">— {story.author}</p>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-            {recognitionStories.length === 0 && otherStories.length === 0 && (
-              <div className="text-center py-6">
-                <Award className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500">No recognitions to display yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Community Impact Banner */}
       <Card className="bg-gradient-to-r from-cyan-600 to-blue-600 border-0 overflow-hidden relative">

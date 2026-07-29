@@ -63,6 +63,8 @@ const departmentConfig: Record<string, { color: string; gradient: string; icon: 
   'design': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Building, label: 'Design' },
   'finance': { color: 'amber', gradient: 'from-amber-500 to-yellow-500', icon: Calculator, label: 'Finance' },
   'field operations': { color: 'blue', gradient: 'from-blue-500 to-cyan-500', icon: HardHat, label: 'Field Operations' },
+  'pre-construction': { color: 'teal', gradient: 'from-teal-500 to-cyan-500', icon: Calculator, label: 'Pre-Construction' },
+  'preconstruction': { color: 'teal', gradient: 'from-teal-500 to-cyan-500', icon: Calculator, label: 'Pre-Construction' },
   'hr': { color: 'purple', gradient: 'from-purple-500 to-violet-500', icon: Heart, label: 'HR' },
   'marketing': { color: 'pink', gradient: 'from-pink-500 to-rose-500', icon: Megaphone, label: 'Marketing' },
   'office operations': { color: 'emerald', gradient: 'from-emerald-500 to-green-500', icon: Briefcase, label: 'Office Operations' },

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight, Facebook, Instagram, Linkedin, Youtube, ShoppingBag } from 'lucide-react';
+import { Megaphone, Palette, FileText, Image, PenTool, Presentation, ChevronRight, Facebook, Instagram, Linkedin, Youtube, ShoppingBag, Camera } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { TeamContactCard } from './TeamContactCard';
@@ -103,11 +103,12 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
     { name: 'Letterhead & Forms', desc: 'Official documents', icon: FileText, href: `/jewett-junction/marketing/letterhead`, color: 'green', external: false },
     { name: 'Presentations', desc: 'Templates and decks', icon: Presentation, href: `/jewett-junction/marketing/presentations`, color: 'purple', external: false },
     { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange', external: false },
-    { name: 'Photo Library', desc: 'Project and team photos', icon: Image, href: `/jewett-junction/marketing/photos`, color: 'pink', external: false },
-    // Apparel Store — URL managed in Site Settings (internal asset page or
-    // external shop). Hidden until set; opens a new tab only for external URLs.
+    { name: 'Submit a Job Site Photo', desc: 'Share photos from the field', icon: Camera, href: `/jewett-junction/marketing/submit-photo`, color: 'pink', external: false },
+    { name: 'Marketing Request', desc: 'Collateral, print, and more', icon: Megaphone, href: `/jewett-junction/marketing/request`, color: 'rose', external: false },
+    // Apparel — guide + store. URL managed in Site Settings; hidden until set.
+    // Opens a new tab only for external URLs.
     ...(apparelStoreUrl
-      ? [{ name: 'Apparel Store', desc: 'Jewett-branded gear', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: apparelStoreUrl.startsWith('http') }]
+      ? [{ name: 'Apparel', desc: 'Apparel guide and store', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: apparelStoreUrl.startsWith('http') }]
       : []),
   ];
 

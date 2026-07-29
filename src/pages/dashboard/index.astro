@@ -30,7 +30,7 @@ try {
   const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, sectionsRes, uiRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
-    getJobPostings({ limit: 5 }),
+    getJobPostings({ limit: 25 }),
     getCultureStories({ limit: 4 }),
     getHRContent({ limit: 3, featured: true }),
     getSafetyContent({ limit: 3, featured: true }),
@@ -709,7 +709,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             </div>
             <div class="divide-y divide-slate-800/50 flex-1">
               {jobs.length > 0 ? (
-                jobs.slice(0, 3).map((job) => (
+                jobs.slice(0, 8).map((job) => (
                   <a href={job['apply-link'] || 'https://www.jewettconstruction.com/careers/'} target="_blank" rel="noopener noreferrer" class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
                     <div>
                       <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>

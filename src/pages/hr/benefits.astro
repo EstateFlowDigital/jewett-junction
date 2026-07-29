@@ -1,0 +1,124 @@
+---
+export const prerender = false;
+import ThemedPage from '../../layouts/themed-page.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Heart, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
+import { getIcon } from '../../components/admin/icon-map';
+import { initCMS, getBenefitLinks, getHRContent, getPageCopy } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+
+// Outside benefit portals live in the Benefit Links CMS collection so HR can
+// add/reorder/retire them without a code change. The benefits guide itself
+// comes from HR Content.
+const [linksResult, hrResult, copy] = await Promise.all([
+  getBenefitLinks(),
+  getHRContent({ limit: 50 }),
+  getPageCopy('hr-benefits'),
+]);
+const benefitLinks = linksResult.items;
+const guides = hrResult.items.filter(
+  (i: any) => /benefit/i.test(i.name || '') && !!i['document-link'],
+);
+const heroHeadline = copy?.['hero-headline'] || 'Benefits';
+const heroSubtitle =
+  copy?.['hero-subtitle'] ||
+  'Your Jewett benefits, plan documents, and the outside portals where you manage them.';
+---
+
+<ThemedPage title={`${heroHeadline} | Jewett Junction`} theme="dark" currentSection="hr">
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a
+        href="/jewett-junction/hr"
+        class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800"
+        aria-label="Back to HR"
+      >
+        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+          <Heart className="h-7 w-7 text-purple-500" aria-hidden="true" />
+          {heroHeadline}
+        </h1>
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
+      </div>
+    </div>
+
+    {/* Plan documents from HR Content */}
+    {guides.length > 0 && (
+      <Card className="bg-slate-800 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-white">Plan Documents</CardTitle>
+          <CardDescription className="text-slate-400">Guides and summaries for your Jewett benefits</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {guides.map((g: any) => (
+              <a
+                href={g['document-link']}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-3 p-4 rounded-xl border border-slate-600 hover:border-purple-500/50 hover:bg-slate-700/60 transition-colors group"
+              >
+                <div class="w-10 h-10 bg-purple-900/60 rounded-lg flex items-center justify-center shrink-0">
+                  <FileText className="h-5 w-5 text-purple-300" aria-hidden="true" />
+                </div>
+                <div class="min-w-0">
+                  <div class="font-medium text-white truncate group-hover:text-purple-300 transition-colors">{g.name}</div>
+                  <div class="text-xs text-slate-400">Opens in a new tab</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )}
+
+    {/* Outside portals — fully CMS-managed */}
+    <Card className="bg-slate-800 border-slate-700">
+      <CardHeader>
+        <CardTitle className="text-white">Benefit Portals</CardTitle>
+        <CardDescription className="text-slate-400">
+          {benefitLinks.length > 0
+            ? 'Log in to manage your coverage with each provider'
+            : 'Add portals in the admin under Benefit Links.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {benefitLinks.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {benefitLinks.map((link) => {
+              const Icon = getIcon(link['icon-name']) || Heart;
+              return (
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex flex-col gap-2 p-5 rounded-xl border border-slate-600 bg-slate-700/40 hover:border-purple-500/50 hover:bg-slate-700/70 transition-colors group min-h-[44px]"
+                  aria-label={`${link.name} (opens in a new tab)`}
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="w-10 h-10 bg-purple-900/60 rounded-lg flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5 text-purple-300" aria-hidden="true" />
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-slate-500 group-hover:text-purple-300 transition-colors" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <div class="font-semibold text-white group-hover:text-purple-300 transition-colors">{link.name}</div>
+                    {link.description && <div class="text-sm text-slate-400 mt-0.5">{link.description}</div>}
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="text-center py-8 text-slate-400">
+            <Heart className="h-10 w-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
+            <p>No benefit portals added yet — check back soon.</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+</ThemedPage>

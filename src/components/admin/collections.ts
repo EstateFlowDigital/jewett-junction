@@ -156,7 +156,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'name', label: 'Full Name', type: 'text', required: true, placeholder: 'First Last', icon: 'Users', group: 'Basics' },
       { key: 'photo', label: 'Profile Photo', type: 'image', helpText: 'Recommended: 400×400px (square). Used on the employee directory.', icon: 'Image', group: 'Basics' },
       { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase', group: 'Basics' },
-      { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'HR', 'Marketing', 'Office Operations'], icon: 'Building', group: 'Basics' },
+      { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'Pre-Construction', 'HR', 'Marketing', 'Office Operations'], icon: 'Building', group: 'Basics' },
 
       // Contact
       { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail', group: 'Contact' },
@@ -762,6 +762,11 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'social-instagram-url', label: 'Instagram URL', type: 'url', placeholder: 'https://www.instagram.com/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
       { key: 'social-linkedin-url', label: 'LinkedIn URL', type: 'url', placeholder: 'https://www.linkedin.com/company/...', helpText: 'Shown in the Marketing Hub social card', icon: 'Linkedin', group: 'Social Media' },
       { key: 'social-youtube-url', label: 'YouTube URL', type: 'url', placeholder: 'https://www.youtube.com/@...', helpText: 'Shown in the Marketing Hub social card', icon: 'Link', group: 'Social Media' },
+      { key: 'safety-award-headline', label: 'Safety Award: Headline', type: 'text', placeholder: '2026 Forever Safety Award Winner', helpText: 'Shown on the Safety page. Leave blank to hide the whole banner.', icon: 'Award', group: 'Safety' },
+      { key: 'safety-award-winner-name', label: 'Safety Award: Winner Name', type: 'text', placeholder: 'Ed Pellerin', icon: 'Users', group: 'Safety' },
+      { key: 'safety-award-winner-title', label: 'Safety Award: Winner Title', type: 'text', placeholder: 'Senior Superintendent', icon: 'Briefcase', group: 'Safety' },
+      { key: 'safety-award-photo', label: 'Safety Award: Photo', type: 'image', helpText: 'Headshot. Recommended 400×400px square.', icon: 'Image', group: 'Safety' },
+      { key: 'safety-award-message', label: 'Safety Award: Message', type: 'text', placeholder: 'Congratulations to…', helpText: 'Optional line under the name', icon: 'FileText', group: 'Safety' },
       { key: 'marketing-apparel-store-url', label: 'Apparel Store URL', type: 'url', placeholder: 'https://...', helpText: 'Link for the Apparel Store tile on the Marketing Hub. Leave blank to hide the tile.', icon: 'Link', group: 'Social Media' },
 
       // Brand identity — drives the Brand Assets page swatches + typography card.
@@ -808,6 +813,22 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'content-block-4-title', label: 'Content Block 4 Title', type: 'text', placeholder: 'e.g., Getting Help', helpText: 'Title for the fourth content block (Help page: "Getting Help").', icon: 'Type' },
       { key: 'content-block-4-body', label: 'Content Block 4 Body', type: 'richtext', helpText: 'Rich-text body for the fourth content block.' },
       { key: 'footer-note', label: 'Footer Note', type: 'text', placeholder: 'Jewett Junction • Your Company Intranet', helpText: 'Small text at the bottom of the page.' },
+    ],
+  },
+  benefitLinks: {
+    name: 'Benefit Links',
+    icon: 'Heart',
+    color: 'violet',
+    gradient: 'from-violet-500 to-purple-500',
+    slug: 'benefit-links',
+    description: 'Outside benefit portals shown on the HR → Benefits page',
+    fields: [
+      { key: 'name', label: 'Benefit Name', type: 'text', required: true, placeholder: 'e.g., Delta Dental Insurance', icon: 'Heart' },
+      { key: 'url', label: 'Portal URL', type: 'url', required: true, placeholder: 'https://...', helpText: 'Opens in a new tab', icon: 'Link' },
+      { key: 'description', label: 'Description', type: 'text', placeholder: 'e.g., Dental plan portal', helpText: 'Short line under the name — good place for a Web ID or login note', icon: 'FileText' },
+      { key: 'icon-name', label: 'Icon Name', type: 'text', placeholder: 'Heart', helpText: 'Lucide icon name (Heart, Shield, Eye, Stethoscope, Scale, HandHeart, PiggyBank, Smile)', icon: 'Sparkles' },
+      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
     ],
   },
   coreValues: {

@@ -27,6 +27,11 @@ interface RuntimeEnv {
   HR_INBOX_EMAIL?: string;
   IDEAS_INBOX_EMAIL?: string;
   SIGNAGE_INBOX_EMAIL?: string;
+  // Any *_INBOX_EMAIL may be a comma-separated list of addresses.
+  MISSION_INBOX_EMAIL?: string;
+  SALES_LEAD_INBOX_EMAIL?: string;
+  BUILTWELL_INBOX_EMAIL?: string;
+  MARKETING_INBOX_EMAIL?: string;
 }
 
 function getEnv(locals: any): RuntimeEnv {
@@ -35,7 +40,16 @@ function getEnv(locals: any): RuntimeEnv {
   return import.meta.env as unknown as RuntimeEnv;
 }
 
-export type InboxKey = 'it' | 'safety' | 'hr' | 'ideas' | 'signage';
+export type InboxKey =
+  | 'it'
+  | 'safety'
+  | 'hr'
+  | 'ideas'
+  | 'signage'
+  | 'mission'
+  | 'salesLead'
+  | 'builtwell'
+  | 'marketing';
 
 function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
   switch (key) {
@@ -44,7 +58,17 @@ function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
     case 'hr': return env.HR_INBOX_EMAIL;
     case 'ideas': return env.IDEAS_INBOX_EMAIL;
     case 'signage': return env.SIGNAGE_INBOX_EMAIL;
+    case 'mission': return env.MISSION_INBOX_EMAIL;
+    case 'salesLead': return env.SALES_LEAD_INBOX_EMAIL;
+    case 'builtwell': return env.BUILTWELL_INBOX_EMAIL;
+    case 'marketing': return env.MARKETING_INBOX_EMAIL;
   }
+}
+
+// An inbox may be configured with several addresses ("a@x.com, b@x.com").
+// Resend accepts an array for `to`, so split and trim into one.
+function parseRecipients(raw: string): string[] {
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
 function escapeHtml(s: string): string {
@@ -79,10 +103,11 @@ export async function sendNotification(locals: any, params: NotifyParams): Promi
   const env = getEnv(locals);
   const apiKey = env.RESEND_API_KEY;
   const from = env.NOTIFY_FROM_EMAIL;
-  const to = inboxAddress(env, params.inbox);
+  const toRaw = inboxAddress(env, params.inbox);
+  const to = toRaw ? parseRecipients(toRaw) : [];
 
-  if (!apiKey || !from || !to) {
-    console.warn(`notify: skipped — missing config (apiKey:${!!apiKey} from:${!!from} to:${!!to})`);
+  if (!apiKey || !from || to.length === 0) {
+    console.warn(`notify: skipped — missing config (apiKey:${!!apiKey} from:${!!from} to:${to.length})`);
     return { ok: false, skipped: true };
   }
 
@@ -103,8 +128,9 @@ ${rows}
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
+  const toLower = new Set(to.map((a) => a.toLowerCase()));
   const cc = Array.from(new Set([...ccFromEnv, ...(params.cc || [])]))
-    .filter((addr) => addr.toLowerCase() !== to.toLowerCase());
+    .filter((addr) => !toLower.has(addr.toLowerCase()));
 
   try {
     const res = await fetch('https://api.resend.com/emails', {

@@ -502,6 +502,7 @@ export const COLLECTIONS = {
   intranetSections: '6a0f2f504c6e8c76850bda42',
   quickActions: '6a0f33dde0546a1a2e4afc24',
   uiStrings: '6a0f46a8a691254e6e83d8fd',
+  benefitLinks: '6a69f01da2e95ce3da497a05',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -608,6 +609,11 @@ export interface SiteSettings {
   'social-linkedin-url'?: string;
   'social-youtube-url'?: string;
   'marketing-apparel-store-url'?: string;
+  'safety-award-headline'?: string;
+  'safety-award-winner-name'?: string;
+  'safety-award-winner-title'?: string;
+  'safety-award-photo'?: { url?: string };
+  'safety-award-message'?: string;
   'brand-heading-font'?: string;
   'brand-body-font'?: string;
   'brand-color-1-name'?: string;
@@ -652,6 +658,26 @@ export interface CoreValue {
   'sort-order'?: number;
   /** Optional destination — makes the Culture tile a link. */
   'link-url'?: string;
+}
+
+export interface BenefitLink {
+  id: string;
+  name?: string;
+  slug?: string;
+  url?: string;
+  description?: string;
+  'icon-name'?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+/** Outside benefit portals (Cigna, Delta Dental, EAP, …) shown on /hr/benefits. */
+export async function getBenefitLinks(): Promise<{ items: BenefitLink[]; total: number }> {
+  if (!COLLECTIONS.benefitLinks) return { items: [], total: 0 };
+  const result = await getCollection<BenefitLink>(COLLECTIONS.benefitLinks, { limit: 50 });
+  const active = result.items.filter((b) => b['is-active'] !== false);
+  const sorted = [...active].sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
+  return { items: sorted, total: sorted.length };
 }
 
 export async function getCoreValues(): Promise<{ items: CoreValue[]; total: number }> {

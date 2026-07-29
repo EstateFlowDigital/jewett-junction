@@ -1,0 +1,47 @@
+---
+export const prerender = false;
+import ThemedPage from '../../layouts/themed-page.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { JobSitePhotoForm } from '../../components/forms/JobSitePhotoForm';
+import { Camera, ArrowLeft } from 'lucide-react';
+import { initCMS, getPageCopy, getUIStrings } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+const [copy, uiMap] = await Promise.all([
+  getPageCopy('marketing-submit-photo'),
+  getUIStrings(),
+]);
+const uiStrings: Record<string, string> = Object.fromEntries(uiMap);
+const heroHeadline = copy?.['hero-headline'] || '';
+const heroSubtitle = copy?.['hero-subtitle'] || '';
+---
+
+<ThemedPage title={`${heroHeadline || 'Submit a Job Site Photo'} | Jewett Junction`} theme="dark" currentSection="marketing">
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a href="/jewett-junction/marketing" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label="Back to Marketing Hub">
+        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      </a>
+      <div>
+        {heroHeadline && (
+          <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+            <Camera className="h-7 w-7 text-orange-500" aria-hidden="true" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
+      </div>
+    </div>
+
+    <!-- Photo Submission Form -->
+    <Card className="bg-slate-800 border-slate-700">
+      <CardHeader>
+        <CardTitle className="text-white">Submit a Job Site Photo</CardTitle>
+        <CardDescription className="text-slate-400">Share photos from your job site with the marketing team. Great shots may be featured on our website and social channels.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <JobSitePhotoForm client:load uiStrings={uiStrings} />
+      </CardContent>
+    </Card>
+  </div>
+</ThemedPage>

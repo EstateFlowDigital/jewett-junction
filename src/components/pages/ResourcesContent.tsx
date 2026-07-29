@@ -115,6 +115,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
 
   const categories = ['All', ...Object.keys(categoryCounts)];
 
+  // Honour ?category=X so section pages can deep-link to a filtered view
+  // (e.g. the Safety hub's "Safety Resources" tile → only safety documents).
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const requested = new URLSearchParams(window.location.search).get('category');
+    if (!requested) return;
+    const match = categories.find((c) => c.toLowerCase() === requested.toLowerCase());
+    if (match) setSelectedCategory(match);
+  }, [categories.length]);
+
   // Get featured resources
   const featuredResources = allResources.filter(r => r.featured);
 

@@ -42,6 +42,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'form-submissions', name: 'Form Submissions', icon: Mail, color: 'cyan', href: '/jewett-junction/admin/form-submissions' },
       { key: 'site-settings', name: 'Site Settings', icon: Settings, color: 'slate', href: '/jewett-junction/admin/site-settings' },
       { key: 'page-copy', name: 'Page Copy', icon: FileText, color: 'sky', href: '/jewett-junction/admin/page-copy' },
+      { key: 'benefit-links', name: 'Benefit Links', icon: Heart, color: 'violet', href: '/jewett-junction/admin/benefit-links' },
       { key: 'core-values', name: 'Core Values', icon: Heart, color: 'pink', href: '/jewett-junction/admin/core-values' },
       { key: 'employee-benefits', name: 'Employee Benefits', icon: Heart, color: 'emerald', href: '/jewett-junction/admin/employee-benefits' },
       { key: 'company-awards', name: 'Company Awards', icon: Award, color: 'amber', href: '/jewett-junction/admin/company-awards' },

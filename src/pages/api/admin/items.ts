@@ -154,6 +154,8 @@ const VALID_FIELDS: Record<string, string[]> = {
     'safety-training-compliance', 'safety-active-sites',
     'culture-volunteer-hours', 'culture-donations',
     'signage-review-days', 'signage-production-days', 'signage-delivery-days',
+    'safety-award-headline', 'safety-award-winner-name', 'safety-award-winner-title',
+    'safety-award-photo', 'safety-award-message',
     'it-system-status-message', 'it-system-status-level',
     'social-facebook-url', 'social-instagram-url',
     'social-linkedin-url', 'social-youtube-url', 'marketing-apparel-store-url',
@@ -174,6 +176,9 @@ const VALID_FIELDS: Record<string, string[]> = {
     'content-block-3-title', 'content-block-3-body',
     'content-block-4-title', 'content-block-4-body',
     'footer-note',
+  ],
+  benefitLinks: [
+    'name', 'slug', 'url', 'description', 'icon-name', 'sort-order', 'is-active',
   ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order', 'link-url',

@@ -1,0 +1,50 @@
+---
+export const prerender = false;
+import ThemedPage from '../../layouts/themed-page.astro';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { MissionNominationForm } from '../../components/forms/MissionNominationForm';
+import { HeartHandshake, ArrowLeft } from 'lucide-react';
+import { initCMS, getPageCopy, getUIStrings } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+const [copy, uiMap] = await Promise.all([
+  getPageCopy('living-the-mission'),
+  getUIStrings(),
+]);
+const uiStrings: Record<string, string> = Object.fromEntries(uiMap);
+const heroHeadline = copy?.['hero-headline'] || '';
+const heroSubtitle = copy?.['hero-subtitle'] || '';
+const backLabel = uiStrings['form-back-to-dashboard'] || 'Back to Dashboard';
+---
+
+<ThemedPage title={`${heroHeadline || 'Living the Mission'} | Jewett Junction`} theme="dark" currentSection="culture">
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a href="/jewett-junction/dashboard" class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800" aria-label={backLabel}>
+        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      </a>
+      <div>
+        {heroHeadline && (
+          <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+            <HeartHandshake className="h-7 w-7 text-orange-500" aria-hidden="true" />
+            {heroHeadline}
+          </h1>
+        )}
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
+      </div>
+    </div>
+
+    <!-- Nomination Form -->
+    <Card className="bg-slate-800 border-slate-700">
+      <CardHeader>
+        <CardTitle className="text-white">Living the Mission</CardTitle>
+        <CardDescription className="text-slate-400">
+          This nomination form is for recognizing your coworkers when you "catch" them not only embodying the Jewett mission, but instances of going above and beyond to create positive experiences and lasting impressions.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MissionNominationForm client:load uiStrings={uiStrings} />
+      </CardContent>
+    </Card>
+  </div>
+</ThemedPage>

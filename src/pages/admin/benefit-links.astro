@@ -1,0 +1,16 @@
+---
+import AdminBase from '../../layouts/admin-base.astro';
+import { AdminLayout } from '../../components/admin/AdminLayout';
+import { CollectionEditor } from '../../components/admin/CollectionEditor';
+import { COLLECTIONS } from '../../components/admin/collections';
+---
+
+<AdminBase title="Benefit Links | Admin">
+  <AdminLayout client:load currentPage="benefit-links" title="Benefit Links">
+    <CollectionEditor
+      client:load
+      collectionKey="benefitLinks"
+      config={COLLECTIONS.benefitLinks}
+    />
+  </AdminLayout>
+</AdminBase>

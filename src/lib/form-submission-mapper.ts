@@ -12,7 +12,20 @@ function pickField(response: AnyRecord, matchers: RegExp[]): string | undefined 
   return undefined;
 }
 
-const NAME_MATCHERS = [/^name$/i, /full\s*name/i, /contact\s*name/i, /your\s*name/i, /first\s*name/i];
+// Also match the attribution labels our own forms use ("Submitted By",
+// "Requested By", "Nominated By") so the admin triage list shows a real
+// submitter name instead of a blank column.
+const NAME_MATCHERS = [
+  /^name$/i,
+  /full\s*name/i,
+  /contact\s*name/i,
+  /your\s*name/i,
+  /first\s*name/i,
+  /submitted\s*by/i,
+  /requested\s*by/i,
+  /nominated\s*by/i,
+  /reported\s*by/i,
+];
 const EMAIL_MATCHERS = [/^e?-?mail/i, /email\s*address/i];
 const PHONE_MATCHERS = [/^phone/i, /phone\s*number/i, /mobile/i, /contact\s*number/i];
 

@@ -105,6 +105,14 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
       BENEFIT_NAME_HINTS.test(item.name || ''),
   );
   const forms = hrItems.filter(item => item['content-type'] === 'Form');
+  // Forms & Documents is the catch-all for anything with a document link that
+  // isn't already surfaced in Benefits Overview. Previously only content-type
+  // 'Form' rendered, so Policy items (the Employee Handbook) vanished even
+  // with "featured" switched on.
+  const benefitIds = new Set(benefits.map((b) => b.id));
+  const documentItems = hrItems.filter(
+    (item) => !benefitIds.has(item.id) && !!item['document-link'],
+  );
 
   // If no items have content-type set, use all items as fallback for display
   const hasContentTypes = announcements.length > 0 || policies.length > 0 || benefits.length > 0 || forms.length > 0;
@@ -273,9 +281,15 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
           {/* HR Forms — only renders when there's at least one form-like item
               with a document link. Empty CMS = no empty card. */}
           {(() => {
-            const formSource = forms.length > 0
-              ? forms.slice(0, 4)
-              : displayItems.filter((item) => item['document-link']).slice(0, 4);
+            // Prefer explicit Forms, then every other linked document
+            // (policies, handbooks), then the no-content-type fallback.
+            const merged = [
+              ...forms,
+              ...documentItems.filter((d) => !forms.some((f) => f.id === d.id)),
+            ];
+            const formSource = merged.length > 0
+              ? merged.slice(0, 6)
+              : displayItems.filter((item) => item['document-link']).slice(0, 6);
             if (formSource.length === 0) return null;
             return (
               <Card className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
@@ -291,11 +305,12 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {formSource.map((form) => ({
+                      id: form.id,
                       name: form.name,
                       desc: stripHtml(form.description)?.trim() || '',
-                      link: form['document-link'] || resourcesLink,
+                      link: form['document-link'] || `/jewett-junction/hr/${form.slug || form.id}`,
                     })).map((form) => (
-                      <a key={form.name} href={form.link} target={form.link.startsWith('http') ? '_blank' : undefined} rel={form.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
+                      <a key={form.id || form.name} href={form.link} target={form.link.startsWith('http') ? '_blank' : undefined} rel={form.link.startsWith('http') ? 'noopener' : undefined} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors group ${isDark ? 'border-slate-600 hover:bg-slate-700' : 'hover:bg-muted/50'}`}>
                         <div className={`w-10 h-10 ${isDark ? 'bg-blue-900' : 'bg-blue-100'} rounded-lg flex items-center justify-center shrink-0`}>
                           <FileText className="h-5 w-5 text-blue-600" />
                         </div>

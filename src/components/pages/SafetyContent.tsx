@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap, Users } from 'lucide-react';
+import { Shield, AlertTriangle, Eye, BookOpen, FileText, Phone, Mail, Newspaper, ChevronRight, Download, Clock, HardHat, Flame, Zap, Users, Award } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -34,6 +34,11 @@ interface SafetySettings {
   'safety-company-record-days'?: number;
   'safety-training-compliance'?: number;
   'safety-active-sites'?: number;
+  'safety-award-headline'?: string;
+  'safety-award-winner-name'?: string;
+  'safety-award-winner-title'?: string;
+  'safety-award-photo'?: { url?: string };
+  'safety-award-message'?: string;
 }
 
 interface SafetyPageCopy {
@@ -61,6 +66,11 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
   const isDark = theme === 'dark';
   const resourcesLink = `/jewett-junction/resources`;
   const safetyEmail = settings['safety-email'] || 'safety@jewettconstruction.com';
+  const awardHeadline = settings['safety-award-headline'] || '';
+  const awardName = settings['safety-award-winner-name'] || '';
+  const awardTitle = settings['safety-award-winner-title'] || '';
+  const awardPhoto = settings['safety-award-photo']?.url || '';
+  const awardMessage = settings['safety-award-message'] || '';
 
   // CMS state - use initialItems if provided (server-side fetched)
   const [safetyItems, setSafetyItems] = React.useState<SafetyItem[]>(initialItems);
@@ -157,6 +167,39 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           )}
         </div>
       </div>
+
+      {/* Safety Award banner — all fields live in Site Settings → Safety Award.
+          Hidden entirely until a headline is set, so it can be retired or
+          swapped each year without a code change. */}
+      {awardHeadline && (
+        <Card className="bg-gradient-to-r from-emerald-600 to-green-700 text-white border-0 overflow-hidden">
+          <CardContent className="py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+              {awardPhoto ? (
+                <img
+                  src={awardPhoto}
+                  alt={awardName || 'Safety award winner'}
+                  className="w-20 h-20 rounded-2xl object-cover border-2 border-white/30 shrink-0"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center shrink-0">
+                  <Award className="h-9 w-9 text-white" aria-hidden="true" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider mb-2">
+                  <Award className="h-3.5 w-3.5" aria-hidden="true" />
+                  {awardHeadline}
+                </div>
+                {awardName && <h2 className="text-2xl font-bold leading-tight">{awardName}</h2>}
+                {awardTitle && <p className="text-green-100">{awardTitle}</p>}
+                {awardMessage && <p className="text-green-50/90 text-sm mt-2">{awardMessage}</p>}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions — fully CMS-driven via the Quick Actions collection */}
       <QuickActionCards actions={quickActions} theme={theme} />
