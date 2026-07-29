@@ -12,9 +12,11 @@ function pickField(response: AnyRecord, matchers: RegExp[]): string | undefined 
   return undefined;
 }
 
-// Also match the attribution labels our own forms use ("Submitted By",
-// "Requested By", "Nominated By") so the admin triage list shows a real
-// submitter name instead of a blank column.
+// Also match the attribution labels our own forms use so the admin triage
+// list shows a real submitter name instead of a blank column. Both the
+// "<verb> By" phrasing and the bare agent-noun form appear across the API
+// routes — safety-incident keys its reporter as "Reporter", it-ticket as
+// "Submitted By" — so cover both or one of them silently lands blank.
 const NAME_MATCHERS = [
   /^name$/i,
   /full\s*name/i,
@@ -25,6 +27,10 @@ const NAME_MATCHERS = [
   /requested\s*by/i,
   /nominated\s*by/i,
   /reported\s*by/i,
+  /^reporter$/i,
+  /^submitter$/i,
+  /^requester$/i,
+  /^nominator$/i,
 ];
 const EMAIL_MATCHERS = [/^e?-?mail/i, /email\s*address/i];
 const PHONE_MATCHERS = [/^phone/i, /phone\s*number/i, /mobile/i, /contact\s*number/i];
