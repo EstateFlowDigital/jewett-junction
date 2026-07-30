@@ -97,6 +97,17 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
   };
   const brandGuidelinesLink = findAssetLink(['brand guideline', 'brand guide', 'guidelines', 'brand standard']);
 
+  // Strict variant of findAssetLink — returns '' instead of the brand-assets
+  // fallback so callers can tell "no such asset" from "found it".
+  const findAssetLinkOrEmpty = (keywords: string[]): string => {
+    const match = assets.find((a) => {
+      const haystack = `${a.name || ''} ${a.slug || ''}`.toLowerCase();
+      return keywords.some((k) => haystack.includes(k.toLowerCase()));
+    });
+    return match ? `/jewett-junction/marketing/${match.slug || match.id}` : '';
+  };
+  const apparelGuideLink = findAssetLinkOrEmpty(['apparel']);
+
   const apparelStoreUrl = settings['marketing-apparel-store-url'] || '';
   const resources = [
     { name: 'Brand Assets', desc: 'Logos, colors, typography', icon: Palette, href: `/jewett-junction/marketing/brand-assets`, color: 'blue', external: false },
@@ -105,10 +116,20 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
     { name: 'Signage Request', desc: 'Order job site signs', icon: PenTool, href: `/jewett-junction/marketing/signage`, color: 'orange', external: false },
     { name: 'Submit a Job Site Photo', desc: 'Share photos from the field', icon: Camera, href: `/jewett-junction/marketing/submit-photo`, color: 'pink', external: false },
     { name: 'Marketing Request', desc: 'Collateral, print, and more', icon: Megaphone, href: `/jewett-junction/marketing/request`, color: 'rose', external: false },
-    // Apparel — guide + store. URL managed in Site Settings; hidden until set.
-    // Opens a new tab only for external URLs.
-    ...(apparelStoreUrl
-      ? [{ name: 'Apparel', desc: 'Apparel guide and store', icon: ShoppingBag, href: apparelStoreUrl, color: 'amber', external: apparelStoreUrl.startsWith('http') }]
+    // Apparel — one box that has to reach BOTH the apparel guide and the
+    // outside store. Prefer the internal guide page, which renders the guide
+    // itself plus a "Shop the Apparel Store" button; linking straight to the
+    // store would leave the guide unreachable from this box. Falls back to the
+    // store URL if the guide asset isn't in the CMS.
+    ...(apparelGuideLink || apparelStoreUrl
+      ? [{
+          name: 'Apparel',
+          desc: 'Apparel guide and store',
+          icon: ShoppingBag,
+          href: apparelGuideLink || apparelStoreUrl,
+          color: 'amber',
+          external: !apparelGuideLink && apparelStoreUrl.startsWith('http'),
+        }]
       : []),
   ];
 

@@ -1,7 +1,7 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import FilePreview from '../../components/shared/FilePreview.astro';
-import { initCMS, getMarketingAssetBySlug, getMarketingAssets, getCollectionItem, COLLECTIONS, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { initCMS, getMarketingAssetBySlug, getMarketingAssets, getCollectionItem, getSiteSettings, COLLECTIONS, decodeHtmlEntities } from '../../lib/webflow-cms';
 import type { MarketingAsset } from '../../lib/webflow-cms';
 
 export const prerender = false;
@@ -37,6 +37,20 @@ if (!item) {
 
 // Get header image (preview image or thumbnail)
 const headerImage = item['preview-image']?.url || item.thumbnail?.url || item.image?.url;
+
+// The Apparel box on /marketing is a single tile that has to reach both the
+// apparel guide and the outside apparel store. The tile points here (the
+// guide), so surface the store as a second action rather than making the
+// client choose one link.
+let apparelStoreUrl = '';
+if (/apparel/i.test(item.name || '') || /apparel/i.test(item.slug || '')) {
+  try {
+    const settings = await getSiteSettings();
+    apparelStoreUrl = settings?.['marketing-apparel-store-url'] || '';
+  } catch {
+    apparelStoreUrl = '';
+  }
+}
 
 // Asset type badge colors
 const typeColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
@@ -169,6 +183,20 @@ const typeStyle = typeColors[item['asset-type'] || ''] || typeColors.default;
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download Asset
+          </a>
+        )}
+        {apparelStoreUrl && (
+          <a
+            href={apparelStoreUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition-colors"
+            aria-label="Shop the Apparel Store (opens in new tab)"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Shop the Apparel Store
           </a>
         )}
         {item['preview-link'] && (
