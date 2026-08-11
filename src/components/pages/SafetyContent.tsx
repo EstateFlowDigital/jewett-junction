@@ -179,7 +179,10 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                 <img
                   src={awardPhoto}
                   alt={awardName || 'Safety award winner'}
-                  className="w-20 h-20 rounded-2xl object-cover border-2 border-white/30 shrink-0"
+                  /* object-top, not the default center: headshots are portrait
+                     crops and centering a 2:3 photo in a square window cuts off
+                     the top of the subject's head. */
+                  className="w-20 h-20 rounded-2xl object-cover object-top border-2 border-white/30 shrink-0"
                   loading="lazy"
                 />
               ) : (
