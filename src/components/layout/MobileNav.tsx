@@ -15,7 +15,6 @@ import {
   Heart,
   BookUser,
   FolderOpen,
-  HardHat,
   Lightbulb,
   HelpCircle,
   Bell,
@@ -76,13 +75,18 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
           <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
             <a
               href="/jewett-junction/dashboard"
-              className="flex items-center gap-3"
+              className="block max-w-[170px]"
               onClick={() => setIsOpen(false)}
+              aria-label="Jewett Junction home"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                <HardHat className="h-5 w-5" />
-              </div>
-              <span className="font-semibold text-white">Jewett Junction</span>
+              {/* Same transparent PNG the desktop rail uses — see SideNav.astro */}
+              <img
+                src="https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/69f8f8155aebffd506c331d7_1777924117776-JCC-Horizontal-Small.png"
+                alt="Jewett Construction"
+                width={1136}
+                height={224}
+                className="w-full h-auto"
+              />
             </a>
           </div>
 
