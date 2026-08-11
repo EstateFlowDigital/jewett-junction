@@ -79,6 +79,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     await sendNotification(locals, {
       inbox: 'marketing',
       subject: `[Job Site Photo] ${data.jobSite}`,
+      // The photo renders inline via `imageUrl`; the field below keeps the
+      // raw link so it survives in the plain-text version and stays
+      // copy-pasteable when a client blocks remote images.
+      imageUrl: data.photoUrl,
       fields: [
         { label: 'Submitted By', value: data.submitterName },
         { label: 'Job Site', value: data.jobSite },
