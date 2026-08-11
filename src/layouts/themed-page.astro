@@ -4,7 +4,8 @@ import '../../generated/webflow.css';
 import '../site-components/global.css';
 import '../styles/global.css';
 import { MobileNav } from '../components/layout/MobileNav';
-import { initCMS, getIntranetSections } from '../lib/webflow-cms';
+import SideNav from '../components/layout/SideNav.astro';
+import { initCMS } from '../lib/webflow-cms';
 
 interface Props {
   title?: string;
@@ -17,15 +18,7 @@ const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
 // Map section to full path for MobileNav
 const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/jewett-junction/dashboard';
 
-// Sidebar labels are CMS-driven via the Intranet Sections collection.
-// Cached 60s in the CMS lib so per-page render overhead is negligible.
 initCMS(Astro.locals);
-let sectionMap = new Map<string, string>();
-try {
-  const sections = await getIntranetSections();
-  sectionMap = new Map(sections.items.map((s) => [s.slug, s.name]));
-} catch {}
-const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallback;
 ---
 
 <html lang="en" class="dark">
@@ -38,57 +31,7 @@ const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallba
     <style>
       .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
       @media (max-width: 767px) { .mobile-safe-area { padding-top: max(4.5rem, env(safe-area-inset-top, 0px)); } }
-      /* Keyboard-only focus ring for sidebar icon links — the visited / hover
-         states already handle pointer use; this fills the a11y gap for tab
-         navigation without altering the visual at rest. */
-      aside a:focus-visible {
-        outline: 2px solid rgb(59, 130, 246);
-        outline-offset: 2px;
-        border-radius: 0.75rem;
-      }
 
-      /* Styled sidebar tooltips. The pseudo-element approach was clipped by
-         the nav's `overflow-y: auto` (CSS spec forces overflow-x to auto when
-         either axis is non-visible), so the tooltip element is portaled onto
-         the body via a small inline script below — it can't be clipped from
-         outside the aside. Styles here match the app's slate + blue accent. */
-      .sidebar-tooltip-portal {
-        position: fixed;
-        background: rgba(15, 23, 42, 0.95);
-        color: rgb(241 245 249);
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 0.01em;
-        padding: 6px 10px;
-        border-radius: 8px;
-        white-space: nowrap;
-        border: 1px solid rgba(59, 130, 246, 0.35);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(10px);
-        opacity: 0;
-        pointer-events: none;
-        transform: translate(-4px, -50%);
-        transition: opacity 120ms ease, transform 120ms ease;
-        z-index: 1000;
-      }
-      .sidebar-tooltip-portal.visible {
-        opacity: 1;
-        transform: translate(0, -50%);
-      }
-      .sidebar-tooltip-portal::before {
-        content: '';
-        position: absolute;
-        left: -10px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0; height: 0;
-        border: 5px solid transparent;
-        border-right-color: rgba(15, 23, 42, 0.95);
-      }
-      /* Hide on mobile — the mobile sheet has labelled nav. */
-      @media (max-width: 767px) {
-        .sidebar-tooltip-portal { display: none; }
-      }
     </style>
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">
@@ -100,98 +43,12 @@ const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallba
     <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>
     <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10"></div>
 
-    <!-- Desktop Sidebar -->
-    <aside class="fixed left-0 top-0 bottom-0 w-20 glass border-r border-slate-800/50 z-40 hidden md:flex flex-col items-center py-6">
-      <a href="/jewett-junction/dashboard" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white mb-8 shadow-lg shadow-blue-500/30">
-        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </a>
-      <nav class="flex-1 flex flex-col items-center gap-2 overflow-y-auto py-1">
-        <a href="/jewett-junction/dashboard" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'dashboard' || !currentSection ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('dashboard', 'Dashboard')} data-tooltip={label('dashboard', 'Dashboard')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-        </a>
-        <a href="/jewett-junction/safety" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'safety' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('safety', 'Safety')} data-tooltip={label('safety', 'Safety')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        </a>
-        <a href="/jewett-junction/hr" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'hr' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('hr', 'HR')} data-tooltip={label('hr', 'HR')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-        </a>
-        <a href="/jewett-junction/it-helpdesk" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'it-helpdesk' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('it-helpdesk', 'IT Helpdesk')} data-tooltip={label('it-helpdesk', 'IT Helpdesk')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        </a>
-        <a href="/jewett-junction/marketing" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'marketing' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('marketing', 'Marketing')} data-tooltip={label('marketing', 'Marketing')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
-        </a>
-        <a href="/jewett-junction/events" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'events' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('events', 'Events')} data-tooltip={label('events', 'Events')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        </a>
-        <a href="/jewett-junction/culture" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'culture' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('culture', 'Culture')} data-tooltip={label('culture', 'Culture')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-        </a>
-        <a href="/jewett-junction/directory" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'directory' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('directory', 'Directory')} data-tooltip={label('directory', 'Directory')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </a>
-        <a href="/jewett-junction/resources" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'resources' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('resources', 'Resources')} data-tooltip={label('resources', 'Resources')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
-        </a>
-        <div class="w-8 border-t border-slate-700/50 my-1"></div>
-        <a href="/jewett-junction/submit-idea" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'submit-idea' ? 'bg-amber-500/20 border border-amber-500/30 text-amber-400' : 'hover:bg-slate-800 text-amber-400/70 hover:text-amber-400'}`} aria-label={label('submit-idea', 'Submit Idea')} data-tooltip={label('submit-idea', 'Submit Idea')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        </a>
-      </nav>
-      <div class="flex flex-col items-center gap-2 pb-2">
-        <a href="/jewett-junction/notifications" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'notifications' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('notifications', 'Notifications')} data-tooltip={label('notifications', 'Notifications')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-        </a>
-        <a href="/jewett-junction/help" class={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentSection === 'help' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'}`} aria-label={label('help', 'Help')} data-tooltip={label('help', 'Help')}>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </a>
-      </div>
-    </aside>
-    <main class="md:pl-20 min-h-screen">
+    <SideNav currentSection={currentSection} />
+    <main class="md:pl-56 min-h-screen">
       <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
         <slot />
       </div>
     </main>
 
-    <!-- Sidebar tooltip script. A single element is appended to <body>
-         (escaping the sidebar's overflow context) and positioned with JS
-         based on the hovered/focused link's bounding rect. -->
-    <script is:inline>
-      (() => {
-        if (typeof window === 'undefined') return;
-        const init = () => {
-          const links = document.querySelectorAll('aside a[data-tooltip]');
-          if (!links.length) return;
-          const tip = document.createElement('div');
-          tip.className = 'sidebar-tooltip-portal';
-          tip.setAttribute('role', 'tooltip');
-          document.body.appendChild(tip);
-          let raf = 0;
-          const show = (e) => {
-            const a = e.currentTarget;
-            const label = a.getAttribute('data-tooltip');
-            if (!label) return;
-            const rect = a.getBoundingClientRect();
-            tip.textContent = label;
-            tip.style.left = (rect.right + 10) + 'px';
-            tip.style.top = (rect.top + rect.height / 2) + 'px';
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(() => tip.classList.add('visible'));
-          };
-          const hide = () => tip.classList.remove('visible');
-          links.forEach((a) => {
-            a.addEventListener('mouseenter', show);
-            a.addEventListener('mouseleave', hide);
-            a.addEventListener('focus', show);
-            a.addEventListener('blur', hide);
-          });
-        };
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
-        } else {
-          init();
-        }
-      })();
-    </script>
   </body>
 </html>
