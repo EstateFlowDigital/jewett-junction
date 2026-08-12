@@ -96,6 +96,22 @@ const featuredHR = hrContent[0];
 const featuredSafety = safetyContent.find(s => s.severity === 'Critical' || s.severity === 'Emergency') || safetyContent[0];
 const featuredIT = itArticles[0];
 
+// Card summaries. These were cut to 80 characters with a hardcoded "..."
+// appended unconditionally — so an item with no description rendered a bare
+// "..." under its title, which is what the featured HR and Safety items do
+// today. Show the real text and drop the paragraph when there isn't any.
+// Only add an ellipsis when text was actually cut — appending it blindly
+// labels short entries as truncated when they aren't.
+function excerpt(html: string | undefined, max: number) {
+  const t = stripHtml(html);
+  if (!t) return '';
+  return t.length > max ? t.slice(0, max).trimEnd() + '…' : t;
+}
+
+const featuredHRDesc = stripHtml(featuredHR?.description || featuredHR?.content);
+const featuredSafetyDesc = stripHtml(featuredSafety?.description || featuredSafety?.content);
+const featuredITDesc = stripHtml(featuredIT?.summary || featuredIT?.content);
+
 // Pre-compute Important Updates card style strings up here — Astro's
 // parser chokes on multi-line template literals nested inside JSX
 // `style={...}` attribute expressions, so we keep the template clean.
@@ -408,8 +424,8 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                       </div>
                       <span class="text-xs text-purple-400 font-medium uppercase">{ui('badge-hr-update', 'HR Update')}</span>
                     </div>
-                    <h3 class="font-medium text-white group-hover:text-purple-300 transition-colors truncate">{featuredHR.name}</h3>
-                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredHR.description || featuredHR.content)?.substring(0, 80)}...</p>
+                    <h3 class="font-medium text-white group-hover:text-purple-300 transition-colors">{featuredHR.name}</h3>
+                    {featuredHRDesc && <p class="text-sm text-slate-400 mt-1">{featuredHRDesc}</p>}
                   </div>
                 </a>
               )}
@@ -427,8 +443,8 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                       </div>
                       <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? `⚠️ ${ui('badge-safety-alert', 'Safety Alert')}` : ui('badge-safety-update', 'Safety Update')}</span>
                     </div>
-                    <h3 class={`font-medium transition-colors truncate ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
-                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredSafety.description || featuredSafety.content)?.substring(0, 80)}...</p>
+                    <h3 class={`font-medium transition-colors ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-white group-hover:text-red-300' : 'text-white group-hover:text-emerald-300'}`}>{featuredSafety.name}</h3>
+                    {featuredSafetyDesc && <p class="text-sm text-slate-400 mt-1">{featuredSafetyDesc}</p>}
                   </div>
                 </a>
               )}
@@ -446,8 +462,8 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                       </div>
                       <span class="text-xs text-blue-400 font-medium uppercase">{ui('badge-it-tip', 'IT Tip')}</span>
                     </div>
-                    <h3 class="font-medium text-white group-hover:text-blue-300 transition-colors truncate">{featuredIT.name}</h3>
-                    <p class="text-sm text-slate-400 mt-1 line-clamp-2">{stripHtml(featuredIT.summary || featuredIT.content)?.substring(0, 80)}...</p>
+                    <h3 class="font-medium text-white group-hover:text-blue-300 transition-colors">{featuredIT.name}</h3>
+                    {featuredITDesc && <p class="text-sm text-slate-400 mt-1">{featuredITDesc}</p>}
                   </div>
                 </a>
               )}
@@ -594,7 +610,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                         {(announcement.priority === 'high' || announcement.priority === 'High' || announcement.priority === 'Urgent') ? 'Important' : 'Update'}
                       </span>
                       <div class="text-sm text-white">{announcement.name}</div>
-                      <div class="text-xs text-slate-500 truncate">{stripHtml(announcement.content)?.substring(0, 60)}...</div>
+                      <div class="text-xs text-slate-500 truncate">{excerpt(announcement.content, 60)}</div>
                     </div>
                     <span class="text-xs text-slate-500 flex-shrink-0">{getRelativeTime(announcement['published-date'])}</span>
                   </a>
