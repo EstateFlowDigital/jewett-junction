@@ -4,11 +4,10 @@ import '../../../generated/fonts.css';
 import '../../../generated/webflow.css';
 import '../../site-components/global.css';
 import '../../styles/global.css';
-import { MobileNav } from '../../components/layout/MobileNav';
+import MobileNav from '../../components/layout/MobileNav.astro';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
 import CmsIcon from '../../components/shared/CmsIcon.astro';
 import SideNav from '../../components/layout/SideNav.astro';
-import NavBoot from '../../components/layout/nav-boot.astro';
 import { getIcon } from '../../components/admin/icon-map';
 import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, decodeHtmlEntities } from '../../lib/webflow-cms';
 
@@ -220,8 +219,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
     </style>
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">
-    <NavBoot />
-    <MobileNav client:load currentTheme="dark" currentPath="/jewett-junction/dashboard" />
+    <MobileNav currentSection="dashboard" />
     <!-- Gradient Background -->
     <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 -z-10"></div>
     <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10"></div>

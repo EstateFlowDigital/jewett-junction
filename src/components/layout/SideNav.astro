@@ -6,23 +6,19 @@
  * themed-page.astro and dashboard/index.astro. Jewett's president asked for
  * the icons to carry visible text, so the rail is now 224px with the label
  * beside each icon — and the markup lives here so the two copies can't drift.
+ * The item list itself is shared with the mobile drawer via lib/nav-items.ts.
  *
  * Labels come from the Intranet Sections CMS collection (cached 60s), with a
  * hardcoded fallback so navigation still renders if the fetch fails.
  */
 import { getIntranetSections } from '../../lib/webflow-cms';
+import { NAV_PRIMARY, NAV_IDEA, NAV_UTILITY, NAV_PATHS, NAV_LOGO_URL } from '../../lib/nav-items';
 
 interface Props {
   currentSection?: string;
 }
 
 const { currentSection = '' } = Astro.props;
-
-// Jewett's horizontal mark from the Webflow asset library. The PNG has a
-// transparent background (the JPEG copies do not), so it sits on the dark
-// rail without a white plate behind it.
-const LOGO_URL =
-  'https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/69f8f8155aebffd506c331d7_1777924117776-JCC-Horizontal-Small.png';
 
 let sectionMap = new Map<string, string>();
 try {
@@ -31,47 +27,10 @@ try {
 } catch {}
 const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallback;
 
-// Icons stay as inline SVG path data — the rail renders server-side on every
-// page, so pulling in an icon component library here would cost more than it
-// saves.
-const PATHS: Record<string, string> = {
-  dashboard: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-  safety: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-  hr: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-  'it-helpdesk': 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-  marketing: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-  events: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-  culture: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-  directory: 'M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-  resources: 'M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z',
-  'submit-idea': 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-  notifications: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
-  help: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-};
-
-type Item = { slug: string; href: string; fallback: string; accent?: 'amber' };
-
-const primary: Item[] = [
-  { slug: 'dashboard', href: '/jewett-junction/dashboard', fallback: 'Dashboard' },
-  { slug: 'safety', href: '/jewett-junction/safety', fallback: 'Safety' },
-  { slug: 'hr', href: '/jewett-junction/hr', fallback: 'HR' },
-  { slug: 'it-helpdesk', href: '/jewett-junction/it-helpdesk', fallback: 'IT Helpdesk' },
-  { slug: 'marketing', href: '/jewett-junction/marketing', fallback: 'Marketing' },
-  { slug: 'events', href: '/jewett-junction/events', fallback: 'Events' },
-  { slug: 'culture', href: '/jewett-junction/culture', fallback: 'Culture' },
-  { slug: 'directory', href: '/jewett-junction/directory', fallback: 'Directory' },
-  { slug: 'resources', href: '/jewett-junction/resources', fallback: 'Resources' },
-];
-const idea: Item = { slug: 'submit-idea', href: '/jewett-junction/submit-idea', fallback: 'Submit Idea', accent: 'amber' };
-const utility: Item[] = [
-  { slug: 'notifications', href: '/jewett-junction/notifications', fallback: 'Notifications' },
-  { slug: 'help', href: '/jewett-junction/help', fallback: 'Help' },
-];
-
 const isActive = (slug: string) =>
   currentSection === slug || (slug === 'dashboard' && !currentSection);
 
-const linkClass = (item: Item) => {
+const linkClass = (item: { slug: string; accent?: 'amber' }) => {
   const active = isActive(item.slug);
   if (item.accent === 'amber') {
     return active
@@ -94,7 +53,7 @@ const linkClass = (item: Item) => {
     aria-label="Jewett Junction home"
   >
     <img
-      src={LOGO_URL}
+      src={NAV_LOGO_URL}
       alt="Jewett Construction"
       width="1136"
       height="224"
@@ -105,14 +64,14 @@ const linkClass = (item: Item) => {
   </a>
 
   <nav class="flex-1 flex flex-col gap-1 overflow-y-auto" aria-label="Primary">
-    {primary.map((item) => (
+    {NAV_PRIMARY.map((item) => (
       <a
         href={item.href}
         class={`flex items-center gap-3 h-11 px-3 rounded-xl transition-all ${linkClass(item)}`}
         aria-current={isActive(item.slug) ? 'page' : undefined}
       >
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={PATHS[item.slug]} />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
         </svg>
         <span class="text-sm font-medium truncate">{label(item.slug, item.fallback)}</span>
       </a>
@@ -121,26 +80,26 @@ const linkClass = (item: Item) => {
     <div class="border-t border-slate-700/50 my-2 mx-3"></div>
 
     <a
-      href={idea.href}
-      class={`flex items-center gap-3 h-11 px-3 rounded-xl transition-all ${linkClass(idea)}`}
-      aria-current={isActive(idea.slug) ? 'page' : undefined}
+      href={NAV_IDEA.href}
+      class={`flex items-center gap-3 h-11 px-3 rounded-xl transition-all ${linkClass(NAV_IDEA)}`}
+      aria-current={isActive(NAV_IDEA.slug) ? 'page' : undefined}
     >
       <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={PATHS[idea.slug]} />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[NAV_IDEA.slug]} />
       </svg>
-      <span class="text-sm font-medium truncate">{label(idea.slug, idea.fallback)}</span>
+      <span class="text-sm font-medium truncate">{label(NAV_IDEA.slug, NAV_IDEA.fallback)}</span>
     </a>
   </nav>
 
   <div class="flex flex-col gap-1 pt-2">
-    {utility.map((item) => (
+    {NAV_UTILITY.map((item) => (
       <a
         href={item.href}
         class={`flex items-center gap-3 h-11 px-3 rounded-xl transition-all ${linkClass(item)}`}
         aria-current={isActive(item.slug) ? 'page' : undefined}
       >
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={PATHS[item.slug]} />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
         </svg>
         <span class="text-sm font-medium truncate">{label(item.slug, item.fallback)}</span>
       </a>

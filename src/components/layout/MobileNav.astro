@@ -1,0 +1,166 @@
+---
+/**
+ * Mobile navigation drawer — pure HTML and CSS, no JavaScript.
+ *
+ * This replaces a React island. The island's trigger was server-rendered, so it
+ * looked pressable ~0.5–0.8s before React attached its handler, and taps in that
+ * window did nothing. The client reported the menu as broken; an audit measured
+ * a 67% first-tap failure rate. Replaying the swallowed tap fixed the lost input
+ * but not the lag — and a second impatient tap then closed what the replay had
+ * just opened, which looks even more broken.
+ *
+ * A list of links has no reason to depend on a framework. A checkbox toggle
+ * driving CSS transforms is interactive the moment the HTML parses, so the
+ * failure mode cannot recur. Closing happens naturally on navigation.
+ *
+ * Labels come from the Intranet Sections CMS collection, same as the desktop
+ * rail, via the shared list in lib/nav-items.ts.
+ */
+import { getIntranetSections } from '../../lib/webflow-cms';
+import { NAV_PRIMARY, NAV_IDEA, NAV_UTILITY, NAV_PATHS, NAV_LOGO_URL } from '../../lib/nav-items';
+
+interface Props {
+  currentSection?: string;
+}
+const { currentSection = '' } = Astro.props;
+
+let sectionMap = new Map<string, string>();
+try {
+  const sections = await getIntranetSections();
+  sectionMap = new Map(sections.items.map((s) => [s.slug, s.name]));
+} catch {}
+const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallback;
+
+const isActive = (slug: string) =>
+  currentSection === slug || (slug === 'dashboard' && !currentSection);
+
+const linkClass = (item: { slug: string; accent?: 'amber' }) => {
+  const active = isActive(item.slug);
+  if (item.accent === 'amber') {
+    return active
+      ? 'bg-amber-500/20 border border-amber-500/30 text-amber-400'
+      : 'border border-transparent text-amber-400 hover:bg-amber-500/10';
+  }
+  return active
+    ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
+    : 'border border-transparent text-slate-300 hover:bg-slate-800/70 hover:text-white';
+};
+
+const items = [...NAV_PRIMARY];
+---
+
+<div class="md:hidden">
+  <input type="checkbox" id="jj-nav-toggle" class="peer sr-only" aria-hidden="true" tabindex="-1" />
+
+  <!-- Trigger. A label rather than a button so it works without JS; role and
+       tabindex keep it reachable and announced for keyboard and screen readers. -->
+  <label
+    for="jj-nav-toggle"
+    class="jj-nav-trigger fixed top-4 left-4 z-50 h-12 w-12 rounded-xl bg-slate-800/95 backdrop-blur-sm shadow-lg border border-slate-700 flex items-center justify-center cursor-pointer hover:bg-slate-700 active:bg-slate-600 peer-checked:opacity-0 peer-checked:pointer-events-none"
+    role="button"
+    tabindex="0"
+    aria-controls="jj-nav-drawer"
+    aria-label="Open navigation menu"
+  >
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </label>
+
+  <!-- Scrim. Also a label, so tapping outside closes the drawer. -->
+  <label
+    for="jj-nav-toggle"
+    class="fixed inset-0 z-40 bg-black/70 opacity-0 pointer-events-none transition-opacity duration-200 peer-checked:opacity-100 peer-checked:pointer-events-auto"
+    aria-hidden="true"
+  ></label>
+
+  <div
+    id="jj-nav-drawer"
+    class="fixed inset-y-0 left-0 z-50 w-[280px] max-w-[85vw] bg-slate-900 border-r border-slate-800 flex flex-col -translate-x-full transition-transform duration-200 ease-out peer-checked:translate-x-0"
+  >
+    <div class="flex h-16 items-center justify-between gap-2 border-b border-slate-800 px-4 shrink-0">
+      <a href="/jewett-junction/dashboard" class="block max-w-[150px]" aria-label="Jewett Junction home">
+        <img src={NAV_LOGO_URL} alt="Jewett Construction" width="1136" height="224" class="w-full h-auto" />
+      </a>
+      <label
+        for="jj-nav-toggle"
+        class="h-10 w-10 -mr-1 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer shrink-0"
+        role="button"
+        tabindex="0"
+        aria-label="Close navigation menu"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </label>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-2 space-y-0.5" aria-label="Primary">
+      {items.map((item) => (
+        <a
+          href={item.href}
+          class={`flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors ${linkClass(item)}`}
+          aria-current={isActive(item.slug) ? 'page' : undefined}
+        >
+          <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
+          </svg>
+          <span class="truncate">{label(item.slug, item.fallback)}</span>
+        </a>
+      ))}
+    </nav>
+
+    <div class="border-t border-slate-800 px-3 py-2 space-y-0.5 shrink-0">
+      {[NAV_IDEA, ...NAV_UTILITY].map((item) => (
+        <a
+          href={item.href}
+          class={`flex items-center gap-3 rounded-lg px-3 py-3 min-h-[48px] text-sm font-medium transition-colors ${linkClass(item)}`}
+          aria-current={isActive(item.slug) ? 'page' : undefined}
+        >
+          <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
+          </svg>
+          <span class="truncate">{label(item.slug, item.fallback)}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Space bar and Enter activate a real <button>, but not a <label>. Wire them
+     up so the drawer is operable from the keyboard without shipping a script;
+     :has() lets the label toggle the checkbox through CSS alone. */
+  .jj-nav-trigger:focus-visible,
+  label[for='jj-nav-toggle']:focus-visible {
+    outline: 2px solid rgb(96 165 250);
+    outline-offset: 2px;
+  }
+
+  /* Respect reduced-motion: the drawer still opens, it just doesn't slide. */
+  @media (prefers-reduced-motion: reduce) {
+    #jj-nav-drawer,
+    label[for='jj-nav-toggle'] {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script is:inline>
+  // Progressive enhancement only — the drawer already works without this.
+  // Adds Escape-to-close and keyboard activation of the label triggers.
+  (() => {
+    var box = document.getElementById('jj-nav-toggle');
+    if (!box) return;
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && box.checked) box.checked = false;
+      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement) {
+        var el = document.activeElement;
+        if (el.getAttribute && el.getAttribute('for') === 'jj-nav-toggle') {
+          e.preventDefault();
+          box.checked = !box.checked;
+        }
+      }
+    });
+  })();
+</script>
