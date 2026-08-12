@@ -276,7 +276,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
                         {story.name}
                       </h4>
-                      <p className="text-sm text-slate-400 line-clamp-2">
+                      <p className="text-sm text-slate-400">
                         {stripHtml(story.content) || story.excerpt}
                       </p>
                       {story.author && (
@@ -325,7 +325,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
                         {story.name}
                       </h4>
-                      <p className="text-sm text-slate-400 line-clamp-2">
+                      <p className="text-sm text-slate-400">
                         {stripHtml(story.content) || story.excerpt}
                       </p>
                       {story.author && (

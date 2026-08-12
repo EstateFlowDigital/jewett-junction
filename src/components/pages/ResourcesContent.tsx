@@ -267,7 +267,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                       </h3>
                     </a>
                     {resource.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2 mb-3">{stripHtml(resource.description)}</p>
+                      <p className="text-sm text-slate-400 mb-3">{stripHtml(resource.description)}</p>
                     )}
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-500">
@@ -431,7 +431,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                     </div>
 
                     {resource.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2 mb-4">{stripHtml(resource.description)}</p>
+                      <p className="text-sm text-slate-400 mb-4">{stripHtml(resource.description)}</p>
                     )}
 
                     <div className="flex items-center justify-between text-xs text-slate-500 mb-4">

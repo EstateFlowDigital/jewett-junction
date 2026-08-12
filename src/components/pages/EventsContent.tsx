@@ -346,7 +346,7 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
               <h3 className="text-xl font-bold text-white mb-3">{featuredEvent.name}</h3>
 
               {featuredEvent.description && (
-                <p className="text-purple-100 text-sm mb-4 line-clamp-2">{stripHtml(featuredEvent.description)}</p>
+                <p className="text-purple-100 text-sm mb-4">{stripHtml(featuredEvent.description)}</p>
               )}
 
               <div className="space-y-2 mb-5">
@@ -532,7 +532,7 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
                         </a>
 
                         {event.description && (
-                          <p className="text-sm text-slate-400 mb-4 line-clamp-2">{stripHtml(event.description)}</p>
+                          <p className="text-sm text-slate-400 mb-4">{stripHtml(event.description)}</p>
                         )}
 
                         <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
