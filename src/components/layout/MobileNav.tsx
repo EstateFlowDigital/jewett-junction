@@ -47,6 +47,22 @@ interface MobileNavProps {
 export function MobileNav({ currentTheme = "dark", currentPath = "", className }: MobileNavProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
+  // The trigger is server-rendered, so it exists and looks pressable before
+  // this island hydrates. A tap in that window hit nothing and was silently
+  // swallowed — on a phone over a slow connection that gap is long enough that
+  // people tapped twice and concluded the button was broken.
+  //
+  // nav-boot.astro records a pre-hydration tap; replay it here on mount so the
+  // first tap always opens the menu, however early it lands.
+  React.useEffect(() => {
+    const w = window as any;
+    w.__jjNavReady = true;
+    if (w.__jjNavPending) {
+      w.__jjNavPending = false;
+      setIsOpen(true);
+    }
+  }, []);
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -61,6 +77,7 @@ export function MobileNav({ currentTheme = "dark", currentPath = "", className }
             className
           )}
           aria-label="Open navigation menu"
+          data-mobile-nav-trigger
         >
           <Menu className="h-6 w-6 text-white" />
         </Button>

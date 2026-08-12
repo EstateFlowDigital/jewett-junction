@@ -121,7 +121,16 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
     if (typeof window === 'undefined') return;
     const requested = new URLSearchParams(window.location.search).get('category');
     if (!requested) return;
-    const match = categories.find((c) => c.toLowerCase() === requested.toLowerCase());
+    const norm = requested.toLowerCase();
+    // The filter compares display labels ("Safety Documents"), but callers link
+    // with the raw CMS category ("?category=Safety"). Matching only on the label
+    // meant the Safety hub's deep link silently showed everything, so fall back
+    // to resolving the raw value through the same config the chips use.
+    const match =
+      categories.find((c) => c.toLowerCase() === norm) ||
+      (categoryConfig[norm] && categories.includes(categoryConfig[norm].label)
+        ? categoryConfig[norm].label
+        : undefined);
     if (match) setSelectedCategory(match);
   }, [categories.length]);
 

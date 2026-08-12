@@ -5,6 +5,7 @@ import '../site-components/global.css';
 import '../styles/global.css';
 import { MobileNav } from '../components/layout/MobileNav';
 import SideNav from '../components/layout/SideNav.astro';
+import NavBoot from '../components/layout/nav-boot.astro';
 import { initCMS } from '../lib/webflow-cms';
 
 interface Props {
@@ -36,6 +37,7 @@ initCMS(Astro.locals);
   </head>
   <body class="bg-slate-950 text-gray-100 min-h-screen">
     <!-- Mobile Navigation -->
+    <NavBoot />
     <MobileNav client:load currentTheme="dark" currentPath={currentPath} />
 
     <!-- Background -->

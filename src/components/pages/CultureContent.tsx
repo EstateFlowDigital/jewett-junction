@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { QuickActionCards, type QuickAction } from './QuickActionCards';
 import {
   Heart,
   Award,
@@ -82,6 +83,7 @@ interface CultureContentProps {
   settings?: CultureSettings;
   coreValues?: CMSCoreValue[];
   pageCopy?: CulturePageCopy | null;
+  quickActions?: QuickAction[];
 }
 
 function stripHtml(html: string | undefined) {
@@ -129,7 +131,7 @@ function getTypeConfig(type: string | undefined) {
   return typeConfig[normalized] || typeConfig['default'];
 }
 
-export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null }: CultureContentProps) {
+export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null, quickActions = [] }: CultureContentProps) {
   const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || '';
   const teamWinsDescription = pageCopy?.['subsection-1-description'] || '';
   const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || '';
@@ -211,15 +213,17 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             and build a culture where everyone can thrive.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button
-              size="lg"
-              className="bg-white text-pink-700 hover:bg-pink-50"
-              onClick={() => document.getElementById('spotlight')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Meet Our Team
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-            <a href="/jewett-junction/submit-idea">
+            {/* A real anchor, not an onClick: the button is server-rendered and
+                looked pressable before this island hydrated, so early clicks did
+                nothing. #spotlight has scroll-mt-8 and the anchor degrades
+                without JS. */}
+            <a href="#spotlight">
+              <Button size="lg" className="bg-white text-pink-700 hover:bg-pink-50">
+                Meet Our Team
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </a>
+            <a href="/jewett-junction/living-the-mission">
               <Button
                 size="lg"
                 variant="outline"
@@ -235,6 +239,11 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -top-10 -left-10 w-48 h-48 bg-rose-400/20 rounded-full blur-3xl"></div>
       </div>
+
+      {/* Quick Actions — the Living the Mission and BuiltWell Idea boxes the
+          client asked for on this page. The records existed in the Quick Actions
+          collection all along; this page just never rendered them. */}
+      <QuickActionCards actions={quickActions} theme={theme} />
 
       {/* Stories Grid - Team Wins & Recognitions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -544,7 +553,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                 </p>
               </div>
             </div>
-            <a href="/jewett-junction/submit-idea">
+            <a href="/jewett-junction/living-the-mission">
               <Button
                 size="lg"
                 className="bg-white text-pink-700 hover:bg-pink-50 flex-shrink-0"
