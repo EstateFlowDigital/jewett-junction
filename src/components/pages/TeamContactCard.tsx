@@ -164,7 +164,10 @@ export function TeamContactCard({
                 href={portalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2 text-sm font-medium break-all underline-offset-2 hover:underline ${isDark ? `text-${accent}-300 hover:text-${accent}-200` : `text-${accent}-600 hover:text-${accent}-700`}`}
+                // max-w-full so break-all can act: an inline-flex item won't
+                // shrink below its content width on its own, so a long portal
+                // URL pushed the page sideways on narrow screens.
+                className={`inline-flex items-center gap-2 max-w-full text-sm font-medium break-all underline-offset-2 hover:underline ${isDark ? `text-${accent}-300 hover:text-${accent}-200` : `text-${accent}-600 hover:text-${accent}-700`}`}
                 aria-label="Open support portal in a new tab"
               >
                 <ExternalLink className="h-4 w-4 flex-shrink-0" />

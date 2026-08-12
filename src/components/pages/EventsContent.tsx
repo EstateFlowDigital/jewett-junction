@@ -391,8 +391,14 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
           )}
         </div>
 
-        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -top-10 -left-10 w-48 h-48 bg-pink-400/20 rounded-full blur-3xl"></div>
+        {/* The blur circles sit outside the hero bounds on purpose, which widened
+            the document and gave narrow screens a horizontal scrollbar. The hero
+            itself can't take overflow-hidden (see note above — it would clip the
+            Add to Calendar dropdown), so clip the decoration on its own layer. */}
+        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none" aria-hidden="true">
+          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -top-10 -left-10 w-48 h-48 bg-pink-400/20 rounded-full blur-3xl"></div>
+        </div>
       </div>
 
       {/* Quick Stats */}

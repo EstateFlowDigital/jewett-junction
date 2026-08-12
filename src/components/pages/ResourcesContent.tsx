@@ -404,7 +404,11 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block">
+                          {/* min-w-0 lets the truncate on the heading actually take effect. As a
+                              flex item this link defaulted to min-width:auto, so long document
+                              names ("Credit Card & Check Payment Request Form") stretched the row
+                              wider than a phone screen and scrolled the whole page sideways. */}
+                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block min-w-0">
                             <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
                               {resource.name}
                             </h3>
@@ -467,7 +471,11 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                     <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-4 items-center">
                       <div className="md:col-span-2">
                         <div className="flex items-center gap-2">
-                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block">
+                          {/* min-w-0 lets the truncate on the heading actually take effect. As a
+                              flex item this link defaulted to min-width:auto, so long document
+                              names ("Credit Card & Check Payment Request Form") stretched the row
+                              wider than a phone screen and scrolled the whole page sideways. */}
+                          <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block min-w-0">
                             <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
                               {resource.name}
                             </h3>

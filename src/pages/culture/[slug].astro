@@ -115,10 +115,13 @@ const formatDate = (dateStr: string) => {
       <div class="glass rounded-2xl p-6 border border-slate-800/50">
         <h2 class="text-xl font-semibold text-white mb-4">More Stories</h2>
         <div class="grid gap-4">
+          {/* min-w-0 on the link: as a grid item it defaults to min-width:auto,
+              so the non-wrapping title stretched the row past the grid track and
+              scrolled the whole page sideways on phones. */}
           {relatedStories.map((related) => (
             <a
               href={`/jewett-junction/culture/${related.slug}`}
-              class="flex items-center gap-4 p-4 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
+              class="flex items-center gap-4 p-4 min-w-0 min-h-[44px] rounded-xl hover:bg-slate-800/50 transition-colors group"
               aria-label={`Read story: ${related.name}`}
             >
               {(related['featured-image']?.url || related.image?.url) ? (
