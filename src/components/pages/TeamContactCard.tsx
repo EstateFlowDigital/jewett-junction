@@ -140,7 +140,7 @@ export function TeamContactCard({
                 loading="lazy"
               />
             ) : (
-              <div className={`w-16 h-16 ${accentBg} rounded-full mx-auto mb-3 flex items-center justify-center`}>
+              <div className={`w-16 h-16 shrink-0 ${accentBg} rounded-full mx-auto mb-3 flex items-center justify-center`}>
                 <span className={`text-2xl font-bold ${accentText}`}>{initials(contact?.name)}</span>
               </div>
             )}
@@ -171,7 +171,7 @@ export function TeamContactCard({
                 aria-label="Open support portal in a new tab"
               >
                 <ExternalLink className="h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{portalUrl.replace(/^https?:\/\//, '')}</span>
+                <span className="break-all">{portalUrl.replace(/^https?:\/\//, '')}</span>
               </a>
             </div>
           ) : hasEmail ? (
@@ -182,7 +182,7 @@ export function TeamContactCard({
               }`}
             >
               <Mail className={`h-5 w-5 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`} />
-              <span className={`text-sm truncate ${isDark ? 'text-slate-300' : ''}`}>{email}</span>
+              <span className={`text-sm break-all ${isDark ? 'text-slate-300' : ''}`}>{email}</span>
             </a>
           ) : null}
           {contact?.phone && (

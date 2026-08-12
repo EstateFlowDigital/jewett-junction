@@ -411,7 +411,7 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
         ].map((stat) => (
           <Card key={stat.label} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
             <CardContent className="p-4 flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
+              <div className={`w-12 h-12 shrink-0 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
                 <stat.icon className={`h-6 w-6 text-${stat.color}-400`} />
               </div>
               <div>

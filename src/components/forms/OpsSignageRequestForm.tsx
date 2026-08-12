@@ -112,7 +112,7 @@ export function OpsSignageRequestForm({ uiStrings = {} }: OpsSignageRequestFormP
   if (status === 'success') {
     return (
       <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center">
-        <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 shrink-0 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 className="h-8 w-8 text-emerald-400" aria-hidden="true" />
         </div>
         <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>

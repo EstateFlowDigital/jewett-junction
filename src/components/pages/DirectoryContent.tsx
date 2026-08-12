@@ -303,7 +303,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                           loading="lazy"
                         />
                       ) : (
-                        <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold text-lg`}>
+                        <div className={`w-14 h-14 shrink-0 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold text-lg`}>
                           {getInitials(emp.name)}
                         </div>
                       )}
@@ -311,7 +311,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                         <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
                           {emp.name}
                         </h3>
-                        <p className="text-sm text-slate-400 truncate">{emp.role}</p>
+                        <p className="text-sm text-slate-400">{emp.role}</p>
                         <Badge className={`mt-1 bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30 text-xs`}>
                           {config.label}
                         </Badge>
@@ -453,7 +453,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                           className="w-16 h-16 rounded-xl object-cover border-4 border-slate-800 shadow-lg"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-xl bg-slate-700 border-4 border-slate-800 shadow-lg flex items-center justify-center text-white font-bold text-xl">
+                        <div className="w-16 h-16 shrink-0 rounded-xl bg-slate-700 border-4 border-slate-800 shadow-lg flex items-center justify-center text-white font-bold text-xl">
                           {getInitials(emp.name)}
                         </div>
                       )}
@@ -474,7 +474,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                           <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
                             {emp.name}
                           </h3>
-                          <p className="text-sm text-slate-400 truncate">{emp.role}</p>
+                          <p className="text-sm text-slate-400">{emp.role}</p>
                         </div>
                         {emp['is-featured'] && (
                           <Star className="h-4 w-4 text-amber-400 flex-shrink-0" />
@@ -574,7 +574,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                         loading="lazy"
                       />
                     ) : (
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold`}>
+                      <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center text-white font-bold`}>
                         {getInitials(emp.name)}
                       </div>
                     )}
@@ -589,7 +589,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
                             <Star className="h-3 w-3 text-amber-400 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-sm text-slate-400 truncate">{emp.role}</p>
+                        <p className="text-sm text-slate-400">{emp.role}</p>
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-slate-400">

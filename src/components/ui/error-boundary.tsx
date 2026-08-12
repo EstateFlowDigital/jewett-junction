@@ -60,7 +60,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       return (
         <div className="min-h-[200px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center">
-            <div className="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 shrink-0 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="h-6 w-6 text-rose-400" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Something went wrong</h3>
@@ -103,7 +103,7 @@ export function PageErrorBoundary({ children }: { children: React.ReactNode }) {
       fallback={
         <div className="min-h-[400px] flex items-center justify-center p-8">
           <div className="max-w-lg w-full text-center">
-            <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 shrink-0 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertTriangle className="h-8 w-8 text-rose-400" aria-hidden="true" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-3">Page Error</h2>

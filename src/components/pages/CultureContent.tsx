@@ -366,7 +366,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                   onClick={() => setActiveValueIndex(index)}
                 >
                   <CardContent className="p-6">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <div className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
                       <value.icon className="h-7 w-7 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
@@ -428,7 +428,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center text-4xl font-bold text-white border-4 border-white/30 shadow-xl mb-4">
+                    <div className="w-32 h-32 shrink-0 bg-white/20 rounded-full flex items-center justify-center text-4xl font-bold text-white border-4 border-white/30 shadow-xl mb-4">
                       {getInitials(currentSpotlight['person-name'] || currentSpotlight.name)}
                     </div>
                   )}
@@ -508,7 +508,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             <div className="text-center md:text-left">
               <div className="flex items-center gap-4 justify-center md:justify-start">
-                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
+                <div className="w-16 h-16 shrink-0 bg-white/10 rounded-2xl flex items-center justify-center">
                   <HandHeart className="h-8 w-8 text-white" />
                 </div>
                 <div>

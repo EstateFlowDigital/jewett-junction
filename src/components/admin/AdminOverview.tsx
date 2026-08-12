@@ -250,7 +250,7 @@ export function AdminOverview() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="region" aria-label="Dashboard statistics">
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
               <TrendingUp className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <div>
@@ -261,7 +261,7 @@ export function AdminOverview() {
         </div>
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
               <FolderOpen className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <div>
@@ -276,7 +276,7 @@ export function AdminOverview() {
           aria-label={`Needs attention: ${triageCount} pending`}
         >
           <div className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${triageCount > 0 ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-slate-600 to-slate-700'}`}>
+            <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center ${triageCount > 0 ? 'bg-gradient-to-br from-amber-500 to-orange-500' : 'bg-gradient-to-br from-slate-600 to-slate-700'}`}>
               <Inbox className="h-6 w-6 text-white" aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
@@ -296,7 +296,7 @@ export function AdminOverview() {
       {triageItems.length > 0 && (
         <div id="needs-attention" className="bg-amber-500/5 border border-amber-500/30 rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-amber-500/20 flex items-center gap-3">
-            <div className="w-9 h-9 bg-amber-500/20 rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 shrink-0 bg-amber-500/20 rounded-lg flex items-center justify-center">
               <Inbox className="h-5 w-5 text-amber-400" aria-hidden="true" />
             </div>
             <div>
@@ -370,7 +370,7 @@ export function AdminOverview() {
                       <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />
                       <div className="relative">
                         <div className="flex items-start justify-between mb-4">
-                          <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                          <div className={`w-12 h-12 shrink-0 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
                             <Icon className="h-6 w-6 text-white" aria-hidden="true" />
                           </div>
                           <span className="px-2.5 py-1 text-xs font-medium bg-slate-700/50 text-slate-300 rounded-full">

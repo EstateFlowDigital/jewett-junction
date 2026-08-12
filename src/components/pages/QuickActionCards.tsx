@@ -233,7 +233,7 @@ export function QuickActionCards({ actions = [], theme = 'dark' }: QuickActionCa
               }`}
             >
               <CardContent className="py-4 text-center">
-                <div className={`w-12 h-12 ${isDark ? p.tileDark : p.tileLight} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
+                <div className={`w-12 h-12 shrink-0 ${isDark ? p.tileDark : p.tileLight} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
                   <Icon className={`h-6 w-6 ${p.iconText}`} />
                 </div>
                 <div className={`font-semibold ${isDark ? p.titleDark : p.titleLight}`}>{title}</div>

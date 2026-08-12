@@ -223,7 +223,7 @@ export function MarketingContent({ theme = 'modern', initialItems = [], settings
           >
             <Card className={`h-full transition-all hover:shadow-lg cursor-pointer ${isDark ? 'bg-slate-800 border-slate-700 hover:border-slate-600' : 'hover:border-slate-300'}`}>
               <CardContent className="pt-6">
-                <div className={`w-12 h-12 ${isDark ? `bg-${resource.color}-900` : `bg-${resource.color}-100`} rounded-xl mb-4 flex items-center justify-center`}>
+                <div className={`w-12 h-12 shrink-0 ${isDark ? `bg-${resource.color}-900` : `bg-${resource.color}-100`} rounded-xl mb-4 flex items-center justify-center`}>
                   <resource.icon className={`h-6 w-6 text-${resource.color}-600`} />
                 </div>
                 <h3 className={`font-semibold mb-1 ${isDark ? 'text-white' : ''}`}>{resource.name}</h3>

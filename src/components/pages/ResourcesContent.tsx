@@ -255,7 +255,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                   className="bg-slate-800/50 border-slate-700 hover:border-amber-500/50 transition-all group"
                 >
                   <CardContent className="p-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center mb-4`}>
+                    <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center mb-4`}>
                       <FileIcon className="h-6 w-6 text-white" />
                     </div>
                     <Badge className={`mb-2 bg-${config.color}-500/20 text-${config.color}-400 border-${config.color}-500/30`}>
@@ -308,7 +308,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
               }`}
             >
               <CardContent className="p-4 text-center">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} mx-auto mb-3 flex items-center justify-center`}>
+                <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${config.gradient} mx-auto mb-3 flex items-center justify-center`}>
                   <config.icon className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-white">{label}</h3>
@@ -418,7 +418,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                               names ("Credit Card & Check Payment Request Form") stretched the row
                               wider than a phone screen and scrolled the whole page sideways. */}
                           <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block min-w-0">
-                            <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
+                            <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors">
                               {resource.name}
                             </h3>
                           </a>
@@ -485,14 +485,14 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
                               names ("Credit Card & Check Payment Request Form") stretched the row
                               wider than a phone screen and scrolled the whole page sideways. */}
                           <a href={`/jewett-junction/resources/${resource.slug || resource.id}`} className="block min-w-0">
-                            <h3 className="font-semibold text-white truncate group-hover:text-amber-400 transition-colors">
+                            <h3 className="font-semibold text-white group-hover:text-amber-400 transition-colors">
                               {resource.name}
                             </h3>
                           </a>
                           {resource.featured && <Star className="h-3 w-3 text-amber-400 flex-shrink-0" />}
                         </div>
                         {resource.description && (
-                          <p className="text-sm text-slate-400 truncate">{stripHtml(resource.description)}</p>
+                          <p className="text-sm text-slate-400">{stripHtml(resource.description)}</p>
                         )}
                       </div>
 

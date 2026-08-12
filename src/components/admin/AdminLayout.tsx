@@ -289,7 +289,7 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
         <div className="w-full max-w-md">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
             <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <Lock className="h-6 w-6 text-white" />
               </div>
             </div>
@@ -366,7 +366,7 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
         {/* Header */}
         <div className="p-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <Settings className="h-5 w-5 text-white" aria-hidden="true" />
             </div>
             <div>

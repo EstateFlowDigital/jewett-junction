@@ -325,7 +325,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             <div class="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
             <div class="relative">
               <div class="flex items-center justify-between mb-4">
-                <div class="w-14 h-14 bg-purple-500/20 border border-purple-500/30 rounded-2xl flex items-center justify-center">
+                <div class="w-14 h-14 shrink-0 bg-purple-500/20 border border-purple-500/30 rounded-2xl flex items-center justify-center">
                   <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <a href="/jewett-junction/events" class="text-sm text-purple-400 hover:text-purple-300">View All →</a>
@@ -348,7 +348,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                           </div>
                         )}
                         <div class="min-w-0">
-                          <div class="font-medium text-white truncate">{event.name}</div>
+                          <div class="font-medium text-white">{event.name}</div>
                           <div class="text-sm text-slate-400">{formatTime(event['event-date'])} • {event.location || 'TBD'}</div>
                         </div>
                       </a>
@@ -366,13 +366,13 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             <a href="/jewett-junction/safety" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-emerald-500/30">
               <div class="flex items-center justify-between mb-3">
                 <span class="text-sm text-slate-400">Safety Hub</span>
-                <div class="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <div class="w-10 h-10 shrink-0 bg-emerald-500/20 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 </div>
               </div>
               {featuredSafety ? (
                 <>
-                  <div class="text-lg font-bold text-white truncate">{featuredSafety.name}</div>
+                  <div class="text-lg font-bold text-white">{featuredSafety.name}</div>
                   <div class="text-sm text-emerald-400 mt-1">{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Alert' : 'View Resources →'}</div>
                 </>
               ) : (
@@ -385,7 +385,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             <a href="/jewett-junction/culture" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-pink-500/30">
               <div class="flex items-center justify-between mb-3">
                 <span class="text-sm text-slate-400">Culture Corner</span>
-                <div class="w-10 h-10 bg-pink-500/20 rounded-xl flex items-center justify-center">
+                <div class="w-10 h-10 shrink-0 bg-pink-500/20 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
                 </div>
               </div>
@@ -419,7 +419,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredHRBadgeBg}>
+                      <div class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center" style={featuredHRBadgeBg}>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredHRBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                       </div>
                       <span class="text-xs text-purple-400 font-medium uppercase">{ui('badge-hr-update', 'HR Update')}</span>
@@ -438,7 +438,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredSafetyBadgeBg}>
+                      <div class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center" style={featuredSafetyBadgeBg}>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredSafetyBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                       </div>
                       <span class={`text-xs font-medium uppercase ${(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? 'text-red-400' : 'text-emerald-400'}`}>{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? `⚠️ ${ui('badge-safety-alert', 'Safety Alert')}` : ui('badge-safety-update', 'Safety Update')}</span>
@@ -457,7 +457,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                   )}
                   <div class="p-4">
                     <div class="flex items-center gap-3 mb-2">
-                      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style={featuredITBadgeBg}>
+                      <div class="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center" style={featuredITBadgeBg}>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={featuredITBadgeFg}><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                       </div>
                       <span class="text-xs text-blue-400 font-medium uppercase">{ui('badge-it-tip', 'IT Tip')}</span>
@@ -538,37 +538,37 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">{quickLinksTitle}</h2>
           <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
             <a href="/jewett-junction/safety" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-emerald-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               </div>
               <div class="font-medium text-white text-sm">Safety</div>
             </a>
             <a href="/jewett-junction/hr" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-blue-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               </div>
               <div class="font-medium text-white text-sm">HR</div>
             </a>
             <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-green-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
               </div>
               <div class="font-medium text-white text-sm">IT Help</div>
             </a>
             <a href="/jewett-junction/resources" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-purple-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
               </div>
               <div class="font-medium text-white text-sm">Resources</div>
             </a>
             <a href="/jewett-junction/events" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-amber-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               </div>
               <div class="font-medium text-white text-sm">Calendar</div>
             </a>
             <a href="/jewett-junction/submit-idea" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-orange-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
+              <div class="w-10 h-10 shrink-0 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
               </div>
               <div class="font-medium text-white text-sm">Submit Idea</div>
@@ -583,7 +583,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
             <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 shrink-0 bg-blue-500/20 rounded-lg flex items-center justify-center">
                   <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                 </div>
                 {newsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{newsTitle}</h2>}
@@ -647,7 +647,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                         )}
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
                           <div>
-                            <h3 class="text-white font-medium text-sm truncate group-hover:text-pink-300 transition-colors">{story.name}</h3>
+                            <h3 class="text-white font-medium text-sm group-hover:text-pink-300 transition-colors">{story.name}</h3>
                             <p class="text-slate-300 text-xs">{story.category || 'Story'}</p>
                           </div>
                         </div>

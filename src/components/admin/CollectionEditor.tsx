@@ -805,7 +805,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                   </div>
                 ) : (
                   <div className="text-center">
-                    <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3 border border-slate-700">
+                    <div className="w-14 h-14 shrink-0 bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3 border border-slate-700">
                       <ImagePlus className="h-7 w-7 text-slate-400" />
                     </div>
                     <p className="text-sm text-white font-medium mb-1">
@@ -909,7 +909,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                               onClick={() => reorderMultiImage(field.key, i, i - 1)}
                               disabled={i === 0}
                               aria-label="Move left"
-                              className="w-7 h-7 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
+                              className="w-7 h-7 shrink-0 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
                             >
                               ‹
                             </button>
@@ -918,7 +918,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                               onClick={() => reorderMultiImage(field.key, i, i + 1)}
                               disabled={i === items.length - 1}
                               aria-label="Move right"
-                              className="w-7 h-7 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
+                              className="w-7 h-7 shrink-0 bg-slate-900/80 hover:bg-slate-800 disabled:opacity-30 text-white rounded-md flex items-center justify-center text-xs"
                             >
                               ›
                             </button>
@@ -927,7 +927,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                             type="button"
                             onClick={() => removeMultiImageAt(field.key, i)}
                             aria-label="Remove image"
-                            className="w-7 h-7 bg-rose-600 hover:bg-rose-500 text-white rounded-md flex items-center justify-center"
+                            className="w-7 h-7 shrink-0 bg-rose-600 hover:bg-rose-500 text-white rounded-md flex items-center justify-center"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -1028,7 +1028,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
                       htmlFor={`file-${field.key}`}
                       className="flex flex-col items-center justify-center gap-2 cursor-pointer"
                     >
-                      <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mb-1 border border-slate-700">
+                      <div className="w-14 h-14 shrink-0 bg-slate-800 rounded-xl flex items-center justify-center mb-1 border border-slate-700">
                         <Upload className="h-7 w-7 text-slate-400" />
                       </div>
                       <p className="text-sm text-white font-medium">Upload PDF</p>
@@ -1547,7 +1547,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
         <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/50">
           <div className="p-5 border-b border-slate-700/50 flex items-center justify-between bg-slate-800/50 rounded-t-2xl">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center`}>
+              <div className={`w-10 h-10 shrink-0 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center`}>
                 <Icon className="h-5 w-5 text-white" />
               </div>
               <h2 className="text-xl font-semibold text-white">
@@ -1606,7 +1606,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
           <div className={`p-5 border-b border-slate-700/50 bg-gradient-to-r ${config.gradient}/10`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
+                <div className={`w-12 h-12 shrink-0 bg-gradient-to-br ${config.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -1746,7 +1746,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             </div>
           ) : items.length === 0 ? (
             <div className="p-16 text-center">
-              <div className={`w-20 h-20 bg-gradient-to-br ${config.gradient}/20 rounded-2xl flex items-center justify-center mx-auto mb-5`}>
+              <div className={`w-20 h-20 shrink-0 bg-gradient-to-br ${config.gradient}/20 rounded-2xl flex items-center justify-center mx-auto mb-5`}>
                 <Icon className="h-10 w-10 text-slate-500" />
               </div>
               <h3 className="text-lg font-medium text-white mb-2">No {config.name.toLowerCase()} yet</h3>

@@ -172,32 +172,51 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           Hidden entirely until a headline is set, so it can be retired or
           swapped each year without a code change. */}
       {awardHeadline && (
-        <Card className="bg-gradient-to-r from-emerald-600 to-green-700 text-white border-0 overflow-hidden">
-          <CardContent className="py-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+        <Card className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white border-0 overflow-hidden">
+          <CardContent className="p-0">
+            <div className="relative flex flex-col sm:flex-row">
+              {/* Oversized award mark, bled off the right edge. The banner runs
+                  the full content width and the text only fills the left third,
+                  so without this the right side reads as empty green. */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+                <Award className="absolute -right-8 top-1/2 -translate-y-1/2 h-56 w-56 text-white/[0.08]" />
+              </div>
+
+              {/* The headshot is a 2:3 portrait. Rather than crop it into a small
+                  square, give it a full-height panel where that shape is the
+                  point. On phones it becomes a banner strip instead. */}
               {awardPhoto ? (
-                <img
-                  src={awardPhoto}
-                  alt={awardName || 'Safety award winner'}
-                  /* object-top, not the default center: headshots are portrait
-                     crops and centering a 2:3 photo in a square window cuts off
-                     the top of the subject's head. */
-                  className="w-20 h-20 rounded-2xl object-cover object-top border-2 border-white/30 shrink-0"
-                  loading="lazy"
-                />
+                <div className="relative shrink-0 w-full h-48 sm:h-auto sm:w-44 lg:w-52 overflow-hidden">
+                  <img
+                    src={awardPhoto}
+                    alt={awardName || 'Safety award winner'}
+                    className="absolute inset-0 h-full w-full object-cover object-top"
+                    loading="lazy"
+                  />
+                  {/* The studio backdrop is near-white and meets the green hard;
+                      this softens the seam without dimming his face. */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-emerald-700/25 sm:to-emerald-700/40" />
+                  <div className="absolute inset-x-0 bottom-0 h-px bg-white/25 sm:hidden" />
+                  <div className="hidden sm:block absolute inset-y-0 right-0 w-px bg-white/25" />
+                </div>
               ) : (
-                <div className="w-20 h-20 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center shrink-0">
-                  <Award className="h-9 w-9 text-white" aria-hidden="true" />
+                <div className="relative shrink-0 w-full h-32 sm:h-auto sm:w-44 lg:w-52 bg-white/10 flex items-center justify-center">
+                  <Award className="h-14 w-14 text-white/70" aria-hidden="true" />
                 </div>
               )}
-              <div className="min-w-0">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider mb-2">
-                  <Award className="h-3.5 w-3.5" aria-hidden="true" />
+
+              <div className="relative min-w-0 flex-1 flex flex-col justify-center p-6 sm:py-7 sm:px-8">
+                <div className="inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider mb-3">
+                  <Award className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                   {awardHeadline}
                 </div>
-                {awardName && <h2 className="text-2xl font-bold leading-tight">{awardName}</h2>}
-                {awardTitle && <p className="text-green-100">{awardTitle}</p>}
-                {awardMessage && <p className="text-green-50/90 text-sm mt-2">{awardMessage}</p>}
+                {awardName && (
+                  <h2 className="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">{awardName}</h2>
+                )}
+                {awardTitle && <p className="text-green-100 mt-0.5">{awardTitle}</p>}
+                {awardMessage && (
+                  <p className="text-green-50/90 text-sm mt-3 max-w-prose leading-relaxed">{awardMessage}</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -362,7 +381,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                     <Card className={`border h-full transition-colors min-h-[44px] ${isDark ? `bg-slate-700 border-slate-600 group-hover:border-${course.color}-600 group-hover:bg-slate-700/80` : `group-hover:border-${course.color}-300 group-hover:shadow-md`}`}>
                       <CardContent className="pt-4">
                         <div className="flex items-start justify-between mb-3">
-                          <div className={`w-10 h-10 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
+                          <div className={`w-10 h-10 shrink-0 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
                             <course.icon className={`h-5 w-5 text-${course.color}-600`} />
                           </div>
                           <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>

@@ -237,8 +237,8 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                             <div
                               className={
                                 customHex
-                                  ? 'w-10 h-10 rounded-lg flex items-center justify-center'
-                                  : `w-10 h-10 rounded-lg flex items-center justify-center ${isDark ? `bg-${fallbackColor}-900` : `bg-${fallbackColor}-100`}`
+                                  ? 'w-10 h-10 shrink-0 rounded-lg flex items-center justify-center'
+                                  : `w-10 h-10 shrink-0 rounded-lg flex items-center justify-center ${isDark ? `bg-${fallbackColor}-900` : `bg-${fallbackColor}-100`}`
                               }
                               style={customHex ? { backgroundColor: `${customHex}33` } : undefined}
                             >
@@ -315,7 +315,7 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
                           <FileText className="h-5 w-5 text-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className={`font-medium truncate group-hover:text-primary ${isDark ? 'text-white' : ''}`}>{form.name}</div>
+                          <div className={`font-medium group-hover:text-primary ${isDark ? 'text-white' : ''}`}>{form.name}</div>
                           {form.desc && (
                             <div className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>{form.desc}</div>
                           )}

@@ -69,7 +69,7 @@ export function ITTicketContent({ itEmail, itPhone, uiStrings = {} }: ITTicketCo
       <div className="max-w-3xl mx-auto">
         <Card className="bg-emerald-900/30 border-emerald-700">
           <CardContent className="py-12 text-center">
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 shrink-0 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-8 w-8 text-emerald-400" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-3">Ticket submitted</h2>
