@@ -717,6 +717,9 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Singleton — global contact info, portal URLs, and defaults used across the intranet',
     fields: [
       { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'Site Settings', helpText: 'Identifier for this singleton; not displayed publicly', icon: 'FileText', group: 'General' },
+      { key: 'ring-it-in-headline', label: 'Ring It In — Headline', type: 'text', placeholder: 'Ring It In', helpText: 'Title on the celebration gong box (Home + Culture). Clear this field to hide the box.', icon: 'Bell' },
+      { key: 'ring-it-in-message', label: 'Ring It In — Message', type: 'textarea', placeholder: 'Congratulations to Preconstruction on another contract win!', helpText: 'Celebration copy under the headline.' },
+      { key: 'ring-it-in-link', label: 'Ring It In — Shoutout Link', type: 'url', placeholder: '/jewett-junction/living-the-mission', helpText: 'Where the Submit your Shoutout button goes.', icon: 'Link' },
 
       // Emergency & Support
       { key: 'eap-phone', label: 'EAP Phone', type: 'tel', placeholder: '1-800-XXX-XXXX', helpText: 'Employee Assistance Program — surfaced on HR page', icon: 'Phone', group: 'Emergency & Support' },

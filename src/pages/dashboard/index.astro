@@ -8,8 +8,9 @@ import MobileNav from '../../components/layout/MobileNav.astro';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
 import CmsIcon from '../../components/shared/CmsIcon.astro';
 import SideNav from '../../components/layout/SideNav.astro';
+import { RingItIn } from '../../components/shared/RingItIn';
 import { getIcon } from '../../components/admin/icon-map';
-import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, getSiteSettings, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -27,9 +28,10 @@ let bannerMessages: any[] = [];
 let pageCopy: any = null;
 let uiStrings = new Map<string, string>();
 let quickActions: any[] = [];
+let siteSettings: any = {};
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, uiRes, quickActionsRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, uiRes, quickActionsRes, siteSettingsRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 25 }),
@@ -42,6 +44,7 @@ try {
     getPageCopy('dashboard'),
     getUIStrings(),
     getQuickActions({ pageSlug: 'dashboard' }),
+    getSiteSettings(),
   ]);
   announcements = announcementsRes.items;
   events = eventsRes.items;
@@ -55,6 +58,7 @@ try {
   pageCopy = copyRes;
   uiStrings = uiRes;
   quickActions = quickActionsRes.items;
+  siteSettings = siteSettingsRes;
 } catch (error) {
   console.error('Error fetching CMS data:', error);
 }
@@ -529,6 +533,18 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               );
             })}
           </div>
+        </div>
+        )}
+
+        <!-- Ring It In — celebration gong (CMS: Site Settings → Ring It In) -->
+        {siteSettings['ring-it-in-headline'] && (
+        <div class="mb-10">
+          <RingItIn
+            client:load
+            headline={siteSettings['ring-it-in-headline']}
+            message={siteSettings['ring-it-in-message'] || ''}
+            link={siteSettings['ring-it-in-link'] || ''}
+          />
         </div>
         )}
 

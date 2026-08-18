@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
+import { RingItIn } from '../shared/RingItIn';
 import {
   Heart,
   Award,
@@ -49,6 +50,9 @@ interface CMSCultureStory {
 interface CultureSettings {
   'culture-volunteer-hours'?: string;
   'culture-donations'?: string;
+  'ring-it-in-headline'?: string;
+  'ring-it-in-message'?: string;
+  'ring-it-in-link'?: string;
 }
 
 interface CMSCoreValue {
@@ -244,6 +248,15 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           client asked for on this page. The records existed in the Quick Actions
           collection all along; this page just never rendered them. */}
       <QuickActionCards actions={quickActions} theme={theme} />
+
+      {/* Ring It In — celebration gong (CMS: Site Settings → Ring It In) */}
+      {settings['ring-it-in-headline'] && (
+        <RingItIn
+          headline={settings['ring-it-in-headline']}
+          message={settings['ring-it-in-message'] || ''}
+          link={settings['ring-it-in-link'] || ''}
+        />
+      )}
 
       {/* Stories Grid - Team Wins & Recognitions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -45,7 +45,7 @@ export const NAV_PATHS: Record<string, string> = {
 };
 
 export const NAV_PRIMARY: NavItem[] = [
-  { slug: 'dashboard', href: '/jewett-junction/dashboard', fallback: 'Dashboard' },
+  { slug: 'dashboard', href: '/jewett-junction/dashboard', fallback: 'Home' },
   { slug: 'safety', href: '/jewett-junction/safety', fallback: 'Safety' },
   { slug: 'hr', href: '/jewett-junction/hr', fallback: 'HR' },
   { slug: 'it-helpdesk', href: '/jewett-junction/it-helpdesk', fallback: 'IT Helpdesk' },
