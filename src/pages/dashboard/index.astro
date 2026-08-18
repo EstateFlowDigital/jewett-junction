@@ -409,6 +409,18 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
         </div>
 
+        <!-- Ring It In — celebration gong (CMS: Site Settings → Ring It In) -->
+        {siteSettings['ring-it-in-headline'] && (
+        <div class="mb-10">
+          <RingItIn
+            client:load
+            headline={siteSettings['ring-it-in-headline']}
+            message={siteSettings['ring-it-in-message'] || ''}
+            link={siteSettings['ring-it-in-link'] || ''}
+          />
+        </div>
+        )}
+
         <!-- Important Updates from HR, Safety, IT -->
         {(featuredHR || featuredSafety || featuredIT) && importantUpdatesTitle && (
           <div class="mb-10">
@@ -533,18 +545,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               );
             })}
           </div>
-        </div>
-        )}
-
-        <!-- Ring It In — celebration gong (CMS: Site Settings → Ring It In) -->
-        {siteSettings['ring-it-in-headline'] && (
-        <div class="mb-10">
-          <RingItIn
-            client:load
-            headline={siteSettings['ring-it-in-headline']}
-            message={siteSettings['ring-it-in-message'] || ''}
-            link={siteSettings['ring-it-in-link'] || ''}
-          />
         </div>
         )}
 
