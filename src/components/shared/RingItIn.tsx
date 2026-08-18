@@ -26,13 +26,13 @@ interface RingItInProps {
 
 // Non-integer partial ratios are what make it a gong and not a church bell.
 const PARTIALS: Array<[ratio: number, gain: number, decay: number]> = [
-  [1.0, 0.9, 3.8],
-  [1.52, 0.55, 3.2],
-  [2.09, 0.38, 2.7],
-  [2.73, 0.26, 2.2],
-  [3.43, 0.18, 1.7],
-  [4.21, 0.12, 1.3],
-  [5.12, 0.07, 1.0],
+  [1.0, 0.9, 6.0],
+  [1.52, 0.55, 5.0],
+  [2.09, 0.38, 4.2],
+  [2.73, 0.26, 3.4],
+  [3.43, 0.18, 2.6],
+  [4.21, 0.12, 2.0],
+  [5.12, 0.07, 1.5],
 ];
 
 function strikeGong(ctx: AudioContext) {
@@ -44,7 +44,7 @@ function strikeGong(ctx: AudioContext) {
   master.connect(limiter);
   limiter.connect(ctx.destination);
 
-  const base = 96; // Hz — large gong territory
+  const base = 138; // Hz — medium gong; tuned up from 96 at the client's request
   for (const [ratio, gain, decay] of PARTIALS) {
     const osc = ctx.createOscillator();
     osc.type = 'sine';
@@ -70,7 +70,7 @@ function strikeGong(ctx: AudioContext) {
   noise.buffer = buf;
   const bp = ctx.createBiquadFilter();
   bp.type = 'bandpass';
-  bp.frequency.value = 320;
+  bp.frequency.value = 460;
   bp.Q.value = 0.8;
   const ng = ctx.createGain();
   ng.gain.setValueAtTime(0.5, now);
