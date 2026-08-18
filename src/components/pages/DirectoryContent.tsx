@@ -155,12 +155,32 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
+  const stripRef = React.useRef<HTMLDivElement | null>(null);
+  const activeChipRef = React.useRef<HTMLButtonElement | null>(null);
+  // Which edges of the pill strip still have departments hidden past them.
+  const [stripOverflow, setStripOverflow] = React.useState({ start: false, end: false });
 
   // Debounce search term for better performance
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  // Get unique departments for filter
-  const departments = ['All', ...new Set(allEmployees.map(e => getDeptConfig(e.department).label))];
+  // Headcount per department. Computed ahead of the pill list so the strip can
+  // order itself by size — the biggest teams land first, where the eye starts.
+  const deptCounts = React.useMemo(
+    () =>
+      allEmployees.reduce((acc, emp) => {
+        const label = getDeptConfig(emp.department).label;
+        acc[label] = (acc[label] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>),
+    [allEmployees],
+  );
+
+  // "All" stays pinned first; the rest sort by headcount, alphabetically on ties.
+  const departments = React.useMemo(() => {
+    const labels = [...new Set(allEmployees.map(e => getDeptConfig(e.department).label))];
+    labels.sort((a, b) => (deptCounts[b] || 0) - (deptCounts[a] || 0) || a.localeCompare(b));
+    return ['All', ...labels];
+  }, [allEmployees, deptCounts]);
 
   // Honour ?department=X from the URL so TeamContactCard's "View Directory"
   // link lands on the correct filtered view. Falls back to "All" when the
@@ -177,6 +197,38 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     );
     if (match) setSelectedDept(match);
   }, [departments.length]);
+
+  React.useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    const update = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      setStripOverflow({ start: strip.scrollLeft > 4, end: strip.scrollLeft < max - 4 });
+    };
+    update();
+    strip.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(strip);
+    return () => {
+      strip.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [departments.length]);
+
+  // A ?department= deep link (or a pick from the far end of the strip) can leave
+  // the active pill scrolled out of frame — nudge the strip, and only the strip,
+  // so the selected filter is always visible.
+  React.useEffect(() => {
+    const strip = stripRef.current;
+    const chip = activeChipRef.current;
+    if (!strip || !chip) return;
+    const stripBox = strip.getBoundingClientRect();
+    const chipBox = chip.getBoundingClientRect();
+    strip.scrollBy({
+      left: chipBox.left - stripBox.left - (stripBox.width - chipBox.width) / 2,
+      behavior: 'smooth',
+    });
+  }, [selectedDept]);
 
   // Get featured employees
   const featuredEmployees = allEmployees.filter(e => e['is-featured']);
@@ -203,15 +255,14 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     return searchResults.map(result => result.item);
   }, [allEmployees, debouncedSearch, selectedDept]);
 
+  // Soft edges signal "there's more this way" and stop a half-clipped pill from
+  // reading as a collision with the result count sitting beside the strip.
+  const stripFade = `linear-gradient(to right, ${
+    stripOverflow.start ? 'transparent' : '#000'
+  } 0, #000 2rem, #000 calc(100% - 2rem), ${stripOverflow.end ? 'transparent' : '#000'} 100%)`;
+
   // Get unique locations (skip empties so the stats card doesn't inflate count with "Unknown")
   const locations = [...new Set(allEmployees.map(e => e.location).filter((l): l is string => !!l))];
-
-  // Department counts
-  const deptCounts = allEmployees.reduce((acc, emp) => {
-    const label = getDeptConfig(emp.department).label;
-    acc[label] = (acc[label] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
 
   return (
     <div className="space-y-8 pb-12">
@@ -355,11 +406,11 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
 
       {/* Search and Filters */}
       <Card id="directory" className="bg-slate-800/50 border-slate-700 scroll-mt-8">
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-            {/* Search */}
-            <div className="flex-1 relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
+        <CardContent className="p-4 space-y-3">
+          {/* Row 1 — search takes the full width it needs; view toggle anchors the right */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
               <input
                 type="text"
                 placeholder={ui('directory-search-placeholder', 'Search by name, role, department, or location...')}
@@ -369,35 +420,8 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
               />
             </div>
 
-            {/* Department Pills */}
-            <div className="flex flex-wrap gap-2">
-              {departments.map((dept) => {
-                const isActive = selectedDept === dept;
-                const config = dept === 'All' ? null : getDeptConfig(dept);
-                return (
-                  <button
-                    key={dept}
-                    onClick={() => setSelectedDept(dept)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
-                      isActive
-                        ? 'bg-cyan-500 text-white'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
-                    }`}
-                  >
-                    {config && <config.icon className="h-3.5 w-3.5" />}
-                    {dept}
-                    {dept !== 'All' && (
-                      <span className={`text-xs ${isActive ? 'text-cyan-200' : 'text-slate-500'}`}>
-                        ({deptCounts[dept] || 0})
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
             {/* View Toggle */}
-            <div className="flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
+            <div className="shrink-0 flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
               <button
                 onClick={() => setViewMode('grid')}
                 aria-label="Grid view"
@@ -420,16 +444,55 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
               </button>
             </div>
           </div>
+
+          {/* Row 2 — every department on one line that scrolls rather than wraps,
+              with the live result count anchored where the strip ends. */}
+          <div className="flex items-center gap-4 border-t border-slate-700/60 pt-3">
+            <div
+              ref={stripRef}
+              className="flex-1 min-w-0 overflow-x-auto scrollbar-none"
+              role="group"
+              aria-label="Filter by department"
+              style={{ maskImage: stripFade, WebkitMaskImage: stripFade }}
+            >
+              <div className="flex items-center gap-2 w-max pr-1">
+                {departments.map((dept) => {
+                  const isActive = selectedDept === dept;
+                  const count = dept === 'All' ? allEmployees.length : deptCounts[dept] || 0;
+                  return (
+                    <React.Fragment key={dept}>
+                      <button
+                        ref={isActive ? activeChipRef : undefined}
+                        onClick={() => setSelectedDept(dept)}
+                        aria-pressed={isActive}
+                        className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${
+                          isActive
+                            ? 'bg-cyan-500 text-white'
+                            : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                        }`}
+                      >
+                        {dept}
+                        <span className={`ml-1.5 text-xs tabular-nums ${isActive ? 'text-cyan-100' : 'text-slate-500'}`}>
+                          {count}
+                        </span>
+                      </button>
+                      {dept === 'All' && (
+                        <span aria-hidden="true" className="shrink-0 w-px h-5 bg-slate-700" />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="shrink-0 text-sm text-slate-400 tabular-nums" aria-live="polite">
+              <span className="text-white font-medium">{filteredEmployees.length}</span> of{' '}
+              <span className="text-white font-medium">{allEmployees.length}</span>
+              <span className="hidden sm:inline"> employees</span>
+            </p>
+          </div>
         </CardContent>
       </Card>
-
-      {/* Results Count */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">
-          Showing <span className="text-white font-medium">{filteredEmployees.length}</span> of{' '}
-          <span className="text-white font-medium">{allEmployees.length}</span> employees
-        </p>
-      </div>
 
       {/* Employee Grid/List */}
       {viewMode === 'grid' ? (

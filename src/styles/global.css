@@ -186,3 +186,13 @@
   background-color: var(--primary) !important;
   opacity: 0.9;
 }
+
+/* Horizontal filter strips (e.g. the directory department pills) scroll
+   sideways without the scrollbar chrome eating a row of vertical space. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

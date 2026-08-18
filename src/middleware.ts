@@ -4,6 +4,13 @@ import { parseAllowlist, isAllowedIp } from './lib/ip-allowlist';
 const GATED_PREFIXES = [
   '/jewett-junction',
   '/admin',
+  // Pages added after this gate was written (Round 2, Aug 2026) — the mount
+  // path is stripped at the edge, so every page needs its post-mount prefix
+  // listed here or it ships unlocked when ALLOWED_IPS is set.
+  '/dashboard',
+  '/living-the-mission',
+  '/builtwell',
+  '/sales-lead',
   '/announcements',
   '/culture',
   '/directory',
@@ -27,6 +34,11 @@ const GATED_PREFIXES = [
   '/jewett-junction/api/cms',
 ];
 
+// The whole /api surface is gated EXCEPT these — the Webflow form-submission
+// webhook arrives from Webflow's servers, which will never be on Jewett's
+// allowlist, and it authenticates itself with a signature instead.
+const OPEN_API_PREFIXES = ['/api/webhooks', '/jewett-junction/api/webhooks'];
+
 function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const allowedOrigins = import.meta.env.ALLOWED_ORIGINS
@@ -48,6 +60,12 @@ function isGatedPath(pathname: string): boolean {
   // it doesn't match any of the GATED_PREFIXES via startsWith without matching
   // every other path too.
   if (pathname === '/') return true;
+  if (OPEN_API_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))) return false;
+  // Deny-by-default for the API: form endpoints write to the CMS and send
+  // email, so an unlisted new endpoint should be born gated, not discovered
+  // open later. Pages stay prefix-listed because /access-denied and /404 must
+  // remain reachable.
+  if (pathname.startsWith('/api/') || pathname.startsWith('/jewett-junction/api/')) return true;
   return GATED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
