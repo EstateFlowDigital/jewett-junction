@@ -14,6 +14,6 @@ const [marketingResult, settings, pageCopy] = await Promise.all([
 const marketingAssets = marketingResult.items;
 ---
 
-<ThemedPage title="Marketing | Jewett Junction" theme="dark" currentSection="marketing">
+<ThemedPage title="Marketing | Jewett Junction" theme="dark" currentSection="marketing" description="Brand assets, letterhead, presentations, apparel, and marketing request forms.">
   <MarketingContent client:load theme="dark" initialItems={marketingAssets} settings={settings} pageCopy={pageCopy} />
 </ThemedPage>

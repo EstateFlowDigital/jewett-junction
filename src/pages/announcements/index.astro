@@ -67,7 +67,7 @@ const featuredAnnouncement = announcements.find(a => a['is-pinned']) || announce
 const otherAnnouncements = announcements.filter(a => a.id !== featuredAnnouncement?.id);
 ---
 
-<ThemedPage title={`${heroHeadline || 'Announcements'} | Jewett Junction`} theme="dark" currentSection="announcements">
+<ThemedPage title={`${heroHeadline || 'Announcements'} | Jewett Junction`} theme="dark" currentSection="announcements" description="Company news and announcements from across Jewett Construction.">
   <div>
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

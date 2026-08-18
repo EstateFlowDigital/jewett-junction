@@ -26,6 +26,6 @@ try {
 const heroHeadline = pageCopy?.['hero-headline'] || '';
 ---
 
-<ThemedPage title={`${heroHeadline || 'Resources'} | Jewett Junction`} theme="dark" currentSection="resources">
+<ThemedPage title={`${heroHeadline || 'Resources'} | Jewett Junction`} theme="dark" currentSection="resources" description="Company documents and resources — safety manuals, HR forms, policies, and guides.">
   <ResourcesContent client:load theme="dark" resources={resources} pageCopy={pageCopy} uiStrings={uiStrings} />
 </ThemedPage>

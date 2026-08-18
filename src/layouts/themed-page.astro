@@ -11,9 +11,18 @@ interface Props {
   title?: string;
   theme?: string;
   currentSection?: string;
+  /** Meta description; a page passes its own for better link previews. */
+  description?: string;
 }
 
-const { title = 'Jewett Junction', currentSection = '' } = Astro.props;
+const {
+  title = 'Jewett Junction',
+  currentSection = '',
+  description = 'Jewett Junction — the Jewett Construction employee intranet. News, safety, HR, events, and team resources in one place.',
+} = Astro.props;
+
+// Social preview card, served from the Webflow asset CDN.
+const OG_IMAGE = 'https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/6a84e10241c0b0bd9e132691_jewett-junction-og.png';
 
 // Map section to full path for MobileNav
 const currentPath = currentSection ? `/jewett-junction/${currentSection}` : '/jewett-junction/dashboard';
@@ -24,10 +33,27 @@ initCMS(Astro.locals);
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    {/* The favicon lives under the Webflow Cloud mount path — a root-relative
+        /favicon.png 404s in production because the app is mounted at
+        /jewett-junction, not at the domain root. */}
+    <link rel="icon" type="image/png" href="/jewett-junction/favicon.png" />
+    <link rel="apple-touch-icon" href="/jewett-junction/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    {/* Internal tool — keep it out of search indexes regardless of the IP gate. */}
+    <meta name="robots" content="noindex, nofollow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Jewett Junction" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={OG_IMAGE} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={OG_IMAGE} />
     <style>
       .glass { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px); }
       @media (max-width: 767px) { .mobile-safe-area { padding-top: max(4.5rem, env(safe-area-inset-top, 0px)); } }
