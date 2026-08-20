@@ -6,7 +6,6 @@
 //   RESEND_API_KEY      — required
 //   NOTIFY_FROM_EMAIL   — required, e.g. "noreply@jewettconstruction.com"
 //                         (must be a Resend-verified sending domain)
-//   IT_INBOX_EMAIL      — IT support inbox
 //   SAFETY_INBOX_EMAIL  — safety/EH&S team inbox
 //   HR_INBOX_EMAIL      — HR team inbox
 //   IDEAS_INBOX_EMAIL   — general ideas/feedback inbox
@@ -25,7 +24,6 @@ interface RuntimeEnv {
   // Comma-separated list of addresses CC'd on every notification — used
   // during rollout so marketing/leadership can audit all submissions.
   NOTIFY_CC_EMAIL?: string;
-  IT_INBOX_EMAIL?: string;
   SAFETY_INBOX_EMAIL?: string;
   HR_INBOX_EMAIL?: string;
   IDEAS_INBOX_EMAIL?: string;
@@ -35,6 +33,7 @@ interface RuntimeEnv {
   SALES_LEAD_INBOX_EMAIL?: string;
   BUILTWELL_INBOX_EMAIL?: string;
   MARKETING_INBOX_EMAIL?: string;
+  RING_IT_IN_INBOX_EMAIL?: string;
 }
 
 function getEnv(locals: any): RuntimeEnv {
@@ -44,7 +43,6 @@ function getEnv(locals: any): RuntimeEnv {
 }
 
 export type InboxKey =
-  | 'it'
   | 'safety'
   | 'hr'
   | 'ideas'
@@ -52,11 +50,11 @@ export type InboxKey =
   | 'mission'
   | 'salesLead'
   | 'builtwell'
-  | 'marketing';
+  | 'marketing'
+  | 'ringItIn';
 
 function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
   switch (key) {
-    case 'it': return env.IT_INBOX_EMAIL;
     case 'safety': return env.SAFETY_INBOX_EMAIL;
     case 'hr': return env.HR_INBOX_EMAIL;
     case 'ideas': return env.IDEAS_INBOX_EMAIL;
@@ -65,6 +63,10 @@ function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
     case 'salesLead': return env.SALES_LEAD_INBOX_EMAIL;
     case 'builtwell': return env.BUILTWELL_INBOX_EMAIL;
     case 'marketing': return env.MARKETING_INBOX_EMAIL;
+    // Falls back to marketing rather than returning undefined: an unset inbox
+    // makes sendNotification skip silently, which is how IT tickets and
+    // BuiltWell ideas went unnoticed. Marketing announces the wins anyway.
+    case 'ringItIn': return env.RING_IT_IN_INBOX_EMAIL || env.MARKETING_INBOX_EMAIL;
   }
 }
 

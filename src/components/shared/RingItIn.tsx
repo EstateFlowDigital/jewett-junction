@@ -133,6 +133,10 @@ export function strikeGong(ctx: BaseAudioContext) {
 }
 
 export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Submit your Shoutout' }: RingItInProps) {
+  // Where the shoutout button goes when Site Settings has no link set. The CMS
+  // value still wins, so this is a floor rather than an override.
+  const href = link || '/jewett-junction/ring-it-in';
+
   const ctxRef = React.useRef<AudioContext | null>(null);
   // 0 = silent and unrendered; any other value is a strike id that re-keys the
   // ripple so a re-click restarts it mid-ring.
@@ -144,17 +148,24 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
       const Ctx = window.AudioContext || (window as any).webkitAudioContext;
       if (!ctxRef.current) ctxRef.current = new Ctx();
       const ctx = ctxRef.current;
-      if (ctx.state === 'suspended') {
-        // Browsers suspend fresh contexts until a user gesture; this IS one.
-        // The strike has to wait for the resume to land: a suspended context's
-        // currentTime is frozen, so scheduling against it queues the whole
-        // envelope in the past and the note comes out clipped or silent. iOS is
-        // the strict one here, and it re-suspends whenever the tab backgrounds,
-        // so this path runs on ordinary repeat visits, not just the first click.
-        void ctx.resume().then(() => strikeGong(ctx));
-      } else {
-        strikeGong(ctx);
-      }
+
+      // iOS unlocks an AudioContext only when a source node is *started inside
+      // the gesture itself*, and it re-locks whenever the tab backgrounds. A
+      // silent one-sample buffer does that unlocking.
+      //
+      // Everything from here stays synchronous on purpose. Waiting for
+      // resume() to resolve before striking pushes the strike outside the
+      // gesture, which is enough for iOS to stay silent — the timing is safe
+      // either way, because a suspended context's currentTime is merely frozen
+      // and resumes from the same value, so events scheduled against it keep
+      // their relative offsets.
+      const unlock = ctx.createBufferSource();
+      unlock.buffer = ctx.createBuffer(1, 1, 22050);
+      unlock.connect(ctx.destination);
+      unlock.start(0);
+
+      if (ctx.state === 'suspended') void ctx.resume();
+      strikeGong(ctx);
     } catch {
       /* no audio support — the animation still acknowledges the click */
     }
@@ -175,11 +186,11 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
   );
 
   const onShoutout = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!link) return;
+    if (!href) return;
     e.preventDefault();
     strike();
     window.setTimeout(() => {
-      window.location.href = link;
+      window.location.href = href;
     }, 700);
   };
 
@@ -226,9 +237,9 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
           <p className="text-xs text-slate-500 mt-1.5">Tap the gong to ring it.</p>
         </div>
 
-        {link && (
+        {href && (
           <a
-            href={link}
+            href={href}
             onClick={onShoutout}
             className="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold transition-colors"
           >
