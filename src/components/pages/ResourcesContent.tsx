@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { FilterBar, buildFilterOptions } from '../shared/FilterBar';
 import {
   FolderOpen,
   FileText,
   Download,
-  Search,
   Shield,
   Users,
   Building,
@@ -113,7 +113,12 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
     return acc;
   }, {} as Record<string, number>);
 
-  const categories = ['All', ...Object.keys(categoryCounts)];
+  const filterOptions = React.useMemo(
+    () => buildFilterOptions(categoryCounts, allResources.length),
+    // categoryCounts is rebuilt each render; its content only changes with the list.
+    [allResources],
+  );
+  const categories = React.useMemo(() => filterOptions.map((o) => o.value), [filterOptions]);
 
   // Honour ?category=X so section pages can deep-link to a filtered view
   // (e.g. the Safety hub's "Safety Resources" tile → only safety documents).
@@ -320,76 +325,44 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
       </div>
 
       {/* Search and Filters */}
-      <Card id="resources" className="bg-slate-800/50 border-slate-700 scroll-mt-8">
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-            {/* Search */}
-            <div className="flex-1 relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
-              <input
-                type="text"
-                placeholder={ui('resources-search-placeholder', 'Search documents by name, description, or category...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors"
-              />
-            </div>
+      <FilterBar
+        id="resources"
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder={ui('resources-search-placeholder', 'Search documents by name, description, or category...')}
+        options={filterOptions}
+        selected={selectedCategory}
+        onSelect={setSelectedCategory}
+        filterLabel="Filter by category"
+        accent="amber"
+        resultCount={sortedResources.length}
+        totalCount={allResources.length}
+        noun="resources"
+      >
+        <div className="shrink-0 flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
+          <button
+            onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
+            aria-pressed={viewMode === 'grid'}
+            className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'grid' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Grid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            aria-label="List view"
+            aria-pressed={viewMode === 'list'}
+            className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'list' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
+      </FilterBar>
 
-            {/* Category Pills */}
-            <div className="flex flex-wrap gap-2">
-              {categories.slice(0, 5).map((cat) => {
-                const isActive = selectedCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-amber-500 text-white'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
-                    }`}
-                  >
-                    {cat}
-                    {cat !== 'All' && (
-                      <span className={`text-xs ml-1 ${isActive ? 'text-amber-200' : 'text-slate-500'}`}>
-                        ({categoryCounts[cat] || 0})
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* View Toggle */}
-            <div className="flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Grid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-amber-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <List className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Results Count */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">
-          Showing <span className="text-white font-medium">{sortedResources.length}</span> of{' '}
-          <span className="text-white font-medium">{allResources.length}</span> resources
-        </p>
-      </div>
 
       {/* Resources Grid/List */}
       {viewMode === 'grid' ? (

@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { FilterBar, buildFilterOptions } from '../shared/FilterBar';
 import {
   Users,
-  Search,
   Phone,
   Mail,
   Building,
@@ -155,10 +155,6 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedDept, setSelectedDept] = React.useState('All');
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
-  const stripRef = React.useRef<HTMLDivElement | null>(null);
-  const activeChipRef = React.useRef<HTMLButtonElement | null>(null);
-  // Which edges of the pill strip still have departments hidden past them.
-  const [stripOverflow, setStripOverflow] = React.useState({ start: false, end: false });
 
   // Debounce search term for better performance
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -175,12 +171,11 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     [allEmployees],
   );
 
-  // "All" stays pinned first; the rest sort by headcount, alphabetically on ties.
-  const departments = React.useMemo(() => {
-    const labels = [...new Set(allEmployees.map(e => getDeptConfig(e.department).label))];
-    labels.sort((a, b) => (deptCounts[b] || 0) - (deptCounts[a] || 0) || a.localeCompare(b));
-    return ['All', ...labels];
-  }, [allEmployees, deptCounts]);
+  const filterOptions = React.useMemo(
+    () => buildFilterOptions(deptCounts, allEmployees.length),
+    [deptCounts, allEmployees.length],
+  );
+  const departments = React.useMemo(() => filterOptions.map((o) => o.value), [filterOptions]);
 
   // Honour ?department=X from the URL so TeamContactCard's "View Directory"
   // link lands on the correct filtered view. Falls back to "All" when the
@@ -197,38 +192,6 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     );
     if (match) setSelectedDept(match);
   }, [departments.length]);
-
-  React.useEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) return;
-    const update = () => {
-      const max = strip.scrollWidth - strip.clientWidth;
-      setStripOverflow({ start: strip.scrollLeft > 4, end: strip.scrollLeft < max - 4 });
-    };
-    update();
-    strip.addEventListener('scroll', update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(strip);
-    return () => {
-      strip.removeEventListener('scroll', update);
-      observer.disconnect();
-    };
-  }, [departments.length]);
-
-  // A ?department= deep link (or a pick from the far end of the strip) can leave
-  // the active pill scrolled out of frame — nudge the strip, and only the strip,
-  // so the selected filter is always visible.
-  React.useEffect(() => {
-    const strip = stripRef.current;
-    const chip = activeChipRef.current;
-    if (!strip || !chip) return;
-    const stripBox = strip.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    strip.scrollBy({
-      left: chipBox.left - stripBox.left - (stripBox.width - chipBox.width) / 2,
-      behavior: 'smooth',
-    });
-  }, [selectedDept]);
 
   // Get featured employees
   const featuredEmployees = allEmployees.filter(e => e['is-featured']);
@@ -254,12 +217,6 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
 
     return searchResults.map(result => result.item);
   }, [allEmployees, debouncedSearch, selectedDept]);
-
-  // Soft edges signal "there's more this way" and stop a half-clipped pill from
-  // reading as a collision with the result count sitting beside the strip.
-  const stripFade = `linear-gradient(to right, ${
-    stripOverflow.start ? 'transparent' : '#000'
-  } 0, #000 2rem, #000 calc(100% - 2rem), ${stripOverflow.end ? 'transparent' : '#000'} 100%)`;
 
   // Get unique locations (skip empties so the stats card doesn't inflate count with "Unknown")
   const locations = [...new Set(allEmployees.map(e => e.location).filter((l): l is string => !!l))];
@@ -405,94 +362,44 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
       )}
 
       {/* Search and Filters */}
-      <Card id="directory" className="bg-slate-800/50 border-slate-700 scroll-mt-8">
-        <CardContent className="p-4 space-y-3">
-          {/* Row 1 — search takes the full width it needs; view toggle anchors the right */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
-              <input
-                type="text"
-                placeholder={ui('directory-search-placeholder', 'Search by name, role, department, or location...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-colors"
-              />
-            </div>
+      <FilterBar
+        id="directory"
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder={ui('directory-search-placeholder', 'Search by name, role, department, or location...')}
+        options={filterOptions}
+        selected={selectedDept}
+        onSelect={setSelectedDept}
+        filterLabel="Filter by department"
+        accent="cyan"
+        resultCount={filteredEmployees.length}
+        totalCount={allEmployees.length}
+        noun="employees"
+      >
+        <div className="shrink-0 flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
+          <button
+            onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
+            aria-pressed={viewMode === 'grid'}
+            className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'grid' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Grid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            aria-label="List view"
+            aria-pressed={viewMode === 'list'}
+            className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'list' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
+      </FilterBar>
 
-            {/* View Toggle */}
-            <div className="shrink-0 flex items-center gap-1 bg-slate-900/50 rounded-lg p-1 border border-slate-600">
-              <button
-                onClick={() => setViewMode('grid')}
-                aria-label="Grid view"
-                aria-pressed={viewMode === 'grid'}
-                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
-                  viewMode === 'grid' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Grid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                aria-label="List view"
-                aria-pressed={viewMode === 'list'}
-                className={`p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
-                  viewMode === 'list' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <List className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Row 2 — every department on one line that scrolls rather than wraps,
-              with the live result count anchored where the strip ends. */}
-          <div className="flex items-center gap-4 border-t border-slate-700/60 pt-3">
-            <div
-              ref={stripRef}
-              className="flex-1 min-w-0 overflow-x-auto scrollbar-none"
-              role="group"
-              aria-label="Filter by department"
-              style={{ maskImage: stripFade, WebkitMaskImage: stripFade }}
-            >
-              <div className="flex items-center gap-2 w-max pr-1">
-                {departments.map((dept) => {
-                  const isActive = selectedDept === dept;
-                  const count = dept === 'All' ? allEmployees.length : deptCounts[dept] || 0;
-                  return (
-                    <React.Fragment key={dept}>
-                      <button
-                        ref={isActive ? activeChipRef : undefined}
-                        onClick={() => setSelectedDept(dept)}
-                        aria-pressed={isActive}
-                        className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${
-                          isActive
-                            ? 'bg-cyan-500 text-white'
-                            : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
-                        }`}
-                      >
-                        {dept}
-                        <span className={`ml-1.5 text-xs tabular-nums ${isActive ? 'text-cyan-100' : 'text-slate-500'}`}>
-                          {count}
-                        </span>
-                      </button>
-                      {dept === 'All' && (
-                        <span aria-hidden="true" className="shrink-0 w-px h-5 bg-slate-700" />
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </div>
-
-            <p className="shrink-0 text-sm text-slate-400 tabular-nums" aria-live="polite">
-              <span className="text-white font-medium">{filteredEmployees.length}</span> of{' '}
-              <span className="text-white font-medium">{allEmployees.length}</span>
-              <span className="hidden sm:inline"> employees</span>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Employee Grid/List */}
       {viewMode === 'grid' ? (

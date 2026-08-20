@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { FilterBar, buildFilterOptions } from '../shared/FilterBar';
 import {
   Calendar,
   Clock,
@@ -11,7 +12,6 @@ import {
   CalendarDays,
   Bell,
   ExternalLink,
-  Search,
   ChevronDown,
   ChevronLeft,
   Star,
@@ -177,11 +177,18 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
     setShowCalendarDropdown(true);
   };
 
-  // Get unique categories
-  const categories = ['All Events', ...new Set(allEvents.map(e => {
-    const config = getCategoryConfig(e.category);
-    return config.label;
-  }))];
+  // Get unique categories, with counts so the filter chips can show and sort by them.
+  const categoryCounts = allEvents.reduce((acc, e) => {
+    const label = getCategoryConfig(e.category).label;
+    acc[label] = (acc[label] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const filterOptions = React.useMemo(
+    () => buildFilterOptions(categoryCounts, allEvents.length, 'All Events'),
+    // categoryCounts is rebuilt each render; its content only changes with the list.
+    [allEvents],
+  );
 
   // Filter events
   const filteredEvents = allEvents.filter(event => {
@@ -424,55 +431,48 @@ export function EventsContent({ theme = 'dark', events: cmsEvents = [], uiString
       </div>
 
       {/* Search and Filters */}
-      <Card id="events-list" className="bg-slate-800/50 border-slate-700 scroll-mt-8">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500" />
-                <input
-                  type="text"
-                  placeholder={ui('events-search-placeholder', 'Search events...')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
-                />
-              </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2.5 border rounded-xl text-sm bg-slate-900/50 border-slate-600 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
-              >
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex items-center gap-2 bg-slate-900/50 rounded-xl p-1 border border-slate-600" role="tablist" aria-label="View mode">
-              <button
-                onClick={() => setViewMode('list')}
-                role="tab"
-                aria-selected={viewMode === 'list'}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
-                  viewMode === 'list' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                List
-              </button>
-              <button
-                onClick={() => setViewMode('calendar')}
-                role="tab"
-                aria-selected={viewMode === 'calendar'}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
-                  viewMode === 'calendar' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Calendar
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <FilterBar
+        id="events-list"
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder={ui('events-search-placeholder', 'Search events...')}
+        options={filterOptions}
+        selected={selectedCategory}
+        onSelect={setSelectedCategory}
+        filterLabel="Filter by category"
+        accent="indigo"
+        resultCount={filteredEvents.length}
+        totalCount={allEvents.length}
+        noun="events"
+      >
+        <div
+          className="shrink-0 flex items-center gap-1 bg-slate-900/50 rounded-xl p-1 border border-slate-600"
+          role="tablist"
+          aria-label="View mode"
+        >
+          <button
+            onClick={() => setViewMode('list')}
+            role="tab"
+            aria-selected={viewMode === 'list'}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'list' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            List
+          </button>
+          <button
+            onClick={() => setViewMode('calendar')}
+            role="tab"
+            aria-selected={viewMode === 'calendar'}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${
+              viewMode === 'calendar' ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Calendar
+          </button>
+        </div>
+      </FilterBar>
+
 
       {/* Events Display */}
       {viewMode === 'list' ? (
