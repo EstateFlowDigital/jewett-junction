@@ -27,10 +27,13 @@ async function findExistingByDedupSlug(collectionId: string, apiToken: string, s
 
 // Pick the right notification inbox from the submitted form's display name.
 // Falls back to 'ideas' (general inbox) for anything we don't recognize.
+//
+// There is deliberately no IT branch: IT support is handled by SymQuest, not
+// by an internal queue, so anything IT-shaped arriving from a marketing-site
+// form lands in the general inbox for a human to forward on.
 function inboxForForm(formName: string | undefined): InboxKey {
   const n = (formName || '').toLowerCase();
   if (/safety|incident|injury|hazard/.test(n)) return 'safety';
-  if (/it\b|helpdesk|tech|software/.test(n)) return 'it';
   if (/hr\b|human\s*resources|benefits|payroll/.test(n)) return 'hr';
   if (/signage|sign\b|marketing/.test(n)) return 'signage';
   return 'ideas';

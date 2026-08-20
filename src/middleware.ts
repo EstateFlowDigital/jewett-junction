@@ -18,7 +18,6 @@ const GATED_PREFIXES = [
   '/help',
   '/hr',
   '/it-helpdesk',
-  '/it-ticket',
   '/marketing',
   '/notifications',
   '/resources',
