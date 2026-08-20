@@ -196,3 +196,19 @@
     display: none;
   }
 }
+
+/* Ring It In gong. The rings shimmer while the strike is audible and fade on a
+   curve that tracks the sound's exponential decay, so the animation dies with
+   the note instead of pinging forever. Duration is passed in from the component
+   so it stays derived from the actual oscillator decay, not a copied number. */
+@keyframes gong-decay {
+  0% { opacity: 1; }
+  15% { opacity: 0.62; }
+  35% { opacity: 0.3; }
+  60% { opacity: 0.1; }
+  100% { opacity: 0; }
+}
+
+@utility animate-gong-decay {
+  animation: gong-decay var(--gong-duration, 6100ms) linear forwards;
+}

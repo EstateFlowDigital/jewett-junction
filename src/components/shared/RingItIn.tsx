@@ -25,24 +25,73 @@ interface RingItInProps {
 }
 
 // Non-integer partial ratios are what make it a gong and not a church bell.
+//
+// The weighting deliberately does NOT roll off steeply into the highs. A phone
+// speaker cannot radiate much below ~500Hz, so a gong whose energy all sits at
+// 138-380Hz is close to silent on a handset however loud the page turns it up.
+// Carrying real weight up through ~1.3kHz is what makes the strike survive a
+// small speaker; on desktop speakers and headphones the low partials still give
+// it body. Highs decay faster than lows, as they do on real struck metal.
 const PARTIALS: Array<[ratio: number, gain: number, decay: number]> = [
-  [1.0, 0.9, 6.0],
-  [1.52, 0.55, 5.0],
-  [2.09, 0.38, 4.2],
-  [2.73, 0.26, 3.4],
-  [3.43, 0.18, 2.6],
-  [4.21, 0.12, 2.0],
-  [5.12, 0.07, 1.5],
+  [1.0, 0.55, 6.0],
+  [1.52, 0.45, 5.2],
+  [2.09, 0.42, 4.6],
+  [2.73, 0.4, 4.0],
+  [3.43, 0.38, 3.4],
+  [4.21, 0.34, 2.8],
+  [5.12, 0.3, 2.2],
+  [6.35, 0.22, 1.7],
+  [7.68, 0.15, 1.3],
+  [9.42, 0.1, 1.0],
 ];
 
-function strikeGong(ctx: AudioContext) {
+// How long a strike stays AUDIBLE — which is not how long its oscillators run.
+// Each partial ramps exponentially down to RAMP_FLOOR (-80dB), but the note
+// stops being heard far earlier; past roughly -45dB it is lost under ordinary
+// room noise. Timing the ripple off the oscillator tail instead left the rings
+// expanding for ~2.5s after the gong had gone silent.
+//
+// Solving the ramp for the moment it crosses that floor, and taking the partial
+// that lasts longest, keeps sound and motion ending together even if the
+// partials are retuned.
+const AUDIBLE_FLOOR_DB = -45;
+const RAMP_FLOOR = 0.0001;
+
+const GONG_DURATION_MS = Math.round(
+  1000 *
+    Math.max(
+      ...PARTIALS.map(
+        ([, gain, decay]) =>
+          (decay * ((AUDIBLE_FLOOR_DB / 20) * Math.LN10)) / Math.log(RAMP_FLOOR / gain),
+      ),
+    ),
+);
+
+// Gain staging. The partials sum well above 1.0 on the strike, so they are
+// scaled down, limited, then brought back up: limiting BEFORE the makeup is
+// what buys loudness without clipping. Raising PRE_GAIN alone would only feed
+// the limiter more and get squashed — MAKEUP is the knob that sets output
+// level, and it is set to land the peak just under full scale.
+const PRE_GAIN = 0.3;
+const MAKEUP = 1.82;
+
+export function strikeGong(ctx: BaseAudioContext) {
   const now = ctx.currentTime;
   const master = ctx.createGain();
-  master.gain.value = 0.28;
+  master.gain.value = PRE_GAIN;
+  // A true limiter (high ratio, fast attack) catching only the strike peak,
+  // rather than the -12dB threshold that used to compress the whole tail flat.
   const limiter = ctx.createDynamicsCompressor();
-  limiter.threshold.value = -12;
+  limiter.threshold.value = -3;
+  limiter.knee.value = 3;
+  limiter.ratio.value = 20;
+  limiter.attack.value = 0.002;
+  limiter.release.value = 0.25;
+  const makeup = ctx.createGain();
+  makeup.gain.value = MAKEUP;
   master.connect(limiter);
-  limiter.connect(ctx.destination);
+  limiter.connect(makeup);
+  makeup.connect(ctx.destination);
 
   const base = 138; // Hz — medium gong; tuned up from 96 at the client's request
   for (const [ratio, gain, decay] of PARTIALS) {
@@ -61,7 +110,9 @@ function strikeGong(ctx: AudioContext) {
     osc.stop(now + decay + 0.1);
   }
 
-  // The mallet strike — a short burst of band-passed noise.
+  // The mallet strike — a short burst of band-passed noise. Centred well above
+  // the old 460Hz: the transient is the part a phone speaker reproduces best,
+  // and it is what reads as "loud" before the tone itself arrives.
   const len = Math.floor(ctx.sampleRate * 0.09);
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
   const data = buf.getChannelData(0);
@@ -70,10 +121,10 @@ function strikeGong(ctx: AudioContext) {
   noise.buffer = buf;
   const bp = ctx.createBiquadFilter();
   bp.type = 'bandpass';
-  bp.frequency.value = 460;
-  bp.Q.value = 0.8;
+  bp.frequency.value = 1200;
+  bp.Q.value = 0.7;
   const ng = ctx.createGain();
-  ng.gain.setValueAtTime(0.5, now);
+  ng.gain.setValueAtTime(0.75, now);
   ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
   noise.connect(bp);
   bp.connect(ng);
@@ -83,21 +134,45 @@ function strikeGong(ctx: AudioContext) {
 
 export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Submit your Shoutout' }: RingItInProps) {
   const ctxRef = React.useRef<AudioContext | null>(null);
-  const [ringing, setRinging] = React.useState(0); // increments per strike so re-clicks re-trigger the ripple
+  // 0 = silent and unrendered; any other value is a strike id that re-keys the
+  // ripple so a re-click restarts it mid-ring.
+  const [ringing, setRinging] = React.useState(0);
+  const silenceTimer = React.useRef<number | null>(null);
 
   const strike = React.useCallback(() => {
     try {
       const Ctx = window.AudioContext || (window as any).webkitAudioContext;
       if (!ctxRef.current) ctxRef.current = new Ctx();
       const ctx = ctxRef.current;
-      // Browsers suspend fresh contexts until a user gesture; this IS one.
-      if (ctx.state === 'suspended') void ctx.resume();
-      strikeGong(ctx);
+      if (ctx.state === 'suspended') {
+        // Browsers suspend fresh contexts until a user gesture; this IS one.
+        // The strike has to wait for the resume to land: a suspended context's
+        // currentTime is frozen, so scheduling against it queues the whole
+        // envelope in the past and the note comes out clipped or silent. iOS is
+        // the strict one here, and it re-suspends whenever the tab backgrounds,
+        // so this path runs on ordinary repeat visits, not just the first click.
+        void ctx.resume().then(() => strikeGong(ctx));
+      } else {
+        strikeGong(ctx);
+      }
     } catch {
       /* no audio support — the animation still acknowledges the click */
     }
     setRinging((n) => n + 1);
+    // Re-striking restarts the clock, so the rings outlive the newest note only.
+    if (silenceTimer.current !== null) window.clearTimeout(silenceTimer.current);
+    silenceTimer.current = window.setTimeout(() => {
+      silenceTimer.current = null;
+      setRinging(0);
+    }, GONG_DURATION_MS);
   }, []);
+
+  React.useEffect(
+    () => () => {
+      if (silenceTimer.current !== null) window.clearTimeout(silenceTimer.current);
+    },
+    [],
+  );
 
   const onShoutout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!link) return;
@@ -118,9 +193,15 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
           aria-label="Ring the gong"
           className="relative shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-full"
         >
-          {/* ripple rings — re-keyed per strike so every hit ripples */}
+          {/* Ripple rings. Rendered only while the strike is audible — the
+              wrapper fades them out along the note's decay and then unmounts. */}
           {ringing > 0 && (
-            <span key={ringing} aria-hidden="true" className="motion-reduce:hidden">
+            <span
+              key={ringing}
+              aria-hidden="true"
+              className="motion-reduce:hidden animate-gong-decay"
+              style={{ '--gong-duration': `${GONG_DURATION_MS}ms` } as React.CSSProperties}
+            >
               <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
               <span className="absolute -inset-2 rounded-full border-2 border-amber-400/30 animate-ping [animation-duration:1.4s]" />
             </span>
