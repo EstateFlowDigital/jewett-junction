@@ -166,6 +166,23 @@ function buildHtml(params: NotifyParams, viewUrl: string): string {
 </td></tr>`
     : '';
 
+  // The inbox preview line — the grey text clients show beside the subject in a
+  // list. Repeating the subject there (which is what it used to do) spends the
+  // slot on words the reader can already see, so summarise the first few fields
+  // instead: who sent it and what it is about.
+  const preheaderText =
+    visible
+      .slice(0, 3)
+      .map((f) => `${f.label}: ${String(f.value).replace(/\s+/g, ' ').trim()}`)
+      .join(' · ')
+      .slice(0, 160) || title;
+
+  // Trailing spacer stops clients from dragging body copy into the preview after
+  // the preheader ends. Zero-width joiners render as nothing but consume the run.
+  const preheader = `<div style="display:none;font-size:0;line-height:0;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(
+    preheaderText,
+  )}${'&#8199;&#65279;&#8203;'.repeat(30)}</div>`;
+
   return `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8" />
@@ -175,12 +192,12 @@ function buildHtml(params: NotifyParams, viewUrl: string): string {
 <title>${escapeHtml(params.subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f5f7;-webkit-text-size-adjust:100%;">
-<div style="display:none;font-size:0;line-height:0;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(title)}</div>
+${preheader}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f4f5f7;">
 <tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:100%;max-width:600px;background:#ffffff;border:1px solid #e3e5e9;border-radius:12px;">
 <tr><td align="center" style="padding:26px 24px 18px;">
-<img src="${LOGO_URL}" alt="Jewett Construction" width="190" style="display:block;width:190px;max-width:58%;height:auto;border:0;" />
+<img src="${LOGO_URL}" alt="Jewett Construction" width="190" height="48" style="display:block;width:190px;max-width:58%;height:auto;border:0;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;letter-spacing:.02em;color:${BRAND_RED};text-decoration:none;" />
 </td></tr>
 <tr><td style="height:4px;background:${BRAND_RED};font-size:0;line-height:0;">&nbsp;</td></tr>
 <tr><td style="padding:26px 32px 2px;">
