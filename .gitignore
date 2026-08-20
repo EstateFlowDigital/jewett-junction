@@ -46,3 +46,7 @@ coverage/
 scripts/*.log
 
 Website-Upload-Final/
+
+# Browser-automation scratch output (screenshots, page snapshots, console logs)
+.playwright-mcp/
+/*.png
