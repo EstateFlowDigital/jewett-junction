@@ -15,7 +15,7 @@ function pickField(response: AnyRecord, matchers: RegExp[]): string | undefined 
 // Also match the attribution labels our own forms use so the admin triage
 // list shows a real submitter name instead of a blank column. Both the
 // "<verb> By" phrasing and the bare agent-noun form appear across the API
-// routes — safety-incident keys its reporter as "Reporter", it-ticket as
+// routes — safety-incident keys its reporter as "Reporter", ring-it-in as
 // "Submitted By" — so cover both or one of them silently lands blank.
 const NAME_MATCHERS = [
   /^name$/i,
