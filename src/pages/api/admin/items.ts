@@ -133,11 +133,6 @@ const VALID_FIELDS: Record<string, string[]> = {
   banner: [
     'name', 'slug', 'message', 'display-order', 'icon-color', 'expiration-date', 'is-active',
   ],
-  jobApplications: [
-    'name', 'slug', 'first-name', 'last-name', 'email', 'phone', 'position',
-    'experience', 'referral-source', 'cover-letter', 'resume-file-name',
-    'is-veteran', 'status', 'admin-notes', 'submitted-at',
-  ],
   formSubmissions: [
     'name', 'slug', 'form-name', 'webflow-form-id', 'submission-id',
     'submitted-at', 'submitter-name', 'submitter-email', 'submitter-phone',

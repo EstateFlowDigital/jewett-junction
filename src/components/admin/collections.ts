@@ -680,35 +680,6 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
     ],
   },
-  jobApplications: {
-    name: 'Job Applications',
-    icon: 'Briefcase',
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-green-500',
-    slug: 'job-applications',
-    description: 'Inbound applications from the careers page',
-    fields: [
-      // Applicant
-      { key: 'name', label: 'Display Name', type: 'text', required: true, placeholder: 'First Last \u2014 Position', helpText: 'Auto-populated on submit; edit to re-identify', icon: 'FileText', group: 'Applicant' },
-      { key: 'first-name', label: 'First Name', type: 'text', required: true, icon: 'Users', group: 'Applicant' },
-      { key: 'last-name', label: 'Last Name', type: 'text', required: true, icon: 'Users', group: 'Applicant' },
-      { key: 'email', label: 'Email', type: 'email', required: true, icon: 'Mail', group: 'Applicant' },
-      { key: 'phone', label: 'Phone', type: 'tel', icon: 'Phone', group: 'Applicant' },
-      { key: 'is-veteran', label: 'Military Veteran', type: 'boolean', group: 'Applicant' },
-
-      // Application
-      { key: 'position', label: 'Position Applied For', type: 'text', required: true, icon: 'Briefcase', group: 'Application' },
-      { key: 'experience', label: 'Experience', type: 'select', options: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'], icon: 'Clock', group: 'Application' },
-      { key: 'referral-source', label: 'Referral Source', type: 'select', options: ['Employee Referral', 'LinkedIn', 'Indeed', 'Company Website', 'Career Fair', 'Other'], icon: 'Tag', group: 'Application' },
-      { key: 'cover-letter', label: 'Cover Letter', type: 'richtext', placeholder: 'Applicant\u2019s message\u2026', group: 'Application' },
-      { key: 'resume-file-name', label: 'Resume File Name', type: 'text', helpText: 'Filename only \u2014 file storage not yet wired', icon: 'FileText', group: 'Application' },
-      { key: 'submitted-at', label: 'Submitted At', type: 'datetime', icon: 'Clock', group: 'Application' },
-
-      // Triage
-      { key: 'status', label: 'Status', type: 'select', options: ['New', 'Under Review', 'Contacted', 'Interviewing', 'Rejected', 'Hired'], icon: 'Zap', group: 'Triage' },
-      { key: 'admin-notes', label: 'Internal Notes', type: 'richtext', placeholder: 'Private reviewer notes\u2026', helpText: 'Not visible to applicant', group: 'Triage' },
-    ],
-  },
   settings: {
     name: 'Site Settings',
     icon: 'Settings',

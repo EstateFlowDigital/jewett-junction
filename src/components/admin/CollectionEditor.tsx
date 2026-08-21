@@ -1789,7 +1789,6 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
               'announcements',
               'events',
               'submittedIdeas',
-              'jobApplications',
             ]);
             const TIME_KEYS = ['submitted-at', 'submitted-on', 'published-date', 'event-date', 'created-at', 'date'];
             const getTimestamp = (it: any): number => {

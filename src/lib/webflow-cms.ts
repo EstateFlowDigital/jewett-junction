@@ -492,7 +492,6 @@ export const COLLECTIONS = {
   ourWork: '67a464bc7184fcb8aacb0ef9',
   imageGalleries: '67a464bc7184fcb8aacb0f82',
   banner: '69e83787ba03eb7aaf73abf0',
-  jobApplications: '69e92188c048862f1a049a8d',
   formSubmissions: '69e95d7506997240e17e09bd',
   settings: '69fcc0eda58c76d3e2a92ad3',
   pageCopy: '6a0d59046808b5093596722b',
