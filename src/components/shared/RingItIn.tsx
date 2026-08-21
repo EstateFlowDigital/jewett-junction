@@ -132,11 +132,21 @@ export function strikeGong(ctx: BaseAudioContext) {
   noise.start(now);
 }
 
-export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Submit your Shoutout' }: RingItInProps) {
-  // Where the shoutout button goes when Site Settings has no link set. The CMS
-  // value still wins, so this is a floor rather than an override.
-  const href = link || '/jewett-junction/ring-it-in';
+interface GongProps {
+  /** Diameter classes, so the same gong can sit in a smaller card. */
+  sizeClass?: string;
+  /** Fires after the strike — used to delay navigation until it is heard. */
+  onStrike?: () => void;
+  /** Populated with the strike function so a sibling control can ring it too. */
+  strikeRef?: React.MutableRefObject<(() => void) | null>;
+}
 
+/**
+ * The strikeable gong on its own. Rendered by the Ring It In box and by the
+ * Internal Sales Lead card on the homepage; both get the identical sound,
+ * ripple and timing because there is only one of it.
+ */
+export function Gong({ sizeClass = 'w-24 h-24', onStrike, strikeRef }: GongProps = {}) {
   const ctxRef = React.useRef<AudioContext | null>(null);
   // 0 = silent and unrendered; any other value is a strike id that re-keys the
   // ripple so a re-click restarts it mid-ring.
@@ -176,7 +186,8 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
       silenceTimer.current = null;
       setRinging(0);
     }, GONG_DURATION_MS);
-  }, []);
+    onStrike?.();
+  }, [onStrike]);
 
   React.useEffect(
     () => () => {
@@ -185,10 +196,61 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
     [],
   );
 
+  // Hand the strike out so the card's own button can ring the gong before it
+  // navigates, instead of the two drifting into separate implementations.
+  React.useEffect(() => {
+    if (!strikeRef) return;
+    strikeRef.current = strike;
+    return () => {
+      strikeRef.current = null;
+    };
+  }, [strike, strikeRef]);
+
+  return (
+    <button
+      type="button"
+      onClick={strike}
+      aria-label="Ring the gong"
+      className="relative shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-full"
+    >
+      {/* Ripple rings. Rendered only while the strike is audible — the wrapper
+          fades them out along the note's decay and then unmounts. */}
+      {ringing > 0 && (
+        <span
+          key={ringing}
+          aria-hidden="true"
+          className="motion-reduce:hidden animate-gong-decay"
+          style={{ '--gong-duration': `${GONG_DURATION_MS}ms` } as React.CSSProperties}
+        >
+          <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
+          <span className="absolute -inset-2 rounded-full border-2 border-amber-400/30 animate-ping [animation-duration:1.4s]" />
+        </span>
+      )}
+      <span
+        className={`relative flex ${sizeClass} items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 border-4 border-amber-300/40 transition-transform group-hover:scale-105 group-active:scale-95`}
+      >
+        {/* concentric gong face */}
+        <span className="absolute inset-[12%] rounded-full border border-amber-200/40" aria-hidden="true" />
+        <span className="absolute inset-[26%] rounded-full border border-amber-200/30" aria-hidden="true" />
+        <span className="w-1/4 h-1/4 rounded-full bg-amber-200/80 shadow-inner" aria-hidden="true" />
+      </span>
+      <span className="sr-only">Plays a gong sound</span>
+    </button>
+  );
+}
+
+export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Submit your Shoutout' }: RingItInProps) {
+  // Where the shoutout button goes when Site Settings has no link set. The CMS
+  // value still wins, so this is a floor rather than an override.
+  const href = link || '/jewett-junction/ring-it-in';
+
+  const gongStrike = React.useRef<(() => void) | null>(null);
+
+  // Ring first, navigate after — the strike is the point of the button.
   const onShoutout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!href) return;
     e.preventDefault();
-    strike();
+    gongStrike.current?.();
     window.setTimeout(() => {
       window.location.href = href;
     }, 700);
@@ -197,36 +259,7 @@ export function RingItIn({ headline, message = '', link = '', buttonLabel = 'Sub
   return (
     <div className="glass rounded-2xl border border-amber-500/30 hover:border-amber-500/50 transition-all overflow-hidden">
       <div className="flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-7">
-        {/* The gong. A button, so it is keyboard-strikeable. */}
-        <button
-          type="button"
-          onClick={strike}
-          aria-label="Ring the gong"
-          className="relative shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-full"
-        >
-          {/* Ripple rings. Rendered only while the strike is audible — the
-              wrapper fades them out along the note's decay and then unmounts. */}
-          {ringing > 0 && (
-            <span
-              key={ringing}
-              aria-hidden="true"
-              className="motion-reduce:hidden animate-gong-decay"
-              style={{ '--gong-duration': `${GONG_DURATION_MS}ms` } as React.CSSProperties}
-            >
-              <span className="absolute inset-0 rounded-full bg-amber-400/40 animate-ping" />
-              <span className="absolute -inset-2 rounded-full border-2 border-amber-400/30 animate-ping [animation-duration:1.4s]" />
-            </span>
-          )}
-          <span
-            className={`relative flex w-24 h-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 border-4 border-amber-300/40 transition-transform group-hover:scale-105 group-active:scale-95`}
-          >
-            {/* concentric gong face */}
-            <span className="absolute inset-3 rounded-full border border-amber-200/40" aria-hidden="true" />
-            <span className="absolute inset-6 rounded-full border border-amber-200/30" aria-hidden="true" />
-            <span className="w-6 h-6 rounded-full bg-amber-200/80 shadow-inner" aria-hidden="true" />
-          </span>
-          <span className="sr-only">Plays a gong sound</span>
-        </button>
+        <Gong strikeRef={gongStrike} />
 
         <div className="min-w-0 flex-1 text-center sm:text-left">
           <h3 className="text-xl font-bold text-white flex items-center justify-center sm:justify-start gap-2">

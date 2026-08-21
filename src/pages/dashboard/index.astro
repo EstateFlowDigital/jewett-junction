@@ -8,7 +8,8 @@ import MobileNav from '../../components/layout/MobileNav.astro';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
 import CmsIcon from '../../components/shared/CmsIcon.astro';
 import SideNav from '../../components/layout/SideNav.astro';
-import { RingItIn } from '../../components/shared/RingItIn';
+import { Gong } from '../../components/shared/RingItIn';
+import { TeamWinsRecognitions } from '../../components/shared/TeamWinsRecognitions';
 import { getIcon } from '../../components/admin/icon-map';
 import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, getSiteSettings, decodeHtmlEntities } from '../../lib/webflow-cms';
 
@@ -29,19 +30,21 @@ let pageCopy: any = null;
 let uiStrings = new Map<string, string>();
 let quickActions: any[] = [];
 let siteSettings: any = {};
+let cultureCopy: any = null;
 
 try {
-  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, uiRes, quickActionsRes, siteSettingsRes] = await Promise.all([
+  const [announcementsRes, eventsRes, jobsRes, cultureRes, hrRes, safetyRes, itRes, marketingRes, bannerRes, copyRes, cultureCopyRes, uiRes, quickActionsRes, siteSettingsRes] = await Promise.all([
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 25 }),
-    getCultureStories({ limit: 4 }),
+    getCultureStories({ limit: 20 }),
     getHRContent({ limit: 3, featured: true }),
     getSafetyContent({ limit: 3, featured: true }),
     getITKnowledgeBase({ limit: 3, featured: true }),
     getMarketingAssets({ limit: 6, featured: true }),
     getBannerMessages({ limit: 20 }),
     getPageCopy('dashboard'),
+    getPageCopy('culture'),
     getUIStrings(),
     getQuickActions({ pageSlug: 'dashboard' }),
     getSiteSettings(),
@@ -56,6 +59,7 @@ try {
   marketingAssets = marketingRes.items;
   bannerMessages = bannerRes.items;
   pageCopy = copyRes;
+  cultureCopy = cultureCopyRes;
   uiStrings = uiRes;
   quickActions = quickActionsRes.items;
   siteSettings = siteSettingsRes;
@@ -333,10 +337,76 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </a>
         ) : null}
 
-        <!-- Bento Grid Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-10">
-          <!-- Upcoming Events Card - Large -->
-          <div class="col-span-12 md:col-span-5 glass rounded-3xl p-6 border border-purple-500/20 glow-purple relative overflow-hidden">
+        <!-- Team Wins & Recent Recognitions — mirrors the Culture page so the
+             two never drift; rendered server-side with no client directive. -->
+        <div class="mb-10">
+          <TeamWinsRecognitions
+            stories={cultureStories}
+            winsHeadline={cultureCopy?.['subsection-1-headline'] || 'Team Wins'}
+            winsDescription={cultureCopy?.['subsection-1-description'] || ''}
+            recognitionsHeadline={cultureCopy?.['subsection-2-headline'] || 'Recent Recognitions'}
+            recognitionsDescription={cultureCopy?.['subsection-2-description'] || ''}
+            showViewAll={true}
+          />
+        </div>
+
+        <!-- Culture Corner -->
+        <div class="mb-10">
+        <!-- Culture Spotlight -->
+        <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
+          <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+            {cultureCornerTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{cultureCornerTitle}</h2>}
+            <a href="/jewett-junction/culture" class="text-sm text-pink-400 hover:text-pink-300">View All</a>
+          </div>
+          <div class="p-4">
+            {cultureStories.length > 0 ? (
+              <div class="grid grid-cols-2 gap-3">
+                {cultureStories.slice(0, 4).map((story, index) => (
+                  <a href={`/jewett-junction/culture/${story.slug || story.id}`} class={`block group ${index === 0 ? 'col-span-2' : ''}`}>
+                    <div class={`relative rounded-xl overflow-hidden ${index === 0 ? 'h-32' : 'h-24'}`}>
+                      {story['featured-image']?.url ? (
+                        <img src={story['featured-image'].url} alt={story.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                      ) : (
+                        <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                          <span class="text-white text-2xl font-bold">{story.name?.substring(0, 2).toUpperCase() || 'JC'}</span>
+                        </div>
+                      )}
+                      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
+                        <div>
+                          <h3 class="text-white font-medium text-sm group-hover:text-pink-300 transition-colors">{story.name}</h3>
+                          <p class="text-slate-300 text-xs">{story.category || 'Story'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div class="flex items-start gap-5 p-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                  JC
+                </div>
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-white">{ui('culture-empty-title', 'Share Your Story')}</h3>
+                  {cultureCornerTitle && <p class="text-slate-400 text-xs sm:text-sm mb-3">{cultureCornerTitle}</p>}
+                  <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    {ui('culture-empty-body', "We're looking for stories to feature! Share what makes Jewett special to you.")}
+                  </p>
+                </div>
+              </div>
+            )}
+            <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
+              <span class="text-sm text-slate-400">{ui('culture-submit-prompt', 'Have a story to share?')}</span>
+              <a href="/jewett-junction/submit-idea" class="text-sm text-pink-400 hover:text-pink-300 font-medium">Submit →</a>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
+        <!-- Upcoming Events & Open Positions -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+          <div class="glass rounded-3xl p-6 border border-purple-500/20 glow-purple relative overflow-hidden">
             <div class="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
             <div class="relative">
               <div class="flex items-center justify-between mb-4">
@@ -376,61 +446,30 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
             </div>
           </div>
 
-          <!-- Right Column Stats -->
-          <div class="col-span-12 md:col-span-7 grid grid-cols-2 gap-4">
-            <a href="/jewett-junction/safety" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-emerald-500/30">
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-slate-400">Safety Hub</span>
-                <div class="w-10 h-10 shrink-0 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                </div>
-              </div>
-              {featuredSafety ? (
-                <>
-                  <div class="text-lg font-bold text-white">{featuredSafety.name}</div>
-                  <div class="text-sm text-emerald-400 mt-1">{(featuredSafety.severity === 'Critical' || featuredSafety.severity === 'Emergency') ? '⚠️ Alert' : 'View Resources →'}</div>
-                </>
+          <div id="open-positions" class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
+            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
+              {openPositionsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{openPositionsTitle}</h2>}
+              <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">{jobs.length} openings</span>
+            </div>
+            <div class="divide-y divide-slate-800/50 flex-1">
+              {jobs.length > 0 ? (
+                jobs.slice(0, 8).map((job) => (
+                  <a href={job['apply-link'] || 'https://www.jewettconstruction.com/careers/'} target="_blank" rel="noopener noreferrer" class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
+                    <div>
+                      <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>
+                      <div class="text-sm text-slate-500">{job.department || 'General'} • {job.location || 'Remote'}</div>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </a>
+                ))
               ) : (
-                <>
-                  <div class="text-2xl font-bold text-white">4EverSafe</div>
-                  <div class="text-sm text-emerald-400 mt-1">View Resources →</div>
-                </>
-              )}
-            </a>
-            <a href="/jewett-junction/culture" class="glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-pink-500/30">
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-sm text-slate-400">Culture Corner</span>
-                <div class="w-10 h-10 shrink-0 bg-pink-500/20 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                <div class="p-8 text-center text-slate-500">
+                  <p>{ui('empty-jobs', 'No open positions at this time')}</p>
                 </div>
-              </div>
-              <div class="text-2xl font-bold text-white">Stories</div>
-              <div class="text-sm text-pink-400 mt-1">Read More →</div>
-            </a>
-            <a href="#open-positions" class="col-span-2 glass rounded-2xl p-5 border border-slate-700/50 card-hover transition-all hover:border-amber-500/30 flex items-center justify-between">
-              <div>
-                <span class="text-sm text-slate-400">Open Positions</span>
-                <div class="text-4xl font-bold text-white mt-1">{jobs.length || 0}</div>
-                <div class="text-sm text-amber-400 mt-1">View Openings →</div>
-              </div>
-              <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              </div>
-            </a>
+              )}
+            </div>
           </div>
         </div>
-
-        <!-- Ring It In — celebration gong (CMS: Site Settings → Ring It In) -->
-        {siteSettings['ring-it-in-headline'] && (
-        <div class="mb-10">
-          <RingItIn
-            client:load
-            headline={siteSettings['ring-it-in-headline']}
-            message={siteSettings['ring-it-in-message'] || ''}
-            link={siteSettings['ring-it-in-link'] || ''}
-          />
-        </div>
-        )}
 
         <!-- Important Updates from HR, Safety, IT -->
         {(featuredHR || featuredSafety || featuredIT) && importantUpdatesTitle && (
@@ -498,30 +537,6 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
         )}
 
-        <!-- Photo Gallery -->
-        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && photoGalleryTitle && (
-          <div class="mb-10">
-            <div class="flex items-center justify-between mb-4">
-              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">{photoGalleryTitle}</h2>
-              <a href="/jewett-junction/marketing" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {marketingAssets.filter(asset => asset['preview-image']?.url || asset.image?.url).slice(0, 6).map((asset) => (
-                <a href={`/jewett-junction/marketing/${asset.slug || asset.id}`} class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all bg-slate-800/60">
-                  <img
-                    src={asset['preview-image']?.url || asset.image?.url}
-                    alt={asset.name || 'Company photo'}
-                    class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                    <span class="text-white text-xs font-medium truncate">{asset.name}</span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
         <!-- Submission boxes (CMS: Quick Actions tagged "dashboard" with a Description) -->
         {featureActions.length > 0 && (
         <div class="mb-10">
@@ -531,13 +546,13 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               const Icon = getIcon(action['icon-name']);
               const href = action['destination-url'] || '#';
               const external = /^https?:\/\//.test(href);
-              return (
-                <a
-                  href={href}
-                  target={external ? '_blank' : undefined}
-                  rel={external ? 'noopener noreferrer' : undefined}
-                  class={`glass rounded-2xl p-6 border border-slate-700/50 ${p.ring} transition-all card-hover group flex flex-col`}
-                >
+              // The sales lead card carries the celebration gong: a contract win
+              // is what this form leads to. Matched on the destination rather
+              // than the title so renaming the card in the CMS can't break it.
+              const hasGong = href.includes('/sales-lead');
+
+              const body = (
+                <>
                   <div class="flex items-start gap-4">
                     <div class={`w-12 h-12 ${p.chip} border rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                       {Icon && <Icon className={`w-6 h-6 ${p.icon}`} aria-hidden="true" />}
@@ -548,58 +563,49 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
                     </div>
                   </div>
                   <p class="text-sm text-slate-400 leading-relaxed mt-4 flex-1">{action.description}</p>
-                  <span class={`inline-flex items-center justify-center gap-2 mt-5 px-4 py-2.5 rounded-xl text-sm font-semibold text-white ${p.btn} transition-colors self-start`}>
-                    {action['button-label'] || 'Get started'}
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                  </span>
+                </>
+              );
+
+              const cta = (
+                <span class={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white ${p.btn} transition-colors self-start`}>
+                  {action['button-label'] || 'Get started'}
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </span>
+              );
+
+              // With a gong the card cannot be one big <a> — a button nested in a
+              // link is invalid and swallows the tap. So the gong-bearing card is
+              // a plain container with its own link, and the rest stay as links.
+              return hasGong ? (
+                <div class={`glass rounded-2xl p-6 border border-slate-700/50 ${p.ring} transition-all group flex flex-col`}>
+                  {body}
+                  <div class="flex items-center gap-5 mt-5">
+                    <Gong client:load sizeClass="w-16 h-16" />
+                    <div class="min-w-0 flex-1">
+                      <a
+                        href={href}
+                        target={external ? '_blank' : undefined}
+                        rel={external ? 'noopener noreferrer' : undefined}
+                        class="inline-block"
+                      >
+                        {cta}
+                      </a>
+                      <p class="text-xs text-slate-500 mt-2">Tap the gong to ring in a win.</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <a
+                  href={href}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
+                  class={`glass rounded-2xl p-6 border border-slate-700/50 ${p.ring} transition-all card-hover group flex flex-col`}
+                >
+                  {body}
+                  <div class="mt-5">{cta}</div>
                 </a>
               );
             })}
-          </div>
-        </div>
-        )}
-
-        <!-- Quick Links -->
-        {quickLinksTitle && (
-        <div class="mb-10">
-          <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">{quickLinksTitle}</h2>
-          <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <a href="/jewett-junction/safety" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-emerald-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">Safety</div>
-            </a>
-            <a href="/jewett-junction/hr" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-blue-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">HR</div>
-            </a>
-            <a href="/jewett-junction/it-helpdesk" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-green-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">IT Help</div>
-            </a>
-            <a href="/jewett-junction/resources" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-purple-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">Resources</div>
-            </a>
-            <a href="/jewett-junction/events" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-amber-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-amber-500/20 border border-amber-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">Calendar</div>
-            </a>
-            <a href="/jewett-junction/submit-idea" class="glass rounded-2xl p-4 border border-slate-700/50 hover:border-orange-500/30 transition-all card-hover text-center group">
-              <div class="w-10 h-10 shrink-0 bg-orange-500/20 border border-orange-500/30 rounded-xl flex items-center justify-center mb-3 mx-auto group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-              </div>
-              <div class="font-medium text-white text-sm">Submit Idea</div>
-            </a>
           </div>
         </div>
         )}
@@ -651,84 +657,30 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
         </div>
 
-        <!-- Employee Spotlight & Open Positions -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Culture Spotlight -->
-          <div class="glass rounded-2xl border border-slate-700/50 overflow-hidden">
-            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
-              {cultureCornerTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{cultureCornerTitle}</h2>}
-              <a href="/jewett-junction/culture" class="text-sm text-pink-400 hover:text-pink-300">View All</a>
+        <!-- Photo Gallery -->
+        {marketingAssets.length > 0 && marketingAssets.some(asset => asset['preview-image']?.url || asset.image?.url) && photoGalleryTitle && (
+          <div class="mb-10">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider">{photoGalleryTitle}</h2>
+              <a href="/jewett-junction/marketing" class="text-sm text-blue-400 hover:text-blue-300">View All →</a>
             </div>
-            <div class="p-4">
-              {cultureStories.length > 0 ? (
-                <div class="grid grid-cols-2 gap-3">
-                  {cultureStories.slice(0, 4).map((story, index) => (
-                    <a href={`/jewett-junction/culture/${story.slug || story.id}`} class={`block group ${index === 0 ? 'col-span-2' : ''}`}>
-                      <div class={`relative rounded-xl overflow-hidden ${index === 0 ? 'h-32' : 'h-24'}`}>
-                        {story['featured-image']?.url ? (
-                          <img src={story['featured-image'].url} alt={story.name} class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
-                        ) : (
-                          <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
-                            <span class="text-white text-2xl font-bold">{story.name?.substring(0, 2).toUpperCase() || 'JC'}</span>
-                          </div>
-                        )}
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3">
-                          <div>
-                            <h3 class="text-white font-medium text-sm group-hover:text-pink-300 transition-colors">{story.name}</h3>
-                            <p class="text-slate-300 text-xs">{story.category || 'Story'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <div class="flex items-start gap-5 p-2">
-                  <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-                    JC
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {marketingAssets.filter(asset => asset['preview-image']?.url || asset.image?.url).slice(0, 6).map((asset) => (
+                <a href={`/jewett-junction/marketing/${asset.slug || asset.id}`} class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition-all bg-slate-800/60">
+                  <img
+                    src={asset['preview-image']?.url || asset.image?.url}
+                    alt={asset.name || 'Company photo'}
+                    class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <span class="text-white text-xs font-medium truncate">{asset.name}</span>
                   </div>
-                  <div>
-                    <h3 class="text-base sm:text-lg font-bold text-white">{ui('culture-empty-title', 'Share Your Story')}</h3>
-                    {cultureCornerTitle && <p class="text-slate-400 text-xs sm:text-sm mb-3">{cultureCornerTitle}</p>}
-                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                      {ui('culture-empty-body', "We're looking for stories to feature! Share what makes Jewett special to you.")}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div class="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between">
-                <span class="text-sm text-slate-400">{ui('culture-submit-prompt', 'Have a story to share?')}</span>
-                <a href="/jewett-junction/submit-idea" class="text-sm text-pink-400 hover:text-pink-300 font-medium">Submit →</a>
-              </div>
+                </a>
+              ))}
             </div>
           </div>
+        )}
 
-          <!-- Open Positions -->
-          <div id="open-positions" class="glass rounded-2xl border border-slate-700/50 overflow-hidden flex flex-col h-full">
-            <div class="p-5 border-b border-slate-700/50 flex items-center justify-between">
-              {openPositionsTitle && <h2 class="font-semibold text-white text-sm sm:text-base">{openPositionsTitle}</h2>}
-              <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-medium rounded-full">{jobs.length} openings</span>
-            </div>
-            <div class="divide-y divide-slate-800/50 flex-1">
-              {jobs.length > 0 ? (
-                jobs.slice(0, 8).map((job) => (
-                  <a href={job['apply-link'] || 'https://www.jewettconstruction.com/careers/'} target="_blank" rel="noopener noreferrer" class="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors group block">
-                    <div>
-                      <div class="font-medium text-white group-hover:text-blue-400">{job.name}</div>
-                      <div class="text-sm text-slate-500">{job.department || 'General'} • {job.location || 'Remote'}</div>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                  </a>
-                ))
-              ) : (
-                <div class="p-8 text-center text-slate-500">
-                  <p>{ui('empty-jobs', 'No open positions at this time')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
     </main>
 
   </body>
