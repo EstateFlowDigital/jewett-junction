@@ -69,16 +69,22 @@ export function FeaturedCarousel({ announcements }: FeaturedCarouselProps) {
         {scrollSnaps.length > 1 && (
           <div className="flex items-center gap-1.5">
             {scrollSnaps.map((_, index) => (
+              /* The dot stays 8px but the button is a full 44px touch target:
+                 padding does the work, and the negative margin keeps the row's
+                 visual spacing unchanged. */
               <button
                 key={index}
                 onClick={() => emblaApi?.scrollTo(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === selectedIndex
-                    ? 'bg-blue-400 w-4'
-                    : 'bg-slate-600 hover:bg-slate-500'
-                }`}
+                className="p-3 -m-1.5 flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 aria-label={`Go to slide ${index + 1}`}
-              />
+                aria-current={index === selectedIndex}
+              >
+                <span
+                  className={`block h-2 rounded-full transition-all ${
+                    index === selectedIndex ? 'bg-blue-400 w-4' : 'bg-slate-600 w-2 hover:bg-slate-500'
+                  }`}
+                />
+              </button>
             ))}
           </div>
         )}

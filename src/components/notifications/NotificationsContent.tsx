@@ -375,17 +375,17 @@ export function NotificationsContent({ heroHeadline = '', heroSubtitle = '', uiS
                       {!notification.read && (
                         <button
                           onClick={() => markAsRead(notification.id)}
-                          className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                          className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1 py-2 px-1 min-h-[32px]"
                         >
-                          <Check className="w-3 h-3" aria-hidden="true" />
+                          <Check className="w-3.5 h-3.5" aria-hidden="true" />
                           Mark read
                         </button>
                       )}
                       <button
                         onClick={() => deleteNotification(notification.id)}
-                        className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+                        className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1 py-2 px-1 min-h-[32px]"
                       >
-                        <X className="w-3 h-3" aria-hidden="true" />
+                        <X className="w-3.5 h-3.5" aria-hidden="true" />
                         Delete
                       </button>
                     </div>

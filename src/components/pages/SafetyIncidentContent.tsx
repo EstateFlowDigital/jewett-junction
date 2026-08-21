@@ -102,7 +102,7 @@ export function SafetyIncidentContent({ safetyEmail, safetyPhone, uiStrings = {}
         <CardContent className="p-4 flex items-start gap-3">
           <Siren className="h-6 w-6 text-rose-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-rose-100">
-            <strong className="text-white">Life-threatening emergency?</strong> Call <a href="tel:911" className="font-bold underline hover:text-rose-300">911</a> first, then come back and file this report.
+            <strong className="text-white">Life-threatening emergency?</strong> Call <a href="tel:911" className="font-bold underline hover:text-rose-300 inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-2 align-middle">911</a> first, then come back and file this report.
           </div>
         </CardContent>
       </Card>
@@ -237,7 +237,7 @@ export function SafetyIncidentContent({ safetyEmail, safetyPhone, uiStrings = {}
             <CardContent className="space-y-3 pt-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-rose-200">Emergency Services</span>
-                <a href="tel:911" className="font-bold text-rose-100 hover:text-white">911</a>
+                <a href="tel:911" className="font-bold text-rose-100 hover:text-white inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-2 align-middle">911</a>
               </div>
               {safetyPhone && (
                 <a href={`tel:${safetyPhone.replace(/[^\d+]/g, '')}`} className="flex items-center justify-between hover:opacity-80 transition-opacity">
