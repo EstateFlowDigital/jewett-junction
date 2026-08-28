@@ -118,6 +118,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
             headers: { 'Content-Type': 'application/json' },
           });
         }
+        // Hand the requested path to the denial page so its retry link points
+        // at what the visitor actually wanted. Astro.url inside a rewrite
+        // reports the rewrite target, not the original request.
+        (context.locals as any).deniedPath = pathname + context.url.search;
         return context.rewrite('/access-denied');
       }
     }

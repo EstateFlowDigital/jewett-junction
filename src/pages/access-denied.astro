@@ -1,25 +1,102 @@
 ---
 export const prerender = false;
+import { initCMS, getUIStrings } from '../lib/webflow-cms';
+
+// Copy is CMS-editable so marketing can reword it without a deploy, but every
+// string falls back to the text below. This is the page the IP gate rewrites
+// to, so it has to render even when the CMS call fails — a denied visitor
+// seeing a blank page would be worse than slightly stale wording.
+let uiStrings: Record<string, string> = {};
+try {
+  initCMS(Astro.locals);
+  uiStrings = Object.fromEntries(await getUIStrings());
+} catch (error) {
+  console.error('access-denied: UI strings unavailable, using fallbacks');
+}
+const ui = (key: string, fallback: string) => uiStrings[key] || fallback;
+
+const heading = ui('access-denied-heading', 'Connect to the Jewett network to continue');
+const body = ui(
+  'access-denied-body',
+  'Jewett Junction is only reachable from a company device on the Jewett VPN, or within the company network. If you’re working remotely, connect to the VPN and reload this page.',
+);
+const retryLabel = ui('access-denied-retry', 'Reload this page');
+const helpPrompt = ui('access-denied-help-prompt', 'Think you should have access?');
+const helpEmail = ui('access-denied-help-email', 'marketing@jewettconstruction.com');
+const publicPrompt = ui('access-denied-public-prompt', 'Not looking for the intranet?');
+const publicLabel = ui('access-denied-public-label', 'Go to jewettconstruction.com');
+
+// The middleware stashes the path the visitor actually asked for before it
+// rewrites here — Astro.url would report /access-denied, so a retry built from
+// it would just loop back to this page. Falls back to the intranet root.
+const deniedPath = (Astro.locals as any)?.deniedPath;
+const retryHref = typeof deniedPath === 'string' && deniedPath.startsWith('/') ? deniedPath : '/';
 ---
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
     <title>Access Denied | Jewett Junction</title>
     <style>
-      body { font-family: system-ui, sans-serif; background: #020617; color: #f1f5f9; margin: 0; }
-      main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-      h1 { font-size: 2rem; margin: 0 0 0.5rem; }
-      p { color: #94a3b8; max-width: 32rem; line-height: 1.5; }
-      a { display: inline-block; margin-top: 1.5rem; padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border-radius: 0.75rem; text-decoration: none; font-weight: 500; }
-      a:hover { background: #2563eb; }
+      :root { color-scheme: dark; }
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: #020617; color: #f1f5f9; margin: 0;
+        -webkit-text-size-adjust: 100%;
+      }
+      main {
+        min-height: 100vh; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 2rem 1.25rem; text-align: center;
+      }
+      .card { width: 100%; max-width: 34rem; }
+      .mark {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 3rem; height: 3rem; border-radius: 9999px;
+        background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35);
+        margin-bottom: 1.25rem;
+      }
+      h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.75rem; text-wrap: balance; }
+      p.lede { color: #94a3b8; line-height: 1.6; margin: 0 auto; max-width: 30rem; }
+      .actions { margin-top: 1.75rem; }
+      a.primary {
+        display: inline-block; padding: 0.85rem 1.6rem; min-height: 44px;
+        box-sizing: border-box; background: #3b82f6; color: #fff;
+        border-radius: 0.75rem; text-decoration: none; font-weight: 600;
+      }
+      a.primary:hover { background: #2563eb; }
+      a.primary:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+      .secondary {
+        margin-top: 1.75rem; padding-top: 1.25rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.18);
+        color: #64748b; font-size: 0.9rem; line-height: 1.9;
+      }
+      .secondary a { color: #93c5fd; text-decoration: none; }
+      .secondary a:hover { text-decoration: underline; }
+      .secondary a:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+      .secondary .row + .row { margin-top: 0.25rem; }
     </style>
   </head>
   <body>
     <main>
-      <h1>You're not in the right place</h1>
-      <p>This area is restricted to Jewett employees on the company network or VPN. If you reached this page by mistake, return to the main site.</p>
-      <a href="https://jewettconstruction.com">Go to jewettconstruction.com</a>
+      <div class="card">
+        <span class="mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </span>
+        <h1>{heading}</h1>
+        <p class="lede">{body}</p>
+        <div class="actions">
+          <a class="primary" href={retryHref}>{retryLabel}</a>
+        </div>
+        <div class="secondary">
+          <div class="row">{helpPrompt} <a href={`mailto:${helpEmail}`}>{helpEmail}</a></div>
+          <div class="row">{publicPrompt} <a href="https://jewettconstruction.com">{publicLabel}</a></div>
+        </div>
+      </div>
     </main>
   </body>
 </html>
