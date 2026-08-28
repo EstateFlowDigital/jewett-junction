@@ -39,6 +39,14 @@ const GATED_PREFIXES = [
 // allowlist, and it authenticates itself with a signature instead.
 const OPEN_API_PREFIXES = ['/api/webhooks', '/jewett-junction/api/webhooks'];
 
+// A denied visitor is rewritten to /access-denied, so that page must never be
+// gated itself — otherwise the rewrite is gated, rewrites again, and the
+// visitor gets HTTP 508 "Loop Detected" instead of the denial page. /404 is
+// here for the same reason. This bit us in production because the edge does
+// NOT always strip the mount path: /jewett-junction/access-denied matched the
+// '/jewett-junction' prefix and gated the very page the gate redirects to.
+const NEVER_GATED = ['/access-denied', '/404'];
+
 function getCorsHeaders(request: Request): Record<string, string> {
   const origin = request.headers.get('Origin') || '';
   const allowedOrigins = import.meta.env.ALLOWED_ORIGINS
@@ -56,10 +64,16 @@ function getCorsHeaders(request: Request): Record<string, string> {
 }
 
 function isGatedPath(pathname: string): boolean {
+  // Match on the post-mount path so every rule below holds whether or not the
+  // edge stripped /jewett-junction — it does not do so reliably.
+  const bare = pathname.replace(/^\/jewett-junction(?=\/|$)/, '') || '/';
+
+  if (NEVER_GATED.includes(bare)) return false;
+
   // Dashboard moved to the mount root, so the bare path needs explicit gating —
   // it doesn't match any of the GATED_PREFIXES via startsWith without matching
   // every other path too.
-  if (pathname === '/') return true;
+  if (bare === '/') return true;
   if (OPEN_API_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))) return false;
   // Deny-by-default for the API: form endpoints write to the CMS and send
   // email, so an unlisted new endpoint should be born gated, not discovered
