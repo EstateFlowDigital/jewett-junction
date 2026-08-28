@@ -122,6 +122,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
         // at what the visitor actually wanted. Astro.url inside a rewrite
         // reports the rewrite target, not the original request.
         (context.locals as any).deniedPath = pathname + context.url.search;
+        // Show the address we actually saw. Someone locked out can read it
+        // straight off the page instead of hunting for a what-is-my-ip site,
+        // and it immediately reveals the two things that bite here: an office
+        // egressing from a different address than IT reported, and an IPv6
+        // client, which this allowlist cannot match at all.
+        (context.locals as any).deniedIp = ip;
         return context.rewrite('/access-denied');
       }
     }

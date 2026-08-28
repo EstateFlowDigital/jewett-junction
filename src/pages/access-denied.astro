@@ -31,6 +31,13 @@ const publicLabel = ui('access-denied-public-label', 'Go to jewettconstruction.c
 // it would just loop back to this page. Falls back to the intranet root.
 const deniedPath = (Astro.locals as any)?.deniedPath;
 const retryHref = typeof deniedPath === 'string' && deniedPath.startsWith('/') ? deniedPath : '/';
+
+// The address the gate actually saw. Showing a visitor their own IP gives away
+// nothing — any what-is-my-ip site returns it — but it turns "I'm locked out"
+// into a report someone can act on.
+const deniedIp = (Astro.locals as any)?.deniedIp;
+const seenIp = typeof deniedIp === 'string' && deniedIp ? deniedIp : null;
+const isIpv6 = !!seenIp && seenIp.includes(':');
 ---
 <html lang="en" class="dark">
   <head>
@@ -76,6 +83,14 @@ const retryHref = typeof deniedPath === 'string' && deniedPath.startsWith('/') ?
       .secondary a:hover { text-decoration: underline; }
       .secondary a:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
       .secondary .row + .row { margin-top: 0.25rem; }
+      .secondary .diag { margin-bottom: 0.75rem; color: #7c8798; }
+      .secondary code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85em; color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.12);
+        padding: 0.15em 0.45em; border-radius: 0.35rem;
+        word-break: break-all;
+      }
     </style>
   </head>
   <body>
@@ -93,6 +108,11 @@ const retryHref = typeof deniedPath === 'string' && deniedPath.startsWith('/') ?
           <a class="primary" href={retryHref}>{retryLabel}</a>
         </div>
         <div class="secondary">
+          {seenIp && (
+            <div class="row diag">
+              Your connection appears as <code>{seenIp}</code>{isIpv6 ? ' (IPv6)' : ''} — include this if you report a problem.
+            </div>
+          )}
           <div class="row">{helpPrompt} <a href={`mailto:${helpEmail}`}>{helpEmail}</a></div>
           <div class="row">{publicPrompt} <a href="https://jewettconstruction.com">{publicLabel}</a></div>
         </div>
