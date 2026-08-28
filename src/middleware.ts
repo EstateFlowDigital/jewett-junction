@@ -21,6 +21,7 @@ const GATED_PREFIXES = [
   '/marketing',
   '/notifications',
   '/resources',
+  '/ring-it-in',
   '/safety',
   '/safety-incident',
   '/submit-idea',
