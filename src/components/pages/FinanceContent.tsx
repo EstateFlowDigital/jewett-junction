@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FileText, ChevronRight, FolderOpen } from 'lucide-react';
 import { DeadlinesNotice } from '../shared/DeadlinesNotice';
+import { QuickActionCards, type QuickAction } from './QuickActionCards';
 
 /**
  * Finance tab: the CTC & Billing Forecast due-dates notice, then the finance
@@ -36,6 +37,8 @@ interface FinanceContentProps {
   documents: FinanceDocument[];
   settings: Record<string, any>;
   pageCopy?: Record<string, any> | null;
+  /** Portals and links for this tab — Quick Actions tagged page-slug "finance". */
+  quickActions?: QuickAction[];
 }
 
 function formatUpdated(iso: string | undefined) {
@@ -45,7 +48,7 @@ function formatUpdated(iso: string | undefined) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function FinanceContent({ documents, settings, pageCopy = null }: FinanceContentProps) {
+export function FinanceContent({ documents, settings, pageCopy = null, quickActions = [] }: FinanceContentProps) {
   const docsHeading = pageCopy?.['subsection-1-headline'] || 'Finance Documents';
   const docsDescription =
     pageCopy?.['subsection-1-description'] ||
@@ -57,6 +60,10 @@ export function FinanceContent({ documents, settings, pageCopy = null }: Finance
         headline={settings['finance-deadlines-headline'] || ''}
         body={settings['finance-deadlines-body'] || ''}
       />
+
+      {/* Portals (HH2 for AP / AIA requisitions, …) — CMS-driven, so Accounting
+          can add another without a deploy. Renders nothing when there are none. */}
+      <QuickActionCards actions={quickActions} theme="dark" />
 
       <section aria-labelledby="finance-docs-heading">
         <div className="mb-4">

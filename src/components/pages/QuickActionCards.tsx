@@ -225,8 +225,16 @@ export function QuickActionCards({ actions = [], theme = 'dark' }: QuickActionCa
         const href = action['destination-url'] || '#';
         const title = action.title || action.name || '';
         const subtitle = action.subtitle || '';
+        // Off-site destinations (vendor portals like HH2) open in a new tab so
+        // the intranet stays put; internal links navigate in place as before.
+        const external = /^https?:\/\//.test(href);
         return (
-          <a key={action.id || action.slug || title} href={href}>
+          <a
+            key={action.id || action.slug || title}
+            href={href}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
+          >
             <Card
               className={`hover:shadow-lg transition-all cursor-pointer h-full ${
                 isDark ? p.cardDark : p.cardLight

@@ -3,15 +3,17 @@ export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { FinanceContent } from '../../components/pages/FinanceContent';
 import { Landmark, ArrowLeft } from 'lucide-react';
-import { initCMS, getResources, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
+import { initCMS, getResources, getSiteSettings, getPageCopy, getQuickActions } from '../../lib/webflow-cms';
 
 initCMS(Astro.locals);
 
-const [resourcesResult, settings, pageCopy] = await Promise.all([
+const [resourcesResult, settings, pageCopy, quickActionsResult] = await Promise.all([
   getResources({ limit: 100 }),
   getSiteSettings(),
   getPageCopy('finance'),
+  getQuickActions({ pageSlug: 'finance' }),
 ]);
+const quickActions = quickActionsResult.items;
 
 // Only documents flagged for this tab. The order is whatever Resources uses,
 // so marketing can reorder in the CMS without a deploy.
@@ -46,6 +48,6 @@ const heroSubtitle =
       </div>
     </div>
 
-    <FinanceContent documents={documents} settings={settings} pageCopy={pageCopy} />
+    <FinanceContent documents={documents} settings={settings} pageCopy={pageCopy} quickActions={quickActions} />
   </div>
 </ThemedPage>
