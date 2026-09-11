@@ -451,6 +451,8 @@ export interface Resource {
   /** legacy alias of `resource-category` (placeholder Option) */
   category: string;
   'resource-category'?: string;
+  /** Placement flag: show this document on the Finance tab. */
+  'finance-page'?: boolean;
   file?: { url: string };
   'external-link'?: string;
   icon?: string;
@@ -581,6 +583,9 @@ export interface SiteSettings {
   'poison-control-phone'?: string;
   'it-phone'?: string;
   'it-email'?: string;
+  /** CTC & Billing Forecast due-dates notice, shown on Finance and Safety. Clear the headline to hide it. */
+  'finance-deadlines-headline'?: string;
+  'finance-deadlines-body'?: string;
   'it-hours-weekday'?: string;
   'it-hours-saturday'?: string;
   'it-emergency-hours'?: string;

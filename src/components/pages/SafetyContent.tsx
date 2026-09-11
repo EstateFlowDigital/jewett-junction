@@ -6,6 +6,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { TeamContactCard } from './TeamContactCard';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
+import { DeadlinesNotice } from '../shared/DeadlinesNotice';
 
 interface SafetyItem {
   id: string;
@@ -29,6 +30,9 @@ const getContent = (item: { 'full-content'?: string; content?: string }) => item
 
 interface SafetySettings {
   'safety-email'?: string;
+  /** Shared with the Finance tab; see DeadlinesNotice. */
+  'finance-deadlines-headline'?: string;
+  'finance-deadlines-body'?: string;
   'poison-control-phone'?: string;
   'safety-days-without-incident'?: number;
   'safety-company-record-days'?: number;
@@ -167,6 +171,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
           )}
         </div>
       </div>
+
+      {/* CTC & Billing Forecast due dates — the same notice as the Finance tab,
+          from the same Site Settings fields, so the two never disagree. */}
+      <DeadlinesNotice
+        headline={settings['finance-deadlines-headline'] || ''}
+        body={settings['finance-deadlines-body'] || ''}
+      />
 
       {/* Safety Award banner — all fields live in Site Settings → Safety Award.
           Hidden entirely until a headline is set, so it can be retired or

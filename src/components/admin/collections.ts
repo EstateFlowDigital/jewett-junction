@@ -198,6 +198,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'file', label: 'Document File (PDF)', type: 'file', helpText: 'Upload a PDF — employees can preview in-browser and download', icon: 'FileText', group: 'File / Link' },
       { key: 'external-link', label: 'External Link', type: 'url', placeholder: 'https://...', helpText: 'Use instead of file upload for third-party resources', icon: 'Link', group: 'File / Link' },
       { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText', group: 'File / Link' },
+      { key: 'finance-page', label: 'Show on Finance page', type: 'boolean', helpText: 'Lists this document on the Finance tab. Leave the category as-is — this only controls placement.', icon: 'Landmark', group: 'File / Link' },
 
       // Metadata
       { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock', group: 'Metadata' },
@@ -690,6 +691,8 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'Site Settings', helpText: 'Identifier for this singleton; not displayed publicly', icon: 'FileText', group: 'General' },
       { key: 'ring-it-in-headline', label: 'Ring It In — Headline', type: 'text', placeholder: 'Ring It In', helpText: 'Title on the celebration gong box (Home + Culture). Clear this field to hide the box.', icon: 'Bell' },
       { key: 'ring-it-in-message', label: 'Ring It In — Message', type: 'textarea', placeholder: 'Congratulations to Preconstruction on another contract win!', helpText: 'Celebration copy under the headline.' },
+      { key: 'finance-deadlines-headline', label: 'Forecast Deadlines — Headline', type: 'text', placeholder: 'CTC & Billing Forecast Due Dates', helpText: 'Title of the due-dates notice on the Finance and Safety tabs. Clear this field to hide the notice on both.', icon: 'CalendarClock' },
+      { key: 'finance-deadlines-body', label: 'Forecast Deadlines — Dates', type: 'textarea', placeholder: 'October 7 & 8', helpText: 'One line of intro, then one date per line. Update these each year.' },
       { key: 'ring-it-in-link', label: 'Ring It In — Shoutout Link', type: 'url', placeholder: '/jewett-junction/living-the-mission', helpText: 'Where the Submit your Shoutout button goes.', icon: 'Link' },
 
       // Emergency & Support

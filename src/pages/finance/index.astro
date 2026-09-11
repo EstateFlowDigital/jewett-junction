@@ -1,0 +1,51 @@
+---
+export const prerender = false;
+import ThemedPage from '../../layouts/themed-page.astro';
+import { FinanceContent } from '../../components/pages/FinanceContent';
+import { Landmark, ArrowLeft } from 'lucide-react';
+import { initCMS, getResources, getSiteSettings, getPageCopy } from '../../lib/webflow-cms';
+
+initCMS(Astro.locals);
+
+const [resourcesResult, settings, pageCopy] = await Promise.all([
+  getResources({ limit: 100 }),
+  getSiteSettings(),
+  getPageCopy('finance'),
+]);
+
+// Only documents flagged for this tab. The order is whatever Resources uses,
+// so marketing can reorder in the CMS without a deploy.
+const documents = resourcesResult.items.filter((r: any) => r['finance-page'] === true);
+
+const heroHeadline = pageCopy?.['hero-headline'] || 'Finance';
+const heroSubtitle =
+  pageCopy?.['hero-subtitle'] || 'Forms, references and forecast deadlines from Accounting.';
+---
+
+<ThemedPage
+  title={`${heroHeadline} | Jewett Junction`}
+  theme="dark"
+  currentSection="finance"
+  description="Finance forms and references — W-9, credit application, payment request form, and forecast due dates."
+>
+  <div class="space-y-6">
+    <div class="flex items-center gap-4">
+      <a
+        href="/jewett-junction/dashboard"
+        class="text-slate-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-slate-800"
+        aria-label="Back to Dashboard"
+      >
+        <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+          <Landmark className="h-7 w-7 text-emerald-400" aria-hidden="true" />
+          {heroHeadline}
+        </h1>
+        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
+      </div>
+    </div>
+
+    <FinanceContent documents={documents} settings={settings} pageCopy={pageCopy} />
+  </div>
+</ThemedPage>
