@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FileText, Download, ExternalLink, FolderOpen } from 'lucide-react';
+import { FileText, ChevronRight, FolderOpen } from 'lucide-react';
 import { DeadlinesNotice } from '../shared/DeadlinesNotice';
 
 /**
@@ -11,6 +11,11 @@ import { DeadlinesNotice } from '../shared/DeadlinesNotice';
  * appear in the Resources library, keep their real category (the W-9 is a
  * Form, not a "Finance"), and can be replaced by marketing without a deploy —
  * the W-9 is dated and needs swapping every January.
+ *
+ * Each card links to the document's landing page (/resources/<slug>), which
+ * has the inline PDF viewer and the download button. No direct-download
+ * shortcut here: that is how every other document on the intranet works, and
+ * the landing page is where people expect to read before they save.
  *
  * No state, no effects: rendered as server HTML with no client directive.
  */
@@ -44,7 +49,7 @@ export function FinanceContent({ documents, settings, pageCopy = null }: Finance
   const docsHeading = pageCopy?.['subsection-1-headline'] || 'Finance Documents';
   const docsDescription =
     pageCopy?.['subsection-1-description'] ||
-    'Forms and references from Accounting. Open a document to preview it in your browser, or download it directly.';
+    'Forms and references from Accounting. Open a document to preview it in your browser and download it.';
 
   return (
     <div className="space-y-8">
@@ -64,20 +69,19 @@ export function FinanceContent({ documents, settings, pageCopy = null }: Finance
         {documents.length > 0 ? (
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {documents.map((doc, i) => {
-              const detailHref = `/jewett-junction/resources/${doc.slug || doc.id}`;
-              const fileHref = doc.file?.url || doc['external-link'] || '';
-              const isExternal = !doc.file?.url && !!doc['external-link'];
+              const href = `/jewett-junction/resources/${doc.slug || doc.id}`;
               const updated = formatUpdated(doc['last-updated']);
-              const meta = [doc['file-type'] || (isExternal ? 'Link' : 'File'), doc['file-size'], updated && `Updated ${updated}`]
+              const meta = [doc['file-type'] || 'File', doc['file-size'], updated && `Updated ${updated}`]
                 .filter(Boolean)
                 .join(' • ');
 
               return (
-                <li
-                  key={doc.id || doc.slug || i}
-                  className="rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-emerald-500/30 transition-colors flex flex-col"
-                >
-                  <a href={detailHref} className="group flex items-start gap-4 p-5 flex-1 min-h-[44px]">
+                <li key={doc.id || doc.slug || i}>
+                  <a
+                    href={href}
+                    className="group flex items-start gap-4 p-5 min-h-[44px] rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-emerald-500/30 hover:bg-slate-800/70 transition-colors"
+                    aria-label={`${doc.name} — view and download`}
+                  >
                     <div className="w-12 h-12 shrink-0 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <FileText className="h-6 w-6 text-emerald-400" aria-hidden="true" />
                     </div>
@@ -88,27 +92,15 @@ export function FinanceContent({ documents, settings, pageCopy = null }: Finance
                       {doc.description && (
                         <p className="text-sm text-slate-400 mt-1 leading-relaxed">{doc.description}</p>
                       )}
-                      {meta && <p className="text-xs text-slate-500 mt-2">{meta}</p>}
+                      <div className="flex items-center justify-between gap-3 mt-3">
+                        {meta && <span className="text-xs text-slate-500">{meta}</span>}
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400 group-hover:text-emerald-300 shrink-0">
+                          View &amp; download
+                          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                      </div>
                     </div>
                   </a>
-                  {fileHref && (
-                    <div className="px-5 pb-5 pt-0">
-                      <a
-                        href={fileHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        download={!isExternal ? '' : undefined}
-                        className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 rounded-lg bg-slate-900/60 border border-slate-700 text-sm font-medium text-slate-200 hover:text-white hover:border-emerald-500/40 transition-colors"
-                      >
-                        {isExternal ? (
-                          <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                        ) : (
-                          <Download className="h-4 w-4" aria-hidden="true" />
-                        )}
-                        {isExternal ? 'Open link' : 'Download PDF'}
-                      </a>
-                    </div>
-                  )}
                 </li>
               );
             })}
