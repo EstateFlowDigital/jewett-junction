@@ -8,9 +8,8 @@ import MobileNav from '../../components/layout/MobileNav.astro';
 import { FeaturedCarousel } from '../../components/dashboard/FeaturedCarousel';
 import CmsIcon from '../../components/shared/CmsIcon.astro';
 import SideNav from '../../components/layout/SideNav.astro';
-import { Gong } from '../../components/shared/RingItIn';
+import { SubmissionBoxes } from '../../components/shared/SubmissionBoxes';
 import { TeamWinsRecognitions } from '../../components/shared/TeamWinsRecognitions';
-import { getIcon } from '../../components/admin/icon-map';
 import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, getSiteSettings, decodeHtmlEntities } from '../../lib/webflow-cms';
 
 // Initialize CMS with Cloudflare runtime context
@@ -67,17 +66,8 @@ try {
   console.error('Error fetching CMS data:', error);
 }
 
-// Home-page submission boxes (Living the Mission, Sales Lead, ...). These are
-// the Quick Actions tagged `dashboard`; anything with a Description renders as
-// a large feature card so the team sees the ask, not just a label. Classes are
-// spelled out because Tailwind purges `bg-${accent}-500/20`-style strings.
-const FEATURE_PALETTE: Record<string, { ring: string; chip: string; icon: string; btn: string; hover: string }> = {
-  pink: { ring: 'hover:border-pink-500/40', chip: 'bg-pink-500/15 border-pink-500/30', icon: 'text-pink-400', btn: 'bg-pink-600 hover:bg-pink-500', hover: 'group-hover:text-pink-300' },
-  emerald: { ring: 'hover:border-emerald-500/40', chip: 'bg-emerald-500/15 border-emerald-500/30', icon: 'text-emerald-400', btn: 'bg-emerald-600 hover:bg-emerald-500', hover: 'group-hover:text-emerald-300' },
-  blue: { ring: 'hover:border-blue-500/40', chip: 'bg-blue-500/15 border-blue-500/30', icon: 'text-blue-400', btn: 'bg-blue-600 hover:bg-blue-500', hover: 'group-hover:text-blue-300' },
-  amber: { ring: 'hover:border-amber-500/40', chip: 'bg-amber-500/15 border-amber-500/30', icon: 'text-amber-400', btn: 'bg-amber-600 hover:bg-amber-500', hover: 'group-hover:text-amber-300' },
-  purple: { ring: 'hover:border-purple-500/40', chip: 'bg-purple-500/15 border-purple-500/30', icon: 'text-purple-400', btn: 'bg-purple-600 hover:bg-purple-500', hover: 'group-hover:text-purple-300' },
-};
+// Home-page submission boxes (Living the Mission, Sales Lead, ...): the Quick
+// Actions tagged `dashboard` that carry a Description.
 const featureActions = quickActions.filter((a: any) => !!a.description);
 
 // UI Strings lookup — admin-editable badges, empty-state copy, etc.
@@ -537,76 +527,11 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </div>
         )}
 
-        <!-- Submission boxes (CMS: Quick Actions tagged "dashboard" with a Description) -->
+        <!-- Submission boxes (CMS: Quick Actions tagged "dashboard" with a Description).
+             Shared with Culture via SubmissionBoxes so the two render one card. -->
         {featureActions.length > 0 && (
         <div class="mb-10">
-          <div class={`grid grid-cols-1 ${featureActions.length > 1 ? 'lg:grid-cols-2' : ''} gap-4`}>
-            {featureActions.map((action: any) => {
-              const p = FEATURE_PALETTE[action['accent-color']] || FEATURE_PALETTE.blue;
-              const Icon = getIcon(action['icon-name']);
-              const href = action['destination-url'] || '#';
-              const external = /^https?:\/\//.test(href);
-              // The sales lead card carries the celebration gong: a contract win
-              // is what this form leads to. Matched on the destination rather
-              // than the title so renaming the card in the CMS can't break it.
-              const hasGong = href.includes('/sales-lead');
-
-              const body = (
-                <>
-                  <div class="flex items-start gap-4">
-                    <div class={`w-12 h-12 ${p.chip} border rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                      {Icon && <Icon className={`w-6 h-6 ${p.icon}`} aria-hidden="true" />}
-                    </div>
-                    <div class="min-w-0">
-                      <h3 class={`text-lg font-semibold text-white ${p.hover} transition-colors`}>{action.title || action.name}</h3>
-                      {action.subtitle && <p class="text-xs uppercase tracking-wider text-slate-500 mt-0.5">{action.subtitle}</p>}
-                    </div>
-                  </div>
-                  <p class="text-sm text-slate-400 leading-relaxed mt-4 flex-1">{action.description}</p>
-                </>
-              );
-
-              const cta = (
-                <span class={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white ${p.btn} transition-colors self-start`}>
-                  {action['button-label'] || 'Get started'}
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </span>
-              );
-
-              // With a gong the card cannot be one big <a> — a button nested in a
-              // link is invalid and swallows the tap. So the gong-bearing card is
-              // a plain container with its own link, and the rest stay as links.
-              return hasGong ? (
-                <div class={`glass rounded-2xl p-6 border border-slate-700/50 ${p.ring} transition-all group flex flex-col`}>
-                  {body}
-                  <div class="flex items-center gap-5 mt-5">
-                    <Gong client:load sizeClass="w-16 h-16" />
-                    <div class="min-w-0 flex-1">
-                      <a
-                        href={href}
-                        target={external ? '_blank' : undefined}
-                        rel={external ? 'noopener noreferrer' : undefined}
-                        class="inline-block"
-                      >
-                        {cta}
-                      </a>
-                      <p class="text-xs text-slate-500 mt-2">Tap the gong to ring in a win.</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <a
-                  href={href}
-                  target={external ? '_blank' : undefined}
-                  rel={external ? 'noopener noreferrer' : undefined}
-                  class={`glass rounded-2xl p-6 border border-slate-700/50 ${p.ring} transition-all card-hover group flex flex-col`}
-                >
-                  {body}
-                  <div class="mt-5">{cta}</div>
-                </a>
-              );
-            })}
-          </div>
+          <SubmissionBoxes client:load actions={featureActions} />
         </div>
         )}
 

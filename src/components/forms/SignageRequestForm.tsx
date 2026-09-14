@@ -16,17 +16,18 @@ interface FormData {
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
+// Matches the department list used by the Directory, per marketing — one
+// vocabulary across the intranet so a request is filed under the same name
+// the requester's own entry uses.
 const DEPARTMENTS = [
-  'Accounting',
-  'Administration',
-  'Engineering',
+  'Executive',
   'Field Operations',
-  'Human Resources',
-  'IT',
+  'Finance',
+  'Office Operations',
+  'Pre-Construction',
+  'Design',
   'Marketing',
-  'Project Management',
-  'Safety',
-  'Sales',
+  'HR',
 ];
 
 const SIGNAGE_TYPES = [

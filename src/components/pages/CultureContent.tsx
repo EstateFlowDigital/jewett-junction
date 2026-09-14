@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
-import { RingItIn } from '../shared/RingItIn';
+import { SubmissionBoxes } from '../shared/SubmissionBoxes';
 import {
   Heart,
   Award,
@@ -244,19 +244,18 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         <div className="absolute -top-10 -left-10 w-48 h-48 bg-rose-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Quick Actions — the Living the Mission and BuiltWell Idea boxes the
-          client asked for on this page. The records existed in the Quick Actions
-          collection all along; this page just never rendered them. */}
-      <QuickActionCards actions={quickActions} theme={theme} />
+      {/* Quick Actions tagged `culture`. Small link cards are the ones without a
+          Description; the ones with a Description render as the large submission
+          boxes below — the same split the homepage makes. Marketing retired the
+          two small cards (Living the Mission, BuiltWell) in Sept 2026 by
+          deactivating them, so this usually renders nothing; it stays so they
+          can be switched back on from the CMS. */}
+      <QuickActionCards actions={quickActions.filter((a) => !a.description)} theme={theme} />
 
-      {/* Ring It In — celebration gong (CMS: Site Settings → Ring It In) */}
-      {settings['ring-it-in-headline'] && (
-        <RingItIn
-          headline={settings['ring-it-in-headline']}
-          message={settings['ring-it-in-message'] || ''}
-          link={settings['ring-it-in-link'] || ''}
-        />
-      )}
+      {/* Internal Sales Lead Submission, with the gong — the same card as the
+          homepage, from the same component. Replaced the Ring It In box here at
+          marketing's request, matching the change already made on the homepage. */}
+      <SubmissionBoxes actions={quickActions.filter((a) => !!a.description)} />
 
       {/* Stories Grid - Team Wins & Recognitions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -359,58 +358,6 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         </Card>
       </div>
 
-      {/* Core Values Section — hidden when the Core Values CMS collection is empty */}
-      {hasCoreValues && (
-        <div>
-          <div className="text-center mb-8">
-            {coreValuesHeadline && <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{coreValuesHeadline}</h2>}
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              These principles guide everything we do—from the projects we build to the relationships we nurture.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {coreValues.map((value, index) => {
-              const card = (
-                <Card
-                  className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer h-full ${
-                    activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
-                  }`}
-                  onClick={() => setActiveValueIndex(index)}
-                >
-                  <CardContent className="p-6">
-                    <div className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                      <value.icon className="h-7 w-7 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
-                    <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
-                    <p className="text-sm text-slate-400">{value.description}</p>
-                  </CardContent>
-                </Card>
-              );
-              // A value with a Link URL set in the admin becomes a real link
-              // (e.g. Safety First → the Safety page); others keep the
-              // highlight-on-click behavior only.
-              return value.linkUrl ? (
-                <a
-                  key={value.name}
-                  href={value.linkUrl}
-                  className="block"
-                  aria-label={`${value.name} — learn more`}
-                  target={value.linkUrl.startsWith('http') ? '_blank' : undefined}
-                  rel={value.linkUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-                >
-                  {card}
-                </a>
-              ) : (
-                <div key={value.name}>{card}</div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-
       {/* Employee Spotlight Section */}
       {spotlightStories.length > 0 && (
         <Card id="spotlight" className="bg-slate-800/50 border-slate-700 overflow-hidden scroll-mt-8">
@@ -511,6 +458,58 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             )}
           </CardContent>
         </Card>
+      )}
+
+
+      {/* Core Values Section — hidden when the Core Values CMS collection is empty */}
+      {hasCoreValues && (
+        <div>
+          <div className="text-center mb-8">
+            {coreValuesHeadline && <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{coreValuesHeadline}</h2>}
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              These principles guide everything we do—from the projects we build to the relationships we nurture.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {coreValues.map((value, index) => {
+              const card = (
+                <Card
+                  className={`bg-slate-800/50 border-slate-700 transition-all cursor-pointer h-full ${
+                    activeValueIndex === index ? 'ring-2 ring-pink-500 border-pink-500/50' : 'hover:border-slate-600'
+                  }`}
+                  onClick={() => setActiveValueIndex(index)}
+                >
+                  <CardContent className="p-6">
+                    <div className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${value.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                      <value.icon className="h-7 w-7 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-1">{value.name}</h3>
+                    <p className={`text-sm text-${value.color}-400 font-medium mb-2`}>{value.tagline}</p>
+                    <p className="text-sm text-slate-400">{value.description}</p>
+                  </CardContent>
+                </Card>
+              );
+              // A value with a Link URL set in the admin becomes a real link
+              // (e.g. Safety First → the Safety page); others keep the
+              // highlight-on-click behavior only.
+              return value.linkUrl ? (
+                <a
+                  key={value.name}
+                  href={value.linkUrl}
+                  className="block"
+                  aria-label={`${value.name} — learn more`}
+                  target={value.linkUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={value.linkUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                >
+                  {card}
+                </a>
+              ) : (
+                <div key={value.name}>{card}</div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
 

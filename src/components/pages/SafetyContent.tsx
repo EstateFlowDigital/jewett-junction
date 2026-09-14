@@ -8,6 +8,12 @@ import { TeamContactCard } from './TeamContactCard';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 import { DeadlinesNotice } from '../shared/DeadlinesNotice';
 
+// The 4EverSafe program mark — the same white-on-transparent asset the public
+// website uses, served from the site's own Webflow CDN, so there is nothing to
+// upload and it stays in step if marketing ever replaces it there.
+const EVERSAFE_LOGO =
+  'https://cdn.prod.website-files.com/67a464bc7184fcb8aacb0e8d/67c621a6e65dae9f89432dae_eversafelogo_final_white-no-inc.webp';
+
 interface SafetyItem {
   id: string;
   name: string;
@@ -170,6 +176,13 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             )
           )}
         </div>
+        <img
+          src={EVERSAFE_LOGO}
+          alt="4EverSafe — Jewett Construction's safety program"
+          className="h-12 sm:h-14 w-auto shrink-0 self-start sm:self-center"
+          loading="eager"
+          decoding="async"
+        />
       </div>
 
       {/* CTC & Billing Forecast due dates — the same notice as the Finance tab,

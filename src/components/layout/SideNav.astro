@@ -30,8 +30,13 @@ const label = (slug: string, fallback: string) => sectionMap.get(slug) || fallba
 const isActive = (slug: string) =>
   currentSection === slug || (slug === 'dashboard' && !currentSection);
 
-const linkClass = (item: { slug: string; accent?: 'amber' }) => {
+const linkClass = (item: { slug: string; accent?: 'amber' | 'red' }) => {
   const active = isActive(item.slug);
+  if (item.accent === 'red') {
+    return active
+      ? 'bg-red-500/20 border border-red-500/30 text-red-400'
+      : 'border border-transparent hover:bg-slate-800 text-red-400/80 hover:text-red-300';
+  }
   if (item.accent === 'amber') {
     return active
       ? 'bg-amber-500/20 border border-amber-500/30 text-amber-400'

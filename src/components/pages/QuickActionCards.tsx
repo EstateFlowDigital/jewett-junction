@@ -15,6 +15,9 @@ export interface QuickAction {
   'accent-color'?: string;
   'sort-order'?: number;
   'is-active'?: boolean;
+  /** Present on the large submission boxes (SubmissionBoxes); absent on plain link cards. */
+  description?: string;
+  'button-label'?: string;
 }
 
 interface QuickActionCardsProps {

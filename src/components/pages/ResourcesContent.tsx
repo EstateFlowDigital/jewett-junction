@@ -4,6 +4,7 @@ import { FilterBar, buildFilterOptions } from '../shared/FilterBar';
 import {
   FolderOpen,
   FileText,
+  Landmark,
   Download,
   Shield,
   Users,
@@ -68,8 +69,17 @@ const categoryConfig: Record<string, { icon: any; color: string; gradient: strin
   'marketing': { icon: FileImage, color: 'pink', gradient: 'from-pink-500 to-rose-500', label: 'Marketing Assets' },
   'training': { icon: BookOpen, color: 'emerald', gradient: 'from-emerald-500 to-green-500', label: 'Training Materials' },
   'policies': { icon: FileText, color: 'slate', gradient: 'from-slate-500 to-slate-600', label: 'Company Policies' },
+  'finance': { icon: Landmark, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', label: 'Finance Documents' },
   'default': { icon: FolderOpen, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Documents' },
 };
+
+// The category a document is grouped under on this page. Documents flagged
+// for the Finance tab group as "Finance Documents" whatever they are filed as
+// in the CMS — the W-9 is still a Form there, but readers look for it with the
+// other finance papers. Same rule the Finance tab uses to pick them.
+function displayCategory(r: { category?: string; 'finance-page'?: boolean }) {
+  return r['finance-page'] === true ? 'finance' : r.category;
+}
 
 function getCategoryConfig(category: string | undefined) {
   if (!category) return categoryConfig['default'];
@@ -108,7 +118,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
 
   // Get unique categories
   const categoryCounts = allResources.reduce((acc, r) => {
-    const config = getCategoryConfig(r.category);
+    const config = getCategoryConfig(displayCategory(r));
     acc[config.label] = (acc[config.label] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -148,7 +158,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
       r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (r.description?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
       (r.category?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-    const config = getCategoryConfig(r.category);
+    const config = getCategoryConfig(displayCategory(r));
     const matchesCategory = selectedCategory === 'All' || config.label === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -252,7 +262,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {featuredResources.slice(0, 4).map((resource) => {
-              const config = getCategoryConfig(resource.category);
+              const config = getCategoryConfig(displayCategory(resource));
               const FileIcon = getFileIcon(resource['file-type'], resource.file?.url || resource['external-link']);
               return (
                 <Card
@@ -368,7 +378,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedResources.map((resource) => {
-            const config = getCategoryConfig(resource.category);
+            const config = getCategoryConfig(displayCategory(resource));
             const FileIcon = getFileIcon(resource['file-type'], resource.file?.url || resource['external-link']);
             return (
               <Card
@@ -437,7 +447,7 @@ export function ResourcesContent({ theme = 'dark', resources: cmsResources = [],
         /* List View */
         <div className="space-y-2">
           {sortedResources.map((resource) => {
-            const config = getCategoryConfig(resource.category);
+            const config = getCategoryConfig(displayCategory(resource));
             const FileIcon = getFileIcon(resource['file-type'], resource.file?.url || resource['external-link']);
             return (
               <Card
