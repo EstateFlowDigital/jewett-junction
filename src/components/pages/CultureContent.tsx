@@ -140,12 +140,10 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   const teamWinsDescription = pageCopy?.['subsection-1-description'] || '';
   const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || '';
   const recognitionsDescription = pageCopy?.['subsection-2-description'] || '';
-  // Section headings (Our Core Values, Community Impact) are CMS-editable too.
+  // Section heading (Our Core Values) is CMS-editable too.
   const coreValuesHeadline = pageCopy?.['content-block-1-title'] || '';
-  const communityImpactHeadline = pageCopy?.['content-block-2-title'] || '';
   // Use CMS stories directly - no hardcoded fallback
   const allStories = cmsStories;
-  const volunteerHours = settings['culture-volunteer-hours'] || '450+';
   // Core values come from the Core Values CMS collection. No hardcoded
   // fallback — when the collection is empty the Values section hides
   // entirely (see render guard further down).
@@ -246,10 +244,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
 
       {/* Quick Actions tagged `culture`. Small link cards are the ones without a
           Description; the ones with a Description render as the large submission
-          boxes below — the same split the homepage makes. Marketing retired the
-          two small cards (Living the Mission, BuiltWell) in Sept 2026 by
-          deactivating them, so this usually renders nothing; it stays so they
-          can be switched back on from the CMS. */}
+          boxes below — the same split the homepage makes. */}
       <QuickActionCards actions={quickActions.filter((a) => !a.description)} theme={theme} />
 
       {/* Internal Sales Lead Submission, with the gong — the same card as the
@@ -513,70 +508,6 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
       )}
 
 
-      {/* Community Impact Banner */}
-      <Card className="bg-gradient-to-r from-cyan-600 to-blue-600 border-0 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
-        <CardContent className="py-8 px-6 md:px-8 relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="text-center md:text-left">
-              <div className="flex items-center gap-4 justify-center md:justify-start">
-                <div className="w-16 h-16 shrink-0 bg-white/10 rounded-2xl flex items-center justify-center">
-                  <HandHeart className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  {communityImpactHeadline && <h2 className="text-xl md:text-2xl font-bold text-white">{communityImpactHeadline}</h2>}
-                  <p className="text-cyan-100">Making a difference together</p>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-4 text-center">
-              <div className="bg-white/10 rounded-xl p-4">
-                <p className="text-3xl font-bold text-white">{volunteerHours}</p>
-                <p className="text-sm text-cyan-100">Volunteer Hours</p>
-              </div>
-            </div>
-            <div className="text-center md:text-right">
-              <a href="/jewett-junction/submit-idea">
-                <Button size="lg" className="bg-white text-cyan-700 hover:bg-cyan-50">
-                  <Gift className="h-4 w-4 mr-2" />
-                  Get Involved
-                </Button>
-              </a>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Nomination CTA */}
-      <Card className="bg-gradient-to-r from-pink-600 to-rose-600 border-0 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptNiA2aDZ2Nmg2di02aC02di02aC02djZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
-        <CardContent className="py-8 px-6 md:px-8 relative">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Award className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-white mb-1">
-                  Know Someone Amazing?
-                </h2>
-                <p className="text-pink-100">
-                  Nominate a teammate who embodies our core values. Your recognition could make their day!
-                </p>
-              </div>
-            </div>
-            <a href="/jewett-junction/living-the-mission">
-              <Button
-                size="lg"
-                className="bg-white text-pink-700 hover:bg-pink-50 flex-shrink-0"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Submit Nomination
-              </Button>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
