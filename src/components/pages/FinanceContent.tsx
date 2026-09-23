@@ -2,6 +2,7 @@ import * as React from 'react';
 import { FileText, ChevronRight, FolderOpen } from 'lucide-react';
 import { DeadlinesNotice } from '../shared/DeadlinesNotice';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
+import { EmployeeCard, type CMSEmployee } from '../shared/EmployeeCard';
 
 /**
  * Finance tab: the CTC & Billing Forecast due-dates notice, then the finance
@@ -39,6 +40,8 @@ interface FinanceContentProps {
   pageCopy?: Record<string, any> | null;
   /** Portals and links for this tab — Quick Actions tagged page-slug "finance". */
   quickActions?: QuickAction[];
+  /** Directory entries in the Finance department, rendered with the Directory's own card. */
+  team?: CMSEmployee[];
 }
 
 function formatUpdated(iso: string | undefined) {
@@ -48,7 +51,7 @@ function formatUpdated(iso: string | undefined) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function FinanceContent({ documents, settings, pageCopy = null, quickActions = [] }: FinanceContentProps) {
+export function FinanceContent({ documents, settings, pageCopy = null, quickActions = [], team = [] }: FinanceContentProps) {
   const docsHeading = pageCopy?.['subsection-1-headline'] || 'Finance Documents';
   const docsDescription =
     pageCopy?.['subsection-1-description'] ||
@@ -122,6 +125,24 @@ export function FinanceContent({ documents, settings, pageCopy = null, quickActi
           </div>
         )}
       </section>
+
+      {team.length > 0 && (
+        <section aria-labelledby="finance-team-heading">
+          <div className="mb-4">
+            <h2 id="finance-team-heading" className="text-lg font-semibold text-white">
+              {pageCopy?.['subsection-2-headline'] || 'Finance Team'}
+            </h2>
+            <p className="text-sm text-slate-400 mt-1">
+              {pageCopy?.['subsection-2-description'] || 'Who to contact in Accounting — call or email directly.'}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {team.map((emp) => (
+              <EmployeeCard key={emp.id} emp={emp} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

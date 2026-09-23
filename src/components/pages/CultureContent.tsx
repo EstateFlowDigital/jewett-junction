@@ -315,7 +315,9 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             )}
           </CardHeader>
           <CardContent className="space-y-4">
-            {([...recognitionStories, ...otherStories].slice(0, 3)).map((story) => {
+            {/* Every recognition, not the first three: promotions and work
+                anniversaries arrive in batches, and a cap silently hid them. */}
+            {[...recognitionStories, ...otherStories].map((story) => {
               const config = getTypeConfig(story.type);
               return (
                 <a

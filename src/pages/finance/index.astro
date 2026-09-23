@@ -3,17 +3,29 @@ export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { FinanceContent } from '../../components/pages/FinanceContent';
 import { Landmark, ArrowLeft } from 'lucide-react';
-import { initCMS, getResources, getSiteSettings, getPageCopy, getQuickActions } from '../../lib/webflow-cms';
+import { initCMS, getResources, getSiteSettings, getPageCopy, getQuickActions, getEmployees } from '../../lib/webflow-cms';
+import { getDeptConfig } from '../../components/shared/EmployeeCard';
 
 initCMS(Astro.locals);
 
-const [resourcesResult, settings, pageCopy, quickActionsResult] = await Promise.all([
+const [resourcesResult, settings, pageCopy, quickActionsResult, employeesResult] = await Promise.all([
   getResources({ limit: 100 }),
   getSiteSettings(),
   getPageCopy('finance'),
   getQuickActions({ pageSlug: 'finance' }),
+  getEmployees(),
 ]);
 const quickActions = quickActionsResult.items;
+
+// Everyone the Directory files under Finance — same department mapping the
+// Directory uses, so a person moved to Finance there shows up here too.
+// Most senior first (Vice President before the rest), then alphabetical.
+const financeTeam = employeesResult.items
+  .filter((e: any) => getDeptConfig(e.department).label === 'Finance')
+  .sort((a: any, b: any) => {
+    const lead = (e: any) => (/vice president|director|controller|cfo/i.test(e.role || '') ? 0 : 1);
+    return lead(a) - lead(b) || String(a.name).localeCompare(String(b.name));
+  });
 
 // Only documents flagged for this tab. The order is whatever Resources uses,
 // so marketing can reorder in the CMS without a deploy.
@@ -48,6 +60,6 @@ const heroSubtitle =
       </div>
     </div>
 
-    <FinanceContent documents={documents} settings={settings} pageCopy={pageCopy} quickActions={quickActions} />
+    <FinanceContent documents={documents} settings={settings} pageCopy={pageCopy} quickActions={quickActions} team={financeTeam} />
   </div>
 </ThemedPage>
