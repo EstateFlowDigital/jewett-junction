@@ -39,7 +39,7 @@ const VALID_FIELDS: Record<string, string[]> = {
   resources: [
     'name', 'slug', 'thumbnail', 'resource-category', 'description', 'file-type',
     'external-link', 'file-size', 'last-updated', 'version', 'audience',
-    'is-required', 'is-new', 'file', 'icon', 'finance-page'
+    'is-required', 'is-new', 'file', 'icon', 'finance-page', 'preconstruction-bucket'
   ],
   hrContent: [
     'name', 'slug', 'content-type', 'icon', 'icon-color', 'description', 'full-content',

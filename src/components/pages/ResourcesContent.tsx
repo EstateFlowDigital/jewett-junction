@@ -5,6 +5,7 @@ import {
   FolderOpen,
   FileText,
   Landmark,
+  HardHat,
   Download,
   Shield,
   Users,
@@ -70,6 +71,7 @@ const categoryConfig: Record<string, { icon: any; color: string; gradient: strin
   'training': { icon: BookOpen, color: 'emerald', gradient: 'from-emerald-500 to-green-500', label: 'Training Materials' },
   'policies': { icon: FileText, color: 'slate', gradient: 'from-slate-500 to-slate-600', label: 'Company Policies' },
   'finance': { icon: Landmark, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', label: 'Finance Documents' },
+  'preconstruction': { icon: HardHat, color: 'blue', gradient: 'from-sky-500 to-blue-600', label: 'Preconstruction' },
   'default': { icon: FolderOpen, color: 'amber', gradient: 'from-amber-500 to-orange-500', label: 'Documents' },
 };
 
@@ -77,7 +79,10 @@ const categoryConfig: Record<string, { icon: any; color: string; gradient: strin
 // for the Finance tab group as "Finance Documents" whatever they are filed as
 // in the CMS — the W-9 is still a Form there, but readers look for it with the
 // other finance papers. Same rule the Finance tab uses to pick them.
-function displayCategory(r: { category?: string; 'finance-page'?: boolean }) {
+// "Preconstruction bucket" works the same way: the Option field's choices can
+// only be added in the Designer, so a Switch carries the grouping instead.
+function displayCategory(r: { category?: string; 'finance-page'?: boolean; 'preconstruction-bucket'?: boolean }) {
+  if (r['preconstruction-bucket'] === true) return 'preconstruction';
   return r['finance-page'] === true ? 'finance' : r.category;
 }
 

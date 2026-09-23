@@ -199,6 +199,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'external-link', label: 'External Link', type: 'url', placeholder: 'https://...', helpText: 'Use instead of file upload for third-party resources', icon: 'Link', group: 'File / Link' },
       { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText', group: 'File / Link' },
       { key: 'finance-page', label: 'Show on Finance page', type: 'boolean', helpText: 'Lists this document on the Finance tab. Leave the category as-is — this only controls placement.', icon: 'Landmark', group: 'File / Link' },
+      { key: 'preconstruction-bucket', label: 'Preconstruction bucket', type: 'boolean', helpText: 'Groups this document under Preconstruction on the Resources page. Leave the category as-is — this only controls grouping.', icon: 'HardHat', group: 'File / Link' },
 
       // Metadata
       { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock', group: 'Metadata' },

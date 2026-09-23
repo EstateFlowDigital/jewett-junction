@@ -453,6 +453,8 @@ export interface Resource {
   'resource-category'?: string;
   /** Placement flag: show this document on the Finance tab. */
   'finance-page'?: boolean;
+  /** Groups the document under "Preconstruction" on the Resources page. */
+  'preconstruction-bucket'?: boolean;
   file?: { url: string };
   'external-link'?: string;
   icon?: string;
