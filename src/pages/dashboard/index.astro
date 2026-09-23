@@ -273,7 +273,7 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
 
       <div class="p-6 md:p-8 lg:p-10 mobile-safe-area md:pt-6">
         <!-- Header Row -->
-        <div class="flex items-start justify-between mb-10">
+        <div class="flex items-center justify-between gap-8 mb-10">
           <div>
             {heroHeadline && (
               <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{heroHeadline}</h1>
@@ -285,6 +285,19 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
               {heroSubtitleClean ? ' ' : ''}{dateString}.
             </p>
           </div>
+          {/* Owner's "Let's keep building something great together!" mascot.
+              Sits in the open space right of the welcome text. Hidden below lg:
+              the speech-bubble lettering drops under ~10px there and becomes
+              unreadable, and the header has no room for it on phones anyway. */}
+          <img
+            src="/jewett-junction/images/keep-building-together.webp"
+            alt="Jewett mascot in a hard hat saying: Let's keep building something great together!"
+            width="840"
+            height="523"
+            class="hidden lg:block w-[340px] xl:w-[400px] h-auto shrink-0 -my-4 select-none"
+            loading="eager"
+            decoding="async"
+          />
         </div>
 
         <!-- Featured Announcements Carousel -->

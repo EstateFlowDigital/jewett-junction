@@ -110,7 +110,7 @@ const items = [...NAV_PRIMARY];
           <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
           </svg>
-          <span class="truncate">{label(item.slug, item.fallback)}</span>
+          <span class="leading-tight min-w-0">{label(item.slug, item.fallback)}</span>
         </a>
       ))}
     </nav>
@@ -125,7 +125,7 @@ const items = [...NAV_PRIMARY];
           <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={NAV_PATHS[item.slug]} />
           </svg>
-          <span class="truncate">{label(item.slug, item.fallback)}</span>
+          <span class="leading-tight min-w-0">{label(item.slug, item.fallback)}</span>
         </a>
       ))}
     </div>
