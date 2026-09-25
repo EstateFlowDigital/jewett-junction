@@ -77,6 +77,11 @@ export const OPTIONS: APIRoute = async () => {
   return new Response(null, { status: 204 });
 };
 
+function isLocalRequest(request: Request): boolean {
+  const host = new URL(request.url).hostname;
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1';
+}
+
 // Helper to get admin password from env
 function getAdminPassword(locals: any): string | undefined {
   const runtime = (locals as any)?.runtime;
@@ -117,6 +122,21 @@ async function handlePost(request: Request, locals: any): Promise<Response> {
     }
 
     const { password } = body;
+
+    // Local development only: sign in without the password, so the admin panel
+    // opens straight away in Stacki's preview. Needs a dev build AND a request
+    // from this computer; import.meta.env.DEV is false in every production
+    // build, so this branch does not exist in the deployed worker.
+    if (import.meta.env.DEV && body.devAutoLogin === true && isLocalRequest(request)) {
+      const secret = getAdminPassword(locals);
+      if (secret) {
+        const token = await generateToken(secret);
+        return withCors(new Response(
+          JSON.stringify({ success: true, token, expiresIn: 24 * 60 * 60 * 1000, dev: true }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        ));
+      }
+    }
 
     if (!password) {
       return withCors(new Response(

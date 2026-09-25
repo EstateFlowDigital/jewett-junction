@@ -101,6 +101,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const { request } = context;
 
+  // Local development only (`astro dev`, and Stacki's preview, which runs it).
+  // The site is served at / here, but its links, forms and admin panel call the
+  // production mount path /jewett-junction/…. Do locally what Webflow Cloud's
+  // edge does in production — strip the mount path — so all of it works on a
+  // laptop. import.meta.env.DEV is false in every production build, so this
+  // branch is compiled out of the deploy (see the note further down on why the
+  // worker must never do this in production).
+  if (import.meta.env.DEV) {
+    const bare = pathname.replace(/^\/jewett-junction(?=\/|$)/, '');
+    if (bare !== pathname) {
+      return context.rewrite((bare || '/') + context.url.search);
+    }
+  }
+
   if (pathname.startsWith('/api/') || pathname.startsWith('/jewett-junction/api/')) {
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: getCorsHeaders(request) });
@@ -134,7 +148,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // No /jewett-junction rewrite here. In production Webflow Cloud strips the
+  // No production /jewett-junction rewrite here (the dev-only one is at the
+  // top of this function). In production Webflow Cloud strips the
   // mount path at the edge so the worker only ever sees post-mount paths
   // (/, /hr, /safety, …); a worker-side rewrite of /jewett-junction would
   // either be dead code OR risk a redirect loop with the edge layer. In local

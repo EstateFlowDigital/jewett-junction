@@ -114,15 +114,41 @@ export function AdminLayout({ children, currentPage, title }: AdminLayoutProps) 
   const [toast, setToast] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  // Check for existing token on mount
+  // Check for existing token on mount. In local development (Stacki's
+  // preview, `astro dev`) sign in automatically instead of asking for the
+  // password; the server only honours that request in a dev build from this
+  // computer, and import.meta.env.DEV is false in production builds.
   React.useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (token) {
       verifyToken(token);
+    } else if (import.meta.env.DEV) {
+      devAutoLogin();
     } else {
       setIsLoading(false);
     }
   }, []);
+
+  const devAutoLogin = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ devAutoLogin: true }),
+        credentials: 'same-origin',
+        mode: 'same-origin'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('admin_token', data.token);
+        setIsAuthenticated(true);
+      }
+    } catch {
+      // Fall back to the normal password form.
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Auto-dismiss toast
   React.useEffect(() => {
