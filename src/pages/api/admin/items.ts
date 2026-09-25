@@ -35,11 +35,13 @@ const VALID_FIELDS: Record<string, string[]> = {
     'phone', 'extension', 'linkedin-url', 'support-portal-url', 'support-portal-message',
     'start-date', 'bio', 'skills',
     'certifications', 'is-featured', 'leadership-team', 'page-contact-for',
+    'additional-departments',
   ],
   resources: [
     'name', 'slug', 'thumbnail', 'resource-category', 'description', 'file-type',
     'external-link', 'file-size', 'last-updated', 'version', 'audience',
-    'is-required', 'is-new', 'file', 'icon', 'finance-page', 'preconstruction-bucket'
+    'is-required', 'is-new', 'file', 'icon', 'finance-page', 'preconstruction-bucket',
+    'quick-reference-title', 'quick-reference-content'
   ],
   hrContent: [
     'name', 'slug', 'content-type', 'icon', 'icon-color', 'description', 'full-content',
@@ -49,7 +51,7 @@ const VALID_FIELDS: Record<string, string[]> = {
   safetyContent: [
     'name', 'slug', 'content-type', 'icon-color', 'image', 'severity', 'description',
     'full-content', 'document-link', 'video-link', 'expiration-date',
-    'required-for', 'priority-order', 'featured', 'is-active'
+    'required-for', 'required', 'priority-order', 'featured', 'is-active'
   ],
   itKnowledgeBase: [
     'name', 'slug', 'article-type', 'icon', 'icon-color', 'summary', 'full-content',
@@ -174,6 +176,9 @@ const VALID_FIELDS: Record<string, string[]> = {
   ],
   benefitLinks: [
     'name', 'slug', 'url', 'description', 'icon-name', 'sort-order', 'is-active',
+  ],
+  dogsOfJewett: [
+    'name', 'slug', 'photo', 'caption', 'sort-order', 'is-active',
   ],
   coreValues: [
     'name', 'slug', 'tagline', 'description', 'icon-name', 'color', 'sort-order', 'link-url',

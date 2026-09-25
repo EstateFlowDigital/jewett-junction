@@ -336,11 +336,10 @@ export function HRContent({ theme = 'modern', initialItems = [], settings = {}, 
             <TeamContactCard
               department="HR"
               pageKey="HR"
-              title="HR Team"
+              title="HR Contact"
               fallbackEmail={hrEmail}
               theme={theme}
               accent="purple"
-              showDirectoryLink={false}
             />
           </div>
 

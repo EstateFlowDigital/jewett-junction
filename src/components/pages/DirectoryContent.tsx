@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { FilterBar, buildFilterOptions } from '../shared/FilterBar';
-import { EmployeeCard, getDeptConfig, getInitials, formatTenure, type CMSEmployee } from '../shared/EmployeeCard';
+import { EmployeeCard, getDeptConfig, getEmployeeDeptLabels, getInitials, formatTenure, type CMSEmployee } from '../shared/EmployeeCard';
 import {
   Users,
   Phone,
@@ -96,8 +96,10 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
   const deptCounts = React.useMemo(
     () =>
       allEmployees.reduce((acc, emp) => {
-        const label = getDeptConfig(emp.department).label;
-        acc[label] = (acc[label] || 0) + 1;
+        // Someone listed under two departments counts toward both.
+        for (const label of getEmployeeDeptLabels(emp)) {
+          acc[label] = (acc[label] || 0) + 1;
+        }
         return acc;
       }, {} as Record<string, number>),
     [allEmployees],
@@ -133,7 +135,7 @@ export function DirectoryContent({ theme = 'dark', employees: cmsEmployees = [],
     // First filter by department
     const deptFiltered = selectedDept === 'All'
       ? allEmployees
-      : allEmployees.filter(emp => getDeptConfig(emp.department).label === selectedDept);
+      : allEmployees.filter(emp => getEmployeeDeptLabels(emp).includes(selectedDept));
 
     // If no search term, return department-filtered results
     if (!debouncedSearch.trim()) {

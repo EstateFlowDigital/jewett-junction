@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award, FileText, ChevronRight, Home } from 'lucide-react';
+import { Lock, LogOut, Send, Settings, Loader2, CheckCircle2, XCircle, Megaphone, Calendar, Briefcase, Heart, Users, FolderOpen, HeartHandshake, HardHat, Monitor, Palette, Lightbulb, LayoutDashboard, Menu, X, BookOpen, Tag, CircleHelp, Wrench, Building, MapPin, Sparkles, Image, Upload, Mail, Award, FileText, ChevronRight, Home, Camera } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
 
@@ -43,6 +43,7 @@ const NAV_GROUPS: NavGroup[] = [
       { key: 'page-copy', name: 'Page Copy', icon: FileText, color: 'sky', href: '/jewett-junction/admin/page-copy' },
       { key: 'benefit-links', name: 'Benefit Links', icon: Heart, color: 'violet', href: '/jewett-junction/admin/benefit-links' },
       { key: 'core-values', name: 'Core Values', icon: Heart, color: 'pink', href: '/jewett-junction/admin/core-values' },
+      { key: 'dogs-of-jewett', name: 'Dogs of Jewett', icon: Camera, color: 'amber', href: '/jewett-junction/admin/dogs-of-jewett' },
       { key: 'employee-benefits', name: 'Employee Benefits', icon: Heart, color: 'emerald', href: '/jewett-junction/admin/employee-benefits' },
       { key: 'company-awards', name: 'Company Awards', icon: Award, color: 'amber', href: '/jewett-junction/admin/company-awards' },
       { key: 'bulk-upload', name: 'Bulk Upload', icon: Upload, color: 'teal', href: '/jewett-junction/admin/bulk-upload' },

@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+import ThemedPage from '../../layouts/themed-page.astro';
+import { initCMS, getPageCopy, decodeHtmlEntities } from '../../lib/webflow-cms';
+
+// Finance text pages — "From the Desk of Finance", "FAQs". Each one is a Page
+// Copy record whose slug is "finance-" plus the page name, so marketing can
+// rewrite the copy in the admin without a deploy:
+//   Hero Headline  → the page title
+//   Hero Subtitle  → the line under it (optional)
+//   Section Body   → the page itself
+// The blocks on the Finance tab that link here are Quick Actions (page slug
+// "finance").
+
+initCMS(Astro.locals);
+
+const { slug } = Astro.params;
+const copy = slug && /^[a-z0-9-]+$/.test(slug) ? await getPageCopy(`finance-${slug}`) : null;
+
+if (!copy) {
+  return Astro.redirect('/jewett-junction/finance');
+}
+
+const title = copy['hero-headline'] || copy.name || 'Finance';
+const subtitle = decodeHtmlEntities(copy['hero-subtitle'] || '').trim();
+const body = decodeHtmlEntities(copy['section-body'] || '').trim();
+---
+
+<ThemedPage title={`${title} | Finance | Jewett Junction`} theme="dark" currentSection="finance">
+  <div>
+    <a
+      href="/jewett-junction/finance"
+      class="inline-flex items-center gap-2 text-slate-400 hover:text-emerald-400 mb-6 transition-colors min-h-[44px]"
+      aria-label="Back to Finance"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Finance
+    </a>
+
+    <article class="glass rounded-2xl overflow-hidden border border-slate-800/50">
+      <div class="h-2 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+      <div class="p-8">
+        <header class="mb-6">
+          <span class="inline-block px-3 py-1 mb-4 text-xs font-medium rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            Finance
+          </span>
+          <h1 class="text-3xl md:text-4xl font-bold text-white">{title}</h1>
+          {subtitle && <div class="text-slate-400 mt-3 text-lg" set:html={subtitle} />}
+        </header>
+
+        {body ? (
+          <div class="prose prose-invert max-w-none">
+            <div class="text-slate-300 leading-relaxed text-lg" set:html={body} />
+          </div>
+        ) : (
+          <p class="text-slate-400 text-lg">Coming soon.</p>
+        )}
+      </div>
+    </article>
+  </div>
+</ThemedPage>

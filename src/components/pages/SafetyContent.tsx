@@ -28,6 +28,8 @@ interface SafetyItem {
   'effective-date'?: string;
   'expiration-date'?: string;
   'video-link'?: string;
+  /** The "Required" switch in Safety Content. Only training marked required gets the badge. */
+  required?: boolean;
   featured?: boolean;
   image?: { url: string };
 }
@@ -57,7 +59,7 @@ interface SafetyPageCopy {
   /** Title for the Safety Alerts & Updates block. */
   'subsection-1-headline'?: string;
   'subsection-1-description'?: string;
-  /** Title for the Required Safety Training block. */
+  /** Title for the Safety Training block. */
   'subsection-2-headline'?: string;
   'subsection-2-description'?: string;
 }
@@ -365,7 +367,8 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
             </CardContent>
           </Card>
 
-          {/* Required Training — hides entirely when there's no content. */}
+          {/* Safety Training — hides entirely when there's no content. The
+              Required badge shows only on items with the Required switch on. */}
           {(() => {
             const trainingSource = training.length > 0
               ? training.slice(0, 2)
@@ -395,6 +398,7 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                   desc: stripHtml(item.description || getContent(item))?.trim().substring(0, 80) || '',
                   color: i === 0 ? 'green' : 'blue',
                   icon: i === 0 ? Shield : HardHat,
+                  required: item.required === true,
                 })).map((course) => (
                   <a
                     key={course.name}
@@ -408,14 +412,15 @@ export function SafetyContent({ theme = 'modern', initialItems = [], settings = 
                           <div className={`w-10 h-10 shrink-0 ${isDark ? `bg-${course.color}-900` : `bg-${course.color}-100`} rounded-lg flex items-center justify-center`}>
                             <course.icon className={`h-5 w-5 text-${course.color}-600`} />
                           </div>
-                          <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
+                          {course.required && (
+                            <Badge className={`bg-${course.color}-100 text-${course.color}-700`}>Required</Badge>
+                          )}
                         </div>
                         <h3 className={`font-semibold mb-1 group-hover:text-${course.color}-500 transition-colors ${isDark ? 'text-white' : ''}`}>{course.name}</h3>
                         {course.desc && (
                           <p className={`text-sm mb-3 ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>{course.desc}</p>
                         )}
-                        <div className="flex items-center justify-between">
-                          <span className={`text-xs ${isDark ? 'text-slate-500' : 'text-muted-foreground'}`}>Required</span>
+                        <div className="flex items-center justify-end">
                           <span className={`inline-flex items-center gap-1 text-sm font-medium text-${course.color}-500 group-hover:gap-2 transition-all`}>
                             View Details
                             <ChevronRight className="h-4 w-4" />

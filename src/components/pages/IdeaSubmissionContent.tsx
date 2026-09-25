@@ -23,6 +23,19 @@ interface IdeaSubmissionContentProps {
   uiStrings?: Record<string, string>;
 }
 
+// Same department list as the Signage Request form and the Directory, so an
+// idea is filed under the name the submitter's own entry uses.
+const DEPARTMENTS = [
+  'Executive',
+  'Field Operations',
+  'Finance',
+  'Office Operations',
+  'Pre-Construction',
+  'Design',
+  'Marketing',
+  'HR',
+];
+
 const categories = [
   { id: 'process', label: 'Process Improvement', icon: Wrench, description: 'Make existing workflows more efficient' },
   { id: 'safety', label: 'Safety Enhancement', icon: Shield, description: 'Improve workplace safety' },
@@ -275,14 +288,9 @@ export function IdeaSubmissionContent({ theme = 'dark', uiStrings = {} }: IdeaSu
                 className="w-full px-4 py-2.5 rounded-lg bg-slate-900/50 border border-slate-600 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors"
               >
                 <option value="">Select your department</option>
-                <option value="operations">Operations</option>
-                <option value="safety">Safety</option>
-                <option value="engineering">Engineering</option>
-                <option value="hr">Human Resources</option>
-                <option value="finance">Finance</option>
-                <option value="admin">Administration</option>
-                <option value="field">Field Operations</option>
-                <option value="other">Other</option>
+                {DEPARTMENTS.map((dept) => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
               </select>
             </div>
 

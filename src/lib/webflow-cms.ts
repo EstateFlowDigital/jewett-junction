@@ -357,6 +357,8 @@ export interface Employee {
   'start-date'?: string;
   'is-featured'?: boolean;
   'leadership-team'?: boolean;
+  /** Other departments this person is also listed under, comma-separated ("HR"). */
+  'additional-departments'?: string;
   'office-location'?: string;
   extension?: string;
   'linkedin-url'?: string;
@@ -455,6 +457,10 @@ export interface Resource {
   'finance-page'?: boolean;
   /** Groups the document under "Preconstruction" on the Resources page. */
   'preconstruction-bucket'?: boolean;
+  /** Label for a second button on the document page that jumps to the content below. */
+  'quick-reference-title'?: string;
+  /** Rich text shown on the document page, e.g. the key contact list from a plan. */
+  'quick-reference-content'?: string;
   file?: { url: string };
   'external-link'?: string;
   icon?: string;
@@ -506,6 +512,7 @@ export const COLLECTIONS = {
   quickActions: '6a0f33dde0546a1a2e4afc24',
   uiStrings: '6a0f46a8a691254e6e83d8fd',
   benefitLinks: '6a69f01da2e95ce3da497a05',
+  dogsOfJewett: '6ab6b4e5988de975119ff854',
 } as const;
 
 // Webflow placeholder Option fields we couldn't update via API got replaced by
@@ -686,6 +693,25 @@ export async function getBenefitLinks(): Promise<{ items: BenefitLink[]; total: 
   return { items: sorted, total: sorted.length };
 }
 
+export interface DogOfJewett {
+  id: string;
+  name?: string;
+  slug?: string;
+  photo?: { url: string; alt?: string };
+  caption?: string;
+  'sort-order'?: number;
+  'is-active'?: boolean;
+}
+
+/** Dogs of Jewett on the Culture page — photos people send in, rotated like the featured announcements. */
+export async function getDogsOfJewett(): Promise<{ items: DogOfJewett[]; total: number }> {
+  if (!COLLECTIONS.dogsOfJewett) return { items: [], total: 0 };
+  const result = await getCollection<DogOfJewett>(COLLECTIONS.dogsOfJewett, { limit: 100 });
+  const active = result.items.filter((d) => d['is-active'] !== false && d.photo?.url);
+  const sorted = [...active].sort((a, b) => (a['sort-order'] ?? 999) - (b['sort-order'] ?? 999));
+  return { items: sorted, total: sorted.length };
+}
+
 export async function getCoreValues(): Promise<{ items: CoreValue[]; total: number }> {
   if (!COLLECTIONS.coreValues) return { items: [], total: 0 };
   const result = await getCollection<CoreValue>(COLLECTIONS.coreValues, { limit: 50 });
@@ -857,6 +883,8 @@ export interface SafetyContent {
   'video-link'?: string;
   'expiration-date'?: string;
   'required-for'?: string;
+  /** Shows the Required badge on the Safety page. Off unless someone turns it on. */
+  required?: boolean;
   'priority-order'?: number;
   featured?: boolean;
   'is-active'?: boolean;

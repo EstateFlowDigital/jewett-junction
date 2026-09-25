@@ -45,6 +45,8 @@ export interface CMSEmployee {
   bio?: string;
   'start-date'?: string;
   'is-featured'?: boolean;
+  /** Other departments this person is also listed under, comma-separated ("HR"). */
+  'additional-departments'?: string;
   location?: string;
   office?: string;
 }
@@ -77,6 +79,23 @@ export function getDeptConfig(dept: string | undefined) {
   if (!dept) return departmentConfig['default'];
   const normalized = dept.toLowerCase();
   return departmentConfig[normalized] || departmentConfig['default'];
+}
+
+/**
+ * Every department label a person is listed under in the Directory: their
+ * main department first, then any from "Also List Under" (e.g. Payroll sits
+ * in Finance and HR). Unknown names are dropped rather than shown as "Team".
+ */
+export function getEmployeeDeptLabels(emp: Pick<CMSEmployee, 'department' | 'additional-departments'>): string[] {
+  const labels = [getDeptConfig(emp.department).label];
+  for (const raw of (emp['additional-departments'] || '').split(',')) {
+    const name = raw.trim();
+    if (!name) continue;
+    const config = getDeptConfig(name);
+    if (config === departmentConfig['default']) continue;
+    if (!labels.includes(config.label)) labels.push(config.label);
+  }
+  return labels;
 }
 
 export function getInitials(name: string) {

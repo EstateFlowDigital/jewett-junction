@@ -157,6 +157,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'photo', label: 'Profile Photo', type: 'image', helpText: 'Recommended: 400×400px (square). Used on the employee directory.', icon: 'Image', group: 'Basics' },
       { key: 'role', label: 'Job Title', type: 'text', required: true, placeholder: 'e.g., Senior Project Manager', icon: 'Briefcase', group: 'Basics' },
       { key: 'dept', label: 'Department', type: 'select', options: ['Executive', 'Estimating', 'Design', 'Finance', 'Field Operations', 'Pre-Construction', 'HR', 'Marketing', 'Office Operations'], icon: 'Building', group: 'Basics' },
+      { key: 'additional-departments', label: 'Also List Under', type: 'text', placeholder: 'e.g., HR', helpText: 'Optional. Other departments this person also belongs to, comma-separated, using the names in the Department list. They show under each one in the Directory and keep their main Department everywhere else.', icon: 'Building', group: 'Basics' },
 
       // Contact
       { key: 'email', label: 'Work Email', type: 'email', placeholder: 'name@jewett.com', icon: 'Mail', group: 'Contact' },
@@ -200,6 +201,10 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'file-size', label: 'File Size', type: 'text', placeholder: 'e.g., 2.5 MB', icon: 'FileText', group: 'File / Link' },
       { key: 'finance-page', label: 'Show on Finance page', type: 'boolean', helpText: 'Lists this document on the Finance tab. Leave the category as-is — this only controls placement.', icon: 'Landmark', group: 'File / Link' },
       { key: 'preconstruction-bucket', label: 'Preconstruction bucket', type: 'boolean', helpText: 'Groups this document under Preconstruction on the Resources page. Leave the category as-is — this only controls grouping.', icon: 'HardHat', group: 'File / Link' },
+
+      // Quick Reference
+      { key: 'quick-reference-title', label: 'Quick Reference Title', type: 'text', placeholder: 'e.g., Key Corporate Personnel Contact List', helpText: 'Optional. Adds a second button next to Download at the top of the document page that jumps to the Quick Reference below. Leave blank to hide both.', icon: 'Bookmark', group: 'Quick Reference' },
+      { key: 'quick-reference-content', label: 'Quick Reference Content', type: 'richtext', helpText: 'The part of the document people need fast, e.g. the contact list from the Crisis Management Plan. Update it when the PDF changes.', group: 'Quick Reference' },
 
       // Metadata
       { key: 'last-updated', label: 'Last Updated', type: 'datetime', helpText: 'When was this last revised?', icon: 'Clock', group: 'Metadata' },
@@ -259,6 +264,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
 
       // Metadata
       { key: 'expiration-date', label: 'Expiration Date', type: 'datetime', helpText: 'When does this expire?', icon: 'Clock', group: 'Metadata' },
+      { key: 'required', label: 'Required', type: 'boolean', helpText: 'Shows a Required badge on this training on the Safety page. Leave off for optional training like Toolbox Talks.', group: 'Metadata' },
       { key: 'required-for', label: 'Required For', type: 'select', options: ['All Employees', 'Field Workers', 'Supervisors', 'New Hires', 'Specific Trades'], icon: 'Users', group: 'Metadata' },
       { key: 'priority-order', label: 'Display Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first', group: 'Metadata' },
       { key: 'featured', label: 'Featured', type: 'boolean', helpText: 'Show prominently on the Safety page', group: 'Metadata' },
@@ -769,7 +775,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     description: 'Editable hero and section copy for fixed pages (Careers, HR, Safety, etc.). One record per page slug.',
     fields: [
       { key: 'name', label: 'Internal Name', type: 'text', required: true, placeholder: 'e.g., Careers Page Copy', helpText: 'Identifier — not shown publicly', icon: 'FileText' },
-      { key: 'slug', label: 'Page Slug', type: 'text', required: true, placeholder: 'careers', helpText: 'Matches the URL — lowercase, no slashes. Currently wired pages: "careers", "hr", "safety", "it-helpdesk", "marketing".', icon: 'Link' },
+      { key: 'slug', label: 'Page Slug', type: 'text', required: true, placeholder: 'careers', helpText: 'Matches the URL — lowercase, no slashes. Currently wired pages: "careers", "hr", "safety", "it-helpdesk", "marketing". Finance pages use "finance-" plus the page name: "finance-desk-of-finance" is /finance/desk-of-finance and "finance-faqs" is /finance/faqs (Hero Headline, Hero Subtitle and Section Body).', icon: 'Link' },
       { key: 'hero-headline', label: 'Hero Headline', type: 'text', placeholder: 'Build Your Career with a Team That Puts People First', helpText: 'Big bold headline at the top of the page', icon: 'Type' },
       { key: 'hero-subtitle', label: 'Hero Subtitle', type: 'richtext', placeholder: 'Supporting paragraph under the hero headline...', helpText: 'Body copy that introduces the page' },
       { key: 'section-headline', label: 'Section Headline', type: 'text', placeholder: 'Why Jewett Construction?', helpText: 'Optional second headline lower on the page', icon: 'Type' },
@@ -777,7 +783,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'application-description', label: 'Form / Application Description', type: 'textarea', placeholder: 'Fill out the form below to get started...', helpText: 'Optional callout shown above forms on pages like Careers or Signage' },
       { key: 'subsection-1-headline', label: 'Subsection 1 Headline', type: 'text', placeholder: 'e.g., Benefits Overview', helpText: 'First main subsection title on the page (HR: Benefits Overview · Safety: Safety Alerts & Updates · IT: Common Issues & Quick Fixes · Culture: Team Wins). Leave blank to use the page default.', icon: 'Type' },
       { key: 'subsection-1-description', label: 'Subsection 1 Description', type: 'text', placeholder: 'Your comprehensive benefits package', helpText: 'One-line description under the first subsection headline. Leave blank to hide.' },
-      { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Required Safety Training · IT: My Recent Tickets · Culture: Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
+      { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Safety Training · IT: My Recent Tickets · Culture: Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
       { key: 'subsection-2-description', label: 'Subsection 2 Description', type: 'text', placeholder: 'Commonly used HR forms', helpText: 'One-line description under the second subsection headline. Leave blank to hide.' },
       // Generic content blocks — used by the Help page for Quick Start /
       // Navigation / Search Tips / Getting Help. Available for any page that
@@ -806,6 +812,21 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'description', label: 'Description', type: 'text', placeholder: 'e.g., Dental plan portal', helpText: 'Short line under the name — good place for a Web ID or login note', icon: 'FileText' },
       { key: 'icon-name', label: 'Icon Name', type: 'text', placeholder: 'Heart', helpText: 'Lucide icon name (Heart, Shield, Eye, Stethoscope, Scale, HandHeart, PiggyBank, Smile)', icon: 'Sparkles' },
       { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers appear first' },
+      { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
+    ],
+  },
+  dogsOfJewett: {
+    name: 'Dogs of Jewett',
+    icon: 'Camera',
+    color: 'amber',
+    gradient: 'from-amber-500 to-orange-500',
+    slug: 'dogs-of-jewett',
+    description: 'Dog photos people send in, rotated on the Culture page',
+    fields: [
+      { key: 'name', label: 'Dog Name', type: 'text', required: true, placeholder: 'e.g., Magnolia', helpText: 'For the admin list and the photo description — not shown on the page', icon: 'Heart' },
+      { key: 'photo', label: 'Photo', type: 'image', required: true, helpText: 'Vertical (portrait) photos look best, e.g. 1080×1350px.', icon: 'Image' },
+      { key: 'caption', label: 'Caption', type: 'textarea', placeholder: "Meet Magnolia, Sarah's Pup! ...", helpText: 'Shown under the photo', icon: 'FileText' },
+      { key: 'sort-order', label: 'Sort Order', type: 'number', placeholder: '1', helpText: 'Lower numbers show first' },
       { key: 'is-active', label: 'Active', type: 'boolean', helpText: 'Toggle off to hide without deleting' },
     ],
   },

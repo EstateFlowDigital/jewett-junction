@@ -31,6 +31,7 @@ import {
   FileText,
   Zap,
   Type,
+  Camera,
 } from 'lucide-react';
 
 const API_BASE = '/jewett-junction';
@@ -86,6 +87,7 @@ const COLLECTION_GROUPS: CollectionGroup[] = [
       { key: 'uiStrings', name: 'UI Strings (Badges, Empty States)', icon: Type, color: 'slate', gradient: 'from-slate-500 to-zinc-500', href: '/jewett-junction/admin/ui-strings' },
       { key: 'benefitLinks', name: 'Benefit Links', icon: Heart, color: 'violet', gradient: 'from-violet-500 to-purple-500', href: '/jewett-junction/admin/benefit-links' },
       { key: 'coreValues', name: 'Core Values', icon: Heart, color: 'pink', gradient: 'from-pink-500 to-rose-500', href: '/jewett-junction/admin/core-values' },
+      { key: 'dogsOfJewett', name: 'Dogs of Jewett', icon: Camera, color: 'amber', gradient: 'from-amber-500 to-orange-500', href: '/jewett-junction/admin/dogs-of-jewett' },
       { key: 'employeeBenefits', name: 'Employee Benefits', icon: Heart, color: 'emerald', gradient: 'from-emerald-500 to-teal-500', href: '/jewett-junction/admin/employee-benefits' },
       { key: 'companyAwards', name: 'Company Awards', icon: Award, color: 'amber', gradient: 'from-amber-500 to-yellow-500', href: '/jewett-junction/admin/company-awards' },
     ],

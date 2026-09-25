@@ -65,6 +65,13 @@ const fileUrl: string | undefined =
   (typeof resource.file === 'string' ? resource.file : undefined);
 const externalLink: string | undefined = resource['external-link'];
 
+// Optional Quick Reference: the part of a long document people need fast (the
+// Crisis Management Plan's key contact list). Its button sits beside Download
+// at the top and opens the panel inline, above the PDF preview.
+const quickRefTitle: string = (resource['quick-reference-title'] || '').toString().trim();
+const quickRefContent: string = decodeHtmlEntities(resource['quick-reference-content'] || '').trim();
+const hasQuickRef = quickRefTitle.length > 0 && quickRefContent.length > 0;
+
 // Header image — only used when the icon is actually an image (not an SVG path)
 const iconImageUrl: string | undefined =
   (typeof resource.icon === 'object' && resource.icon?.url) ||
@@ -184,29 +191,8 @@ const tags: string[] = resource.tags
           </div>
         )}
 
-        <!-- Tags -->
-        {tags.length > 0 && (
-          <div class="mb-6">
-            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tags</h3>
-            <div class="flex flex-wrap gap-2">
-              {tags.map((tag: string) => (
-                <span class="px-3 py-1 text-sm bg-slate-800 text-slate-300 rounded-full border border-slate-700/50">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <!-- Inline file preview (PDF / image / Office / video) -->
-        {fileUrl && (
-          <div class="mb-6">
-            <FilePreview url={fileUrl} name={resource.name} accent={cfg.accent} />
-          </div>
-        )}
-
-        <!-- Actions -->
-        <div class="flex flex-wrap gap-3">
+        <!-- Actions — at the top so Download is the first thing on the page -->
+        <div class="flex flex-wrap gap-3 mb-6">
           {fileUrl && (
             <a
               href={fileUrl}
@@ -220,6 +206,20 @@ const tags: string[] = resource.tags
               </svg>
               Download File
             </a>
+          )}
+          {hasQuickRef && (
+            <button
+              type="button"
+              data-quick-ref-toggle
+              aria-expanded="false"
+              aria-controls="quick-reference"
+              class="inline-flex items-center gap-2 px-6 py-3 min-h-[44px] bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-xl transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              {quickRefTitle}
+            </button>
           )}
           {externalLink && (
             <a
@@ -247,6 +247,39 @@ const tags: string[] = resource.tags
             <span data-copy-label>Copy Link</span>
           </button>
         </div>
+
+        {hasQuickRef && (
+          <section
+            id="quick-reference"
+            hidden
+            aria-label={quickRefTitle}
+            class="mb-6 rounded-2xl border border-slate-700 bg-slate-900/60 p-6 scroll-mt-8"
+          >
+            <h2 class="text-xl font-semibold text-white mb-4">{quickRefTitle}</h2>
+            <div class="quick-ref prose prose-invert max-w-none" set:html={quickRefContent} />
+          </section>
+        )}
+
+        <!-- Tags -->
+        {tags.length > 0 && (
+          <div class="mb-6">
+            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tags</h3>
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag: string) => (
+                <span class="px-3 py-1 text-sm bg-slate-800 text-slate-300 rounded-full border border-slate-700/50">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Inline file preview (PDF / image / Office / video) -->
+        {fileUrl && (
+          <div class="mb-6">
+            <FilePreview url={fileUrl} name={resource.name} accent={cfg.accent} />
+          </div>
+        )}
 
         <!-- Metadata strip -->
         {(fileSize || fileType || lastUpdated || resource['view-count']) && (
@@ -289,7 +322,7 @@ const tags: string[] = resource.tags
           </svg>
           Related Resources
         </h2>
-        <div class="grid gap-3 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           {relatedResources.map((related) => {
             const relCfg = getCategoryConfig(related.category);
             const relIcon = (typeof related.icon === 'object' && related.icon?.url) ? related.icon.url : null;
@@ -326,7 +359,33 @@ const tags: string[] = resource.tags
   </div>
 </ThemedPage>
 
+<style is:global>
+  /* Quick Reference rich text: role headings as small labels, one contact per paragraph. */
+  .quick-ref h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: rgb(148 163 184); margin: 1.5rem 0 0.5rem; }
+  .quick-ref h3:first-child { margin-top: 0; }
+  .quick-ref p { margin: 0 0 0.75rem; color: rgb(226 232 240); line-height: 1.6; }
+  .quick-ref a { color: rgb(253 186 116); text-decoration: none; }
+  .quick-ref a:hover { text-decoration: underline; }
+</style>
+
 <script>
+  // Quick Reference toggle — opens the panel under the buttons. A link to
+  // #quick-reference (e.g. shared from Teams) opens it straight away.
+  const refToggle = document.querySelector<HTMLButtonElement>('[data-quick-ref-toggle]');
+  const refPanel = document.getElementById('quick-reference');
+  if (refToggle && refPanel) {
+    const setOpen = (open: boolean) => {
+      refPanel.hidden = !open;
+      refToggle.setAttribute('aria-expanded', String(open));
+    };
+    refToggle.addEventListener('click', () => {
+      const open = refPanel.hidden;
+      setOpen(open);
+      if (open) refPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    if (window.location.hash === '#quick-reference') setOpen(true);
+  }
+
   // Wire up "Copy Link" button
   const btn = document.querySelector<HTMLButtonElement>('[data-copy-link]');
   if (btn) {

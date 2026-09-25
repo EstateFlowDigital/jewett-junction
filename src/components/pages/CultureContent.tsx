@@ -2,6 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 import { SubmissionBoxes } from '../shared/SubmissionBoxes';
+import { DogsOfJewett, type Dog } from './DogsOfJewett';
 import {
   Heart,
   Award,
@@ -86,6 +87,8 @@ interface CultureContentProps {
   stories?: CMSCultureStory[];
   settings?: CultureSettings;
   coreValues?: CMSCoreValue[];
+  /** Dogs of Jewett photos, already filtered to active and sorted. */
+  dogs?: Dog[];
   pageCopy?: CulturePageCopy | null;
   quickActions?: QuickAction[];
 }
@@ -135,7 +138,7 @@ function getTypeConfig(type: string | undefined) {
   return typeConfig[normalized] || typeConfig['default'];
 }
 
-export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null, quickActions = [] }: CultureContentProps) {
+export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null, quickActions = [], dogs = [] }: CultureContentProps) {
   const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || '';
   const teamWinsDescription = pageCopy?.['subsection-1-description'] || '';
   const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || '';
@@ -457,6 +460,8 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
         </Card>
       )}
 
+      {/* Dogs of Jewett — between Employee Spotlight and Core Values. Hidden when there are none. */}
+      <DogsOfJewett dogs={dogs} />
 
       {/* Core Values Section — hidden when the Core Values CMS collection is empty */}
       {hasCoreValues && (
