@@ -2,6 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 import { SubmissionBoxes } from '../shared/SubmissionBoxes';
+import { storyPreview } from '../shared/TeamWinsRecognitions';
 import { DogsOfJewett, type Dog } from './DogsOfJewett';
 import {
   Heart,
@@ -286,8 +287,8 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors mb-1">
                         {story.name}
                       </h4>
-                      <p className="text-sm text-slate-400">
-                        {stripHtml(story.content) || story.excerpt}
+                      <p className="text-sm text-slate-400 line-clamp-3">
+                        {storyPreview(story)}
                       </p>
                       {story.author && (
                         <p className="text-xs text-slate-500 mt-2">— {story.author}</p>
@@ -337,8 +338,8 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                       <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
                         {story.name}
                       </h4>
-                      <p className="text-sm text-slate-400">
-                        {stripHtml(story.content) || story.excerpt}
+                      <p className="text-sm text-slate-400 line-clamp-3">
+                        {storyPreview(story)}
                       </p>
                       {story.author && (
                         <p className="text-xs text-slate-500 mt-2">— {story.author}</p>

@@ -32,6 +32,15 @@ function stripHtml(html: string | undefined) {
   return html.replace(/<[^>]*>/g, '').trim();
 }
 
+/**
+ * Card text for a story: its "Short Preview" (excerpt), falling back to the
+ * full story as plain text for stories written without one. Cards clamp it to
+ * three lines either way; the full story lives on /culture/<slug>.
+ */
+export function storyPreview(story: { excerpt?: string; content?: string }) {
+  return story.excerpt?.trim() || stripHtml(story.content);
+}
+
 interface Story {
   id?: string;
   slug?: string;
@@ -57,6 +66,7 @@ interface TeamWinsRecognitionsProps {
   recognitionsDescription?: string;
   /** Homepage shows a link through to the full Culture page; Culture itself doesn't. */
   showViewAll?: boolean;
+  /** Caps Team Wins only; every recognition is always shown. */
   limit?: number;
 }
 
@@ -96,7 +106,9 @@ export function TeamWinsRecognitions({
       iconClass: 'text-blue-400',
       hoverText: 'group-hover:text-blue-400',
       hoverBorder: 'hover:border-blue-500/30',
-      items: [...recognitions, ...others].slice(0, limit),
+      // Every recognition, not the first three — same as the Culture page:
+      // promotions and work anniversaries arrive in batches.
+      items: [...recognitions, ...others],
       emptyIcon: Award,
       emptyText: 'No recognitions to display yet',
     },
@@ -152,8 +164,8 @@ export function TeamWinsRecognitions({
                         >
                           {story.name}
                         </h3>
-                        <p className="text-sm text-slate-400">
-                          {stripHtml(story.content) || story.excerpt}
+                        <p className="text-sm text-slate-400 line-clamp-3">
+                          {storyPreview(story)}
                         </p>
                         {story.author && (
                           <p className="text-xs text-slate-500 mt-2">— {story.author}</p>

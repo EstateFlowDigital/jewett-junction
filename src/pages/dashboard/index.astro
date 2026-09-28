@@ -36,7 +36,9 @@ try {
     getAnnouncements({ limit: 10 }),
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 25 }),
-    getCultureStories({ limit: 20 }),
+    // No limit: with one, Webflow returns a page in its own order and only that
+    // page is date-sorted, so "Recent Recognitions" could skip the newest ones.
+    getCultureStories(),
     getHRContent({ limit: 3, featured: true }),
     getSafetyContent({ limit: 3, featured: true }),
     getITKnowledgeBase({ limit: 3, featured: true }),
