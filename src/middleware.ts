@@ -37,8 +37,15 @@ const GATED_PREFIXES = [
 
 // The whole /api surface is gated EXCEPT these — the Webflow form-submission
 // webhook arrives from Webflow's servers, which will never be on Jewett's
-// allowlist, and it authenticates itself with a signature instead.
-const OPEN_API_PREFIXES = ['/api/webhooks', '/jewett-junction/api/webhooks'];
+// allowlist, and it authenticates itself with a signature instead. /api/public
+// serves the public website (the Careers page's open positions) to any visitor,
+// so nothing under it may return anything that isn't already public.
+const OPEN_API_PREFIXES = [
+  '/api/webhooks',
+  '/jewett-junction/api/webhooks',
+  '/api/public',
+  '/jewett-junction/api/public',
+];
 
 // A denied visitor is rewritten to /access-denied, so that page must never be
 // gated itself — otherwise the rewrite is gated, rewrites again, and the
