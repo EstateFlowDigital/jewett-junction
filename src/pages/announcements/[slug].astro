@@ -1,6 +1,7 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { initCMS, getAnnouncementBySlug, getAnnouncements, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { videoEmbedUrl } from '../../lib/video-embed';
 
 export const prerender = false;
 
@@ -54,6 +55,9 @@ const priorityColors: Record<string, string> = {
   low: 'bg-slate-500/20 text-slate-400 border-slate-500/30'
 };
 const priorityKey = (announcement.priority || '').toString().toLowerCase();
+
+// A video replaces the hero image, so it plays here instead of on Vimeo/YouTube.
+const videoSrc = videoEmbedUrl(announcement['video-url']);
 ---
 
 <ThemedPage title={`${announcement.name} | Announcements | Jewett Junction`} theme="dark" currentSection="dashboard">
@@ -68,8 +72,30 @@ const priorityKey = (announcement.priority || '').toString().toLowerCase();
 
     <!-- Announcement Content -->
     <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
-      <!-- Hero Image: prefer landscape blog-body-image, fall back to thumbnail -->
-      {(announcement['blog-body-image']?.url || announcement.image?.url) && (
+      <!-- Hero: the video when there is one, otherwise the landscape
+           blog-body-image, falling back to the thumbnail -->
+      {videoSrc ? (
+        <>
+          <div class="w-full aspect-video bg-black">
+            <iframe
+              src={videoSrc}
+              title={`Video: ${announcement.name}`}
+              class="w-full h-full"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+              allowfullscreen
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          </div>
+          <div class="flex justify-end px-8 pt-4">
+            <a href={`/jewett-junction/announcements/${announcement.slug || slug}/watch`} class="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors min-h-[44px]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" />
+              </svg>
+              Watch full size
+            </a>
+          </div>
+        </>
+      ) : (announcement['blog-body-image']?.url || announcement.image?.url) && (
         <div class={`w-full overflow-hidden relative ${announcement['blog-body-image']?.url ? 'aspect-video' : 'h-64'}`}>
           <img
             src={announcement['blog-body-image']?.url || announcement.image?.url}

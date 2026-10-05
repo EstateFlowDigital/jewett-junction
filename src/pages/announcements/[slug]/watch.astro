@@ -1,0 +1,86 @@
+---
+import ThemedPage from '../../../layouts/themed-page.astro';
+import { initCMS, getAnnouncementBySlug } from '../../../lib/webflow-cms';
+import { videoEmbedUrl } from '../../../lib/video-embed';
+
+export const prerender = false;
+
+// An announcement's video on its own page: the same layout and card as the
+// announcement page, with the video given the whole card and nothing else
+// under it but the title. Linked from "Watch full size" under the video on
+// the announcement page.
+
+initCMS(Astro.locals);
+
+const { slug } = Astro.params;
+let announcement: any = null;
+try {
+  if (slug) announcement = await getAnnouncementBySlug(slug);
+} catch (error) {
+  console.error('Error fetching announcement for watch page:', error);
+}
+
+if (!announcement) return Astro.redirect('/jewett-junction/announcements');
+
+const videoSrc = videoEmbedUrl(announcement['video-url']);
+const announcementHref = `/jewett-junction/announcements/${announcement.slug || slug}`;
+if (!videoSrc) return Astro.redirect(announcementHref);
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+};
+---
+
+<ThemedPage title={`${announcement.name} | Video | Jewett Junction`} theme="dark" currentSection="dashboard">
+  <div>
+    <!-- Back link -->
+    <a href={announcementHref} class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors min-h-[44px]" aria-label="Back to the announcement">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Announcement
+    </a>
+
+    <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
+      <div class="w-full aspect-video bg-black">
+        <iframe
+          src={videoSrc}
+          title={`Video: ${announcement.name}`}
+          class="w-full h-full"
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
+
+      <div class="p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{announcement.name}</h1>
+        <div class="flex flex-wrap items-center gap-6 text-slate-400">
+          {announcement.author && (
+            <span class="flex items-center gap-2">
+              <div class="w-8 h-8 shrink-0 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {announcement.author.charAt(0).toUpperCase()}
+              </div>
+              {announcement.author}
+            </span>
+          )}
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {formatDate(announcement['published-date'])}
+          </span>
+          <a href={announcementHref} class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors min-h-[44px]">
+            Read the announcement
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </article>
+  </div>
+</ThemedPage>

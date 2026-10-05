@@ -381,6 +381,8 @@ export interface Announcement {
   'expiration-date'?: string;
   'cta-text'?: string;
   'cta-link'?: string;
+  /** Vimeo or YouTube link; plays at the top of the announcement page (lib/video-embed.ts) */
+  'video-url'?: string;
 }
 
 export interface Event {

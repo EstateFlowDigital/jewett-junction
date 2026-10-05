@@ -11,6 +11,7 @@ import SideNav from '../../components/layout/SideNav.astro';
 import { SubmissionBoxes } from '../../components/shared/SubmissionBoxes';
 import { TeamWinsRecognitions } from '../../components/shared/TeamWinsRecognitions';
 import { initCMS, getAnnouncements, getEvents, getJobPostings, getCultureStories, getHRContent, getSafetyContent, getITKnowledgeBase, getMarketingAssets, getBannerMessages, getPageCopy, getUIStrings, getQuickActions, getSiteSettings, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { videoEmbedUrl } from '../../lib/video-embed';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -199,7 +200,9 @@ const carouselData = pinnedAnnouncements.map(a => ({
   author: a.author || '',
   priority: a.priority || '',
   category: a.category || '',
+  hasVideo: !!videoEmbedUrl(a['video-url']),
 }));
+const featuredHasVideo = !!videoEmbedUrl(featuredAnnouncement?.['video-url']);
 
 // Banner messages — fully CMS-driven. When the Banner Messages collection is
 // empty, the marquee hides entirely (no hardcoded fallback copy).
@@ -309,8 +312,16 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           <a href={`/jewett-junction/announcements/${featuredAnnouncement.slug || featuredAnnouncement.id}`} class="block bg-gradient-to-br from-blue-600/80 to-purple-600/80 rounded-3xl mb-10 border border-blue-500/30 glow-blue relative overflow-hidden hover:from-blue-600 hover:to-purple-600 transition-all">
             {(featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url) ? (
               <div class="flex flex-col md:flex-row">
-                <div class="md:w-1/3 h-48 md:h-auto overflow-hidden">
+                <div class="relative md:w-1/3 h-48 md:h-auto overflow-hidden">
                   <img src={featuredAnnouncement['blog-body-image']?.url || featuredAnnouncement.image?.url} alt={featuredAnnouncement.name} class="w-full h-full object-cover" loading="lazy" />
+                  {featuredHasVideo && (
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div class="w-14 h-14 rounded-full bg-black/55 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+                      </div>
+                      <span class="sr-only">Includes a video</span>
+                    </div>
+                  )}
                 </div>
                 <div class="p-6 md:w-2/3 relative">
                   <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>

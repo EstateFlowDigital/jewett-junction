@@ -46,6 +46,9 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'blog-body-image', label: 'Thumbnail / Body Image', type: 'image', helpText: 'Recommended: 1600×900px (16:9 landscape). Used as the card thumbnail and the hero at the top of the detail page.', icon: 'Image', group: 'Images' },
       { key: 'image', label: 'Social Sharing Image', type: 'image', helpText: 'Recommended: 1200×630px. Open Graph image used when shared on social. Used as a card fallback only when no Body Image is set.', icon: 'Image', group: 'Images' },
 
+      // Video
+      { key: 'video-url', label: 'Video URL', type: 'url', placeholder: 'https://vimeo.com/...', helpText: 'Vimeo or YouTube link. The video plays at the top of the announcement page, in place of the Body Image, and the dashboard card shows a play icon. Keep the Body Image set: it is still the card thumbnail.', icon: 'Video', group: 'Video' },
+
       // Categorization
       { key: 'news-category', label: 'News Category', type: 'select', options: ['Company News', 'HR Update', 'Safety Alert', 'Project Update', 'Team News', 'Policy Change'], icon: 'Tag', group: 'Categorization' },
       { key: 'priority-level', label: 'Priority', type: 'select', options: ['Normal', 'High', 'Urgent'], icon: 'Bell', group: 'Categorization' },

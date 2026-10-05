@@ -13,7 +13,7 @@ const BASE_URL = 'https://api.webflow.com/v2';
 const VALID_FIELDS: Record<string, string[]> = {
   announcements: [
     'name', 'slug', 'content', 'image', 'blog-body-image', 'author', 'news-category', 'priority-level',
-    'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date'
+    'expiration-date', 'cta-text', 'cta-link', 'is-pinned', 'published-date', 'video-url'
   ],
   events: [
     'name', 'slug', 'event-date', 'end-date', 'banner-image', 'location',
