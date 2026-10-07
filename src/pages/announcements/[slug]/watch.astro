@@ -22,7 +22,7 @@ try {
 
 if (!announcement) return Astro.redirect('/jewett-junction/announcements');
 
-const videoSrc = videoEmbedUrl(announcement['video-url']);
+const videoSrc = videoEmbedUrl(announcement['video-url'], { autoplay: true });
 const announcementHref = `/jewett-junction/announcements/${announcement.slug || slug}`;
 if (!videoSrc) return Astro.redirect(announcementHref);
 

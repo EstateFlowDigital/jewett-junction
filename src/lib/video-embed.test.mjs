@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { videoEmbedUrl } from './video-embed.ts';
+import { videoEmbedUrl, hasEmbeddedVideo } from './video-embed.ts';
 
 const VIMEO = 'https://player.vimeo.com/video/123456789?title=0&byline=0&portrait=0&dnt=1';
 
@@ -34,4 +34,22 @@ test('anything else falls back to the image', () => {
   assert.equal(videoEmbedUrl('https://vimeo.com/showcase'), null);
   assert.equal(videoEmbedUrl('https://www.youtube.com/watch?v=short'), null);
   assert.equal(videoEmbedUrl('https://example.com/video/123456789'), null);
+});
+
+test('autoplay starts muted, the only way browsers allow it', () => {
+  assert.equal(videoEmbedUrl('https://vimeo.com/123456789', { autoplay: true }), `${VIMEO}&autoplay=1&muted=1`);
+  assert.equal(
+    videoEmbedUrl('https://youtu.be/dQw4w9WgXcQ', { autoplay: true }),
+    'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&autoplay=1&mute=1',
+  );
+});
+
+test('spots a Vimeo or YouTube player pasted into rich text', () => {
+  // Vimeo's own embed code, as Hailley pasted it into the Business Update body
+  const vimeo = '<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1233779126?badge=0&amp;autoplay=1&amp;muted=1" frameborder="0"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>';
+  assert.equal(hasEmbeddedVideo(vimeo), true);
+  assert.equal(hasEmbeddedVideo('<iframe width="560" src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'), true);
+  assert.equal(hasEmbeddedVideo('<p>Watch on <a href="https://vimeo.com/123">Vimeo</a></p>'), false);
+  assert.equal(hasEmbeddedVideo('<iframe src="https://forms.hubspot.com/x"></iframe>'), false);
+  assert.equal(hasEmbeddedVideo(undefined), false);
 });
