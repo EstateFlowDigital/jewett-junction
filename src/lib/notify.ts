@@ -34,7 +34,12 @@ interface RuntimeEnv {
   BUILTWELL_INBOX_EMAIL?: string;
   MARKETING_INBOX_EMAIL?: string;
   RING_IT_IN_INBOX_EMAIL?: string;
+  CANDY_JAR_INBOX_EMAIL?: string;
 }
+
+// Hailley asked for the candy jar guesses to go to her and Sarah. Used when
+// CANDY_JAR_INBOX_EMAIL isn't set, so the game works without a new env var.
+const CANDY_JAR_DEFAULT_INBOX = 'hholmes@jewettconstruction.com, sleblanc@jewettconstruction.com';
 
 function getEnv(locals: any): RuntimeEnv {
   const runtime = (locals as any)?.runtime?.env;
@@ -51,7 +56,8 @@ export type InboxKey =
   | 'salesLead'
   | 'builtwell'
   | 'marketing'
-  | 'ringItIn';
+  | 'ringItIn'
+  | 'candyJar';
 
 function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
   switch (key) {
@@ -67,6 +73,7 @@ function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
     // makes sendNotification skip silently, which is how IT tickets and
     // BuiltWell ideas went unnoticed. Marketing announces the wins anyway.
     case 'ringItIn': return env.RING_IT_IN_INBOX_EMAIL || env.MARKETING_INBOX_EMAIL;
+    case 'candyJar': return env.CANDY_JAR_INBOX_EMAIL || CANDY_JAR_DEFAULT_INBOX;
   }
 }
 

@@ -163,7 +163,7 @@ const VALID_FIELDS: Record<string, string[]> = {
   ],
   pageCopy: [
     'name', 'slug',
-    'hero-headline', 'hero-subtitle',
+    'hero-headline', 'hero-subtitle', 'hero-image',
     'section-headline', 'section-body',
     'application-description',
     'subsection-1-headline', 'subsection-1-description',

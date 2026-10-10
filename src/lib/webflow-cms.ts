@@ -562,6 +562,8 @@ export interface PageCopy {
   'section-headline'?: string;
   'section-body'?: string;
   'application-description'?: string;
+  /** Optional photo at the top of the page (the Candy Jar page's jar photo). */
+  'hero-image'?: { url: string; alt?: string };
 }
 
 /**

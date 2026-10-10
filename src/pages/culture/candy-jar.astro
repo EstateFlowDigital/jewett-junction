@@ -1,0 +1,65 @@
+---
+import ThemedPage from '../../layouts/themed-page.astro';
+import { CandyJarForm } from '../../components/pages/CandyJarForm';
+import { initCMS, getPageCopy, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { candyJarStatus } from '../../lib/candy-jar';
+
+export const prerender = false;
+
+// Halloween candy jar guess. Copy and the jar photo come from the Page Copy
+// record "candy-jar" (Hero Headline, Hero Subtitle, Hero Image). The page can be
+// opened before October 24 to preview it, but the form only appears while
+// guessing is open (lib/candy-jar.ts), and the Culture box only links here then.
+
+initCMS(Astro.locals);
+
+let copy: any = null;
+try {
+  copy = await getPageCopy('candy-jar');
+} catch (error) {
+  console.error('Error fetching candy jar copy:', error);
+}
+
+const status = candyJarStatus();
+const headline = copy?.['hero-headline'] || 'How many candies are in the jar?';
+const subtitle = copy?.['hero-subtitle'] ? decodeHtmlEntities(copy['hero-subtitle']) : '';
+const photo = copy?.['hero-image']?.url;
+---
+
+<ThemedPage title="Candy Jar Guess | Culture | Jewett Junction" theme="dark" currentSection="culture">
+  <div class="max-w-3xl">
+    <a href="/jewett-junction/culture" class="inline-flex items-center gap-2 text-slate-400 hover:text-blue-400 mb-6 transition-colors min-h-[44px]" aria-label="Back to Culture">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to Culture
+    </a>
+
+    <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
+      {photo && (
+        <div class="w-full bg-slate-950 flex justify-center">
+          <img src={photo} alt={copy?.['hero-image']?.alt || 'The candy jar'} class="max-h-[28rem] w-auto object-contain" loading="eager" />
+        </div>
+      )}
+
+      <div class="p-6 sm:p-8">
+        <span class="inline-block px-3 py-1 text-xs font-medium rounded-full border bg-amber-500/20 text-amber-400 border-amber-500/30 mb-4">Halloween</span>
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{headline}</h1>
+        {subtitle && <div class="text-slate-300 leading-relaxed mb-8" set:html={subtitle} />}
+
+        {status === 'open' && (
+          <>
+            <CandyJarForm client:load />
+            <p class="text-xs text-slate-500 mt-4">Guesses close at the end of October 31.</p>
+          </>
+        )}
+        {status === 'upcoming' && (
+          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Saturday, October 24.</p>
+        )}
+        {status === 'closed' && (
+          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing is closed. Thanks to everyone who played!</p>
+        )}
+      </div>
+    </article>
+  </div>
+</ThemedPage>

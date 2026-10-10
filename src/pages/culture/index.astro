@@ -3,6 +3,7 @@ export const prerender = false;
 import ThemedPage from '../../layouts/themed-page.astro';
 import { CultureContent } from '../../components/pages/CultureContent';
 import { initCMS, getCultureStories, getSiteSettings, getCoreValues, getPageCopy, getQuickActions, getDogsOfJewett } from '../../lib/webflow-cms';
+import { candyJarStatus, CANDY_JAR_PATH } from '../../lib/candy-jar';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -27,7 +28,11 @@ try {
   settings = siteSettings;
   coreValues = coreValuesResult.items;
   pageCopy = copy;
-  quickActions = quickActionsResult.items;
+  // The Candy Jar box only shows while guessing is open (Oct 24–31), so its
+  // Quick Action can stay switched on without anyone flipping it on the day.
+  quickActions = quickActionsResult.items.filter(
+    (a: any) => !(a['destination-url'] || '').startsWith(CANDY_JAR_PATH) || candyJarStatus() === 'open',
+  );
   dogs = dogsResult.items;
 } catch (error) {
   console.error('Error fetching culture data:', error);
