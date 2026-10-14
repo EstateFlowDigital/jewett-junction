@@ -16,7 +16,9 @@ import {
   Minus,
   RemoveFormatting,
   ChevronDown,
-  Type
+  Type,
+  Image as ImageIcon,
+  Loader2
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -24,6 +26,9 @@ interface RichTextEditorProps {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  /** Uploads an image and resolves to its hosted URL. When set, the toolbar
+   *  gets an "Insert image" button (e.g. a Venmo QR code in an announcement). */
+  onUploadImage?: (file: File) => Promise<string>;
 }
 
 // Toolbar button - memoized and defined outside component
@@ -121,8 +126,14 @@ const HeadingDropdown = memo(({ onSelect }: { onSelect: (tag: string) => void })
 
 HeadingDropdown.displayName = 'HeadingDropdown';
 
-export default function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
+export default function RichTextEditor({ value, onChange, placeholder, className, onUploadImage }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Where the cursor was when "Insert image" was clicked: the file picker
+  // steals focus, so the image would otherwise land at the top of the content.
+  const savedRange = useRef<Range | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
   const isUserTyping = useRef(false);
   // Sentinel ensures the very first effect run always pushes `value` into innerHTML,
   // even when the item already has content. If this were seeded with `value`, the
@@ -230,6 +241,50 @@ export default function RichTextEditor({ value, onChange, placeholder, className
     execCommand('insertHorizontalRule');
   }, [execCommand]);
 
+  // Insert image: remember the cursor, open the file picker, upload, then put
+  // the image where the cursor was (or at the end if it wasn't in the editor).
+  const openImagePicker = useCallback(() => {
+    const selection = window.getSelection();
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    savedRange.current =
+      range && editorRef.current?.contains(range.commonAncestorContainer) ? range.cloneRange() : null;
+    setImageError('');
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleImageFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !onUploadImage || !editorRef.current) return;
+    setImageUploading(true);
+    setImageError('');
+    try {
+      const url = await onUploadImage(file);
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ');
+      const p = document.createElement('p');
+      p.appendChild(img);
+
+      const range = savedRange.current;
+      if (range && editorRef.current.contains(range.commonAncestorContainer)) {
+        // Drop the image after the paragraph the cursor is in, so it sits on its own line.
+        let block: Node | null = range.startContainer;
+        while (block && block.parentNode !== editorRef.current) block = block.parentNode;
+        if (block) editorRef.current.insertBefore(p, block.nextSibling);
+        else editorRef.current.appendChild(p);
+      } else {
+        editorRef.current.appendChild(p);
+      }
+      handleInput();
+    } catch (err: any) {
+      setImageError(err?.message || 'Image upload failed. Please try again.');
+    } finally {
+      setImageUploading(false);
+      savedRange.current = null;
+    }
+  }, [onUploadImage, handleInput]);
+
   // Keyboard shortcuts
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.ctrlKey || e.metaKey) {
@@ -297,6 +352,23 @@ export default function RichTextEditor({ value, onChange, placeholder, className
         <div className="flex items-center gap-0.5 pr-2 mr-1 border-r border-slate-600/50">
           <ToolbarButton onClick={insertLink} icon={Link} title="Insert Link" />
           <ToolbarButton onClick={insertHorizontalRule} icon={Minus} title="Horizontal Line" />
+          {onUploadImage && (
+            <>
+              <ToolbarButton
+                onClick={openImagePicker}
+                icon={imageUploading ? Loader2 : ImageIcon}
+                title={imageUploading ? 'Uploading image…' : 'Insert Image'}
+                disabled={imageUploading}
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={handleImageFile}
+              />
+            </>
+          )}
         </div>
 
         {/* Clear */}
@@ -329,8 +401,10 @@ export default function RichTextEditor({ value, onChange, placeholder, className
           [&_u]:underline
           [&_s]:line-through [&_strike]:line-through
           [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:py-1 [&_blockquote]:my-3 [&_blockquote]:italic [&_blockquote]:text-slate-300 [&_blockquote]:bg-slate-800/30
-          [&_hr]:border-slate-600 [&_hr]:my-4"
+          [&_hr]:border-slate-600 [&_hr]:my-4
+          [&_img]:max-w-full [&_img]:max-h-80 [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2"
       />
+      {imageError && <p className="px-4 pb-3 text-sm text-red-400" role="alert">{imageError}</p>}
     </div>
   );
 }

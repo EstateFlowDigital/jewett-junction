@@ -146,7 +146,9 @@ const bodyHasVideo = hasEmbeddedVideo(decodeHtmlEntities(announcement.content));
       </header>
 
       <div class="prose prose-invert max-w-none">
-        <div class="text-slate-300 leading-relaxed text-lg" set:html={decodeHtmlEntities(announcement.content)} />
+        <!-- Images placed in the content (e.g. a Venmo QR code) stay inside the
+             card, keep their shape and are capped so a phone photo doesn't fill the screen. -->
+        <div class="text-slate-300 leading-relaxed text-lg [&_img]:max-w-full [&_img]:max-h-[32rem] [&_img]:w-auto [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-4 [&_figure]:my-6 [&_figure]:max-w-full" set:html={decodeHtmlEntities(announcement.content)} />
       </div>
 
       <!-- CTA Button -->

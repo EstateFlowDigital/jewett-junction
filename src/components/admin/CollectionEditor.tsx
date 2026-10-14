@@ -572,6 +572,30 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
     }
   };
 
+  // Images placed inside rich text (the editor's "Insert image" button). Same
+  // upload as image fields, but the URL goes into the HTML instead of a field.
+  const uploadInlineImage = async (file: File): Promise<string> => {
+    const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!imageTypes.includes(file.type)) throw new Error('Images must be JPEG, PNG, GIF or WebP.');
+    if (file.size > 4 * 1024 * 1024) throw new Error('Image too large. Maximum size is 4 MB.');
+
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+    const response = await fetch(`${API_BASE}/api/admin/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getToken()}`,
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ fileName: file.name, fileType: file.type, fileSize: file.size, fileData: base64 })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.url) throw new Error(data.error || `Image upload failed (${response.status}).`);
+    return data.url;
+  };
+
   const handleDrop = (e: React.DragEvent, fieldKey: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1086,6 +1110,7 @@ export function CollectionEditor({ collectionKey, config }: CollectionEditorProp
             value={formData[field.key] || ''}
             onChange={(html) => setFormData({ ...formData, [field.key]: html })}
             placeholder={field.placeholder || "Start typing your content..."}
+            onUploadImage={uploadInlineImage}
           />
         )}
 
