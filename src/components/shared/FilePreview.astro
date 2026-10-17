@@ -1,4 +1,5 @@
 ---
+import { splitBox } from "@/utils/box.ts";
 // Inline file/image preview for detail pages.
 // Auto-detects type from URL extension and renders the best preview:
 //   - PDF       → embedded iframe (75vh)
@@ -6,7 +7,30 @@
 //   - Video     → <video controls>
 //   - Office    → Google Docs Viewer (gview) iframe
 //   - Other/external → file card with "Open in new tab"
-interface Props {
+// stacki-box:start (written by scripts/stacki-box.mjs; change it there)
+type StackiBox = {
+  /** Space inside this component, on all four sides. Empty keeps the design's own spacing. */
+  padding?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the top edge. Overrides Padding for that side. */
+  paddingTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the bottom edge. Overrides Padding for that side. */
+  paddingBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the left edge. Overrides Padding for that side. */
+  paddingLeft?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the right edge. Overrides Padding for that side. */
+  paddingRight?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, above it. Empty keeps the design's own spacing. */
+  marginTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, below it. Empty keeps the design's own spacing. */
+  marginBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Color scheme for this component and everything inside it. Inherit follows the page; Dark uses the app's dark colors. */
+  theme?: "inherit" | "dark";
+  /** How wide this component can grow. Small keeps it to a readable width; Full fills its column. */
+  maxWidth?: "small" | "full" | "none";
+};
+// stacki-box:end
+
+interface Props extends StackiBox {
   url?: string | null;
   name?: string;
   accent?: 'blue' | 'purple' | 'orange' | 'cyan' | 'rose' | 'amber' | 'green' | 'emerald' | 'red' | 'slate';
@@ -14,7 +38,9 @@ interface Props {
   height?: string; // tailwind class fragment for iframe/video height (e.g. "h-[75vh]")
 }
 
-const { url, name, accent = 'blue', aspectRatio = 'auto', height = 'h-[75vh]' } = Astro.props;
+const { class: __ownClass, url, name, accent = 'blue', aspectRatio = 'auto', height = 'h-[75vh]' } = Astro.props as Props & { class?: string };
+const __box = splitBox(Astro.props);
+const className = [__ownClass, __box.boxClass].filter(Boolean).join(" ") || undefined;
 
 // Skip rendering entirely if no URL
 const hasUrl = typeof url === 'string' && url.length > 0;
@@ -79,7 +105,7 @@ const aspectClass =
 ---
 
 {hasUrl && (
-  <div class="rounded-xl overflow-hidden border border-slate-700/50 bg-slate-950">
+  <div class:list={["rounded-xl overflow-hidden border border-slate-700/50 bg-slate-950", className]}>
     {/* Filename strip + open-in-new-tab */}
     <div class="px-4 py-2.5 border-b border-slate-700/50 bg-slate-900/50 flex items-center justify-between text-xs text-slate-400 gap-3">
       <span class="flex items-center gap-2 min-w-0">
