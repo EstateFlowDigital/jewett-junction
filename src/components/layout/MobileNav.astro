@@ -18,11 +18,37 @@
  */
 import { getIntranetSections } from '../../lib/webflow-cms';
 import { NAV_PRIMARY, NAV_IDEA, NAV_UTILITY, NAV_PATHS, NAV_LOGO_URL } from '../../lib/nav-items';
+import { splitBox } from "@/utils/box.ts";
 
-interface Props {
+// stacki-box:start (written by scripts/stacki-box.mjs; change it there)
+type StackiBox = {
+  /** Space inside this component, on all four sides. Empty keeps the design's own spacing. */
+  padding?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the top edge. Overrides Padding for that side. */
+  paddingTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the bottom edge. Overrides Padding for that side. */
+  paddingBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the left edge. Overrides Padding for that side. */
+  paddingLeft?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the right edge. Overrides Padding for that side. */
+  paddingRight?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, above it. Empty keeps the design's own spacing. */
+  marginTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, below it. Empty keeps the design's own spacing. */
+  marginBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Color scheme for this component and everything inside it. Inherit follows the page; Dark uses the app's dark colors. */
+  theme?: "inherit" | "dark";
+  /** How wide this component can grow. Small keeps it to a readable width; Full fills its column. */
+  maxWidth?: "small" | "full" | "none";
+};
+// stacki-box:end
+
+interface Props extends StackiBox {
   currentSection?: string;
 }
-const { currentSection = '' } = Astro.props;
+const { class: __ownClass, currentSection = '' } = Astro.props as Props & { class?: string };
+const __box = splitBox(Astro.props);
+const className = [__ownClass, __box.boxClass].filter(Boolean).join(" ") || undefined;
 
 let sectionMap = new Map<string, string>();
 try {
@@ -54,7 +80,7 @@ const linkClass = (item: { slug: string; accent?: 'amber' | 'red' }) => {
 const items = [...NAV_PRIMARY];
 ---
 
-<div class="md:hidden">
+<div class:list={["md:hidden", className]}>
   <input type="checkbox" id="jj-nav-toggle" class="peer sr-only" aria-hidden="true" tabindex="-1" />
 
   <!-- Trigger. A label rather than a button so it works without JS; role and
