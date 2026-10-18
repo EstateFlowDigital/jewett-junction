@@ -95,7 +95,7 @@ const difficultyColors: Record<string, string> = {
             class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
             style={iconHex ? `background-color: ${iconHex}33` : 'background-color: rgba(148,163,184,0.15)'}
           >
-            <CmsIcon url={titleIcon} color={iconHex || undefined} size={32} ariaLabel={item.name} />
+            <CmsIcon url={titleIcon} hex={iconHex || undefined} size={32} ariaLabel={item.name} />
           </div>
         )}
         {!headerImage && !titleIcon && (
@@ -229,7 +229,7 @@ const difficultyColors: Record<string, string> = {
                     class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={relatedHex ? `background-color: ${relatedHex}33` : 'background-color: rgba(148,163,184,0.15)'}
                   >
-                    <CmsIcon url={related.icon.url} color={relatedHex || undefined} size={24} ariaLabel={related.name} />
+                    <CmsIcon url={related.icon.url} hex={relatedHex || undefined} size={24} ariaLabel={related.name} />
                   </div>
                 )}
                 {!related.icon?.url && (

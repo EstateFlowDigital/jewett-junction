@@ -69,3 +69,39 @@ test("box settings never reach the markup as attributes", () => {
   assert.equal(boxClass, "padding-6");
   assert.deepEqual(props, { id: "x", theme: "dark" }, "a component's own theme stays with it");
 });
+
+/** The setting's type and the doc comment on the line above it. */
+function propLine(file, name) {
+  const lines = fs.readFileSync(path.join(ROOT, file), "utf8").split("\n");
+  const i = lines.findIndex((l) => new RegExp(`^\\s+${name}\\?:`).test(l));
+  return { type: lines[i]?.replace(/^\s+\w+\?:\s*/, "").replace(/;.*$/, ""), doc: lines[i - 1] ?? "" };
+}
+
+test("CmsIcon color and FilePreview height are dropdowns with a description", () => {
+  for (const [file, name] of [
+    ["shared/CmsIcon.astro", "color"],
+    ["shared/FilePreview.astro", "height"],
+  ]) {
+    const { type, doc } = propLine(file, name);
+    assert.match(type ?? "", /^("[^"]+"\s*\|\s*)+"[^"]+"$/, `${file} ${name}: not a list of choices`);
+    assert.match(doc, /^\s*\/\*\*.+\*\/\s*$/, `${file} ${name}: no description`);
+  }
+});
+
+test("FilePreview's default height is still 75vh", () => {
+  const text = fs.readFileSync(path.join(ROOT, "shared/FilePreview.astro"), "utf8");
+  assert.match(text, /height = "large"/);
+  assert.match(text, /large: "h-\[75vh\]"/);
+});
+
+test("pages hand CmsIcon the CMS hex through hex, not color", () => {
+  const offenders = [];
+  (function walk(dir) {
+    for (const f of fs.readdirSync(dir)) {
+      const p = path.join(dir, f);
+      if (fs.statSync(p).isDirectory()) walk(p);
+      else if (p.endsWith(".astro") && /<CmsIcon\b[^>]*\bcolor=\{/.test(fs.readFileSync(p, "utf8"))) offenders.push(p);
+    }
+  })("src/pages");
+  assert.deepEqual(offenders, []);
+});

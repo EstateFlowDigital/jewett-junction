@@ -35,10 +35,13 @@ interface Props extends StackiBox {
   name?: string;
   accent?: 'blue' | 'purple' | 'orange' | 'cyan' | 'rose' | 'amber' | 'green' | 'emerald' | 'red' | 'slate';
   aspectRatio?: 'video' | 'square' | 'auto';
-  height?: string; // tailwind class fragment for iframe/video height (e.g. "h-[75vh]")
+  /** How tall a PDF, document or video preview is. Large is three quarters of the screen; Full is the whole screen. */
+  height?: "small" | "medium" | "large" | "full";
 }
 
-const { class: __ownClass, url, name, accent = 'blue', aspectRatio = 'auto', height = 'h-[75vh]' } = Astro.props as Props & { class?: string };
+const { class: __ownClass, url, name, accent = 'blue', aspectRatio = 'auto', height = "large" } = Astro.props as Props & { class?: string };
+const HEIGHTS = { small: "h-[40vh]", medium: "h-[60vh]", large: "h-[75vh]", full: "h-screen" } as const;
+const heightClass = HEIGHTS[height] ?? HEIGHTS.large;
 const __box = splitBox(Astro.props);
 const className = [__ownClass, __box.boxClass].filter(Boolean).join(" ") || undefined;
 
@@ -152,7 +155,7 @@ const aspectClass =
         <video
           controls
           preload="metadata"
-          class={`w-full ${height} max-h-[75vh]`}
+          class={`w-full ${heightClass} max-h-[75vh]`}
           src={url}
         >
           Your browser doesn't support inline video.
@@ -163,14 +166,14 @@ const aspectClass =
       <iframe
         src={url}
         title={`Preview of ${filename}`}
-        class={`w-full ${height} bg-white`}
+        class={`w-full ${heightClass} bg-white`}
         loading="lazy"
       />
     ) : isOffice && gviewUrl ? (
       <iframe
         src={gviewUrl}
         title={`Preview of ${filename}`}
-        class={`w-full ${height} bg-white`}
+        class={`w-full ${heightClass} bg-white`}
         loading="lazy"
       />
     ) : (
