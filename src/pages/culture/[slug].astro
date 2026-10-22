@@ -1,6 +1,7 @@
 ---
 import ThemedPage from '../../layouts/themed-page.astro';
 import { initCMS, getCultureStoryBySlug, getCultureStories, decodeHtmlEntities } from '../../lib/webflow-cms';
+import { videoEmbedUrl, hasEmbeddedVideo } from '../../lib/video-embed';
 
 export const prerender = false;
 
@@ -30,6 +31,12 @@ if (!story) {
   return Astro.redirect('/jewett-junction/culture');
 }
 
+// A Video URL plays at the top of the story, in place of the hero image, the
+// same way announcements do. Embed code pasted into the body also hides the
+// image so it isn't repeated above the video.
+const videoSrc = videoEmbedUrl(story['video-url'], { autoplay: true });
+const bodyHasVideo = hasEmbeddedVideo(decodeHtmlEntities(story.content));
+
 // Format date safely
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
@@ -56,8 +63,19 @@ const formatDate = (dateStr: string) => {
 
     <!-- Story Content -->
     <article class="glass rounded-2xl overflow-hidden mb-8 border border-slate-800/50">
-      <!-- Hero Image -->
-      {(story['featured-image']?.url || story.image?.url) && (
+      <!-- Hero: the video when there is one, otherwise the featured image -->
+      {videoSrc ? (
+        <div class="w-full aspect-video bg-black">
+          <iframe
+            src={videoSrc}
+            title={`Video: ${story.name}`}
+            class="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+      ) : !bodyHasVideo && (story['featured-image']?.url || story.image?.url) && (
         <div class="aspect-video relative">
           <img
             src={story['featured-image']?.url || story.image?.url}
