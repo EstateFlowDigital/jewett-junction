@@ -5,9 +5,9 @@
 // No imports and type-only TypeScript, so candy-jar.test.mjs can load this
 // file directly under Node's type stripping.
 
-// Eastern time. Opens the morning of Saturday Oct 24; the last guess counts up
-// to midnight at the end of Oct 31.
-export const CANDY_JAR_OPENS = '2026-10-24T00:00:00-04:00';
+// Opens Tuesday Oct 27 at 6 PM Pacific (9 PM Eastern), as Hailley asked on
+// Oct 19; the last guess counts up to midnight Eastern at the end of Oct 31.
+export const CANDY_JAR_OPENS = '2026-10-27T18:00:00-07:00';
 export const CANDY_JAR_CLOSES = '2026-11-01T00:00:00-04:00';
 export const CANDY_JAR_PATH = '/jewett-junction/culture/candy-jar';
 

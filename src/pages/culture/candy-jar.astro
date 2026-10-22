@@ -8,7 +8,7 @@ export const prerender = false;
 
 // Halloween candy jar guess. Copy and the jar photo come from the Page Copy
 // record "candy-jar" (Hero Headline, Hero Subtitle, Hero Image). The page can be
-// opened before October 24 to preview it, but the form only appears while
+// opened before October 27 to preview it, but the form only appears while
 // guessing is open (lib/candy-jar.ts), and the Culture box only links here then.
 
 initCMS(Astro.locals);
@@ -54,7 +54,7 @@ const photo = copy?.['hero-image']?.url;
           </>
         )}
         {status === 'upcoming' && (
-          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Saturday, October 24.</p>
+          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Tuesday, October 27, at 6 PM Pacific (9 PM Eastern).</p>
         )}
         {status === 'closed' && (
           <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing is closed. Thanks to everyone who played!</p>

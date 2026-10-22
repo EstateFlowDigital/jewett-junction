@@ -22,7 +22,7 @@ function escapeHtml(s: string) {
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const status = candyJarStatus();
-  if (status === 'upcoming') return json({ error: 'Guessing opens October 24.' }, 403);
+  if (status === 'upcoming') return json({ error: 'Guessing opens October 27 at 6 PM Pacific.' }, 403);
   if (status === 'closed') return json({ error: 'Guessing is closed.' }, 403);
 
   let data: any;
