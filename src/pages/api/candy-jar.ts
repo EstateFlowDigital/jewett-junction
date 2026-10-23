@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { COLLECTIONS } from '../../lib/webflow-cms';
 import { sendNotification } from '../../lib/notify';
-import { candyJarStatus, cleanName, parseGuess, guessSlug } from '../../lib/candy-jar';
+import { candyJarStatus, cleanNamePart, parseGuess, guessSlug } from '../../lib/candy-jar';
 
 export const prerender = false;
 
@@ -32,8 +32,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: 'Invalid request' }, 400);
   }
 
-  const name = cleanName(data?.name);
-  if (!name) return json({ error: 'Please enter your first and last name.' }, 400);
+  // Both halves are required: the portal is one shared login, so the name is
+  // the only thing that tells two guessers apart.
+  const firstName = cleanNamePart(data?.firstName);
+  const lastName = cleanNamePart(data?.lastName);
+  if (!firstName || !lastName) return json({ error: 'Please enter your first and last name.' }, 400);
+  const name = `${firstName} ${lastName}`;
   const guess = parseGuess(data?.guess);
   if (guess === null) return json({ error: 'Please enter your guess as a whole number.' }, 400);
   const slug = guessSlug(name);

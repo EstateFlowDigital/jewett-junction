@@ -1,11 +1,14 @@
 import * as React from 'react';
 
 /**
- * The two-field guess form on /culture/candy-jar. The page decides whether
- * guessing is open; this only renders while it is.
+ * The guess form on /culture/candy-jar. The page decides whether guessing is
+ * open; this only renders while it is. First and last name are separate
+ * required fields: the portal is one shared login, so the name is what keeps
+ * one person's guess from replacing another's.
  */
 export function CandyJarForm() {
-  const [name, setName] = React.useState('');
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
   const [guess, setGuess] = React.useState('');
   const [status, setStatus] = React.useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [message, setMessage] = React.useState('');
@@ -19,7 +22,7 @@ export function CandyJarForm() {
       const res = await fetch('/jewett-junction/api/candy-jar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, guess }),
+        body: JSON.stringify({ firstName, lastName, guess }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Something went wrong saving your guess. Please try again.');
@@ -49,22 +52,39 @@ export function CandyJarForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label htmlFor="candy-name" className="block text-sm font-medium text-slate-300 mb-2">
-          Your First and Last Name <span className="text-amber-400">*</span>
-        </label>
-        <input
-          id="candy-name"
-          type="text"
-          required
-          minLength={2}
-          maxLength={80}
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={inputClass}
-          placeholder="e.g., Jane Doe"
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="candy-first-name" className="block text-sm font-medium text-slate-300 mb-2">
+            First name <span className="text-amber-400">*</span>
+          </label>
+          <input
+            id="candy-first-name"
+            type="text"
+            required
+            maxLength={40}
+            autoComplete="given-name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className={inputClass}
+            placeholder="e.g., Jane"
+          />
+        </div>
+        <div>
+          <label htmlFor="candy-last-name" className="block text-sm font-medium text-slate-300 mb-2">
+            Last name <span className="text-amber-400">*</span>
+          </label>
+          <input
+            id="candy-last-name"
+            type="text"
+            required
+            maxLength={40}
+            autoComplete="family-name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className={inputClass}
+            placeholder="e.g., Doe"
+          />
+        </div>
       </div>
       <div>
         <label htmlFor="candy-guess" className="block text-sm font-medium text-slate-300 mb-2">

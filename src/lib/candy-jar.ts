@@ -20,10 +20,13 @@ export function candyJarStatus(now: Date = new Date()): CandyJarStatus {
   return 'open';
 }
 
-// Trimmed, single-spaced name, or null when it's too short or too long to be one.
-export function cleanName(raw: unknown): string | null {
-  const name = String(raw ?? '').replace(/\s+/g, ' ').trim();
-  return name.length >= 2 && name.length <= 80 ? name : null;
+// One half of a name ("Jane", "O'Neil"), trimmed and single-spaced, or null
+// when it's empty, has no letters or runs past 40 characters. The form asks for
+// first and last name separately so two people called Mike can't overwrite
+// each other's guess by typing only "Mike".
+export function cleanNamePart(raw: unknown): string | null {
+  const part = String(raw ?? '').replace(/\s+/g, ' ').trim();
+  return part.length <= 40 && /\p{L}/u.test(part) ? part : null;
 }
 
 // Whole number of candies, commas allowed ("1,250"), up to 9,999,999.

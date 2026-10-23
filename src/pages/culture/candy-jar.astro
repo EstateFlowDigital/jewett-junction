@@ -21,6 +21,9 @@ try {
 }
 
 const status = candyJarStatus();
+// Stacki previews the page on a local dev server, so the form shows there
+// whatever the date. The live site still waits for guessing to open.
+const showForm = status === 'open' || import.meta.env.DEV;
 const headline = copy?.['hero-headline'] || 'How many candies are in the jar?';
 const subtitle = copy?.['hero-subtitle'] ? decodeHtmlEntities(copy['hero-subtitle']) : '';
 const photo = copy?.['hero-image']?.url;
@@ -47,16 +50,16 @@ const photo = copy?.['hero-image']?.url;
         <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{headline}</h1>
         {subtitle && <div class="text-slate-300 leading-relaxed mb-8" set:html={subtitle} />}
 
-        {status === 'open' && (
+        {showForm && (
           <>
             <CandyJarForm client:load />
             <p class="text-xs text-slate-500 mt-4">Guesses close at the end of October 31.</p>
           </>
         )}
-        {status === 'upcoming' && (
+        {!showForm && status === 'upcoming' && (
           <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Tuesday, October 27, at 6 PM Pacific (9 PM Eastern).</p>
         )}
-        {status === 'closed' && (
+        {!showForm && status === 'closed' && (
           <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing is closed. Thanks to everyone who played!</p>
         )}
       </div>

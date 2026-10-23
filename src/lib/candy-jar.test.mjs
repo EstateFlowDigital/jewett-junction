@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { candyJarStatus, cleanName, parseGuess, guessSlug } from './candy-jar.ts';
+import { candyJarStatus, cleanNamePart, parseGuess, guessSlug } from './candy-jar.ts';
 
 test('guessing opens Oct 27 at 6 PM Pacific and closes at the end of Oct 31, Eastern', () => {
   assert.equal(candyJarStatus(new Date('2026-10-27T17:59:00-07:00')), 'upcoming');
@@ -9,12 +9,16 @@ test('guessing opens Oct 27 at 6 PM Pacific and closes at the end of Oct 31, Eas
   assert.equal(candyJarStatus(new Date('2026-11-01T00:00:00-04:00')), 'closed');
 });
 
-test('names are trimmed and must look like a name', () => {
-  assert.equal(cleanName('  Jane   Doe '), 'Jane Doe');
-  assert.equal(cleanName('J'), null);
-  assert.equal(cleanName(''), null);
-  assert.equal(cleanName(undefined), null);
-  assert.equal(cleanName('x'.repeat(81)), null);
+test('first and last names are trimmed and must contain a letter', () => {
+  assert.equal(cleanNamePart('  Mary   Ann '), 'Mary Ann');
+  assert.equal(cleanNamePart("O'Neil"), "O'Neil");
+  assert.equal(cleanNamePart('J'), 'J');
+  assert.equal(cleanNamePart('Núñez'), 'Núñez');
+  assert.equal(cleanNamePart(''), null);
+  assert.equal(cleanNamePart('   '), null);
+  assert.equal(cleanNamePart('123'), null);
+  assert.equal(cleanNamePart(undefined), null);
+  assert.equal(cleanNamePart('x'.repeat(41)), null);
 });
 
 test('guesses are whole numbers; commas are fine', () => {
