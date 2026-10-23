@@ -2,11 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { candyJarStatus, cleanNamePart, parseGuess, guessSlug } from './candy-jar.ts';
 
-test('guessing opens Oct 27 at 6 PM Pacific and closes at the end of Oct 31, Eastern', () => {
-  assert.equal(candyJarStatus(new Date('2026-10-27T17:59:00-07:00')), 'upcoming');
-  assert.equal(candyJarStatus(new Date('2026-10-27T18:00:00-07:00')), 'open');
-  assert.equal(candyJarStatus(new Date('2026-10-31T23:59:00-04:00')), 'open');
-  assert.equal(candyJarStatus(new Date('2026-11-01T00:00:00-04:00')), 'closed');
+test('guessing opens Oct 28 and closes Oct 30 at noon, Eastern', () => {
+  assert.equal(candyJarStatus(new Date('2026-10-27T23:59:00-04:00')), 'upcoming');
+  assert.equal(candyJarStatus(new Date('2026-10-27T21:00:00-07:00')), 'open');
+  assert.equal(candyJarStatus(new Date('2026-10-30T11:59:00-04:00')), 'open');
+  assert.equal(candyJarStatus(new Date('2026-10-30T12:00:00-04:00')), 'closed');
 });
 
 test('first and last names are trimmed and must contain a letter', () => {

@@ -37,9 +37,9 @@ interface RuntimeEnv {
   CANDY_JAR_INBOX_EMAIL?: string;
 }
 
-// Hailley asked for the candy jar guesses to go to her and Sarah. Used when
+// Hailley asked for the candy jar guesses to go to her, Sarah and lpalmer. Used when
 // CANDY_JAR_INBOX_EMAIL isn't set, so the game works without a new env var.
-const CANDY_JAR_DEFAULT_INBOX = 'hholmes@jewettconstruction.com, sleblanc@jewettconstruction.com';
+const CANDY_JAR_DEFAULT_INBOX = 'hholmes@jewettconstruction.com, sleblanc@jewettconstruction.com, lpalmer@jewettconstruction.com';
 
 function getEnv(locals: any): RuntimeEnv {
   const runtime = (locals as any)?.runtime?.env;

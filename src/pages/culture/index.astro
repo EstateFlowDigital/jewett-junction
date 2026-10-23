@@ -28,7 +28,7 @@ try {
   settings = siteSettings;
   coreValues = coreValuesResult.items;
   pageCopy = copy;
-  // The Candy Jar box only shows while guessing is open (Oct 27–31), so its
+  // The Candy Jar box only shows while guessing is open (Oct 28–30), so its
   // Quick Action can stay switched on without anyone flipping it on the day.
   quickActions = quickActionsResult.items.filter(
     (a: any) => !(a['destination-url'] || '').startsWith(CANDY_JAR_PATH) || candyJarStatus() === 'open',

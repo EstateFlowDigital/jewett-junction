@@ -5,10 +5,11 @@
 // No imports and type-only TypeScript, so candy-jar.test.mjs can load this
 // file directly under Node's type stripping.
 
-// Opens Tuesday Oct 27 at 6 PM Pacific (9 PM Eastern), as Hailley asked on
-// Oct 19; the last guess counts up to midnight Eastern at the end of Oct 31.
-export const CANDY_JAR_OPENS = '2026-10-27T18:00:00-07:00';
-export const CANDY_JAR_CLOSES = '2026-11-01T00:00:00-04:00';
+// Hailley's contest dates (Oct 23): guessing opens Wednesday Oct 28 (midnight
+// Eastern, 9 PM Pacific on the 27th) and closes Friday Oct 30 at 12:00 PM
+// Eastern; the winner is announced at 2 PM that day.
+export const CANDY_JAR_OPENS = '2026-10-28T00:00:00-04:00';
+export const CANDY_JAR_CLOSES = '2026-10-30T12:00:00-04:00';
 export const CANDY_JAR_PATH = '/jewett-junction/culture/candy-jar';
 
 export type CandyJarStatus = 'upcoming' | 'open' | 'closed';
@@ -36,8 +37,8 @@ export function parseGuess(raw: unknown): number | null {
 }
 
 // One guess per person: the CMS slug is built from the name, so "Jane O'Neil"
-// and " jane  o'neil " land on the same record and a second guess replaces the
-// first.
+// and " jane  o'neil " land on the same record, and the API turns away a
+// second guess (the first guess wins a tie, so it can't be replaced).
 export function guessSlug(name: string): string | null {
   const key = name
     .toLowerCase()

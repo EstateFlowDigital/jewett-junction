@@ -8,7 +8,7 @@ export const prerender = false;
 
 // Halloween candy jar guess. Copy and the jar photo come from the Page Copy
 // record "candy-jar" (Hero Headline, Hero Subtitle, Hero Image). The page can be
-// opened before October 27 to preview it, but the form only appears while
+// opened before October 28 to preview it, but the form only appears while
 // guessing is open (lib/candy-jar.ts), and the Culture box only links here then.
 
 initCMS(Astro.locals);
@@ -48,16 +48,16 @@ const photo = copy?.['hero-image']?.url;
       <div class="p-6 sm:p-8">
         <span class="inline-block px-3 py-1 text-xs font-medium rounded-full border bg-amber-500/20 text-amber-400 border-amber-500/30 mb-4">Halloween</span>
         <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">{headline}</h1>
-        {subtitle && <div class="text-slate-300 leading-relaxed mb-8" set:html={subtitle} />}
+        {subtitle && <div class="text-slate-300 leading-relaxed mb-8 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_li]:mb-1 [&_strong]:text-white" set:html={subtitle} />}
 
         {showForm && (
           <>
             <CandyJarForm client:load />
-            <p class="text-xs text-slate-500 mt-4">Guesses close at the end of October 31.</p>
+            <p class="text-xs text-slate-500 mt-4">Guessing closes Friday, October 30 at 12:00 PM Eastern.</p>
           </>
         )}
         {!showForm && status === 'upcoming' && (
-          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Tuesday, October 27, at 6 PM Pacific (9 PM Eastern).</p>
+          <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing opens Wednesday, October 28.</p>
         )}
         {!showForm && status === 'closed' && (
           <p class="rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-slate-300">Guessing is closed. Thanks to everyone who played!</p>

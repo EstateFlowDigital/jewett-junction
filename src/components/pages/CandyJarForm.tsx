@@ -12,7 +12,6 @@ export function CandyJarForm() {
   const [guess, setGuess] = React.useState('');
   const [status, setStatus] = React.useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [message, setMessage] = React.useState('');
-  const [updated, setUpdated] = React.useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +25,6 @@ export function CandyJarForm() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Something went wrong saving your guess. Please try again.');
-      setUpdated(!!data.updated);
       setStatus('success');
     } catch (error: any) {
       setMessage(error?.message || 'Something went wrong saving your guess. Please try again.');
@@ -39,9 +37,8 @@ export function CandyJarForm() {
       <div className="text-center py-6" role="status">
         <h2 className="text-xl font-semibold text-white mb-2">Your guess is in!</h2>
         <p className="text-slate-300">
-          {updated ? 'We replaced your earlier guess with ' : 'You guessed '}
-          <span className="font-semibold text-white">{Number(guess.replace(/,/g, '')).toLocaleString('en-US')}</span>
-          {updated ? '.' : ' pieces of candy.'} Good luck!
+          You guessed <span className="font-semibold text-white">{Number(guess.replace(/,/g, '')).toLocaleString('en-US')}</span> pieces
+          of candy. The winner is announced Friday, October 30 at 2:00 PM. Good luck!
         </p>
       </div>
     );

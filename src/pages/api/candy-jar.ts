@@ -8,9 +8,10 @@ export const prerender = false;
 const BASE_URL = 'https://api.webflow.com/v2';
 
 // Halloween candy jar guesses. Each one is a Form Submissions record (the
-// admin already lists those) whose slug comes from the guesser's name, so a
-// second guess from the same person updates their record instead of adding
-// another. Every guess is emailed to the candyJar inbox (Hailley and Sarah).
+// admin already lists those) whose slug comes from the guesser's name. One
+// guess per person: a second guess under the same name is turned away, since
+// ties go to the first guess submitted. Every guess is emailed to the candyJar
+// inbox (Hailley, Sarah and lpalmer).
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -22,7 +23,7 @@ function escapeHtml(s: string) {
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const status = candyJarStatus();
-  if (status === 'upcoming') return json({ error: 'Guessing opens October 27 at 6 PM Pacific.' }, 403);
+  if (status === 'upcoming') return json({ error: 'Guessing opens Wednesday, October 28.' }, 403);
   if (status === 'closed') return json({ error: 'Guessing is closed.' }, 403);
 
   let data: any;
@@ -57,7 +58,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const existing = lookup.ok
       ? ((await lookup.json()).items || []).find((i: any) => i?.fieldData?.slug === slug)
       : null;
-    const previous = existing ? parseGuess(String(existing.fieldData?.['full-response'] || '').match(/Guess:\s*([\d,]+)/)?.[1]) : null;
+    if (existing) {
+      return json({ error: "You've already submitted a guess. It's one guess per person, so your first one stands." }, 409);
+    }
 
     const fieldData = {
       name: `Candy Jar: ${name} guessed ${guess.toLocaleString('en-US')}`,
@@ -66,22 +69,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
       'submitter-name': name,
       'submitted-at': new Date().toISOString(),
       'published-path': '/culture/candy-jar',
-      'full-response': `<p>Guess: ${guess}</p>${previous !== null ? `<p>Previous guess: ${previous}</p>` : ''}<p>Name: ${escapeHtml(name)}</p>`,
+      'full-response': `<p>Guess: ${guess}</p><p>Name: ${escapeHtml(name)}</p>`,
       status: 'New',
     };
 
     // Drafts, like the other form records: internal, never published pages.
-    const res = existing
-      ? await fetch(`${BASE_URL}/collections/${collectionId}/items/${existing.id}`, {
-          method: 'PATCH',
-          headers,
-          body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
-        })
-      : await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
-        });
+    const res = await fetch(`${BASE_URL}/collections/${collectionId}/items`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ isArchived: false, isDraft: true, fieldData }),
+    });
     if (!res.ok) {
       console.error('candy-jar: Webflow error saving guess:', await res.text());
       return json({ error: 'Something went wrong saving your guess. Please try again.' }, 500);
@@ -93,11 +90,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       fields: [
         { label: 'Name', value: name },
         { label: 'Guess', value: guess.toLocaleString('en-US') },
-        { label: 'Previous guess', value: previous !== null ? `${previous.toLocaleString('en-US')} (replaced by this one)` : undefined },
       ],
     });
 
-    return json({ success: true, guess, updated: !!existing });
+    return json({ success: true, guess });
   } catch (error) {
     console.error('candy-jar: error saving guess:', error);
     return json({ error: 'Something went wrong saving your guess. Please try again.' }, 500);
