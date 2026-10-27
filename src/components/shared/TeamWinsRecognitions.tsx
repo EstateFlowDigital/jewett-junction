@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Trophy, Award, Star, Heart, Medal, HandHeart, Sparkles } from 'lucide-react';
+import { Trophy, Award, Star, Heart, Medal, HandHeart, Sparkles, Bell } from 'lucide-react';
 
 /**
- * Team Wins and Recent Recognitions, shown on both Culture and the homepage.
+ * Team Wins/Recent Recognitions and Reminders, shown on both Culture and the
+ * homepage. Wins and recognitions share the first block; stories typed
+ * "Reminder" fill the second.
  *
  * Extracted rather than copied so the two never drift. It is pure markup with
  * no state, so the homepage renders it with no client directive at all — the
@@ -19,6 +21,7 @@ const typeConfig: Record<string, { icon: any; gradient: string }> = {
   'core-value': { icon: Heart, gradient: 'from-pink-500 to-rose-500' },
   'milestone': { icon: Medal, gradient: 'from-purple-500 to-violet-500' },
   'community': { icon: HandHeart, gradient: 'from-cyan-500 to-blue-500' },
+  'reminder': { icon: Bell, gradient: 'from-amber-500 to-yellow-500' },
   'default': { icon: Sparkles, gradient: 'from-slate-500 to-slate-600' },
 };
 
@@ -58,32 +61,39 @@ function matches(s: Story, word: string) {
   );
 }
 
+/**
+ * Splits stories into the two blocks. Spotlights have their own carousel on
+ * Culture, so they appear in neither. Shared with CultureContent.
+ */
+export function splitStories(stories: Story[]) {
+  const reminders = stories.filter((s) => matches(s, 'reminder'));
+  // Every win and recognition, newest first (stories arrive date-sorted):
+  // anniversaries and promotions come in batches and a cap silently hid them.
+  const winsAndRecognitions = stories.filter(
+    (s) => !matches(s, 'spotlight') && !matches(s, 'reminder'),
+  );
+  return { winsAndRecognitions, reminders };
+}
+
 interface TeamWinsRecognitionsProps {
   stories: Story[];
   winsHeadline?: string;
   winsDescription?: string;
-  recognitionsHeadline?: string;
-  recognitionsDescription?: string;
+  remindersHeadline?: string;
+  remindersDescription?: string;
   /** Homepage shows a link through to the full Culture page; Culture itself doesn't. */
   showViewAll?: boolean;
-  /** Caps Team Wins only; every recognition is always shown. */
-  limit?: number;
 }
 
 export function TeamWinsRecognitions({
   stories,
-  winsHeadline = 'Team Wins',
+  winsHeadline = 'Team Wins/Recent Recognitions',
   winsDescription = '',
-  recognitionsHeadline = 'Recent Recognitions',
-  recognitionsDescription = '',
+  remindersHeadline = 'Reminders',
+  remindersDescription = '',
   showViewAll = false,
-  limit = 3,
 }: TeamWinsRecognitionsProps) {
-  const wins = stories.filter((s) => matches(s, 'win'));
-  const recognitions = stories.filter((s) => matches(s, 'recognition'));
-  const others = stories.filter(
-    (s) => !matches(s, 'spotlight') && !matches(s, 'win') && !matches(s, 'recognition'),
-  );
+  const { winsAndRecognitions, reminders } = splitStories(stories);
 
   const blocks = [
     {
@@ -94,23 +104,21 @@ export function TeamWinsRecognitions({
       iconClass: 'text-emerald-400',
       hoverText: 'group-hover:text-emerald-400',
       hoverBorder: 'hover:border-emerald-500/30',
-      items: wins.slice(0, limit),
+      items: winsAndRecognitions,
       emptyIcon: Trophy,
-      emptyText: 'No team wins to display yet',
+      emptyText: 'No team wins or recognitions to display yet',
     },
     {
-      key: 'recognitions',
-      headline: recognitionsHeadline,
-      description: recognitionsDescription,
-      Icon: Award,
-      iconClass: 'text-blue-400',
-      hoverText: 'group-hover:text-blue-400',
-      hoverBorder: 'hover:border-blue-500/30',
-      // Every recognition, not the first three — same as the Culture page:
-      // promotions and work anniversaries arrive in batches.
-      items: [...recognitions, ...others],
-      emptyIcon: Award,
-      emptyText: 'No recognitions to display yet',
+      key: 'reminders',
+      headline: remindersHeadline,
+      description: remindersDescription,
+      Icon: Bell,
+      iconClass: 'text-amber-400',
+      hoverText: 'group-hover:text-amber-400',
+      hoverBorder: 'hover:border-amber-500/30',
+      items: reminders,
+      emptyIcon: Bell,
+      emptyText: 'No reminders right now',
     },
   ];
 

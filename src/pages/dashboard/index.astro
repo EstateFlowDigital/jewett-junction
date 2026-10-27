@@ -38,7 +38,7 @@ try {
     getEvents({ limit: 6, upcoming: true }),
     getJobPostings({ limit: 25 }),
     // No limit: with one, Webflow returns a page in its own order and only that
-    // page is date-sorted, so "Recent Recognitions" could skip the newest ones.
+    // page is date-sorted, so the Culture blocks could skip the newest ones.
     getCultureStories(),
     getHRContent({ limit: 3, featured: true }),
     getSafetyContent({ limit: 3, featured: true }),
@@ -358,15 +358,15 @@ const bannerLoop = hasBannerMessages ? [...bannerMessages, ...bannerMessages] : 
           </a>
         ) : null}
 
-        <!-- Team Wins & Recent Recognitions — mirrors the Culture page so the
+        <!-- Team Wins/Recent Recognitions and Reminders — mirrors the Culture page so the
              two never drift; rendered server-side with no client directive. -->
         <div class="mb-10">
           <TeamWinsRecognitions
             stories={cultureStories}
-            winsHeadline={cultureCopy?.['subsection-1-headline'] || 'Team Wins'}
+            winsHeadline={cultureCopy?.['subsection-1-headline'] || 'Team Wins/Recent Recognitions'}
             winsDescription={cultureCopy?.['subsection-1-description'] || ''}
-            recognitionsHeadline={cultureCopy?.['subsection-2-headline'] || 'Recent Recognitions'}
-            recognitionsDescription={cultureCopy?.['subsection-2-description'] || ''}
+            remindersHeadline={cultureCopy?.['subsection-2-headline'] || 'Reminders'}
+            remindersDescription={cultureCopy?.['subsection-2-description'] || ''}
             showViewAll={true}
           />
         </div>

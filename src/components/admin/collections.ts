@@ -128,7 +128,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
     fields: [
       // Basics
       { key: 'name', label: 'Title', type: 'text', required: true, placeholder: 'e.g., Employee Spotlight: John Smith', icon: 'Star', group: 'Basics' },
-      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact'], helpText: 'Controls placement on the Culture page: Employee Spotlight → Spotlight carousel; Team Win → Team Wins; everything else (Recognition, Milestone, Community Impact, Core Value) → Recent Recognitions.', icon: 'Tag', group: 'Basics' },
+      { key: 'story-type', label: 'Story Type', type: 'select', options: ['Employee Spotlight', 'Team Win', 'Recognition', 'Core Value', 'Milestone', 'Community Impact', 'Reminder'], helpText: 'Controls placement on the Culture page and homepage: Employee Spotlight → Spotlight carousel; Reminder → Reminders; everything else (Team Win, Recognition, Milestone, Community Impact, Core Value) → Team Wins/Recent Recognitions.', icon: 'Tag', group: 'Basics' },
       { key: 'excerpt', label: 'Short Preview', type: 'textarea', placeholder: 'Brief preview text (2-3 sentences)', helpText: 'Shows on dashboard cards', group: 'Basics' },
       { key: 'content', label: 'Full Story', type: 'richtext', placeholder: 'Tell the story...', group: 'Basics' },
 
@@ -143,7 +143,7 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'quote', label: 'Featured Quote', type: 'textarea', placeholder: 'A memorable quote from the person', icon: 'FileText', group: 'Featured Person' },
 
       // Publishing
-      { key: 'author', label: 'Nominated By / Written By', type: 'text', placeholder: 'e.g., Jane Smith', helpText: 'On Employee Spotlights this shows as "Nominated by <name>". On Team Wins and Recognitions it shows as the attribution line "— <name>".', icon: 'Users', group: 'Publishing' },
+      { key: 'author', label: 'Nominated By / Written By', type: 'text', placeholder: 'e.g., Jane Smith', helpText: 'On Employee Spotlights this shows as "Nominated by <name>". On Team Wins/Recent Recognitions and Reminders it shows as the attribution line "— <name>".', icon: 'Users', group: 'Publishing' },
       { key: 'published-date', label: 'Published Date', type: 'datetime', helpText: 'Sort order on the Culture page is newest first by this date.', icon: 'Calendar', group: 'Publishing' },
       { key: 'featured', label: 'Featured Story', type: 'boolean', helpText: 'Show on the dashboard Culture Corner', group: 'Publishing' },
     ]
@@ -785,9 +785,9 @@ export const COLLECTIONS: Record<string, CollectionConfig> = {
       { key: 'section-headline', label: 'Section Headline', type: 'text', placeholder: 'Why Jewett Construction?', helpText: 'Optional second headline lower on the page', icon: 'Type' },
       { key: 'section-body', label: 'Section Body', type: 'richtext', placeholder: 'Body copy for the secondary section...', helpText: 'Rich-text body for the second content block' },
       { key: 'application-description', label: 'Form / Application Description', type: 'textarea', placeholder: 'Fill out the form below to get started...', helpText: 'Optional callout shown above forms on pages like Careers or Signage' },
-      { key: 'subsection-1-headline', label: 'Subsection 1 Headline', type: 'text', placeholder: 'e.g., Benefits Overview', helpText: 'First main subsection title on the page (HR: Benefits Overview · Safety: Safety Alerts & Updates · IT: Common Issues & Quick Fixes · Culture: Team Wins). Leave blank to use the page default.', icon: 'Type' },
+      { key: 'subsection-1-headline', label: 'Subsection 1 Headline', type: 'text', placeholder: 'e.g., Benefits Overview', helpText: 'First main subsection title on the page (HR: Benefits Overview · Safety: Safety Alerts & Updates · IT: Common Issues & Quick Fixes · Culture: Team Wins/Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
       { key: 'subsection-1-description', label: 'Subsection 1 Description', type: 'text', placeholder: 'Your comprehensive benefits package', helpText: 'One-line description under the first subsection headline. Leave blank to hide.' },
-      { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Safety Training · IT: My Recent Tickets · Culture: Recent Recognitions). Leave blank to use the page default.', icon: 'Type' },
+      { key: 'subsection-2-headline', label: 'Subsection 2 Headline', type: 'text', placeholder: 'e.g., Forms & Documents', helpText: 'Second main subsection title on the page (HR: Forms & Documents · Safety: Safety Training · IT: My Recent Tickets · Culture: Reminders). Leave blank to use the page default.', icon: 'Type' },
       { key: 'subsection-2-description', label: 'Subsection 2 Description', type: 'text', placeholder: 'Commonly used HR forms', helpText: 'One-line description under the second subsection headline. Leave blank to hide.' },
       // Generic content blocks — used by the Help page for Quick Start /
       // Navigation / Search Tips / Getting Help. Available for any page that

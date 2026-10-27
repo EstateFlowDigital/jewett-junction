@@ -2,7 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { QuickActionCards, type QuickAction } from './QuickActionCards';
 import { SubmissionBoxes } from '../shared/SubmissionBoxes';
-import { storyPreview } from '../shared/TeamWinsRecognitions';
+import { storyPreview, splitStories } from '../shared/TeamWinsRecognitions';
 import { DogsOfJewett, type Dog } from './DogsOfJewett';
 import {
   Heart,
@@ -25,7 +25,8 @@ import {
   Gift,
   Medal,
   Zap,
-  PartyPopper
+  PartyPopper,
+  Bell
 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -72,10 +73,10 @@ interface CMSCoreValue {
 interface CulturePageCopy {
   'hero-headline'?: string;
   'hero-subtitle'?: string;
-  /** Title for the Team Wins block. */
+  /** Title for the Team Wins/Recent Recognitions block. */
   'subsection-1-headline'?: string;
   'subsection-1-description'?: string;
-  /** Title for the Recent Recognitions block. */
+  /** Title for the Reminders block. */
   'subsection-2-headline'?: string;
   'subsection-2-description'?: string;
   /** Page-section headings (Our Core Values, Community Impact). */
@@ -130,6 +131,7 @@ const typeConfig: Record<string, { icon: any; color: string; gradient: string; l
   'core-value': { icon: Heart, color: 'pink', gradient: 'from-pink-500 to-rose-500', label: 'Core Value' },
   'milestone': { icon: Medal, color: 'purple', gradient: 'from-purple-500 to-violet-500', label: 'Milestone' },
   'community': { icon: HandHeart, color: 'cyan', gradient: 'from-cyan-500 to-blue-500', label: 'Community Impact' },
+  'reminder': { icon: Bell, color: 'amber', gradient: 'from-amber-500 to-yellow-500', label: 'Reminder' },
   'default': { icon: Sparkles, color: 'slate', gradient: 'from-slate-500 to-slate-600', label: 'Culture Story' },
 };
 
@@ -140,10 +142,10 @@ function getTypeConfig(type: string | undefined) {
 }
 
 export function CultureContent({ theme = 'dark', stories: cmsStories = [], settings = {}, coreValues: cmsCoreValues = [], pageCopy = null, quickActions = [], dogs = [] }: CultureContentProps) {
-  const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || '';
+  const teamWinsHeadline = pageCopy?.['subsection-1-headline'] || 'Team Wins/Recent Recognitions';
   const teamWinsDescription = pageCopy?.['subsection-1-description'] || '';
-  const recognitionsHeadline = pageCopy?.['subsection-2-headline'] || '';
-  const recognitionsDescription = pageCopy?.['subsection-2-description'] || '';
+  const remindersHeadline = pageCopy?.['subsection-2-headline'] || 'Reminders';
+  const remindersDescription = pageCopy?.['subsection-2-description'] || '';
   // Section heading (Our Core Values) is CMS-editable too.
   const coreValuesHeadline = pageCopy?.['content-block-1-title'] || '';
   // Use CMS stories directly - no hardcoded fallback
@@ -168,20 +170,7 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
   const spotlightStories = allStories.filter(s =>
     s.type?.toLowerCase().includes('spotlight') || s.category?.toLowerCase().includes('spotlight')
   );
-  const winStories = allStories.filter(s =>
-    s.type?.toLowerCase().includes('win') || s.category?.toLowerCase().includes('win')
-  );
-  const recognitionStories = allStories.filter(s =>
-    s.type?.toLowerCase().includes('recognition') || s.category?.toLowerCase().includes('recognition')
-  );
-  const otherStories = allStories.filter(s =>
-    !s.type?.toLowerCase().includes('spotlight') &&
-    !s.type?.toLowerCase().includes('win') &&
-    !s.type?.toLowerCase().includes('recognition') &&
-    !s.category?.toLowerCase().includes('spotlight') &&
-    !s.category?.toLowerCase().includes('win') &&
-    !s.category?.toLowerCase().includes('recognition')
-  );
+  const { winsAndRecognitions, reminders: reminderStories } = splitStories(allStories);
 
   // Get current spotlight
   const currentSpotlight = spotlightStories[spotlightIndex] || spotlightStories[0];
@@ -256,9 +245,9 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
           marketing's request, matching the change already made on the homepage. */}
       <SubmissionBoxes actions={quickActions.filter((a) => !!a.description)} />
 
-      {/* Stories Grid - Team Wins & Recognitions */}
+      {/* Stories Grid - Team Wins/Recent Recognitions & Reminders */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Team Wins */}
+        {/* Team Wins/Recent Recognitions */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
@@ -270,7 +259,9 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
             )}
           </CardHeader>
           <CardContent className="space-y-4">
-            {(winStories.length > 0 ? winStories : allStories.filter(s => s.type?.toLowerCase().includes('win'))).slice(0, 3).map((story) => {
+            {/* Every win and recognition, not the first three: promotions and
+                work anniversaries arrive in batches, and a cap silently hid them. */}
+            {winsAndRecognitions.map((story) => {
               const config = getTypeConfig(story.type);
               return (
                 <a
@@ -298,44 +289,42 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                 </a>
               );
             })}
-            {winStories.length === 0 && (
+            {winsAndRecognitions.length === 0 && (
               <div className="text-center py-6">
                 <Trophy className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500">No team wins to display yet</p>
+                <p className="text-slate-500">No team wins or recognitions to display yet</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Recognitions */}
+        {/* Reminders */}
         <Card className="bg-slate-800/50 border-slate-700">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <Award className="h-5 w-5 text-blue-400" />
-              {recognitionsHeadline}
+              <Bell className="h-5 w-5 text-amber-400" />
+              {remindersHeadline}
             </CardTitle>
-            {recognitionsDescription && (
-              <CardDescription className="text-slate-400">{recognitionsDescription}</CardDescription>
+            {remindersDescription && (
+              <CardDescription className="text-slate-400">{remindersDescription}</CardDescription>
             )}
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Every recognition, not the first three: promotions and work
-                anniversaries arrive in batches, and a cap silently hid them. */}
-            {[...recognitionStories, ...otherStories].map((story) => {
+            {reminderStories.map((story) => {
               const config = getTypeConfig(story.type);
               return (
                 <a
                   key={story.id}
                   href={`/jewett-junction/culture/${story.slug || story.id}`}
-                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-blue-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
-                  aria-label={`Read recognition: ${story.name}`}
+                  className="block p-4 rounded-xl bg-slate-900/50 border border-slate-700 hover:border-amber-500/30 hover:bg-slate-900/70 transition-colors group min-h-[44px]"
+                  aria-label={`Read reminder: ${story.name}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} flex items-center justify-center flex-shrink-0`}>
                       <config.icon className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors mb-1">
+                      <h4 className="font-semibold text-white group-hover:text-amber-400 transition-colors mb-1">
                         {story.name}
                       </h4>
                       <p className="text-sm text-slate-400 line-clamp-3">
@@ -349,10 +338,10 @@ export function CultureContent({ theme = 'dark', stories: cmsStories = [], setti
                 </a>
               );
             })}
-            {recognitionStories.length === 0 && otherStories.length === 0 && (
+            {reminderStories.length === 0 && (
               <div className="text-center py-6">
-                <Award className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-500">No recognitions to display yet</p>
+                <Bell className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-500">No reminders right now</p>
               </div>
             )}
           </CardContent>
