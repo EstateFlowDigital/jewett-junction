@@ -1,0 +1,131 @@
+---
+// Stacki design kit: the page every design in src/designs is drawn on.
+//
+// It loads the site's own stylesheets and <head>, so a design uses exactly
+// this site's variables, fonts and components. Designs are not routes — they
+// never ship with the site; Stacki serves them to its canvas and exports them.
+import '../../generated/fonts.css';
+import '../../generated/webflow.css';
+import '../site-components/global.css';
+import '../styles/global.css';
+
+interface Props {
+  /** Width of one frame, in px (print sizes are 96px to the inch). */
+  width: number;
+  /** Height of one frame, in px. */
+  height: number;
+  /**
+   * How the frames sit together.
+   *
+   * - `single` — one frame (default)
+   * - `carousel` — side by side as one strip, cut into slides on export, so
+   *   artwork can run across a cut
+   * - `pages` — separate pages, exported together as a PDF
+   */
+  mode?: "single" | "carousel" | "pages";
+  /** The Stacki Hub format this was made for, such as `ig-carousel`. */
+  format?: string;
+  /** The design's name, used for exported files. */
+  name?: string;
+  /** Colors every frame that doesn't set its own theme. */
+  theme?: "inherit" | "light" | "dark" | "brand";
+  /** The Stacki Hub folder it is filed in (kept here so the filing travels with the file). */
+  folder?: string;
+}
+
+const { width, height, mode = "single", format, name = "Design", theme = "inherit" } = Astro.props;
+const page = `@page { size: ${width}px ${height}px; margin: 0; }`;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  class:list={["stacki-design", theme !== "inherit" && `theme-${theme}`]}
+  data-design-mode={mode}
+  data-design-format={format}
+  style={`--design-width: ${width}px; --design-height: ${height}px;`}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    {/* Root-relative /favicon.png 404s in production: the app is mounted at
+    /jewett-junction, so the icon has to be requested under that prefix. */}
+    <link rel="icon" type="image/png" href="/jewett-junction/favicon.png" />
+    <link rel="apple-touch-icon" href="/jewett-junction/favicon.png" />
+    <title>{name}</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <Fragment set:html={`<style>${page}</style>`} />
+    <script is:inline>
+(() => {
+  const root = document.documentElement;
+  const mine = new Set();
+  const pin = () => {
+    for (const name of mine) root.style.removeProperty(name);
+    mine.clear();
+    const names = new Set();
+    const visit = (rules) => {
+      for (const rule of rules) {
+        if (rule.style) for (const prop of rule.style) if (prop.startsWith('--') && /vw\b/.test(rule.style.getPropertyValue(prop))) names.add(prop);
+        if (rule.cssRules) visit(rule.cssRules);
+      }
+    };
+    for (const sheet of document.styleSheets) { try { visit(sheet.cssRules); } catch {} }
+    const computed = getComputedStyle(root);
+    for (const name of names) {
+      if (name === '--design-width' || name === '--design-height') continue;
+      const value = computed.getPropertyValue(name);
+      if (!/vw\b/.test(value)) continue;
+      root.style.setProperty(name, value.replace(/(-?\d*\.?\d+)vw\b/g, 'calc($1 * var(--design-width) / 100)'));
+      mine.add(name);
+    }
+  };
+  pin();
+  let timer = 0;
+  new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(pin, 30); })
+    .observe(document.head, { childList: true, subtree: true, characterData: true });
+  window.addEventListener('load', pin);
+})();
+    </script>
+  </head>
+  <body class="design-body">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  html.stacki-design,
+  html.stacki-design body {
+    margin: 0;
+    padding: 0;
+    width: max-content;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+  /* Explicit about everything: a site's own body rules (Lumos stacks body
+     children in a column) must not rearrange the frames. */
+  html.stacki-design .design-body {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  html.stacki-design[data-design-mode="pages"] .design-body {
+    flex-direction: column;
+  }
+  @media print {
+    html.stacki-design .design-body {
+      display: block;
+    }
+    html.stacki-design .design-frame {
+      break-after: page;
+    }
+    html.stacki-design .design-frame:last-child {
+      break-after: auto;
+    }
+  }
+</style>

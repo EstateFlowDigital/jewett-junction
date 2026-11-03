@@ -31,19 +31,25 @@ const getImageUrl = (img: any) => {
         <ArrowLeft className="h-5 w-5" />
       </a>
       <div>
-        {heroHeadline && (
-          <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
-            <Image className="h-7 w-7 text-purple-500" />
-            {heroHeadline}
-          </h1>
-        )}
-        {heroSubtitle && <p class="text-slate-400 mt-1">{heroSubtitle}</p>}
+        {
+          heroHeadline && (
+            <h1 class="text-2xl font-bold tracking-tight flex items-center gap-3 text-white">
+              <Image className="h-7 w-7 text-purple-500" />
+              {heroHeadline}
+            </h1>
+          )
+        }
+        {
+          heroSubtitle && (
+            <p class="text-slate-400 mt-1">{heroSubtitle}</p>
+          )
+        }
       </div>
     </div>
 
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-white">Photos & Videos</CardTitle>
+        <CardTitle className="text-white">Photos &amp; Videos</CardTitle>
         <CardDescription className="text-slate-400">
           {photos.length > 0
             ? `${photos.length} item${photos.length > 1 ? 's' : ''} available`
@@ -51,46 +57,48 @@ const getImageUrl = (img: any) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {photos.length > 0 ? (
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {photos.map((photo) => {
-              const imageUrl = getImageUrl(photo.thumbnail) || getImageUrl(photo['preview-image']);
-              const downloadUrl = photo['download-link'];
-              return (
-                <a
-                  href={`/jewett-junction/marketing/${photo.slug || photo.id}`}
-                  class="group relative aspect-square bg-slate-700 rounded-lg overflow-hidden block"
-                >
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={photo.name}
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-600 to-slate-800">
-                      <Image className="h-8 w-8 text-slate-500" />
-                    </div>
-                  )}
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                    <p class="text-white text-sm font-medium">{photo.name}</p>
-                    {downloadUrl && (
-                      <span class="text-purple-300 flex items-center gap-1 text-xs mt-1">
-                        <Download className="h-3 w-3" /> Available to download
-                      </span>
+        {
+          photos.length > 0 ? (
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {photos.map((photo) => {
+                const imageUrl = getImageUrl(photo.thumbnail) || getImageUrl(photo['preview-image']);
+                const downloadUrl = photo['download-link'];
+                return (
+                  <a
+                    href={`/jewett-junction/marketing/${photo.slug || photo.id}`}
+                    class="group relative aspect-square bg-slate-700 rounded-lg overflow-hidden block"
+                  >
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={photo.name}
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-600 to-slate-800">
+                        <Image className="h-8 w-8 text-slate-500" />
+                      </div>
                     )}
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        ) : (
-          <div class="text-center py-12 text-slate-400">
-            <Image className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p class="text-sm">No photos uploaded yet — check back soon.</p>
-          </div>
-        )}
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                      <p class="text-white text-sm font-medium">{photo.name}</p>
+                      {downloadUrl && (
+                        <span class="text-purple-300 flex items-center gap-1 text-xs mt-1">
+                          <Download className="h-3 w-3" /> Available to download
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          ) : (
+            <div class="text-center py-12 text-slate-400">
+              <Image className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p class="text-sm">No photos uploaded yet — check back soon.</p>
+            </div>
+          )
+        }
       </CardContent>
     </Card>
   </div>

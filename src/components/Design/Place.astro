@@ -1,0 +1,42 @@
+---
+// Stacki design kit: puts what it wraps at an exact spot in its Frame, the way
+// artwork is placed in Canva. Stacki writes one when something is dragged
+// on the design canvas; x, y and width are in the frame's own pixels.
+interface Props {
+  /** Distance from the frame's left edge, in px. */
+  x: number;
+  /** Distance from the frame's top edge, in px. */
+  y: number;
+  /** Width, in px. Unset, it is as wide as its content. */
+  width?: number;
+  /** Turn, in degrees. */
+  rotate?: number;
+  /** Stacking: higher sits on top. */
+  layer?: number;
+}
+
+const { x, y, width, rotate, layer } = Astro.props;
+const style = [
+  `left: ${x}px`,
+  `top: ${y}px`,
+  width !== undefined && `width: ${width}px`,
+  rotate ? `transform: rotate(${rotate}deg)` : null,
+  layer !== undefined && `z-index: ${layer}`,
+]
+  .filter(Boolean)
+  .join("; ");
+---
+
+<div class="design-place" style={style}>
+  <slot />
+</div>
+
+<style>
+  @layer components {
+    .design-place {
+      position: absolute;
+      box-sizing: border-box;
+      transform-origin: center;
+    }
+  }
+</style>

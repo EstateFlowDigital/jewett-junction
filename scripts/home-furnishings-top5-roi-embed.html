@@ -1,0 +1,102 @@
+<!--
+  Home Furnishings landing page (jewettconstruction.com/marketing/…), Webflow Embed
+  placed directly after the Featured Projects section (portfolio_wrap).
+  Lives in the Webflow Designer, not in this app; kept here so it is versioned.
+  Email 2 button link: https://www.jewettconstruction.com/marketing/<page-slug>#top-5-roi
+-->
+<section id="top-5-roi" class="roi-list_wrap u-width-full">
+  <div class="roi-list_contain u-container">
+    <div class="roi-list_intro">
+      <h2 class="u-text-h2">Top 5 Ways a Redesigned Warehouse Improves ROI for Furniture Retailers</h2>
+      <p class="roi-list_subhead">Your showroom brings the sale in. Your warehouse decides whether you keep the margin.</p>
+      <p>Furniture is one of the hardest categories to move. It's heavy, bulky, fragile, and often custom-ordered, so every inefficiency in your back of house shows up on the P&amp;L. Here are the five places a well-designed warehouse earns its keep.</p>
+    </div>
+
+    <div class="roi-list_items">
+      <details class="roi-list_item">
+        <summary class="roi-list_summary"><h3 class="u-text-h5">1. Fewer damaged goods and returns</h3><span class="roi-list_icon" aria-hidden="true"></span></summary>
+        <div class="roi-list_body">
+          <p>Every time a piece is handled, it risks damage. Cramped aisles, floor stacking, and poor staging force extra moves and create tight spots where cartons get crushed and legs get snapped.</p>
+          <ul>
+            <li><strong>What a redesign changes:</strong> Wider aisles, dedicated staging zones, protected racking, and a clear one-way flow from receiving to shipping mean fewer touches per piece.</li>
+            <li><strong>The ROI:</strong> Lower damage write-offs, fewer redeliveries, less time spent on claims, and better reviews.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="roi-list_item">
+        <summary class="roi-list_summary"><h3 class="u-text-h5">2. Faster receiving at the dock</h3><span class="roi-list_icon" aria-hidden="true"></span></summary>
+        <div class="roi-list_body">
+          <p>When containers and trucks stack up because you only have two doors, or no dock levelers, your crew spends hours unloading by hand while carriers charge detention fees.</p>
+          <ul>
+            <li><strong>What a redesign changes:</strong> More dock doors sized to your volume, dock levelers and seals, drive-in doors for box trucks, and receiving space near the doors.</li>
+            <li><strong>The ROI:</strong> Shorter unload times, fewer detention charges, and inventory that's available to sell sooner.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="roi-list_item">
+        <summary class="roi-list_summary"><h3 class="u-text-h5">3. More storage in the same footprint</h3><span class="roi-list_icon" aria-hidden="true"></span></summary>
+        <div class="roi-list_body">
+          <p>If your ceilings are low, you're paying for square footage you can't use. Many older buildings have clear heights that rule out modern racking, so product sprawls across the floor.</p>
+          <ul>
+            <li><strong>What a redesign changes:</strong> Higher clear heights and furniture-specific racking (cantilever, pallet, and deep-bay) let you store vertically and consolidate.</li>
+            <li><strong>The ROI:</strong> More SKUs on hand without leasing overflow space, fewer lost pieces, and faster order fulfillment.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="roi-list_item">
+        <summary class="roi-list_summary"><h3 class="u-text-h5">4. Lower labor cost per delivery</h3><span class="roi-list_icon" aria-hidden="true"></span></summary>
+        <div class="roi-list_body">
+          <p>Labor is usually the largest controllable cost in the warehouse. When your team walks long distances, searches for product, or rearranges stacks to reach an order, you're paying for motion rather than output.</p>
+          <ul>
+            <li><strong>What a redesign changes:</strong> A layout built around your pick-and-prep process, including logical slotting, a staging area for next-day routes, a dedicated prep and touch-up area, and room for material handling equipment.</li>
+            <li><strong>The ROI:</strong> More deliveries prepped per shift, less overtime, and crews that are easier to train and keep.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="roi-list_item">
+        <summary class="roi-list_summary"><h3 class="u-text-h5">5. A better delivery experience, and more repeat business</h3><span class="roi-list_icon" aria-hidden="true"></span></summary>
+        <div class="roi-list_body">
+          <p>Late or damaged deliveries are among the most common complaints in furniture retail, and they're the last thing a customer remembers about you. A warehouse that runs smoothly makes on-time, damage-free, white-glove delivery the norm.</p>
+          <ul>
+            <li><strong>What a redesign changes:</strong> Everything above, plus room for clean inspection before loading, secure customer-pickup areas, and space to expand delivery capacity as you grow.</li>
+            <li><strong>The ROI:</strong> More five-star reviews, more referrals, and more repeat purchases, which cost far less to win than new customers.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <div class="roi-list_outro">
+      <h3 class="u-text-h5">The bottom line</h3>
+      <p>A warehouse redesign isn't just a building project. It's an operations upgrade that affects damage rates, labor, inventory, and customer loyalty all at once.</p>
+      <p><strong>Ready to find out what your warehouse is costing you?</strong> Contact us for a free Warehouse Assessment.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Top 5 ROI listicle. #top-5-roi is the anchor for the Email 2 button;
+     scroll-margin keeps the heading clear of the fixed navbar. */
+  .roi-list_wrap { scroll-margin-top: 6rem; }
+  .roi-list_contain { padding-top: 5rem; padding-bottom: 5rem; }
+  .roi-list_intro { max-width: 52rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem; }
+  .roi-list_intro p, .roi-list_body p, .roi-list_outro p { margin: 0; }
+  .roi-list_subhead { font-size: 1.25em; font-weight: 700; }
+  .roi-list_items { border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent); }
+  .roi-list_item { border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); }
+  .roi-list_summary { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.25rem 0; cursor: pointer; list-style: none; }
+  .roi-list_summary::-webkit-details-marker { display: none; }
+  .roi-list_summary h3 { margin: 0; }
+  .roi-list_icon { position: relative; flex: none; width: 1.25rem; height: 1.25rem; }
+  .roi-list_icon::before, .roi-list_icon::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: currentColor; transition: transform .2s ease; }
+  .roi-list_icon::after { transform: rotate(90deg); }
+  .roi-list_item[open] .roi-list_icon::after { transform: rotate(0deg); }
+  .roi-list_summary:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  .roi-list_body { max-width: 52rem; display: flex; flex-direction: column; gap: 1rem; padding-bottom: 1.5rem; }
+  .roi-list_body ul { margin: 0; padding-left: 1.25em; list-style: disc; display: flex; flex-direction: column; gap: .5rem; }
+  .roi-list_outro { max-width: 52rem; display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
+  @media (prefers-reduced-motion: reduce) { .roi-list_icon::before, .roi-list_icon::after { transition: none; } }
+</style>

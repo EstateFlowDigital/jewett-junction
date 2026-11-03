@@ -1,0 +1,110 @@
+---
+// Stacki design kit: one slide, page or post of a design.
+import type { ImageMetadata } from "astro";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"section"> {
+  /** Colors this frame and everything in it. */
+  theme?: "inherit" | "light" | "dark" | "brand";
+  /**
+   * How many slides this frame covers, for artwork that runs across the cut
+   * between carousel slides. Defaults to 1.
+   */
+  span?: number;
+  /** Space inside the frame's edges. Defaults to `medium`. */
+  padding?: "none" | "small" | "medium" | "large";
+  /**
+   * Where the content sits, top to bottom.
+   *
+   * - `start` — at the top (default)
+   * - `center` — in the middle
+   * - `end` — at the bottom
+   * - `between` — first child at the top, last at the bottom
+   */
+  justify?: "start" | "center" | "end" | "between";
+  /** Where the content sits, side to side. Defaults to `start`. */
+  align?: "start" | "center" | "end" | "stretch";
+  /** Space between the frame's children, from the spacing scale. Defaults to `5`. */
+  gap?: "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8";
+  /** An image that fills the frame, behind the content: a URL or an imported image. */
+  backgroundImage?: string | ImageMetadata;
+  /** How visible the background image is, as a percentage. Defaults to 100. */
+  backgroundOpacity?: number;
+  /** Which part of the image stays in view when it is cropped, e.g. `center`, `top`, `30% 70%`. */
+  backgroundPosition?: string;
+}
+
+const {
+  theme = "inherit",
+  span = 1,
+  padding = "medium",
+  justify = "start",
+  align = "start",
+  gap = "5",
+  backgroundImage,
+  backgroundOpacity = 100,
+  backgroundPosition = "center",
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+const background = typeof backgroundImage === "string" ? backgroundImage : backgroundImage?.src;
+---
+
+<section
+  class:list={["design-frame", theme !== "inherit" && `theme-${theme}`, className]}
+  data-padding={padding}
+  data-justify={justify}
+  data-align={align}
+  style={[`--design-span: ${Math.max(1, Math.round(span))}; --frame-gap: var(--space-${gap}, ${Number(gap) * 0.5}rem);`, style]
+    .filter(Boolean)
+    .join(" ")}
+  {...rest}
+>
+  {
+    background && (
+      <img class="design-frame-bg" src={background} alt="" style={`opacity: ${backgroundOpacity / 100}; object-position: ${backgroundPosition}`} />
+    )
+  }
+  <slot name="background" />
+  <slot />
+</section>
+
+<style>
+  /* In the components layer, so the site's utility classes still win. */
+  @layer components {
+    .design-frame {
+      position: relative;
+      isolation: isolate;
+      box-sizing: border-box;
+      flex: none;
+      width: calc(var(--design-width) * var(--design-span, 1));
+      height: var(--design-height);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: var(--frame-gap);
+      background-color: var(--background, #fff);
+      color: var(--text, inherit);
+      padding: var(--space-7, 4rem);
+    }
+    .design-frame[data-padding="none"] { padding: 0; }
+    .design-frame[data-padding="small"] { padding: var(--space-5, 2rem); }
+    .design-frame[data-padding="large"] { padding: var(--space-8, 6rem); }
+    .design-frame[data-justify="center"] { justify-content: center; }
+    .design-frame[data-justify="end"] { justify-content: flex-end; }
+    .design-frame[data-justify="between"] { justify-content: space-between; }
+    .design-frame[data-align="start"] { align-items: flex-start; }
+    .design-frame[data-align="center"] { align-items: center; text-align: center; }
+    .design-frame[data-align="end"] { align-items: flex-end; text-align: end; }
+    .design-frame-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+  }
+</style>

@@ -1,0 +1,53 @@
+---
+import DesignLayout from "../layouts/DesignLayout.astro";
+import Frame from "../components/Design/Frame.astro";
+import Place from "../components/Design/Place.astro";
+import { NAV_LOGO_URL } from "../lib/nav-items";
+
+const steps = [
+  "Clear leaves and debris",
+  "Check downspouts drain away",
+  "Look for sagging sections",
+  "Seal leaking joints",
+  "Book a yearly inspection",
+];
+---
+
+<DesignLayout name="YouTube thumbnail 9/30/2026" format="yt-thumb" width={1280} height={720} mode="single" folder="MantelMarketing">
+  <Frame padding="none" class="bg-[var(--brand-accent)] text-white">
+    {/* Jewett red, the logo's own colour, deepening toward the bottom. */}
+    <div slot="background" class="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-transparent to-[var(--brand-accent-hover)]"></div>
+
+    <Place x={56} y={48} width={250}>
+      <img src={NAV_LOGO_URL} alt="Jewett Construction" width="1136" height="224" class="block h-auto w-full" />
+    </Place>
+
+    {/* The owner's hard-hat mascot from the dashboard header, speech bubble
+        removed, pointing at the headline. */}
+    <Place x={36} y={170} width={452}>
+      <img src="/src/designs/assets/jewett-mascot-pointing.png" alt="Jewett mascot in a hard hat, pointing" width="396" height="523" class="block h-auto w-full" />
+    </Place>
+
+    <Place x={520} y={92} width={700}>
+      <div class="flex flex-col items-start">
+        <span class="rounded-md bg-slate-950 px-4 py-1.5 text-lg font-bold uppercase tracking-[0.18em]">Checklist</span>
+        <h2 class="mt-5 text-8xl leading-[0.92] font-bold tracking-tight text-balance">Before the rain season</h2>
+
+        <ul class="m-0 mt-10 flex list-none flex-col gap-3.5 p-0">
+          {
+            steps.map((step) => (
+              <li class="flex items-center gap-4">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-[3px] border-white" aria-hidden="true">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span class="text-3xl leading-tight font-semibold">{step}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Place>
+  </Frame>
+</DesignLayout>
