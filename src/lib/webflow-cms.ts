@@ -236,18 +236,10 @@ export async function getCollection<T = Record<string, unknown>>(
     };
   }
 
-  // Single-page path when caller passed an explicit limit
-  if (options.limit) {
-    const data = await fetchPage(options.limit, options.offset ?? 0);
-    return {
-      items: data.items
-        .filter(item => !item.isArchived && !item.isDraft)
-        .map(mapItem) as (T & { id: string })[],
-      total: data.pagination.total,
-    };
-  }
-
-  // Auto-paginate to fetch all items
+  // Auto-paginate to fetch all items. An explicit limit is applied only after
+  // drafts are dropped: Webflow pages include drafts, so taking the first N
+  // raw items let old drafts crowd out newer published ones (Featured
+  // Announcements showed 5 of 6 published, Nov 2026).
   const allRaw: WebflowItem[] = [];
   let offset = options.offset ?? 0;
   let total = 0;
@@ -259,9 +251,9 @@ export async function getCollection<T = Record<string, unknown>>(
     offset += WEBFLOW_MAX_PAGE;
   }
 
+  const published = allRaw.filter(item => !item.isArchived && !item.isDraft);
   return {
-    items: allRaw
-      .filter(item => !item.isArchived && !item.isDraft)
+    items: (options.limit ? published.slice(0, options.limit) : published)
       .map(mapItem) as (T & { id: string })[],
     total,
   };
@@ -778,13 +770,15 @@ export async function getEmployees(options?: { limit?: number; featured?: boolea
 
 export async function getAnnouncements(options?: { limit?: number; pinned?: boolean }) {
   if (!COLLECTIONS.announcements) return { items: [], total: 0 };
-  const result = await getCollection<Announcement>(COLLECTIONS.announcements, options);
+  // Fetch everything, sort, then apply the limit, so a pinned or newer
+  // announcement can't be cut before the sort sees it.
+  const result = await getCollection<Announcement>(COLLECTIONS.announcements);
   const sorted = result.items.sort((a, b) => {
     if (a['is-pinned'] && !b['is-pinned']) return -1;
     if (!a['is-pinned'] && b['is-pinned']) return 1;
     return new Date(b['published-date']).getTime() - new Date(a['published-date']).getTime();
   });
-  return { ...result, items: sorted };
+  return { ...result, items: options?.limit ? sorted.slice(0, options.limit) : sorted };
 }
 
 export async function getBannerMessages(options?: { limit?: number }) {
@@ -804,17 +798,16 @@ export async function getBannerMessages(options?: { limit?: number }) {
 
 export async function getEvents(options?: { limit?: number; upcoming?: boolean }) {
   if (!COLLECTIONS.events) return { items: [], total: 0 };
-  const result = await getCollection<Event>(COLLECTIONS.events, options);
   if (options?.upcoming) {
+    // Filter to upcoming before applying the limit, or past events use up the slots.
+    const result = await getCollection<Event>(COLLECTIONS.events);
     const now = new Date();
-    return {
-      ...result,
-      items: result.items
-        .filter(e => new Date(e['event-date']) >= now)
-        .sort((a, b) => new Date(a['event-date']).getTime() - new Date(b['event-date']).getTime()),
-    };
+    const upcoming = result.items
+      .filter(e => new Date(e['event-date']) >= now)
+      .sort((a, b) => new Date(a['event-date']).getTime() - new Date(b['event-date']).getTime());
+    return { ...result, items: options.limit ? upcoming.slice(0, options.limit) : upcoming };
   }
-  return result;
+  return getCollection<Event>(COLLECTIONS.events, options);
 }
 
 export async function getJobPostings(options?: { limit?: number }) {
