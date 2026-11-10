@@ -2,8 +2,28 @@
 // Stacki design kit: one slide, page or post of a design.
 import type { ImageMetadata } from "astro";
 import type { HTMLAttributes } from "astro/types";
+import { splitBox } from "@/utils/box.ts";
 
-interface Props extends HTMLAttributes<"section"> {
+// stacki-box:start (written by scripts/stacki-box.mjs; change it there)
+type StackiBox = {
+  /** Space inside this component, along the top edge. Overrides Padding for that side. */
+  paddingTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the bottom edge. Overrides Padding for that side. */
+  paddingBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the left edge. Overrides Padding for that side. */
+  paddingLeft?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space inside this component, along the right edge. Overrides Padding for that side. */
+  paddingRight?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, above it. Empty keeps the design's own spacing. */
+  marginTop?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** Space outside this component, below it. Empty keeps the design's own spacing. */
+  marginBottom?: "none" | "xsmall" | "small" | "medium" | "large" | "xlarge";
+  /** How wide this component can grow. Small keeps it to a readable width; Full fills its column. */
+  maxWidth?: "small" | "full" | "none";
+};
+// stacki-box:end
+
+interface Props extends StackiBox, HTMLAttributes<"section"> {
   /** Colors this frame and everything in it. */
   theme?: "inherit" | "light" | "dark" | "brand";
   /**
@@ -44,10 +64,13 @@ const {
   backgroundImage,
   backgroundOpacity = 100,
   backgroundPosition = "center",
-  class: className,
+  class: __ownClass,
   style,
-  ...rest
+  ...__restRaw
 } = Astro.props;
+const __box = splitBox(Astro.props, ["padding","theme"]);
+const rest = splitBox(__restRaw, ["padding","theme"]).props;
+const className = [__ownClass, __box.boxClass].filter(Boolean).join(" ") || undefined;
 const background = typeof backgroundImage === "string" ? backgroundImage : backgroundImage?.src;
 ---
 

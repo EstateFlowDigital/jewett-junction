@@ -16,7 +16,9 @@ const ROOT = "src/components";
 const START = "// stacki-box:start";
 
 /** Components with nothing on screen to style, each with its reason. */
-const EXEMPT = {};
+const EXEMPT = {
+  "Design/Place.astro": "positions artwork in a design; Stacki writes its x and y when dragged",
+};
 
 const files = [];
 (function walk(dir) {
