@@ -35,11 +35,16 @@ interface RuntimeEnv {
   MARKETING_INBOX_EMAIL?: string;
   RING_IT_IN_INBOX_EMAIL?: string;
   CANDY_JAR_INBOX_EMAIL?: string;
+  ELF_HUNT_INBOX_EMAIL?: string;
 }
 
 // Hailley asked for the candy jar guesses to go to her, Sarah and lpalmer. Used when
 // CANDY_JAR_INBOX_EMAIL isn't set, so the game works without a new env var.
 const CANDY_JAR_DEFAULT_INBOX = 'hholmes@jewettconstruction.com, sleblanc@jewettconstruction.com, lpalmer@jewettconstruction.com';
+
+// The elf hunt photos (Nov 30 to Dec 23) go to the same three people as the
+// candy jar unless ELF_HUNT_INBOX_EMAIL says otherwise.
+const ELF_HUNT_DEFAULT_INBOX = CANDY_JAR_DEFAULT_INBOX;
 
 function getEnv(locals: any): RuntimeEnv {
   const runtime = (locals as any)?.runtime?.env;
@@ -57,7 +62,8 @@ export type InboxKey =
   | 'builtwell'
   | 'marketing'
   | 'ringItIn'
-  | 'candyJar';
+  | 'candyJar'
+  | 'elfHunt';
 
 function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
   switch (key) {
@@ -74,6 +80,7 @@ function inboxAddress(env: RuntimeEnv, key: InboxKey): string | undefined {
     // BuiltWell ideas went unnoticed. Marketing announces the wins anyway.
     case 'ringItIn': return env.RING_IT_IN_INBOX_EMAIL || env.MARKETING_INBOX_EMAIL;
     case 'candyJar': return env.CANDY_JAR_INBOX_EMAIL || CANDY_JAR_DEFAULT_INBOX;
+    case 'elfHunt': return env.ELF_HUNT_INBOX_EMAIL || ELF_HUNT_DEFAULT_INBOX;
   }
 }
 

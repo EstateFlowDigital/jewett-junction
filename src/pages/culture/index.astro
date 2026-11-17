@@ -4,6 +4,7 @@ import ThemedPage from '../../layouts/themed-page.astro';
 import { CultureContent } from '../../components/pages/CultureContent';
 import { initCMS, getCultureStories, getSiteSettings, getCoreValues, getPageCopy, getQuickActions, getDogsOfJewett } from '../../lib/webflow-cms';
 import { candyJarStatus, CANDY_JAR_PATH } from '../../lib/candy-jar';
+import { elfHuntStatus, ELF_HUNT_PATH } from '../../lib/elf-hunt';
 
 // Initialize CMS with Cloudflare runtime context
 initCMS(Astro.locals);
@@ -28,11 +29,15 @@ try {
   settings = siteSettings;
   coreValues = coreValuesResult.items;
   pageCopy = copy;
-  // The Candy Jar box only shows while guessing is open (Oct 28–30), so its
-  // Quick Action can stay switched on without anyone flipping it on the day.
-  quickActions = quickActionsResult.items.filter(
-    (a: any) => !(a['destination-url'] || '').startsWith(CANDY_JAR_PATH) || candyJarStatus() === 'open',
-  );
+  // The Candy Jar and Elf Hunt boxes only show while each contest is open
+  // (candy jar Oct 28–30, elf hunt Nov 30–Dec 23), so their Quick Actions can
+  // stay switched on without anyone flipping them on the day.
+  quickActions = quickActionsResult.items.filter((a: any) => {
+    const url = a['destination-url'] || '';
+    if (url.startsWith(CANDY_JAR_PATH)) return candyJarStatus() === 'open';
+    if (url.startsWith(ELF_HUNT_PATH)) return elfHuntStatus() === 'open';
+    return true;
+  });
   dogs = dogsResult.items;
 } catch (error) {
   console.error('Error fetching culture data:', error);
