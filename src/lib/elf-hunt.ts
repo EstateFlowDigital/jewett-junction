@@ -6,9 +6,11 @@
 // directly under Node's type stripping.
 
 // Hailley's dates: the elf hides from Monday November 30 through Wednesday
-// December 23. The whole run is Eastern Standard Time (UTC-5), so the offsets
+// December 23. The form itself opens early because Hailley asked for it live
+// on Nov 24; anything sent before November 30 is filed under the week of
+// Nov 23, apart from the first contest week. The whole run is Eastern Standard Time (UTC-5), so the offsets
 // below and the week maths don't need daylight saving handling.
-export const ELF_HUNT_OPENS = '2026-11-30T00:00:00-05:00';
+export const ELF_HUNT_OPENS = '2026-11-25T00:00:00-05:00';
 export const ELF_HUNT_CLOSES = '2026-12-24T00:00:00-05:00';
 export const ELF_HUNT_PATH = '/jewett-junction/culture/elf-hunt';
 

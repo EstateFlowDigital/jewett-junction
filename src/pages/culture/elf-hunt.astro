@@ -11,9 +11,8 @@ import { elfHuntStatus } from '../../lib/elf-hunt';
 // the other form pages (marketing/submit-photo): back arrow, icon headline and
 // subtitle, then the form in a card. The words are Hailley's; a Page Copy
 // record "elf-hunt" (Hero Headline, Hero Subtitle) can replace the headline
-// and subtitle without a code change. The page can be opened before November
-// 30 so Hailley can link to it from her announcement, but the form only
-// appears while the hunt is open (lib/elf-hunt.ts).
+// and subtitle without a code change. The form only appears while it is
+// open (lib/elf-hunt.ts).
 
 initCMS(Astro.locals);
 
@@ -26,7 +25,7 @@ try {
 
 const status = elfHuntStatus();
 // Stacki previews the page on a local dev server, so the form shows there
-// whatever the date. The live site still waits for November 30.
+// whatever the date. The live site follows lib/elf-hunt.ts.
 const showForm = status === 'open' || import.meta.env.DEV;
 const heroHeadline = copy?.['hero-headline'] || 'Where’s the Elf? Jewett’s Holiday Hide & Seek!';
 const heroSubtitle = copy?.['hero-subtitle'] || 'Snap a photo of the elf and upload it below!';
